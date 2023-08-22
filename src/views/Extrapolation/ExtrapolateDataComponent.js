@@ -1814,7 +1814,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("ActualConsumptionList@@@@@@@@@@@@@", actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
-                    extrapolationNotes:extrapolationNotes,
+                    extrapolationNotes:(extrapolationNotes=="" || extrapolationNotes==undefined || extrapolationNotes==null)?"":extrapolationNotes,
                     startDate: startDate1,
                     stopDate: endDate1,
                     rangeValue1: rangeValue2,
@@ -1868,7 +1868,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -1884,7 +1885,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         dataEl: "",
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -2916,6 +2918,22 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     render() {
+        var height=60;
+        if (this.state.movingAvgId){
+            height += 55;
+        }
+        if (this.state.semiAvgId){
+            height += 55;
+        }
+        if (this.state.linearRegressionId){
+            height += 55;
+        }
+        if (this.state.smoothingId){
+            height += 55;
+        }
+        if (this.state.arimaId){
+            height += 55;
+        }
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -3590,9 +3608,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
 
-                                                    <div className="row col-md-12 pt-lg-2">
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
 
-                                                    <div className="col-md-3 px-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                    <div className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                         <Input
                                                             className="controls"
@@ -3661,7 +3679,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
                                                             </Popover>
                                                         </div>
-                                                        <div className="col-md-3 px-2">
+                                                        <div className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover60" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
@@ -3691,6 +3709,349 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)}>
                                                             <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
                                                         </Popover>
+                                                    </div>
+
+
+                                                    {/* <div className="row col-md-12 pt-lg-2" > */}
+                                                        
+                                                    <div className="pt-lg-2 col-md-12">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="smoothingId"
+                                                            name="smoothingId"
+                                                            checked={this.state.smoothingId}
+                                                            onClick={(e) => { this.setSmoothingId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                        
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover61" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="select"
+                                                                bsSize="sm"
+                                                                id="confidenceLevelId"
+                                                                name="confidenceLevelId"
+                                                                value={this.state.confidenceLevelId}
+                                                                valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
+                                                                invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelId(e) }}
+                                                            >
+                                                                <option value="0.85">85%</option>
+                                                                <option value="0.90">90%</option>
+                                                                <option value="0.95">95%</option>
+                                                                <option value="0.99">99%</option>
+                                                                <option value="0.995">99.5%</option>
+                                                                <option value="0.999">99.9%</option>
+                                                            </Input>
+                                                            <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
+                                                        </div>
+                                                        <div style={{ display: 'none' }}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3" style={{ display: 'none' }}>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                bsSize="sm"
+                                                                id="seasonalityId"
+                                                                name="seasonalityId"
+                                                                min={1}
+                                                                max={24}
+                                                                step={1}
+                                                                value={this.state.noOfMonthsForASeason}
+                                                                valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
+                                                                invalid={touched.seasonalityId && !!errors.seasonalityId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setSeasonals(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.seasonalityId}</FormFeedback>
+                                                        </div>
+                                                        {/* <div className="col-md-3">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="showAdvanceId"
+                                                            name="showAdvanceId"
+                                                            checked={this.state.showAdvanceId}
+                                                            onClick={(e) => { this.setShowAdvanceId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            Show Advance
+                                                        </Label>
+                                                        </div> */}
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="alphaId"
+                                                                bsSize="sm"
+                                                                name="alphaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.alpha}
+                                                                valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
+                                                                invalid={touched.alphaId && !!errors.alphaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setAlpha(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.alphaId}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenBeta} target="Popover9" trigger="hover" toggle={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="betaId"
+                                                                bsSize="sm"
+                                                                name="betaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.beta}
+                                                                valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
+                                                                invalid={touched.betaId && !!errors.betaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setBeta(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.betaId}</FormFeedback>
+                                                        </div>
+
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenGamma} target="Popover10" trigger="hover" toggle={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover10" onClick={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                bsSize="sm"
+                                                                id="gammaId"
+                                                                name="gammaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.gamma}
+                                                                valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
+                                                                invalid={touched.gammaId && !!errors.gammaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setGamma(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.gammaId}</FormFeedback>
+                                                        </div>
+                                                        </div>
+                                                        {/* <div className="col-md-2">
+                                                        <Label htmlFor="appendedInputButton">Phi</Label>
+                                                        <Input
+                                                            className="controls"
+                                                            type="text"
+                                                            id="phiId"
+                                                            name="phiId"
+                                                        />
+                                                    </div> */}
+                                                    {/* </div> */}
+                                                    <div className="row pl-lg-3">
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div className="pt-lg-2 col-md-7">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="arimaId"
+                                                            name="arimaId"
+                                                            checked={this.state.arimaId}
+                                                            onClick={(e) => { this.setArimaId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.arimaFull')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '9px' }}>
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="checkbox"
+                                                                id="seasonality"
+                                                                name="seasonality"
+                                                                // checked={true}
+                                                                checked={this.state.seasonality}
+                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                            </Label>
+                                                        </div>
+
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="select"
+                                                                bsSize="sm"
+                                                                id="confidenceLevelIdArima"
+                                                                name="confidenceLevelIdArima"
+                                                                value={this.state.confidenceLevelIdArima}
+                                                                valid={!errors.confidenceLevelIdArima && this.state.confidenceLevelIdArima != null ? this.state.confidenceLevelIdArima : '' != ''}
+                                                                invalid={touched.confidenceLevelIdArima && !!errors.confidenceLevelIdArima}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelIdArima(e) }}
+                                                            >
+                                                                <option value="0.85">85%</option>
+                                                                <option value="0.90">90%</option>
+                                                                <option value="0.95">95%</option>
+                                                                <option value="0.99">99%</option>
+                                                                <option value="0.995">99.5%</option>
+                                                                <option value="0.999">99.9%</option>
+                                                            </Input>
+                                                            <FormFeedback>{errors.confidenceLevelIdArima}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="pId"
+                                                                bsSize="sm"
+                                                                name="pId"
+                                                                value={this.state.p}
+                                                                valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
+                                                                invalid={touched.pId && !!errors.pId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setPId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.pId}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="dId"
+                                                                bsSize="sm"
+                                                                name="dId"
+                                                                value={this.state.d}
+                                                                valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
+                                                                invalid={touched.dId && !!errors.dId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setDId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.dId}</FormFeedback>
+
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="qId"
+                                                                bsSize="sm"
+                                                                name="qId"
+                                                                value={this.state.q}
+                                                                valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
+                                                                invalid={touched.qId && !!errors.qId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setQId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.qId}</FormFeedback>
+                                                        </div>
+                                                        
+                                                        {/* <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '30px' }}>
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="checkbox"
+                                                                id="seasonality"
+                                                                name="seasonality"
+                                                                // checked={true}
+                                                                checked={this.state.seasonality}
+                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                            </Label>
+                                                        </div> */}
+                                                       
+                                                    </div>
                                                     </div>
                                                     {/* <div className="pt-lg-2 col-md-12">
                                                         <Input
@@ -3853,9 +4214,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </div>
 
                                         <div className=" col-md-4 pt-lg-0">
+                                        <div className=" col-md-12 pt-lg-0" >
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
                                                             <Input
-                                                                style={{width: '100%', height: '143%'}}
+                                                                style={{height:height+"px"}}
                                                                 className="controls"
                                                                 bsSize="sm"
                                                                 type="textarea"
@@ -3865,372 +4227,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 onChange={(e) => { this.changeNotes(e.target.value) }}
                                                             ></Input>
                                         </div>
-
-                                        </div>
-
-
-
-                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
-                                                        
-                                                    <div className="pt-lg-2 col-md-12">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="smoothingId"
-                                                            name="smoothingId"
-                                                            checked={this.state.smoothingId}
-                                                            onClick={(e) => { this.setSmoothingId(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
-                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                        </Label>
-                                                    </div>
-                                                        
-                                                        
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover61" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                id="confidenceLevelId"
-                                                                name="confidenceLevelId"
-                                                                value={this.state.confidenceLevelId}
-                                                                valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
-                                                                invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelId(e) }}
-                                                            >
-                                                                <option value="0.85">85%</option>
-                                                                <option value="0.90">90%</option>
-                                                                <option value="0.95">95%</option>
-                                                                <option value="0.99">99%</option>
-                                                                <option value="0.995">99.5%</option>
-                                                                <option value="0.999">99.9%</option>
-                                                            </Input>
-                                                            <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
-                                                        </div>
-                                                        <div style={{ display: 'none' }}>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2" style={{ display: 'none' }}>
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                bsSize="sm"
-                                                                id="seasonalityId"
-                                                                name="seasonalityId"
-                                                                min={1}
-                                                                max={24}
-                                                                step={1}
-                                                                value={this.state.noOfMonthsForASeason}
-                                                                valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
-                                                                invalid={touched.seasonalityId && !!errors.seasonalityId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setSeasonals(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.seasonalityId}</FormFeedback>
-                                                        </div>
-                                                        {/* <div className="col-md-3">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="showAdvanceId"
-                                                            name="showAdvanceId"
-                                                            checked={this.state.showAdvanceId}
-                                                            onClick={(e) => { this.setShowAdvanceId(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            Show Advance
-                                                        </Label>
-                                                    </div> */}
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                id="alphaId"
-                                                                bsSize="sm"
-                                                                name="alphaId"
-                                                                min={0}
-                                                                max={1}
-                                                                step={0.1}
-                                                                value={this.state.alpha}
-                                                                valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
-                                                                invalid={touched.alphaId && !!errors.alphaId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setAlpha(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.alphaId}</FormFeedback>
-                                                        </div>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenBeta} target="Popover9" trigger="hover" toggle={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                id="betaId"
-                                                                bsSize="sm"
-                                                                name="betaId"
-                                                                min={0}
-                                                                max={1}
-                                                                step={0.1}
-                                                                value={this.state.beta}
-                                                                valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
-                                                                invalid={touched.betaId && !!errors.betaId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setBeta(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.betaId}</FormFeedback>
-                                                        </div>
-
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenGamma} target="Popover10" trigger="hover" toggle={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover10" onClick={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                bsSize="sm"
-                                                                id="gammaId"
-                                                                name="gammaId"
-                                                                min={0}
-                                                                max={1}
-                                                                step={0.1}
-                                                                value={this.state.gamma}
-                                                                valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
-                                                                invalid={touched.gammaId && !!errors.gammaId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setGamma(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.gammaId}</FormFeedback>
-                                                        </div>
-                                                        {/* <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">Phi</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="phiId"
-                                                            name="phiId"
-                                                        />
-                                                    </div> */}
-                                                    </div>
-
-
-
-
-
-                                        <div className="row pl-lg-3 pt-lg-3">
                                         <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                            <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
-                                                        </Popover>
-                                                    </div>
-                                                    <div className="pt-lg-2 col-md-4">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="arimaId"
-                                                            name="arimaId"
-                                                            checked={this.state.arimaId}
-                                                            onClick={(e) => { this.setArimaId(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                        </Label>
-                                                    </div>
-
-                                                    <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '9px' }}>
-                                                            <Input
-                                                                className="form-check-input checkboxMargin"
-                                                                type="checkbox"
-                                                                id="seasonality"
-                                                                name="seasonality"
-                                                                // checked={true}
-                                                                checked={this.state.seasonality}
-                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
-                                                            </Label>
-                                                        </div>
-
-                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                id="confidenceLevelIdArima"
-                                                                name="confidenceLevelIdArima"
-                                                                value={this.state.confidenceLevelIdArima}
-                                                                valid={!errors.confidenceLevelIdArima && this.state.confidenceLevelIdArima != null ? this.state.confidenceLevelIdArima : '' != ''}
-                                                                invalid={touched.confidenceLevelIdArima && !!errors.confidenceLevelIdArima}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelIdArima(e) }}
-                                                            >
-                                                                <option value="0.85">85%</option>
-                                                                <option value="0.90">90%</option>
-                                                                <option value="0.95">95%</option>
-                                                                <option value="0.99">99%</option>
-                                                                <option value="0.995">99.5%</option>
-                                                                <option value="0.999">99.9%</option>
-                                                            </Input>
-                                                            <FormFeedback>{errors.confidenceLevelIdArima}</FormFeedback>
-                                                        </div>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                id="pId"
-                                                                bsSize="sm"
-                                                                name="pId"
-                                                                value={this.state.p}
-                                                                valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
-                                                                invalid={touched.pId && !!errors.pId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setPId(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.pId}</FormFeedback>
-                                                        </div>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                id="dId"
-                                                                bsSize="sm"
-                                                                name="dId"
-                                                                value={this.state.d}
-                                                                valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
-                                                                invalid={touched.dId && !!errors.dId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setDId(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.dId}</FormFeedback>
-
-                                                        </div>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                            </Label>
-                                                            <Input
-                                                                className="controls"
-                                                                type="number"
-                                                                id="qId"
-                                                                bsSize="sm"
-                                                                name="qId"
-                                                                value={this.state.q}
-                                                                valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
-                                                                invalid={touched.qId && !!errors.qId}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.setQId(e) }}
-                                                            />
-                                                            <FormFeedback>{errors.qId}</FormFeedback>
-                                                        </div>
-                                                        
-                                                        {/* <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '30px' }}>
-                                                            <Input
-                                                                className="form-check-input checkboxMargin"
-                                                                type="checkbox"
-                                                                id="seasonality"
-                                                                name="seasonality"
-                                                                // checked={true}
-                                                                checked={this.state.seasonality}
-                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
-                                                            </Label>
-                                                        </div> */}
-                                                        <FormGroup className="pl-lg-5">
-                                                            <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-4 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <FormGroup className="pl-lg-5">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-0 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && 
-                                                        (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:""
+                                                        (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:""
                                                         }
-                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
+                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                             </FormGroup>
-                                                    </div>
-                                        </div>
+                                            </div>
+                                    </div>
 
-                                        {/* </div> */}
-                                        {/* <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
-                            </div> */}
-                                        {/* </Form> */}
+                                        </div>
                                         {(this.state.offlineTES || this.state.offlineArima)  && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                         <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
@@ -4238,8 +4249,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             {this.state.showData &&
                                                 <>
                                                     {this.state.checkIfAnyMissingActualConsumption && <><span className="red"><i class="fa fa-exclamation-triangle"></i><span className="pl-lg-2">{i18n.t('static.extrapolation.missingDataNotePart1')}</span><a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank"><span>{i18n.t('static.dashboard.dataEntryAndAdjustment') + " "}</span></a><span>{i18n.t('static.extrapolation.missingDataNotePart2')}</span></span></>}
-                                                    <div className={this.state.checkIfAnyMissingActualConsumption ? "check inline pt-lg-3 pl-lg-3" : "check inline pl-lg-3"}>
-                                                        <div className="">
+                                                    <div className={this.state.checkIfAnyMissingActualConsumption ? "check inline pt-lg-3 pl-lg-3" : "check inline pl-lg-2"}>
+                                                        <div className="pt-lg-2 col-md-12">
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="checkbox"
