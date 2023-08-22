@@ -360,8 +360,8 @@ class usageTemplate extends Component {
     }
 
     getTracerCategory() {
-        // TracerCategoryService.getTracerCategoryListAll()
-        DropdownService.getTracerCategoryDropdownList()
+        TracerCategoryService.getTracerCategoryListAll()
+        // DropdownService.getTracerCategoryDropdownList()
             .then(response => {
                 if (response.status == 200) {
                     // console.log("TracerCategory------->123", response.data);
@@ -377,9 +377,9 @@ class usageTemplate extends Component {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
                                 name: getLabelText(listArray[i].label, this.state.lang),
-                                id: parseInt(listArray[i].id)
-                                // active: listArray[i].active,
-                                // healthAreaId: listArray[i].healthArea.id
+                                id: parseInt(listArray[i].tracerCategoryId),
+                                active: listArray[i].active,
+                                healthAreaId: listArray[i].healthArea.id
                             }
                             tempList[i] = paJson
                         }
@@ -2382,7 +2382,7 @@ class usageTemplate extends Component {
     }.bind(this)
 
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
-        var mylist = this.state.tracerCategoryList;
+        var mylist = this.state.tracerCategoryList.filter(c=>c.active);
         var programList = this.state.typeList;
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.dataEl.getJson(null, false)[r])[1];
