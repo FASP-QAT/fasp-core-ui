@@ -464,7 +464,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                if (regionList.length == 0) {
+                // if (regionList.length == 0) {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId && myResult[i].programId == programId) {
                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
@@ -478,7 +478,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             
                         }
                     }
-                }
+                // }
                 console.log("regionList--->",regionList)
                 var regionIds = regionList.map((item, i) => {
                     return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
@@ -1369,7 +1369,9 @@ fetchData(){
                                         actualQty: consumptionAdjForStockOutId ? currentAdjustedActualConsumption:currentActualQty,
                                         forecastQty: currentForecastQty,
                                         daysOfStockOut: currentDayOfStockOut,
-                                        errorPerc:errorPerc
+                                        errorPerc:errorPerc,
+                                        totalOfActualForRegionOfLastMonths: totalOfActualForRegionOfLastMonths,
+                                        totalDiffForRegionOfLastmonths: totalDiffForRegionOfLastmonths
                                     });
                                 }
                                 var totalErrorPerc = totalOfActualForLast6months > 0 ? (totalDiffForLast6months/ totalOfActualForLast6months):null;
@@ -1396,6 +1398,8 @@ fetchData(){
                                 var temp_actualQty = '';
                                 var temp_totalOfActualForLast6months = 0;
                                 var temp_totalDiffForLast6months = 0;
+                                var temp_totalOfActualForRegionOfLastMonths = 0;
+                                var temp_totalDiffForRegionOfLastmonths = 0;
                                 var temp_list = dataList_arr[0].filter(e => e.month == monthArray[ii].date);
                                 var temp_regionData = temp_list.map(e => e.regionData)
                                 temp_regionData = [].concat.apply([], temp_regionData);
@@ -1403,11 +1407,24 @@ fetchData(){
                                     var region = { id: regionList[ij].regionId, label: regionList[ij].label };
                                     var temp = temp_regionData.filter(e => e.region.id == region.id);
                                     var temp_forecastQty1 = temp.reduce((sum, e) => sum + Number(e.forecastQty), 0);
-                                    var temp_actualQty1 = temp.reduce((sum, e) => sum + Number(e.actualQty), 0);
+                                    // var temp_actualQty1 = temp.reduce((sum, e) => sum + Number(e.actualQty), 0);
+                                    var temp_actualQty1 = ''
+                                    for(let ik = 0; ik < temp.length; ik++){
+                                        if(temp[ik].actualQty == ''){
+                                            temp_actualQty1 = temp_actualQty1;
+                                        }else{
+                                            temp_actualQty1 = Number(temp_actualQty1) + Number(temp[ik].actualQty); 
+                                        }
+                                    }
+                                    var temp_totalOfActualForRegionOfLastMonths = temp.reduce((sum, e) => sum + Number(e.totalOfActualForRegionOfLastMonths), 0);
+                                    var temp_totalDiffForRegionOfLastmonths = temp.reduce((sum, e) => sum + Number(e.totalDiffForRegionOfLastmonths), 0);
+                                    var temp_daysOfStockOut = temp.reduce((sum, e) => sum + Number(e.daysOfStockOut), 0);
                                     regionData.push({
                                         region: region,
                                         forecastQty: temp_forecastQty1,
                                         actualQty: temp_actualQty1,
+                                        errorPerc: temp_totalOfActualForRegionOfLastMonths===''?'':(temp_totalOfActualForRegionOfLastMonths > 0 ? (temp_totalDiffForRegionOfLastmonths/ temp_totalOfActualForRegionOfLastMonths):0),
+                                        daysOfStockOut: temp_daysOfStockOut
                                     });
                                 }
                             
@@ -1451,8 +1468,13 @@ fetchData(){
                 //     yaxisEquUnit:equivalencyUnitId
                 // })                             
             } // View by forecastingUnit
-            else if(forecastingUnitId > 0){
+            else if(forecastingUnitIds.length > 0){
                 var planningUnitIdList;
+                var monthArray_arr = [];
+                var dataList_arr = [];
+                var consumptionAdjForStockOutId_arr = [];
+                var yaxisEquUnit_arr = [];
+                for(let arr=0; arr < forecastingUnitIds.length; arr++){
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
@@ -1476,7 +1498,7 @@ fetchData(){
                                 proList[i] = myResult[i];
                             }
                         }
-                        var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitId);
+                        var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitIds[arr]);
                         planningUnitIdList = proListDataFilter.map(c => c.planningUnit.id);
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onerror = function (event) {
@@ -1564,7 +1586,7 @@ fetchData(){
                                                     // Conversion in EU
                                                         for (var cl = 0; cl < conlist1.length; cl++) {    
                                                             if (equivalencyUnitId != -1) {
-                                                                let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitId)[0].convertToEu;    
+                                                                let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitIds[arr])[0].convertToEu;    
                                                                 conlist1[cl].consumptionQty = Number(Number(conlist1[cl].consumptionQty) * Number(selectPlanningObj[0].multiplier)) * Number(convertToEu);
                                                             }else{
                                                                 conlist1[cl].consumptionQty = Number(Number(conlist1[cl].consumptionQty) * Number(selectPlanningObj[0].multiplier));
@@ -1617,7 +1639,9 @@ fetchData(){
                                                     actualQty: consumptionAdjForStockOutId ? currentAdjustedActualConsumption:currentActualQty,
                                                     forecastQty: currentForecastQty,
                                                     daysOfStockOut: currentDayOfStockOut,
-                                                    errorPerc: errorPerc
+                                                    errorPerc: errorPerc,
+                                                    totalOfActualForRegionOfLastMonths: totalOfActualForRegionOfLastMonths,
+                                                    totalDiffForRegionOfLastmonths: totalDiffForRegionOfLastmonths
                                                 });
                                             }
                                             var totalErrorPerc = totalOfActualForLast6months > 0 ? (totalDiffForLast6months/ totalOfActualForLast6months):null;
@@ -1627,19 +1651,88 @@ fetchData(){
                                             actualQty: consumptionAdjForStockOutId ? isNaN(regionTotalAdjustedActualQty) ? null:regionTotalAdjustedActualQty :isNaN(regionTotalActualQty)?null:regionTotalActualQty,
                                             forecastQty: isNaN(regionTotalForecastQty)? null:regionTotalForecastQty,
                                             errorPerc: totalErrorPerc
-                                            })
+                                            })       
                                     }
                                 }
-                                this.setState({
-                                    monthArray: monthArray,
-                                    dataList: dataList,
-                                    consumptionAdjForStockOutId: consumptionAdjForStockOutId,
-                                    yaxisEquUnit:equivalencyUnitId
-                                })                            
+                                    monthArray_arr.push(monthArray);
+                                    dataList_arr.push(dataList);
+                                    consumptionAdjForStockOutId_arr.push(consumptionAdjForStockOutId);
+                                    yaxisEquUnit_arr.push(equivalencyUnitId);
+                                    if(arr == forecastingUnitIds.length - 1){
+                                        for(let ii = 0; ii < monthArray.length; ii++){
+                                            var regionData = [];
+                                            var temp_forecastQty = 0;
+                                            var temp_actualQty = '';
+                                            var temp_totalOfActualForLast6months = 0;
+                                            var temp_totalDiffForLast6months = 0;
+                                            var temp_totalOfActualForRegionOfLastMonths = 0;
+                                            var temp_totalDiffForRegionOfLastmonths = 0;
+                                            var temp_list = dataList_arr[0].filter(e => e.month == monthArray[ii].date);
+                                            var temp_regionData = temp_list.map(e => e.regionData)
+                                            temp_regionData = [].concat.apply([], temp_regionData);
+                                            for(let ij = 0; ij < regionList.length; ij++){
+                                                var region = { id: regionList[ij].regionId, label: regionList[ij].label };
+                                                var temp = temp_regionData.filter(e => e.region.id == region.id);
+                                                var temp_forecastQty1 = temp.reduce((sum, e) => sum + Number(e.forecastQty), 0);
+                                                // var temp_actualQty1 = temp.reduce((sum, e) => sum + Number(e.actualQty), 0);
+                                                var temp_actualQty1 = ''
+                                                for(let ik = 0; ik < temp.length; ik++){
+                                                    if(temp[ik].actualQty == ''){
+                                                        temp_actualQty1 = temp_actualQty1;
+                                                    }else{
+                                                        temp_actualQty1 = Number(temp_actualQty1) + Number(temp[ik].actualQty); 
+                                                    }
+                                                }
+                                                var temp_totalOfActualForRegionOfLastMonths = temp.reduce((sum, e) => sum + Number(e.totalOfActualForRegionOfLastMonths), 0);
+                                                var temp_totalDiffForRegionOfLastmonths = temp.reduce((sum, e) => sum + Number(e.totalDiffForRegionOfLastmonths), 0);
+                                                var temp_daysOfStockOut = temp.reduce((sum, e) => sum + Number(e.daysOfStockOut), 0);
+                                                regionData.push({
+                                                    region: region,
+                                                    forecastQty: temp_forecastQty1,
+                                                    actualQty: temp_actualQty1,
+                                                    errorPerc: temp_totalOfActualForRegionOfLastMonths===''?'':(temp_totalOfActualForRegionOfLastMonths > 0 ? (temp_totalDiffForRegionOfLastmonths/ temp_totalOfActualForRegionOfLastMonths):0),
+                                                    daysOfStockOut: temp_daysOfStockOut
+                                                });
+                                            }
+                                        
+                                            for(let ij = 0; ij < dataList_arr[0].length; ij++){
+                                                if(monthArray[ii].date == dataList_arr[0][ij].month){
+                                                    temp_forecastQty += Number(dataList_arr[0][ij].forecastQty);
+                                                    if(dataList_arr[0][ij].actualQty == ''){
+                                                        temp_actualQty = temp_actualQty;
+                                                    }else{
+                                                        temp_actualQty = Number(temp_actualQty) + Number(dataList_arr[0][ij].actualQty); 
+                                                    }
+                                                    temp_totalOfActualForLast6months += Number(dataList_arr[0][ij].totalOfActualForLast6months); 
+                                                    temp_totalDiffForLast6months += Number(dataList_arr[0][ij].totalDiffForLast6months);
+                                                } 
+                                            }
+                                            dataByMonth.push({
+                                                month: monthArray[ii].date,
+                                                forecastQty: temp_forecastQty,
+                                                actualQty: temp_actualQty,
+                                                regionData: regionData,
+                                                errorPerc: temp_totalOfActualForLast6months > 0 ? (temp_totalDiffForLast6months / temp_totalOfActualForLast6months) : null
+                                            })
+                                        }
+                                        this.setState({
+                                            monthArray: monthArray,
+                                            dataList: dataByMonth,
+                                            consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                            yaxisEquUnit:equivalencyUnitId
+                                        })
+                                    }
+                                // this.setState({
+                                //     monthArray: monthArray,
+                                //     dataList: dataList,
+                                //     consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                //     yaxisEquUnit:equivalencyUnitId
+                                // })                            
                             }.bind(this);
                         }.bind(this);    
                     }.bind(this);
                 }.bind(this);
+                }
             }
         }else{
             this.setState({
@@ -2884,9 +2977,9 @@ fetchData(){
                                                                     let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
                                                                         regionErrorTotal += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc:0;
                                                                         regionErrorTotalCount += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
-                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(errorDataRegionData[0].actualQty==='')? errorDataRegionData[0].forecastQty===''?"No months in this period contain both forecast and actual consumption":"No Actual Data": errorDataRegionData[0].actualQty >= 0 ?((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? '': this.PercentageFormatter(errorDataRegionData[0].errorPerc)):"No Actual Data"}</b></td>)              
+                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(errorDataRegionData[0].actualQty==='')? errorDataRegionData[0].forecastQty===''?"No months in this period contain both forecast and actual consumption":"No Actual Data": errorDataRegionData[0].actualQty >= 0 ?((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? '': this.PercentageFormatter(errorDataRegionData[0].errorPerc * 100)):"No Actual Data"}</b></td>)              
                                                                     })}
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{regionErrorTotalCount>0 ? this.PercentageFormatter(regionErrorTotal / regionErrorTotalCount):0}</b></td>
+                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{regionErrorTotalCount>0 ? this.PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100):0}</b></td>
                                                                     </tr>
                                                                  {/* actual */}
                                                                {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
