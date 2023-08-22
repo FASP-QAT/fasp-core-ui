@@ -329,6 +329,7 @@ export default class SyncMasterData extends Component {
                                             //     }
                                             // }
                                             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active == true) : [];
+                                            var inactiveLinkedShipmentsList=generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active.toString() == "false") : [];
                                             // console.log("Linked Shipment list from loaded program Test", linkedShipmentsList)
                                             // console.log("LinkedShipmentsList=========================>", linkedShipmentsList)
                                             var linkedShipmentsListFilter = linkedShipmentsList.filter(c => roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo + "|" + c.roPrimeLineNo));
@@ -612,6 +613,7 @@ export default class SyncMasterData extends Component {
                                                         }
                                                     }
                                                     for (var u = 0; u < knShipmentNoThatExistsInLinkedShipmentsList.length; u++) {
+                                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                                         var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo == knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo == knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo == knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
                                                         var linkedShipmentsListFilter1 = linkedShipmentsList.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo == knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo == knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo == knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
                                                         linkedShipmentsList[linkedShipmentsListIndex].active = false;
@@ -820,7 +822,7 @@ export default class SyncMasterData extends Component {
                                             // programJson.shipmentList = shipmentDataList;
                                             // programJson.batchInfoList = batchInfoList;
                                             generalJson.actionList = actionList;
-                                            generalJson.shipmentLinkingList = linkedShipmentsList.concat(generalJson.shipmentLinkingList.filter(c => c.active == false));
+                                            generalJson.shipmentLinkingList = linkedShipmentsList.concat(inactiveLinkedShipmentsList);
                                             generalJson.problemReportList = problemReportList;
                                             prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                             prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
