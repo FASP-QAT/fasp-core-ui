@@ -328,9 +328,13 @@ export default class ListTreeComponent extends Component {
                         }
                     }
                     tree.flatList = items;
-                    tree.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.lastModifiedBy={
+                        userId:AuthenticationService.getLoggedInUserId()
+                    };
                     tree.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                    tree.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.createdBy={
+                        userId:AuthenticationService.getLoggedInUserId()
+                    };
                     tree.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                     // console.log("findTreeIndex---", findTreeIndex);
@@ -638,9 +642,9 @@ export default class ListTreeComponent extends Component {
                         "label_fr": null,
                         "label_pr": null
                     };
-                    treeObj.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                    treeObj.lastModifiedBy={userId:AuthenticationService.getLoggedInUserId()};
                     treeObj.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
-                    treeObj.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                    treeObj.createdBy={userId:AuthenticationService.getLoggedInUserId()};
                     treeObj.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
 
                     treeList.push(treeObj);
@@ -887,9 +891,9 @@ export default class ListTreeComponent extends Component {
                 "label_fr": null,
                 "label_pr": null
             }
-            treeObj.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+            treeObj.lastModifiedBy={userId:AuthenticationService.getLoggedInUserId()};
             treeObj.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-            treeObj.createdBy.userId=AuthenticationService.getLoggedInUserId();
+            treeObj.createdBy={userId:AuthenticationService.getLoggedInUserId()};
             treeObj.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
 
             treeList.push(treeObj);
