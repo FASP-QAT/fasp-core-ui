@@ -514,7 +514,7 @@ function addCommas(cell1, row) {
         cell1 += '';
         var x = cell1.replaceAll(",", "").split('.');
         var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -2998,9 +2998,13 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     tree.flatList = items;
-                    tree.lastModifiedBy.userId = AuthenticationService.getLoggedInUserId();
+                    tree.lastModifiedBy={
+                        userId:AuthenticationService.getLoggedInUserId()
+                    };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                    tree.createdBy.userId = AuthenticationService.getLoggedInUserId();
+                    tree.createdBy={
+                        userId:AuthenticationService.getLoggedInUserId()
+                    };
                     tree.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     console.log("TempTreeId Test@123", this.state.tempTreeId)
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);

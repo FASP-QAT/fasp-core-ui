@@ -1814,7 +1814,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("ActualConsumptionList@@@@@@@@@@@@@", actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
-                    extrapolationNotes:extrapolationNotes,
+                    extrapolationNotes:(extrapolationNotes=="" || extrapolationNotes==undefined || extrapolationNotes==null)?"":extrapolationNotes,
                     startDate: startDate1,
                     stopDate: endDate1,
                     rangeValue1: rangeValue2,
@@ -1868,7 +1868,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -1884,7 +1885,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         dataEl: "",
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -2918,19 +2920,19 @@ export default class ExtrapolateDataComponent extends React.Component {
     render() {
         var height=60;
         if (this.state.movingAvgId){
-            height += 20;
+            height += 55;
         }
         if (this.state.semiAvgId){
-            height += 20;
+            height += 55;
         }
         if (this.state.linearRegressionId){
-            height += 20;
+            height += 55;
         }
         if (this.state.smoothingId){
-            height += 20;
+            height += 55;
         }
         if (this.state.arimaId){
-            height += 20;
+            height += 55;
         }
         jexcel.setDictionary({
             Show: " ",
@@ -3606,9 +3608,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
 
-                                                    <div className="row col-md-12 pt-lg-2">
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
 
-                                                    <div className="col-md-3 px-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                    <div className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                         <Input
                                                             className="controls"
@@ -3728,8 +3730,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
-                                                        
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                        
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
@@ -3800,7 +3802,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             Show Advance
                                                         </Label>
-                                                    </div> */}
+                                                        </div> */}
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
@@ -3892,13 +3894,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         />
                                                     </div> */}
                                                     {/* </div> */}
-                                                    <div className="row pl-lg-3 pt-lg-3">
+                                                    <div className="row pl-lg-3">
                                                     <div>
                                                         <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
                                                             <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div className="pt-lg-2 col-md-6">
+                                                    <div className="pt-lg-2 col-md-7">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -4215,7 +4217,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <div className=" col-md-12 pt-lg-0" >
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
                                                             <Input
-                                                                style={{height:"200px"}}
+                                                                style={{height:height+"px"}}
                                                                 className="controls"
                                                                 bsSize="sm"
                                                                 type="textarea"
@@ -4226,38 +4228,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             ></Input>
                                         </div>
                                         <div>
-                                        <FormGroup className="pl-lg-5">
-                                                            <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-4 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <FormGroup className="pl-lg-5">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-0 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && 
-                                                        (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
-                                                        (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:""
+                                                        (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                                        (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:""
                                                         }
-                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
-                                                        </FormGroup>
-                                        </div>
-                                        </div>
-
+                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
+                                            </FormGroup>
+                                            </div>
                                     </div>
 
-
-
-
-
-
-
-
-                                        {/* <div className="row pl-lg-3 pt-lg-3"> */}
-                                        
-                                        {/* </div> */}
-
-                                        {/* </div> */}
-                                        {/* <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
-                            </div> */}
-                                        {/* </Form> */}
+                                        </div>
                                         {(this.state.offlineTES || this.state.offlineArima)  && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                         <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
