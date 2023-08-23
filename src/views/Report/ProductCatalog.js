@@ -447,7 +447,7 @@ class ProductCatalog extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: listArray, loading: false
+                            programs: proList, loading: false
                         }, () => { })
                     }
 

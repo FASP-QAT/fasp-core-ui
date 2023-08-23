@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { decompressJson, compressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import moment from "moment"
@@ -34,7 +35,7 @@ import { LOGO } from "../../CommonComponent/Logo";
 import { buildJxl1, dataCheck } from '../DataSet/DataCheckComponent.js';
 import { buildJxl } from '../DataSet/DataCheckComponent.js';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked, consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
-
+import pako from 'pako';
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
     notes: ''
@@ -286,6 +287,7 @@ export default class CommitTreeComponent extends React.Component {
                     }
                     DatasetService.getAllDatasetData(programVersionJson)
                         .then(response => {
+                            response.data = decompressJson(response.data);
                             // console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                             this.setState({
                                 programDataServer: response.data[0],
@@ -430,6 +432,7 @@ export default class CommitTreeComponent extends React.Component {
         }
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
+                response.data = decompressJson(response.data);
                 var json = response.data;
                 var db1;
                 getDatabase();
@@ -688,10 +691,10 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
-                                // console.log("commit*** final programJson---", programJson);
-
+                                // console.log("commit*** final programJson---", programJson)
+                                const compressedData = isCompress(programJson);
                                 //create saveDatasetData in ProgramService
-                                DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
+                                DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
                                     if (response.status == 200) {
                                         var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
                                         var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');

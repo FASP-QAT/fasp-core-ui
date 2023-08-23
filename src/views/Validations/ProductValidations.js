@@ -21,6 +21,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -128,6 +129,7 @@ class ProductValidation extends Component {
             DatasetService.getAllDatasetData(json).then(response => {
                 if (response.status == 200) {
                     // console.log("resp--------------------", response.data);
+                    response.data = decompressJson(response.data);
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,
@@ -466,7 +468,7 @@ class ProductValidation extends Component {
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 // console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
                 try {
-                    if (finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id.toString().includes("Local")) {
+                    if (this.state.versionId.toString().includes("Local")) {
                         selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
                     } else {
                         selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
@@ -484,7 +486,7 @@ class ProductValidation extends Component {
                     }
                 }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
-                    if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
+                    if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage.toString() != "true") {
                         // console.log("finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod)
                         var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null && finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId != '' ? this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en : '';
                         usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + " " + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + " " + usageFrequency + " " + i18n.t('static.tree.timesPer') + " " + selectedText2 + " " + i18n.t('static.tree.for') + " " + (finalData[i].parentNodeNodeDataMap.fuNode.repeatCount != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatCount : '') + " " + selectedText3;

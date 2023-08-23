@@ -1983,7 +1983,7 @@ export default class StockStatusMatrix extends React.Component {
           ele.minMonthsOfStock,
           ele.planBasedOn == 1
             ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
-            : Math.round(ele.maxStock),
+            : this.roundAMC(ele.maxStock),
           ele.year,
           ele.planBasedOn == 1
             ? ele.jan != null
@@ -2445,7 +2445,7 @@ export default class StockStatusMatrix extends React.Component {
         ? this.formatterMaxQty(
             Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
           )
-        : this.formatterMaxQty(Math.round(ele.maxStock)),
+        : this.formatterMaxQty(this.roundAMC(ele.maxStock)),
       ele.year,
       ele.planBasedOn == 1
         ? ele.jan != null
@@ -2760,6 +2760,23 @@ export default class StockStatusMatrix extends React.Component {
       return { backgroundColor: legendcolor[4].color };
     }
   };
+
+  roundAMC(amc){
+    if(amc!=null){
+    if(Number(amc).toFixed(0)>=100){
+        return Number(amc).toFixed(0);
+    }else if(Number(amc).toFixed(1)>=10){
+        return Number(amc).toFixed(1);
+    }else if(Number(amc).toFixed(2)>=1){
+        return Number(amc).toFixed(2);
+    }else{
+        return Number(amc).toFixed(3);
+    }
+}else{
+    return null;
+}
+}
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList =
@@ -3397,7 +3414,7 @@ export default class StockStatusMatrix extends React.Component {
                                       Number(ele.reorderFrequency)
                                   )
                                 : this.formatterMaxQty(
-                                    Math.round(ele.maxStock)
+                                    this.roundAMC(ele.maxStock)
                                   )}
                             </td>
                             <td className="text-center">{ele.year}</td>

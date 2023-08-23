@@ -23,10 +23,11 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions';
+import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero, decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
+import pako from 'pako';
 
 export default class SyncMasterDataForTree extends Component {
 
@@ -211,7 +212,7 @@ export default class SyncMasterDataForTree extends Component {
                             .then(response => {
                                 // console.log("Response data Test@@@123",response.data)
                                 if (response.status == 200) {
-                                    // console.log("M sync Response", response.data)
+                                    response.data = decompressJson(response.data);
                                     var response = response.data;
 
                                     // country
