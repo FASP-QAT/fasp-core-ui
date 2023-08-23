@@ -726,10 +726,28 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[15] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
+                }else{
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
                 } else {
                     if (rowData[2] == 2) {
                         var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
@@ -813,9 +831,27 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[15] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
+                    }
+                    }else{
+                        if (rowData[2] == 2) {
+                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        } else {
+                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        }
+    
+                        if (rowData[15] > 0) {
+                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        } else {
+                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        }
                     }
                 } else {
                     if (rowData[2] == 2) {
@@ -927,10 +963,28 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[15] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
+                }else{
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
                 } else {
                     if (rowData[2] == 2) {
                         var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))

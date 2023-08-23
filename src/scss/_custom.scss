@@ -1632,6 +1632,10 @@ label.arrow_label:after {
   height: 400px;
 }
 
+.chart-graph-report1 {
+  height: 600px;
+}
+
 a {
   color: #205493;
   text-decoration: none;
@@ -10516,4 +10520,16 @@ border-top: 1px solid #c8ced3 !important;
   pointer-events: none;
   opacity: unset!important;
 
+}
+.tablesticky .table thead tr th {
+  top: 0px!important;
+}
+.UsageTemplateTableFilter .jss > thead > tr > .InfoTrAsteriskTheadtrTd::before {
+  
+  left: unset!important;
+ 
+}
+
+.NotesNnputBoxHeight{
+  height: 309px!important;
 }

@@ -980,11 +980,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               countRecived: 0,
               count: 0,
               showDetailTable: true,
-              jsonDataMovingAvg: [],
-              jsonDataSemiAverage: [],
-              jsonDataLinearRegression: [],
-              jsonDataTes: [],
-              jsonDataArima: [],
               datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
@@ -1646,6 +1641,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
+              jsonDataMovingAvg: [],
+              jsonDataSemiAverage: [],
+              jsonDataLinearRegression: [],
+              jsonDataTes: [],
+              jsonDataArima: [],
               datasetJson: datasetJson
             }, () => {
               // console.log("Above extrapolated parameteres Test")
@@ -1840,7 +1840,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var columns = [];
     columns.push(i18n.t('static.dashboard.Productmenu').replaceAll(' ', '%20'));
     this.state.monthArray.map(item => (
-      columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+      columns.push(("\'").concat(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)))
     ))
     columns.push(i18n.t('static.supplyPlan.total').replaceAll(' ', '%20'));
     columns.push(i18n.t('static.dataentry.regionalPer').replaceAll(' ', '%20'));
@@ -1897,7 +1897,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var columns = [];
       columns.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'))
       this.state.monthArray.map(item => (
-        columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        columns.push(("\'").concat(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)))
       ))
       columns.push('')
       columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
@@ -1985,7 +1985,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var columns = [];
       columns.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'))
       this.state.monthArray.map(item => (
-        columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        columns.push(("\'").concat(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)))
       ))
       columns.push('')
       columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
