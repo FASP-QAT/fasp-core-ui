@@ -2987,6 +2987,17 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             procurementAgentListForWhatIf: listArrays,
                             procurementAgentsUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (ele1.procurementAgent.id)))]
+                        },()=>{
+                            var procurementAgentIdSingle=this.state.procurementAgentIdSingle;    
+                            var procurementAgentListFilterTBD=this.state.procurementAgentListForWhatIf.filter(c=>c.procurementAgentId==TBD_PROCUREMENT_AGENT_ID);
+                            if(procurementAgentListFilterTBD.length==0){
+                                if(this.state.procurementAgentListForWhatIf.length==1){
+                                    procurementAgentIdSingle=this.state.procurementAgentListForWhatIf[0].procurementAgentId;
+                                }else{
+                                    procurementAgentIdSingle="";
+                                }
+                            }
+                            this.setState({procurementAgentIdSingle:procurementAgentIdSingle})
                         })
 
                         var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
