@@ -142,7 +142,11 @@ class StockStatus extends Component {
   programChange(event) {
     this.setState({
       programId: event.target.value,
-      versionId: ''
+      versionId: '',
+      planningUnits: [],
+      planningUnitsMulti: [],
+      planningUnitLabel: "",
+      stockStatusList: []
     }, () => {
       // console.log("ProgramId-------->1", this.state.programId);
       localStorage.setItem("sesVersionIdReport", '');
@@ -346,18 +350,18 @@ class StockStatus extends Component {
               item1.primeLineNo == null &&
               item1.roNo == null &&
               item1.roPrimeLineNo == null
-                ? " | N/A"
-                : (item1.roNo == null && item1.roPrimeLineNo == null
-                    ? ""
-                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                  (item1.orderNo == null && item1.primeLineNo == null
-                    ? ""
-                    : item1.orderNo == null
-                    ? ""
-                    : " | " + item1.orderNo) +
-                  (item1.primeLineNo == null
-                    ? ""
-                    : "-" + item1.primeLineNo))
+              ? " | N/A"
+              : (item1.roNo == null && item1.roPrimeLineNo == null
+                ? ""
+                : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+              (item1.orderNo == null && item1.primeLineNo == null
+                ? ""
+                : item1.orderNo == null
+                  ? ""
+                  : " | " + item1.orderNo) +
+              (item1.primeLineNo == null
+                ? ""
+                : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
           , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
@@ -873,16 +877,16 @@ class StockStatus extends Component {
                 item1.primeLineNo == null &&
                 item1.roNo == null &&
                 item1.roPrimeLineNo == null
-                  ? " | N/A"
-                  : (item1.roNo == null && item1.roPrimeLineNo == null
-                      ? ""
-                      : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                    (item1.orderNo == null && item1.primeLineNo == null
-                      ? ""
-                      : item1.orderNo == null
-                      ? ""
-                      : " | " + item1.orderNo) +
-                    (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
+                  ? ""
+                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                (item1.orderNo == null && item1.primeLineNo == null
+                  ? ""
+                  : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
             , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
@@ -4110,7 +4114,7 @@ class StockStatus extends Component {
 
 
                   </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 && ppu!=undefined &&
+                  {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
@@ -4212,27 +4216,24 @@ class StockStatus extends Component {
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
-                                    ? " | N/A"
-                                    : `${
-                                        item.roNo == null &&
-                                        item.roPrimeLineNo == null
-                                          ? ""
-                                          : " | " +
-                                            item.roNo +
-                                            "-" +
-                                            item.roPrimeLineNo
-                                      }   ${
-                                        item.orderNo == null &&
-                                        item.primeLineNo == null
-                                          ? ""
-                                          : item.orderNo == null
-                                          ? ""
-                                          : " | " + item.orderNo
-                                      }   ${
-                                        item.primeLineNo == null
-                                          ? ""
-                                          : "-" + item.primeLineNo
-                                      }`}</td></tr>)
+                                  ? " | N/A"
+                                  : `${item.roNo == null &&
+                                    item.roPrimeLineNo == null
+                                    ? ""
+                                    : " | " +
+                                    item.roNo +
+                                    "-" +
+                                    item.roPrimeLineNo
+                                  }   ${item.orderNo == null &&
+                                    item.primeLineNo == null
+                                    ? ""
+                                    : item.orderNo == null
+                                      ? ""
+                                      : " | " + item.orderNo
+                                  }   ${item.primeLineNo == null
+                                    ? ""
+                                    : "-" + item.primeLineNo
+                                  }`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
