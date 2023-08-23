@@ -1,51 +1,26 @@
-import React, { Component, lazy, Suspense, DatePicker } from 'react';
-import { Bar, Line, Pie } from 'react-chartjs-2';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
+import { Bar } from 'react-chartjs-2';
 import {
-  Badge,
   Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
   Card,
   CardBody,
-  // CardFooter,
-  CardHeader,
-  CardTitle,
   Col,
-  Widgets,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Progress,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Row,
-  CardColumns,
-  Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
+  Table, FormGroup, Input, InputGroup, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
-import Pdf from "react-to-pdf"
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
-import actualIcon from '../../assets/img/actual.png';
 import csvicon from '../../assets/img/csv.png'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -54,24 +29,13 @@ import ReportService from '../../api/ReportService'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from "react-multi-select-component";
+import DropdownService from '../../api/DropdownService';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
 const entityname1 = i18n.t('static.dashboard.stockstatus')
 
-const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
-// const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
-
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-
-
-
-
 
 //Random Numbers
 function random(min, max) {
@@ -92,8 +56,6 @@ const pickerLang = {
   months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   from: 'From', to: 'To',
 }
-
-
 
 class StockStatus extends Component {
   constructor(props) {
@@ -2840,11 +2802,21 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
-      ProgramService.getProgramList()
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
           // console.log(JSON.stringify(response.data))
+          var proList = [];
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code,
+            };
+            proList[i] = programJson;
+          }
           this.setState({
-            programs: response.data, message: '',
+            programs: proList, message: '',
             loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
@@ -3027,11 +2999,64 @@ class StockStatus extends Component {
           this.setState({
             versions: []
           }, () => {
-            this.setState({
-              versions: program[0].versionList.filter(function (x, i, a) {
-                return a.indexOf(x) === i;
-              })
-            }, () => { this.consolidatedVersionList(programId) });
+            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+              .then(response => {
+                // console.log("response===>", response.data)
+                this.setState({
+                  versions: []
+                }, () => {
+                  this.setState({
+                    versions: (response.data.filter(function (x, i, a) {
+                      return a.indexOf(x) === i;
+                    }))
+                  }, () => {
+                    this.consolidatedVersionList(programId)
+                  });
+                });
+              }).catch(
+                error => {
+                  this.setState({
+                    programs: [], loading: false
+                  })
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      loading: false
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
           });
 
 
