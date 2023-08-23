@@ -980,11 +980,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               countRecived: 0,
               count: 0,
               showDetailTable: true,
-              jsonDataMovingAvg: [],
-              jsonDataSemiAverage: [],
-              jsonDataLinearRegression: [],
-              jsonDataTes: [],
-              jsonDataArima: [],
               datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
@@ -1646,6 +1641,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
+              jsonDataMovingAvg: [],
+              jsonDataSemiAverage: [],
+              jsonDataLinearRegression: [],
+              jsonDataTes: [],
+              jsonDataArima: [],
               datasetJson: datasetJson
             }, () => {
               // console.log("Above extrapolated parameteres Test")
