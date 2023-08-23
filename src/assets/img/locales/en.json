@@ -446,7 +446,7 @@
     "static.tree.startValue": "Start Value",
     "static.dataentry.otherUnitName": "Enter Other unit name",
     "static.program.organisation": "Organization",
-    "static.commitTree.note": "Note that the table below will not populate unless a forecast is selected for the planning unit in the `Compare and Select` screen. Regardless of whether the table is populated, you can still commit to save your work.",
+    "static.commitTree.note": "Note: In order to commit to the server, users must resolve all conflicts first by right-clicking on the line items and selecting to either “Accept local version” or “Accept server version.",
     "static.commitTree.modeling": "Modeling",
     "static.tooltip.UsageName": "These Usage Names will appear when adding/editing a forecasting tree node in the 'Copy from Template' dropdown",
     "static.mt.selectShipmentId": "Please select shipment id",
@@ -3203,6 +3203,6 @@
     "static.tooltip.calculatedTotal": "Starting with your ... See more in show guidance.",
     "static.tooltip.diffTargetVsCalculatedNo": "Difference = Calculated Total - Target. This difference will be large if the annual change varies significantly between years",
     "static.tooltip.diffTargetVsCalculatedPer": "(Calculated Total - Target) / Target. This difference will be large if the annual change varies significantly between years",
-    "static.modelingCalculator.confirmAlert": "Do you want to replace the existing table ?"
-    
+    "static.modelingCalculator.confirmAlert": "Do you want to replace the existing table ?",
+    "static.commitVersion.treeAndConsumptionLastModifiedDateTooltip":"This date refers to when the data element was last edited in this particular version."
 }
