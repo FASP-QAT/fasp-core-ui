@@ -19,6 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRowOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { decompressJson, compressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -1866,6 +1867,7 @@ export default class syncPage extends Component {
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
               if (response.status == 200) {
+                response.data = decompressJson(response.data);
                 // console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                 AuthenticationService.setupAxiosInterceptors();
@@ -5108,7 +5110,8 @@ export default class syncPage extends Component {
               // if (response1.data == false) {
               // console.log("Program Json Final Test@@@123", programJson)
               // console.log("CommitLogs --- 2 Log before sending data to server")
-              ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
+              const compressedData = isCompress(programJson);
+              ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   // console.log("CommitLogs --- 3 Log after response 200")
                   // console.log(")))) Commit Request generated successfully");
@@ -5538,6 +5541,7 @@ export default class syncPage extends Component {
         // console.log("CommitLogs --- 18 after getting latest program from server")
         // console.log(")))) After calling get notification api")
         // console.log("Resposne+++", response);
+        response.data = decompressJson(response.data);
         var json = response.data;
         var updatedJson = [];
         for (var r = 0; r < json.length; r++) {

@@ -21,6 +21,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -128,6 +129,7 @@ class ProductValidation extends Component {
             DatasetService.getAllDatasetData(json).then(response => {
                 if (response.status == 200) {
                     // console.log("resp--------------------", response.data);
+                    response.data = decompressJson(response.data);
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,

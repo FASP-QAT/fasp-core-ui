@@ -1,4 +1,5 @@
-import { APPLICATION_STATUS_URL } from "../Constants";
+import { APPLICATION_STATUS_URL, COMPRESS_LIMIT_SIZE } from "../Constants";
+import pako from 'pako';
 
 export function paddingZero(string, padStr, len) {
   var str = string.toString();
@@ -72,4 +73,49 @@ export function isSiteOnline() {
   } else {
     return false;
   }
+}
+
+export function decompressJson(str) {
+  let value = typeof str !== "string" ? JSON.stringify(str) : str;
+  try {
+      JSON.parse(value);
+  } catch (e) {
+      const compressedData = atob(str);
+      const byteArray = new Uint8Array(compressedData.length);
+      for (let i = 0; i < compressedData.length; i++) {
+        byteArray[i] = compressedData.charCodeAt(i);
+      }
+      const decompressedData = pako.inflate(byteArray, { to: 'string' });
+      var json = JSON.parse(decompressedData);
+      return json;
+  }
+  return str;
+}
+
+export function compressJson(str) {
+  const jsonStr = JSON.stringify(str);
+      const input = new TextEncoder().encode(jsonStr);
+      const compressedData = pako.gzip(input);
+
+      // Create a base64 string directly from the compressed data (Uint8Array)
+      let base64String = '';
+      const len = compressedData.length;
+      for (let i = 0; i < len; i++) {
+        base64String += String.fromCharCode(compressedData[i]);
+      }
+      base64String = btoa(base64String);
+      return base64String;
+}
+
+export function sizeOfJson(str) {
+  const size = new TextEncoder().encode(JSON.stringify(str)).length
+  const kiloBytes = size / 1000;
+  const megaBytes = kiloBytes / 1000;
+  return megaBytes;
+}
+
+export function isCompress(str) {
+  if(sizeOfJson(str) > COMPRESS_LIMIT_SIZE)
+    return compressJson(str);
+  return str
 }
