@@ -2345,7 +2345,7 @@ export default class BuildTree extends Component {
                 if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3")!=""?(c.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId == map1.get("3").split('_')[0]:(c.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"))
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"))
@@ -2357,7 +2357,7 @@ export default class BuildTree extends Component {
                 if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3")!=""?(c.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId == map1.get("3").split('_')[0]:(c.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"))
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"))
