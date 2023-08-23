@@ -1334,6 +1334,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                             items.push({
                                                                 title: i18n.t('static.common.deleterow'),
                                                                 onclick: function () {
+                                                                    this.props.updateState("shipmentChangedFlag", 1);
                                                                     obj.setValueFromCoords(33, y, false, true);
                                                                 }.bind(this)
                                                             });
