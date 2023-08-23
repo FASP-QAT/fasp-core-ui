@@ -1028,7 +1028,7 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '90',
+                    width: '180',
                     textEditor: true,//2 C
                 },
                 {
@@ -5120,7 +5120,7 @@ class usageTemplate extends Component {
                             {/* <h5>{i18n.t("static.placeholder.usageTemplate")}</h5> */}
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
-                            <div className="UsageTemplateTable leftAlignTable1">
+                            <div className="UsageTemplateTable leftAlignTable1 UsageTemplateTableFilter">
                                 <div id="paputableDiv" className="consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>
