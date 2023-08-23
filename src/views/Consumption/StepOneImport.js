@@ -4,29 +4,8 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import {
-    Badge,
     Button,
-    ButtonDropdown,
-    ButtonGroup,
-    ButtonToolbar,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Col,
-    Widgets,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Progress,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Row,
-    CardColumns,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
+    FormGroup, Input, InputGroup, Label
 } from 'reactstrap';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -38,10 +17,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import TracerCategoryService from "../../api/TracerCategoryService";
 import moment from "moment";
 import { Prompt } from 'react-router';
-import ReportService from '../../api/ReportService';
 import DropdownService from '../../api/DropdownService';
 import AuthenticationService from '../Common/AuthenticationService';
 const pickerLang = {
@@ -59,6 +36,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             mapPlanningUnitEl: '',
+            forecastProgramVersionId: 0,
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
@@ -131,6 +109,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     () => {
                         this.props.updateStepOneData("loading", false);
                         document.getElementById("stepOneBtn").disabled = true;
+                        this.filterData();
                     })
             }).catch(
                 error => {
@@ -274,7 +253,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     getDatasetList() {
-        console.log("getDatasetList----------->");
+        // console.log("getDatasetList----------->");
 
         var db1;
         getDatabase();
@@ -452,7 +431,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // console.log("Seema---->programId---", programId);
         // console.log("Seema---->versionId---", versionId);
         // console.log("Seema---->forecastProgramId---", forecastProgramId);
-        
 
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
 
@@ -662,9 +640,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
                 data[5] = papuList[j].forecastingUnit.tracerCategory.id
-
                 let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
                 let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
+
                 let match = filteredPlanningUnit.filter(c => c.id == papuList[j].id);
 
                 if (match.length > 0) {
@@ -887,7 +865,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
-            versionId: ''
+            versionId: '',
+            forecastProgramId: '',
+            selSource1: []
         }, () => {
             this.filterVersion();
             this.filterForcastUnit();
@@ -899,69 +879,65 @@ export default class StepOneImportMapPlanningUnits extends Component {
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
-
-            const program = this.state.programs.filter(c => c.id == programId)
-            // console.log(program)
-
             this.setState({
                 versions: [],
             }, () => {
                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-                .then(response => {
-                //   console.log("response===>", response.data)
-                  this.setState({
-                    versions: []
-                  }, () => {
-                    this.setState({
-                        versions: (response.data.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })).reverse()
-                    }, () => { });
-                  });
-                }).catch(
-                  error => {
-                    this.setState({
-                      programs: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                      this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                      });
-                    } else {
-                      switch (error.response ? error.response.status : "") {
-  
-                        case 401:
-                          this.props.history.push(`/login/static.message.sessionExpired`)
-                          break;
-                        case 403:
-                          this.props.history.push(`/accessDenied`)
-                          break;
-                        case 500:
-                        case 404:
-                        case 406:
-                          this.setState({
-                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                            loading: false
-                          });
-                          break;
-                        case 412:
-                          this.setState({
-                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                            loading: false
-                          });
-                          break;
-                        default:
-                          this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                          });
-                          break;
-                      }
-                    }
-                  }
-                );
+                    .then(response => {
+                        //   console.log("response===>", response.data)
+                        this.setState({
+                            versions: []
+                        }, () => {
+                            this.setState({
+                                versions: (response.data.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })).reverse()
+                            }, () => { });
+                        });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programs: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
             });
         } else {
             this.setState({
@@ -979,15 +955,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // console.log("programId--->programs---",this.state.programs)
             // console.log("programId--->countryId---",countryId)
             // console.log("programId--->this.state.datasetList---",this.state.datasetList)
-            
+
             this.state.getDatasetFilterList = this.state.datasetList
             // console.log("programId--->this.state.getDatasetFilterList---",this.state.getDatasetFilterList)
-            
+
             // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
             var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
-            
+
             // console.log("programId--->datasetlist---",datasetlist)
-            
+
             this.setState({
                 data: [],
             }, () => {
