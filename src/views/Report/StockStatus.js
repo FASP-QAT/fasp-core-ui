@@ -98,8 +98,25 @@ class StockStatus extends Component {
     this.programChange = this.programChange.bind(this);
     this.versionChange = this.versionChange.bind(this);
     this.toggleExport = this.toggleExport.bind(this);
+    this.roundAMC=this.roundAMC.bind(this);
 
   }
+
+  roundAMC(amc){
+    if(amc!=null){
+    if(Number(amc).toFixed(0)>=100){
+        return Number(amc).toFixed(0);
+    }else if(Number(amc).toFixed(1)>=10){
+        return Number(amc).toFixed(1);
+    }else if(Number(amc).toFixed(2)>=1){
+        return Number(amc).toFixed(2);
+    }else{
+        return Number(amc).toFixed(3);
+    }
+  }else{
+    return null;
+  }
+}
 
   programChange(event) {
     this.setState({
@@ -145,13 +162,13 @@ class StockStatus extends Component {
       return ''
     }
   }
-  formatAmc = value => {
-    if (value != null) {
-      return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
-    } else {
-      return null;
-    }
-  }
+  // formatAmc = value => {
+  //   if (value != null) {
+  //     return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   formatter = value => {
     if (value != null) {
@@ -265,7 +282,7 @@ class StockStatus extends Component {
       csvRow.push(A[i].join(","))
 
     }
-    var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
+    var list = this.state.PlanningUnitDataForExport
     list.map(
       (item, index) => {
         csvRow.push("")
@@ -326,7 +343,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
         // console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
@@ -850,7 +867,7 @@ class StockStatus extends Component {
                     : " | " + item1.orderNo) +
                 (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.roundAMC(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundAMC(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
@@ -4272,10 +4289,10 @@ class StockStatus extends Component {
                             {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
                               <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
                             <td>
-                              {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
+                              {this.formatter(this.roundAMC(this.state.stockStatusList[idx].amc))}
                             </td>
                             <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
-                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.state.stockStatusList[idx].maxStock)}
+                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.roundAMC(this.state.stockStatusList[idx].maxStock))}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
