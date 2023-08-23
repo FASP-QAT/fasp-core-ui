@@ -965,7 +965,9 @@ export function exportPDF(props) {
                             startY: y,
                             head: [columnsArray],
                             body: data,
-                            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
+                            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" },
+                            horizontalPageBreak: true,
+                            horizontalPageBreakRepeat: 0,
 
                         };
                         doc.autoTable(content);
