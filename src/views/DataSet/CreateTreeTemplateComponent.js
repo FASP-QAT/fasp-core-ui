@@ -7208,6 +7208,11 @@ export default class CreateTreeTemplate extends Component {
         }
         else if (nodeTypeId == 4) {
             // Forecasting unit node
+            if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
+                if(currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != null && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != "" && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != undefined && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != null && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != "" && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != undefined && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id!="" && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id!=null && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id!=undefined){
+                    currentItemConfig.context.payload.label.label_en = getLabelText((currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label,this.state.lang).trim();
+                }
+            }
             if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == undefined) {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode = {
                     oneTimeUsage: "false",
