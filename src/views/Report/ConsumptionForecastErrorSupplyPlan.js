@@ -1787,7 +1787,7 @@ fetchData(){
                 daysOfStockOut: consumptionAdjForStockOutId?true:false // Boolean field that if true means we should consider the Days of Stock Out valued and adjust the consumption accordingly. Only adjusts for Actual Consumption.                            
             }
             console.log("fetchData JSON INPUT---------->", inputjson);
-            ReportService.forecastError(inputjson)
+            ReportService.forecastErrorNew(inputjson)
                 .then(response => {
                     console.log("fetchData dataList--->", response.data);
                     var monthArray = [];
