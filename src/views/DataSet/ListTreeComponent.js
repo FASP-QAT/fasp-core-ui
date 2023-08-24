@@ -1111,7 +1111,7 @@ export default class ListTreeComponent extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
 
-                var program = (filteredGetRequestList.filter(x => x.programId == this.state.datasetId)).filter(v => v.version == this.state.versionId.toString().split(" ")[0])[0];
+                var program = filteredGetRequestList.filter(x => x.id == (this.state.datasetIdModal+"_uId_" + userId).replace("~","_"))[0];
                 console.log("program------",program);
                 var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                 var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -1134,8 +1134,13 @@ export default class ListTreeComponent extends Component {
                 console.log("1Aug planningFullList------",planningFullList);
                 
             programData.planningUnitList = planningFullList;
+            var datasetListJexcel=programData;
             console.log("1Aug programData------after",programData.planningUnitList);
-            let downloadedProgramData = programData;
+            let downloadedProgramData = this.state.downloadedProgramData;
+            console.log("DPD Test@123",downloadedProgramData);
+            var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+            console.log("Index Test@123",index)
+            downloadedProgramData[index]=programData;
             programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
             program.programData = programData;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
@@ -1163,8 +1168,8 @@ export default class ListTreeComponent extends Component {
                             // message: i18n.t('static.mt.dataUpdateSuccess'),
                             color: "green",
                             missingPUList: [],
-                            downloadedProgramData:[downloadedProgramData],
-                            datasetListJexcel:downloadedProgramData
+                            downloadedProgramData:downloadedProgramData,
+                            datasetListJexcel:datasetListJexcel
                         });
                     }.bind(this)
                 }.bind(this)
