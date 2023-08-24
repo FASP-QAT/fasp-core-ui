@@ -2004,6 +2004,7 @@ export default class CommitTreeComponent extends React.Component {
         if (this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0) {
             console.log("In if merge data Test@123")
             // Build json here
+            var programDataLocal=this.state.programDataLocal;
             var programDataJson = this.state.programDataLocal;
             var programDataServer = this.state.programDataServer;
             var versionSettingsJson = this.state.versionSettingsInstance.getJson(null, false);
@@ -2080,6 +2081,78 @@ export default class CommitTreeComponent extends React.Component {
                     var planningUnitIndexServer = programDataServer.planningUnitList.findIndex(c => c.planningUnit.id == selectedForecastJson[sf][15]);
                     if (planningUnitIndexLocal != -1 && planningUnitIndexServer != -1) {
                         programDataJson.planningUnitList[planningUnitIndexLocal].selectedForecastMap[selectedForecastJson[sf][16]] = programDataServer.planningUnitList[planningUnitIndexServer].selectedForecastMap[selectedForecastJson[sf][16]]
+                    }
+                }
+            }
+            
+            for(var fpu=0;fpu<programDataJson.planningUnitList.length;fpu++){
+                for(var rl=0;rl<this.state.regionSet.length;rl++){
+                    var selectedForecastMap=programDataJson.planningUnitList[fpu].selectedForecastMap[this.state.regionSet[rl]];
+                    if(selectedForecastMap!=undefined){
+                        var selectedTreeId=selectedForecastMap.treeId;
+                        var selectedScenarioId=selectedForecastMap.scenarioId;
+                        var selectedConsumptionExtrapolationId=selectedForecastMap.consumptionExtrapolationId;
+                        var finalSelectedTreeId=selectedForecastMap.treeId;
+                        var finalSelectedScenarioId=selectedForecastMap.scenarioId;
+                        var finalSelectedConsumptionExtrapolationId=selectedForecastMap.consumptionExtrapolationId;
+                        if(selectedScenarioId>0){
+                            var checkIfTreeExists=programDataJson.treeList.findIndex(c=>c.treeId==selectedTreeId);
+                            if(checkIfTreeExists==-1){
+                                var checkIfExistsInLocalVersion=programDataLocal.treeList.findIndex(c=>c.treeId==selectedTreeId);
+                                if(checkIfExistsInLocalVersion!=-1){
+                                    // Means vo tree local pe hai but final pe nhi hai
+                                    var localTreeAnchorId=programDataLocal.treeList[checkIfExistsInLocalVersion].treeAnchorId;
+                                    var localTempTreeAnchorId=programDataLocal.treeList[checkIfExistsInLocalVersion].tempTreeAnchorId;
+                                    var checkIfLocalTreeAnchorIdExistsInFinal=programDataJson.treeList.findIndex(c=>localTreeAnchorId>0?c.treeAnchorId==localTreeAnchorId:c.tempTreeAnchorId==localTempTreeAnchorId);
+                                    if(checkIfLocalTreeAnchorIdExistsInFinal!=-1){
+                                        finalSelectedTreeId=programDataJson.treeList[checkIfLocalTreeAnchorIdExistsInFinal].treeId;
+                                        var scenarioIndex=programDataLocal.treeList[checkIfExistsInLocalVersion].scenarioList.findIndex(c=>c.id==selectedScenarioId);
+                                        finalSelectedScenarioId=programDataJson.treeList[checkIfLocalTreeAnchorIdExistsInFinal].scenarioList[scenarioIndex].id;
+                                    }
+                                }else{
+                                    var checkIfExistsInServerVersion=programDataServer.treeList.findIndex(c=>c.treeId==selectedTreeId);
+                                    if(checkIfExistsInServerVersion!=-1){
+                                        // Means vo tree server pe hai but final pe nhi hai
+                                        var serverTreeAnchorId=programDataServer.treeList[checkIfExistsInServerVersion].treeAnchorId;
+                                        var serverTempTreeAnchorId=programDataServer.treeList[checkIfExistsInServerVersion].tempTreeAnchorId;
+                                        var checkIfServerTreeAnchorIdExistsInFinal=programDataJson.treeList.findIndex(c=>serverTreeAnchorId>0?c.treeAnchorId==serverTreeAnchorId:c.tempTreeAnchorId==serverTempTreeAnchorId);
+                                        if(checkIfServerTreeAnchorIdExistsInFinal!=-1){
+                                            finalSelectedTreeId=programDataJson.treeList[checkIfServerTreeAnchorIdExistsInFinal].treeId;
+                                            var scenarioIndex=programDataServer.treeList[checkIfExistsInServerVersion].scenarioList.findIndex(c=>c.id==selectedScenarioId);
+                                            finalSelectedScenarioId=programDataJson.treeList[checkIfServerTreeAnchorIdExistsInFinal].scenarioList[scenarioIndex].id;
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            var checkIfExtrapolationExists=programDataJson.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
+                            if(checkIfExtrapolationExists==-1){
+                                var checkIfExistsInLocalVersion=programDataLocal.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
+                                if(checkIfExistsInLocalVersion!=-1){
+                                    // Means vo extrapolation local pe hai but final pe nhi hai
+                                    var extrapolationMethodId=programDataLocal.consumptionExtrapolation[checkIfExistsInLocalVersion].extrapolationMethod.id;
+                                    var finalConsumptionExtrapolation=programDataJson.consumptionExtrapolation.findIndex(c=>c.planningUnit.id==programDataJson.planningUnitList[fpu].planningUnit.id && c.region.id==this.state.regionSet[rl] && c.extrapolationMethod.id==extrapolationMethodId);
+                                    if(finalConsumptionExtrapolation!=-1){
+                                        finalSelectedConsumptionExtrapolationId=programDataJson.consumptionExtrapolation[finalConsumptionExtrapolation].consumptionExtrapolationId;
+                                    }
+                                    
+                                }else{
+                                    var checkIfExistsInServerVersion=programDataServer.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
+                                    if(checkIfExistsInServerVersion!=-1){
+                                        // Means vo extrapolation local pe hai but final pe nhi hai
+                                        var extrapolationMethodId=programDataServer.consumptionExtrapolation[checkIfExistsInServerVersion].extrapolationMethod.id;
+                                        var finalConsumptionExtrapolation=programDataJson.consumptionExtrapolation.findIndex(c=>c.planningUnit.id==programDataJson.planningUnitList[fpu].planningUnit.id && c.region.id==this.state.regionSet[rl] && c.extrapolationMethod.id==extrapolationMethodId);
+                                        if(finalConsumptionExtrapolation!=-1){
+                                            finalSelectedConsumptionExtrapolationId=programDataJson.consumptionExtrapolation[finalConsumptionExtrapolation].consumptionExtrapolationId;
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        programDataJson.planningUnitList[fpu].selectedForecastMap[this.state.regionSet[rl]].treeId=finalSelectedTreeId;
+                        programDataJson.planningUnitList[fpu].selectedForecastMap[this.state.regionSet[rl]].scenarioId=finalSelectedScenarioId;
+                        programDataJson.planningUnitList[fpu].selectedForecastMap[this.state.regionSet[rl]].consumptionExtrapolationId=finalSelectedConsumptionExtrapolationId;
                     }
                 }
             }
