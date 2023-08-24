@@ -121,7 +121,8 @@ class usageTemplate extends Component {
             lang: localStorage.getItem('lang'),
             tempTracerCategoryId: '',
             tracerCategoryLoading: true,
-            tempForecastingUnitList: []
+            tempForecastingUnitList: [],
+            tcListBasedOnProgram:[]
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -2371,14 +2372,7 @@ class usageTemplate extends Component {
 
         value = Number(value);
         if (value != -1 && value != 0) {
-            let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
-            let programHealthAreaList = programObj.healthAreaList;
-            let tempMyList = [];
-
-            for (let k = 0; k < programHealthAreaList.length; k++) {
-                tempMyList = tempMyList.concat(mylist.filter(c => c.healthAreaId == programHealthAreaList[k].id));
-            }
-            mylist = tempMyList;
+            return this.state.tcListBasedOnProgram.filter(c=>c.active)
         }
         // console.log("check---------------->3", mylist);
         return mylist;
@@ -3625,6 +3619,46 @@ class usageTemplate extends Component {
                     this.el.setComments(col, "");
                 }
             }
+
+            let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
+            if(value!=-1){
+        TracerCategoryService.getTracerCategoryByProgramIds(realmId, [value])
+          .then(response => {
+            // console.log("tc respons==>", response.data);
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var tcList=[];
+            listArray.map(item=>{
+                tcList.push({
+                    name: getLabelText(item.label, this.state.lang),
+                    id: parseInt(item.tracerCategoryId),
+                    active: item.active,
+                    healthAreaId: item.healthArea.id
+                })
+            })
+            this.setState({
+              tcListBasedOnProgram: tcList
+            }, () => {
+            });
+          }).catch(
+            error => {
+              this.setState({
+                tcListBasedOnProgram: []
+              }, () => {
+              });
+              
+            }
+          );
+        }else{
+            this.setState({
+                tcListBasedOnProgram: []
+              }, () => {
+              });
+        }
         }
 
         //Usage Name
