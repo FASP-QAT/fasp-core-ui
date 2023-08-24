@@ -1023,26 +1023,26 @@ export default class CommitTreeComponent extends React.Component {
                                 data[9] = mergedPlanningUnitList[pul].planningUnitNotes;
                                 data[10] = mergedPlanningUnitList[pul].active;
 
-                                var oldDataList = planningUnits.filter(c => c.programPlanningUnitId == mergedPlanningUnitList[pul].programPlanningUnitId);
+                                var oldDataList = planningUnits.filter(c => c.planningUnit.id == mergedPlanningUnitList[pul].planningUnit.id);
                                 var oldData = ""
                                 if (oldDataList.length > 0) {
-                                    oldData = [oldDataList[0].planningUnit.forecastingUnit.productCategory.id, oldDataList[0].planningUnit.id, oldDataList[0].consumptionForecast, oldDataList[0].treeForecast, oldDataList[0].stock, oldDataList[0].existingShipments, oldDataList[0].monthsOfStock, (oldDataList[0].price === "" || oldDataList[0].price == null || oldDataList[0].price == undefined) ? "" : (oldDataList[0].procurementAgent == null || oldDataList[0].procurementAgent == undefined ? -1 : oldDataList[0].procurementAgent.id), oldDataList[0].price, oldDataList[0].planningUnitNotes, oldDataList[0].active];
+                                    oldData = [oldDataList[0].planningUnit.forecastingUnit.productCategory.id, oldDataList[0].planningUnit.id, oldDataList[0].consuptionForecast, oldDataList[0].treeForecast, oldDataList[0].stock, oldDataList[0].existingShipments, oldDataList[0].monthsOfStock, (oldDataList[0].price === "" || oldDataList[0].price == null || oldDataList[0].price == undefined) ? "" : (oldDataList[0].procurementAgent == null || oldDataList[0].procurementAgent == undefined ? -1 : oldDataList[0].procurementAgent.id), oldDataList[0].price, oldDataList[0].planningUnitNotes, oldDataList[0].active];
                                 }
 
                                 data[11] = oldData;
 
-                                var latestDataList = planningUnitsLatest.filter(c => c.programPlanningUnitId == mergedPlanningUnitList[pul].programPlanningUnitId);
+                                var latestDataList = planningUnitsLatest.filter(c => c.planningUnit.id == mergedPlanningUnitList[pul].planningUnit.id);
                                 var latestData = ""
                                 if (latestDataList.length > 0) {
-                                    latestData = [latestDataList[0].planningUnit.forecastingUnit.productCategory.id, latestDataList[0].planningUnit.id, latestDataList[0].consumptionForecast, latestDataList[0].treeForecast, latestDataList[0].stock, latestDataList[0].existingShipments, latestDataList[0].monthsOfStock, (latestDataList[0].price === "" || latestDataList[0].price == null || latestDataList[0].price == undefined) ? "" : (latestDataList[0].procurementAgent == null || latestDataList[0].procurementAgent == undefined ? -1 : latestDataList[0].procurementAgent.id), latestDataList[0].price, latestDataList[0].planningUnitNotes, latestDataList[0].active];
+                                    latestData = [latestDataList[0].planningUnit.forecastingUnit.productCategory.id, latestDataList[0].planningUnit.id, latestDataList[0].consuptionForecast, latestDataList[0].treeForecast, latestDataList[0].stock, latestDataList[0].existingShipments, latestDataList[0].monthsOfStock, (latestDataList[0].price === "" || latestDataList[0].price == null || latestDataList[0].price == undefined) ? "" : (latestDataList[0].procurementAgent == null || latestDataList[0].procurementAgent == undefined ? -1 : latestDataList[0].procurementAgent.id), latestDataList[0].price, latestDataList[0].planningUnitNotes, latestDataList[0].active];
                                 }
 
                                 data[12] = latestData;
 
-                                var downloadedDataList = planningUnitsDownloaded.filter(c => c.programPlanningUnitId == mergedPlanningUnitList[pul].programPlanningUnitId);
+                                var downloadedDataList = planningUnitsDownloaded.filter(c => c.planningUnit.id == mergedPlanningUnitList[pul].planningUnit.id);
                                 var downloadedData = "";
                                 if (downloadedDataList.length > 0) {
-                                    downloadedData = [downloadedDataList[0].planningUnit.forecastingUnit.productCategory.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].consumptionForecast, downloadedDataList[0].treeForecast, downloadedDataList[0].stock, downloadedDataList[0].existingShipments, downloadedDataList[0].monthsOfStock, (downloadedDataList[0].price === "" || downloadedDataList[0].price == null || downloadedDataList[0].price == undefined) ? "" : (downloadedDataList[0].procurementAgent == null || downloadedDataList[0].procurementAgent == undefined ? -1 : downloadedDataList[0].procurementAgent.id), downloadedDataList[0].price, downloadedDataList[0].planningUnitNotes, downloadedDataList[0].active];
+                                    downloadedData = [downloadedDataList[0].planningUnit.forecastingUnit.productCategory.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].consuptionForecast, downloadedDataList[0].treeForecast, downloadedDataList[0].stock, downloadedDataList[0].existingShipments, downloadedDataList[0].monthsOfStock, (downloadedDataList[0].price === "" || downloadedDataList[0].price == null || downloadedDataList[0].price == undefined) ? "" : (downloadedDataList[0].procurementAgent == null || downloadedDataList[0].procurementAgent == undefined ? -1 : downloadedDataList[0].procurementAgent.id), downloadedDataList[0].price, downloadedDataList[0].planningUnitNotes, downloadedDataList[0].active];
                                 }
 
                                 data[13] = downloadedData;
@@ -1544,7 +1544,7 @@ export default class CommitTreeComponent extends React.Component {
                                                 obj.setStyle(col, "background-color", "transparent");
                                                 obj.setValueFromCoords(1, y, "", true);
                                                 obj.setValueFromCoords(6, y, 2, true);
-                                                obj.options.false = true;
+                                                obj.options.editable = false;
                                                 this.setState({
                                                     conflictsCountTree: this.state.conflictsCountTree - 1
                                                 }, () => {
@@ -2225,10 +2225,13 @@ export default class CommitTreeComponent extends React.Component {
         target.classList.add("removeOddColor")
         var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
         var tr = asterisk.firstChild;
-        tr.children[6].classList.add('InfoTr');
-        console.log("This.state.program " + this.state.programDataServer)
+        tr.children[6].classList.add('InfoTr');        
         var serverVersionId = this.state.programDataServer.currentVersion.versionId + 1;
         tr.children[6].title = i18n.t('static.commitVersion.exculdeConsumptionTooltip', { serverVersionId });
+        tr.children[3].classList.add('InfoTr');        
+        tr.children[3].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
+        tr.children[4].classList.add('InfoTr');        
+        tr.children[4].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
         jExcelLoadedFunction(instance, 2);
         var elInstance = instance.worksheets[0];
         var jsonData = elInstance.getJson();
@@ -2252,7 +2255,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 3, true);
                 }
-            } else if ((jsonData[c])[3] != "" && (jsonData[c])[2] != "" && (jsonData[c])[6] != 1) {
+            } else if ((jsonData[c])[3] != (jsonData[c])[2] && (jsonData[c])[6] != 1) {
                 var oldData = (jsonData[c])[7];
                 var latestData = (jsonData[c])[8];
                 var downloadedData = (jsonData[c])[9];
@@ -2307,6 +2310,10 @@ export default class CommitTreeComponent extends React.Component {
         tr.children[4].classList.add('InfoTr');
         var serverVersionId = this.state.programDataServer.currentVersion.versionId + 1;
         tr.children[4].title = i18n.t('static.commitVersion.exculdeTreeTooltip', { serverVersionId });
+        tr.children[1].classList.add('InfoTr');        
+        tr.children[1].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
+        tr.children[2].classList.add('InfoTr');        
+        tr.children[2].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
         jExcelLoadedFunction(instance, 3);
         var elInstance = instance.worksheets[0];
         var jsonData = elInstance.getJson();
@@ -2329,7 +2336,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 3, true);
                 }
-            } else if ((jsonData[c])[8] != "" && (jsonData[c])[7] != "" && (jsonData[c])[6] != 1) {
+            } else if ((jsonData[c])[8] != (jsonData[c])[7] && (jsonData[c])[6] != 1) {
                 var oldData = (jsonData[c])[7];
                 var latestData = (jsonData[c])[8];
                 var downloadedData = (jsonData[c])[9];
@@ -3304,8 +3311,8 @@ export default class CommitTreeComponent extends React.Component {
                                 </ul>
                             </div>
                             <Form name='simpleForm'>
-                                <div className=" pl-0">
-                                    <div className="row">
+                                <Col md="12 pl-0">
+                                    <div className="d-md-flex">
                                         <FormGroup className="col-md-3 ">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                             <div className="controls ">
@@ -3322,10 +3329,18 @@ export default class CommitTreeComponent extends React.Component {
                                                 </Input>
                                             </div>
                                         </FormGroup>
+                                        <div className="col-md-10 pt-4 pb-3">
+                                            <ul className="legendcommitversion">
+                                                <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li>
+                                                <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                                                <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                                                {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
+                                </Col>
                             </Form>
-                            {/* <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined !== "") ? 'block' : 'none' }}><b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b></div> */}
+                            <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined !== "") ? 'block' : 'none' }}><b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b></div>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <Row style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined) ? 'block' : 'none' }}>
                                     <Col xs="12" md="12" className="mb-4">
