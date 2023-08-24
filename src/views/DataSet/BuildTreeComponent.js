@@ -564,7 +564,7 @@ function addCommas(cell1, row) {
         console.log("Comma---x---", x);
         var x1 = x[0];
         console.log("Comma---x1---", x1);
-        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
         console.log("Comma---x2---", x2);
         var rgx = /(\d+)(\d{3})/;
         console.log("Comma---reg");

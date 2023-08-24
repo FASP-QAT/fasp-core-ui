@@ -2817,6 +2817,14 @@ export default class CommitTreeComponent extends React.Component {
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
+
+                                            var annualTargetCalculator=node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator;
+                                            if(annualTargetCalculator!=undefined){
+                                                if(annualTargetCalculator.yearsOfTarget=="" || annualTargetCalculator.actualOrTargetValueList.length==0){
+                                                    annualTargetCalculator={}
+                                                }
+                                            }
+                                            node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator=annualTargetCalculator;
                                             // console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             // console.log("commit*** findNodeIndex1---", findNodeIndex);
