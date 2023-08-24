@@ -1650,7 +1650,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.tree.firstMonthOfTarget": "Primer mes del objetivo",
-    "static.tree.annualTargetLabel": "Esta calculadora está alcanzando objetivos anuales (suma de 12 meses) y, en general, es adecuada para productos discretos, en lugar de continuos. QAT utiliza sus objetivos y el cambio entre sus objetivos para generar un cambio porcentual mensual. El uso de esta calculadora proporciona un pronóstico dinámico en lugar de escalonado. Tenga en cuenta que siempre habrá pequeñas diferencias en el total anual final y su objetivo. Sin embargo, la diferencia será pequeña si sus objetivos cambian a un ritmo similar de un año a otro. Consulte Mostrar orientación para obtener más detalles sobre el cálculo.",
+    "static.tree.annualTargetLabel": "Esta calculadora permite a los usuarios convertir sus objetivos anuales en tasas mensuales directamente en QAT para realizar pronósticos mensuales de árboles. Esta característica generalmente es apropiada para productos discretos, en lugar de continuos. La calculadora requiere datos reales para el año anterior al pronóstico, los objetivos anuales durante el período del pronóstico y el objetivo para el año posterior al pronóstico. Luego, QAT calcula el cambio entre estas cifras anuales para generar un cambio mensual. Luego, la calculadora completará el mes de inicio y el valor en la "pestaña Nodo" y las filas en la pestaña "Modelado y transferencia".\nTenga en cuenta que siempre habrá pequeñas diferencias entre el total anual final pronosticado y su objetivo. Sin embargo, la diferencia será pequeña si sus objetivos cambian a un ritmo similar de un año a otro. La ventaja de utilizar la calculadora es que proporciona un pronóstico dinámico en lugar de escalonado.",
     "static.tree.targetYears": "¿Cuántos años de objetivos?",
     "static.tree.actualOrTarget": "Real/Objetivo",
     "static.tree.annualChangePer": "Cambio Anual (%)",
@@ -1659,7 +1659,7 @@
     "static.tree.differenceTargetVsCalculatedPer": "Diferencia (objetivo frente a calculado, %)",
     "static.tooltip.actualOrTarget": "Suma de 12 meses. Debe proporcionar el total de un año antes del primer objetivo y 1 año después del último objetivo.",
     "static.tooltip.annualChangePer": "Cambio respecto al año anterior. Cambio anual (%) = (objetivo anual - objetivo o real del año anterior) / (objetivo o real del año anterior)",
-    "static.tooltip.calculatedTotal": "Starting with your ... See more in show guidance.",
+    "static.tooltip.calculatedTotal": "QAT supone que la meta anual/12 se alcanzará en el punto medio del año objetivo y luego interpola entre esos puntos medios suponiendo una tasa de cambio lineal o exponencial.",
     "static.tooltip.diffTargetVsCalculatedNo": "Diferencia = Total calculado - Objetivo. Esta diferencia será grande si el cambio anual varía significativamente entre años.",
     "static.tooltip.diffTargetVsCalculatedPer": "(Total calculado - Objetivo) / Objetivo. Esta diferencia será grande si el cambio anual varía significativamente entre años.",
     "static.modelingCalculator.confirmAlert": "¿Quieres reemplazar la mesa existente?",
@@ -3173,5 +3173,7 @@
     "static.currency.conversionrateusd": "Tasa de cambio a USD",
     "static.logout.confirmLogout": "¿Desea cerrar la sesión?",
     "static.common.node": "Nodo",
-    "static.pipeline.pipelineConvertorLinux": "Linux"
+    "static.pipeline.pipelineConvertorLinux": "Linux",
+    "static.tooltip.FirstMonthOfTarget": "De forma predeterminada, los objetivos comienzan en el mes de inicio de su período de pronóstico, pero se pueden cambiar si lo desea. Los objetivos deben ser en períodos de 12 meses, pero no es necesario que comiencen en enero.",
+    "static.tooltip.yearsOfTarget": "QAT recomienda proporcionar objetivos para el período de pronóstico y un año más allá del período de pronóstico. Si proporciona menos, el final de su pronóstico no tendrá cambios en el tiempo."
 }
