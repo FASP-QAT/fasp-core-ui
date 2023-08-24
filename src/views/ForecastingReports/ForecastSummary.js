@@ -1267,7 +1267,7 @@ class ForecastSummary extends Component {
                                                                     return {
                                                                         consumptionDate: m.month,
                                                                         // consumptionQty: Math.round(m.calculatedMmdValue)
-                                                                        consumptionQty: (m.calculatedMmdValue == null ? 0 : (m.calculatedMmdValue).toFixed(2))
+                                                                        consumptionQty: (m.calculatedMmdValue == null ? 0 : (m.calculatedMmdValue))
                                                                     }
                                                                 });
 
@@ -1295,7 +1295,7 @@ class ForecastSummary extends Component {
                                                         return {
                                                             consumptionDate: m.month,
                                                             // consumptionQty: (m.amount).toFixed(2)
-                                                            consumptionQty: (m.amount == null ? 0 : Number(m.amount).toFixed(2))
+                                                            consumptionQty: (m.amount == null ? 0 : Number(m.amount))
                                                         }
                                                     });
                                                     if (consumptionData.length > 0) {
@@ -1407,7 +1407,7 @@ class ForecastSummary extends Component {
                                             return a;
                                         }, {}));
                                         // console.log("Result True Test@123",resultTrue)
-                                        totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
+                                        totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty) : 0);
 
                                     }
 
@@ -1421,7 +1421,7 @@ class ForecastSummary extends Component {
                                     let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                     let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
                                     let planningUnit = planningUnitList[j].planningUnit;
-                                    let totalForecastedQuantity = totalForecastedQuantity0ri;
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri.toFixed(2);
                                     let stock1 = planningUnitList[j].stock;
                                     let existingShipments = planningUnitList[j].existingShipments;
                                     let stock2 = ((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri);
@@ -1614,17 +1614,17 @@ class ForecastSummary extends Component {
                                                 }else{
                                                     totalForecast=null;
                                                 }
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast).toFixed(2) : "";
-                                                total += Number(filterForecastSelected != undefined ? Number(totalForecast).toFixed(2) : 0);
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast) : "";
+                                                total += Number(filterForecastSelected != undefined ? Number(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
-                                                if ((filterForecastSelected != undefined ? Number(totalForecast).toFixed(2) : "") != "") {
+                                                if ((filterForecastSelected != undefined ? Number(totalForecast) : "") != "") {
                                                     selectedForecastQty = selectedForecastQty + 1;
                                                 }
                                             }
                                             data[(regRegionList.length * 3) + 3] = 2
                                             // data[(regRegionList.length * 3) + 4] = total;
-                                            data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : total);
+                                            data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : Number(total).toFixed(2));
                                             data[(regRegionList.length * 3) + 5] = 0
                                             dataArray.push(data);
                                         }
