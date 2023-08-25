@@ -1544,6 +1544,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
                   fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
                   fullConsumptionList[index].puAmount = puAmountValue;
+                  fullConsumptionList[index].createdBy = {
+                    userId: curUser
+                  };
+                  fullConsumptionList[index].createdDate = curDate;
                 } else {
                   var json = {
                     amount: actualConsumptionValue,

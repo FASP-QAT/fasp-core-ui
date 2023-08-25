@@ -1252,6 +1252,7 @@ export default class CommitTreeComponent extends React.Component {
                                     data[9] = downloadedModifiedDate != "" ? moment(downloadedModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
                                     data[10] = mergedPlanningUnitList[pul].planningUnit.id
                                     data[11] = mergedRegionList[rl].regionId;
+                                    data[12] = false;
                                     mergedConsumptionListArray.push(data);
                                 }
                             }
@@ -1290,9 +1291,12 @@ export default class CommitTreeComponent extends React.Component {
                                         title: "Downloaded v7"
                                     },
                                     {
-                                        title: 'Exclude',
+                                        title: i18n.t('static.commitVersion.exclude'),
                                         type: 'checkbox',
                                         // readOnly: true //16Q
+                                    },
+                                    {
+                                        type: 'hidden'
                                     },
                                     {
                                         type: 'hidden'
@@ -1323,6 +1327,14 @@ export default class CommitTreeComponent extends React.Component {
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
                                 // editable: false,
+                                onclick:function (instance, cell, x, y, event) {
+                                    if(x==5){
+                                        instance.options.editable=true;
+                                        instance.setValueFromCoords(12,y,instance.getValueFromCoords(5,y,true).toString()=="true"?false:true,true)
+                                        instance.options.editable=false;                                    
+                                        this.mergeData();                                        
+                                    }
+                                }.bind(this),
                                 onload: this.loadedFunctionForConsumption,
                                 // text: {
                                 //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1456,6 +1468,7 @@ export default class CommitTreeComponent extends React.Component {
                                 data[7] = treeLocal.length > 0 ? moment(treeLocal[0].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
                                 data[8] = treeServer.length > 0 ? moment(treeServer[0].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
                                 data[9] = treeDownloaded.length > 0 ? moment(treeDownloaded[0].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
+                                data[10] = false;
                                 mergedTreeListArray.push(data);
                             }
                             var options = {
@@ -1481,9 +1494,12 @@ export default class CommitTreeComponent extends React.Component {
                                         title: "Downloaded v7"
                                     },
                                     {
-                                        title: 'Exclude',
+                                        title: i18n.t('static.commitVersion.exclude'),
                                         type: 'checkbox',
                                         // readOnly: true //16Q
+                                    },
+                                    {
+                                        type: 'hidden'
                                     },
                                     {
                                         type: 'hidden'
@@ -1515,6 +1531,14 @@ export default class CommitTreeComponent extends React.Component {
                                 allowDeleteRow: false,
                                 // editable: false,
                                 onload: this.loadedFunctionForTree,
+                                onclick:function (instance, cell, x, y, value) {
+                                    if(x==3){
+                                        instance.options.editable=true;
+                                        instance.setValueFromCoords(10,y,instance.getValueFromCoords(3,y,true).toString()=="true"?false:true,true)
+                                        instance.options.editable=false;                                    
+                                        this.mergeData();                                        
+                                    }
+                                }.bind(this),
                                 // text: {
                                 //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                 //   show: '',
@@ -2033,17 +2057,18 @@ export default class CommitTreeComponent extends React.Component {
             var consumptionJson = this.state.consumptionInstance.getJson(null, false);
             console.log("Consumption Json Test@123", consumptionJson)
             for (var c = 0; c < consumptionJson.length; c++) {
-                if (consumptionJson[c][6] == 3) {
+                if (consumptionJson[c][6] == 3 || consumptionJson[c][12].toString()=="true") {
                     programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
-                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.concat(programDataServer.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11])));
+                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.concat(programDataServer.actualConsumptionList.filter(item => (item.planningUnit.id == consumptionJson[c][10] && item.region.id == consumptionJson[c][11])));
                     programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
-                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.concat(programDataServer.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11])));
+                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.concat(programDataServer.consumptionExtrapolation.filter(item => (item.planningUnit.id == consumptionJson[c][10] && item.region.id == consumptionJson[c][11])));
                 }
             }
 
             var treeJson = this.state.treeInstance.getJson(null, false);
+            console.log("Tree Json Test@123",treeJson)
             for (var t = 0; t < treeJson.length; t++) {
-                if (treeJson[t][6] == 3) {
+                if (treeJson[t][6] == 3 || treeJson[t][10].toString()=="true") {
                     var treeFromServerIndex = programDataServer.treeList.findIndex(c => c.treeAnchorId == treeJson[t][4]);
                     if (treeFromServerIndex != -1) {
                         var treeFromLocalIndex = programDataJson.treeList.findIndex(c => c.treeAnchorId == treeJson[t][4]);
@@ -2295,8 +2320,9 @@ export default class CommitTreeComponent extends React.Component {
         var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[6].classList.add('InfoTr');        
-        var serverVersionId = this.state.programDataServer.currentVersion.versionId + 1;
-        tr.children[6].title = i18n.t('static.commitVersion.exculdeConsumptionTooltip', { serverVersionId });
+        var serverVersionId = this.state.programDataServer.currentVersion.versionId;
+        var localVersionId=this.state.programDataLocal.currentVersion.versionId;
+        tr.children[6].title = i18n.t('static.commitVersion.exculdeConsumptionTooltip', { localVersionId,serverVersionId });
         tr.children[3].classList.add('InfoTr');        
         tr.children[3].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
         tr.children[4].classList.add('InfoTr');        
@@ -2309,14 +2335,14 @@ export default class CommitTreeComponent extends React.Component {
         for (var c = 0; c < jsonData.length; c++) {
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
-            if ((jsonData[c])[3] == "" && (jsonData[c])[2] != "" && (jsonData[c])[4] == "") {
+            if ((jsonData[c])[8] == "" && (jsonData[c])[7] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 2, true);
                 }
-            } else if ((jsonData[c])[2] == "" && (jsonData[c])[3] != "" && (jsonData[c])[4] == "") {
+            } else if ((jsonData[c])[7] == "" && (jsonData[c])[8] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
 
@@ -2324,7 +2350,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 3, true);
                 }
-            } else if ((jsonData[c])[3] != (jsonData[c])[2] && (jsonData[c])[6] != 1) {
+            } else if ((jsonData[c])[7] != (jsonData[c])[8] && (jsonData[c])[6] != 1) {
                 var oldData = (jsonData[c])[7];
                 var latestData = (jsonData[c])[8];
                 var downloadedData = (jsonData[c])[9];
@@ -2335,7 +2361,7 @@ export default class CommitTreeComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                     }
                 } else {
-                    if ((jsonData[c])[4] != "" && oldData == downloadedData) {
+                    if ((jsonData[c])[9] != "" && oldData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
                         var col = ("D").concat(parseInt(c) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -2343,7 +2369,7 @@ export default class CommitTreeComponent extends React.Component {
                         // }
                         elInstance.setValueFromCoords(6, c, 3, true);
                         (jsonData[c])[6] = 3;
-                    } else if ((jsonData[c])[4] != "" && latestData == downloadedData) {
+                    } else if ((jsonData[c])[9] != "" && latestData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
                         var col = ("C").concat(parseInt(c) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -2377,8 +2403,9 @@ export default class CommitTreeComponent extends React.Component {
         var asterisk = document.getElementsByClassName("jss")[3].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[4].classList.add('InfoTr');
-        var serverVersionId = this.state.programDataServer.currentVersion.versionId + 1;
-        tr.children[4].title = i18n.t('static.commitVersion.exculdeTreeTooltip', { serverVersionId });
+        var serverVersionId = this.state.programDataServer.currentVersion.versionId;
+        var localVersionId=this.state.programDataLocal.currentVersion.versionId;
+        tr.children[4].title = i18n.t('static.commitVersion.exculdeTreeTooltip', { localVersionId,serverVersionId });
         tr.children[1].classList.add('InfoTr');        
         tr.children[1].title = i18n.t('static.commitVersion.treeAndConsumptionLastModifiedDateTooltip');
         tr.children[2].classList.add('InfoTr');        
@@ -2839,12 +2866,12 @@ export default class CommitTreeComponent extends React.Component {
                                 // console.log("ProgramJson+++", programJson);
                                 // console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
                                 var treeList = programJson.treeList;
-                                var treeJson=this.state.treeInstance.getJson(null,false);
-                                for(var tj=0;tj<treeJson.length;tj++){
-                                    if(this.state.treeInstance.getCell(("D").concat(parseInt(tj) + 1)).firstChild.checked.toString()=="true"){
-                                        treeList=treeList.filter(c=>c.treeAnchorId>0?c.treeAnchorId!=treeJson[tj][4]:c.tempTreeAnchorId!=treeJson[tj][5]);
-                                    }
-                                }
+                                // var treeJson=this.state.treeInstance.getJson(null,false);
+                                // for(var tj=0;tj<treeJson.length;tj++){
+                                //     if(this.state.treeInstance.getCell(("D").concat(parseInt(tj) + 1)).firstChild.checked.toString()=="true"){
+                                //         treeList=treeList.filter(c=>c.treeAnchorId>0?c.treeAnchorId!=treeJson[tj][4]:c.tempTreeAnchorId!=treeJson[tj][5]);
+                                //     }
+                                // }
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
@@ -2918,13 +2945,13 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
 
-                                var consumptionJson=this.state.consumptionInstance.getJson(null,false);
-                                for(var c=0;c<consumptionJson.length;c++){
-                                    if(this.state.consumptionInstance.getCell(("F").concat(parseInt(c) + 1)).firstChild.checked.toString()=="true"){
-                                        programJson.actualConsumptionList = programJson.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
-                                        programJson.consumptionExtrapolation = programJson.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
-                                    }
-                                }
+                                // var consumptionJson=this.state.consumptionInstance.getJson(null,false);
+                                // for(var c=0;c<consumptionJson.length;c++){
+                                //     if(this.state.consumptionInstance.getCell(("F").concat(parseInt(c) + 1)).firstChild.checked.toString()=="true"){
+                                //         programJson.actualConsumptionList = programJson.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                                //         programJson.consumptionExtrapolation = programJson.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                                //     }
+                                // }
 
                                 programJson.treeList = treeList;
                                 console.log("commit*** final programJson---", programJson)
