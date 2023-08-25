@@ -9210,7 +9210,7 @@ export default class BuildTree extends Component {
     }
 
     loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
         let count = document.getElementById("targetYears").value;
         count = Number(Number(count) + 1);
         var elInstance = instance.worksheets[0];
