@@ -3587,7 +3587,7 @@ class ShipmentSummery extends Component {
                       </div>
                     </div>
                   </Col>
-                  <Col md="12 pl-0">
+                  <Col md="12 pl-2">
                     <div className="row">
                       <FormGroup className="col-md-10 mt-3 ">
                         <ul className="legendcommitversion list-group">
@@ -3602,7 +3602,7 @@ class ShipmentSummery extends Component {
                         </ul>
                       </FormGroup>
                       <div
-                        className="consumptionDataEntryTable ShipmentSummeryReportMarginTop"
+                        className="consumptionDataEntryTable ShipmentSummeryReportMarginTop TableWidth100"
                         id="mytable2"
                       >
                         {/* this.props.items is undefined that's why removed this style - Sonal */}

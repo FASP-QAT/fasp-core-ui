@@ -3803,7 +3803,7 @@ class EditSupplyPlanStatus extends Component {
                         </ul>
                     </FormGroup>
                     <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
-                        <div id="problemListDiv" className="" />
+                        <div id="problemListDiv" className="TableWidth100" />
                     </div>
                 </TabPane>
 
