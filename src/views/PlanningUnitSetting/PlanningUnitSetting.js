@@ -109,7 +109,8 @@ export default class PlanningUnitSetting extends Component {
             isPlanningUnitLoaded: false,
             tempSortOrder:'',
             sortOrderLoading: true,
-            tempPlanningUnitList: []
+            tempPlanningUnitList: [],
+            dropdownList: []
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -694,8 +695,21 @@ export default class PlanningUnitSetting extends Component {
             }
             if (data[i].x == 1) {
                 // console.log("-----------------onPaste---------------------42", data[i].value);
-
-                (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                let temp = data[i].value.split(" | ");
+                let temp_obj = {
+                    id: parseInt(temp[1]),
+                    name: data[i].value
+                };
+                let temp_list = this.state.dropdownList;
+                temp_list[data[i].y] = temp_obj;
+                this.setState(
+                    {
+                        dropdownList: temp_list
+                    }, () => {
+                        (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                    }
+                )
+                
             }
         }
     }
@@ -730,21 +744,61 @@ export default class PlanningUnitSetting extends Component {
 
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
-
-                // console.log("mylist--------->1112", planningUnitId);
-
-                if (tempPaList != undefined) {
-                    // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
-                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
-                    // console.log("mylist--------->1113", obj);
-                    if (typeof obj != 'undefined') {
-                        this.el.setValueFromCoords(8, y, obj.price, true);
-                    } else {
-                        // this.el.setValueFromCoords(8, y, '', true);
-                        let q = '';
-                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
+                .then(response => {
+                    if (response.status == 200) {
+                        if(response.data.length > 0){
+                            let obj = response.data[0].procurementAgentPriceList.filter(c => c.id == value)[0];
+                            if (typeof obj != 'undefined') {
+                                this.el.setValueFromCoords(8, y, obj.price, true);
+                            } else {
+                                // this.el.setValueFromCoords(8, y, '', true);
+                                let q = '';
+                                q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                            }
+                        }
                     }
-                }
+                }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+        
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                );
 
             } else {
                 // console.log("Value--------------->ELSE");
@@ -2006,14 +2060,13 @@ export default class PlanningUnitSetting extends Component {
         let outPutListArray = [];
         let count = 0;
         let indexVar = 1;
-        let dropdownList = [];
-
+        let dropdownList = this.state.dropdownList;
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            dropdownList.push({
+            dropdownList[j] = {
                 id: outPutList[j].planningUnit.id,
                 name : outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
-            });
+            };
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
@@ -2068,7 +2121,7 @@ export default class PlanningUnitSetting extends Component {
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutListArray;
-
+        this.setState({dropdownList: dropdownList})
         var options = {
             data: data,
             columnDrag: true,
@@ -3191,7 +3244,7 @@ export default class PlanningUnitSetting extends Component {
 
     }
     getPlanningUnitList(callBy) {
-        if (!this.state.isPlanningUnitLoaded || callBy == 0) {
+        if (callBy == 0) {
             var pID = document.getElementById("forecastProgramId").value;
             if (pID != 0) {
                 this.setState({
