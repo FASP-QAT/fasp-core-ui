@@ -988,6 +988,7 @@ export default class CreateTreeTemplate extends Component {
         this.buildModelingCalculatorJexcel = this.buildModelingCalculatorJexcel.bind(this);
         this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
+        this.changedMissingPUForCreateTree=this.changedMissingPUForCreateTree.bind(this);
     }
 
     cancelNodeDataClicked() {
@@ -1435,13 +1436,13 @@ export default class CreateTreeTemplate extends Component {
                         this.el.setValueFromCoords(8, y, obj.price, true);
                     } else {
                         let q = '';
-                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                        this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : this.el.setValueFromCoords(8, y, '', true)
                     }
                 }
 
             } else {
                 console.log("Value--------------->ELSE");
-                // this.el.setValueFromCoords(8, y, '', true);
+                this.el.setValueFromCoords(8, y, '', true);
                 // let q = '';
                 // q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
             }
@@ -1626,7 +1627,7 @@ export default class CreateTreeTemplate extends Component {
         //unit price
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
-            this.el.setValueFromCoords(10, y, 1, true);
+            // this.el.setValueFromCoords(10, y, 1, true);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == '' || value == null) {
                 value = this.el.getValueFromCoords(8, y);
@@ -13765,9 +13766,11 @@ export default class CreateTreeTemplate extends Component {
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                &nbsp;
-
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>All template Planning Units are in the program.</strong>}
+                                                        &nbsp;
                                             </FormGroup>
                                         </div>
 

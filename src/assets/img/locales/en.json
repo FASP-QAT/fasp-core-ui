@@ -1553,7 +1553,7 @@
     "static.dataentry.notesMaxLength": "Maximum 600 characters only",
     "static.extrapolation.EachPlanningUnit": "screen for each planning unit and region you would like to extrapolate",
     "static.dataValidation.scenarioNotes": "Scenario Notes",
-    "static.realmCountryPlanningUnit.failedToUpdate": "Failed to update data as one of the one is to one mapping is missing",
+    "static.realmCountryPlanningUnit.failedToUpdate": "Cannot deactivate ARU with conversion factor = 1, please reactivate to continue",
     "static.masterDataSync.syncFailed": "Master data sync failed. Try again",
     "static.common.alphabetNumericCharOnly": "Only letters, numbers, hyphens (-), underscores (_), apostrophes (`), and forward slashes (/) allowed.",
     "static.inventory.program": "Program",
@@ -3188,8 +3188,8 @@
     "static.commitVersion.updatePUSettings":"Update Planning Unit Settings",
     "static.commitVersion.localV":"Local v",
     "static.commitVersion.serverV":"Server v",
-    "static.commitVersion.exculdeConsumptionTooltip":"If checked, this product will not appear in Server v{{serverVersionId}} for this region",
-    "static.commitVersion.exculdeTreeTooltip":"If checked, this tree will not appear in Server v{{serverVersionId}}",
+    "static.commitVersion.exculdeConsumptionTooltip":"If checked, QAT will exclude any changes to this planning unit on version {{localVersionId}} (local) and revert to the latest server version {{serverVersionId}}.",
+    "static.commitVersion.exculdeTreeTooltip":"If checked, QAT will exclude any changes to this tree on version {{localVersionId}} (local) and revert to the latest server version {{serverVersionId}}.",
     "static.tree.firstMonthOfTarget": "First Month of Target",
     "static.tree.annualTargetLabel": "This calculator is reaching annual targets (sum across 12 months) and is generally appropriate for products are discrete, rather than continuous.  QAT uses your targets and the change between your targets to generate a monthly % change. Using this calculator provides a dynamic rather than stairstep forecast. Note that will always be minor differences in the final annual total and your target. However, the difference will be small if your targets change at a similar rate from year to year. See show guidance for more detail on the calculation.",
     "static.tree.targetYears": "How many years of targets?",
@@ -3204,5 +3204,6 @@
     "static.tooltip.diffTargetVsCalculatedNo": "Difference = Calculated Total - Target. This difference will be large if the annual change varies significantly between years",
     "static.tooltip.diffTargetVsCalculatedPer": "(Calculated Total - Target) / Target. This difference will be large if the annual change varies significantly between years",
     "static.modelingCalculator.confirmAlert": "Do you want to replace the existing table ?",
-    "static.commitVersion.treeAndConsumptionLastModifiedDateTooltip":"This date refers to when the data element was last edited in this particular version."
+    "static.commitVersion.treeAndConsumptionLastModifiedDateTooltip":"This date refers to when the data element was last edited in this particular version.",
+    "static.commitVersion.exclude":"Exclude local changes"
 }
