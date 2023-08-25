@@ -1677,7 +1677,7 @@ class Budgets extends Component {
                                     // this.state.show && 
                                     // this.state.selBudget.length > 0 &&
                                     <div className="dataEnteredTable">
-                                        <div id="budgetTable">
+                                        <div id="budgetTable" className='TableWidth100'>
                                         </div>
                                     </div>
                                 }
