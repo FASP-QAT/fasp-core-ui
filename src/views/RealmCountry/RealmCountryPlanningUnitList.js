@@ -380,6 +380,15 @@ export default class RealmCountryPlanningUnitList extends Component {
                     },
                     () => {
                       this.hideSecondComponent();
+                      var json=this.el.getJson(null,false);
+                      for(var j=0;j<json.length;j++){
+                        if(json[j][9]==1 && json[j][6].toString()=="false" && json[j][10]==1){
+                          var col = "G".concat(parseInt(j) + 1);
+                          this.el.setStyle(col, "background-color", "transparent");
+                          this.el.setStyle(col, "background-color", "yellow");
+                          this.el.setComments(col, i18n.t("static.realmCountryPlanningUnit.failedToUpdate"));
+                        }
+                      }
                     }
                   );
                   break;
