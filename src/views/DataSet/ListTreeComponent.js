@@ -587,16 +587,13 @@ export default class ListTreeComponent extends Component {
                     if (typeof obj != 'undefined') {
                         this.el.setValueFromCoords(8, y, obj.price, true);
                     } else {
-                        let q = '';
-                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                        this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : this.el.setValueFromCoords(8, y, '', true);
                     }
                 }
 
             } else {
                 console.log("Value--------------->ELSE");
-                // this.el.setValueFromCoords(8, y, '', true);
-                // let q = '';
-                // q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                this.el.setValueFromCoords(8, y, '', true);
             }
 
         }
@@ -779,7 +776,7 @@ export default class ListTreeComponent extends Component {
         //unit price
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
-            this.el.setValueFromCoords(10, y, 1, true);
+            // this.el.setValueFromCoords(10, y, 1, true);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == '' || value == null) {
                 value = this.el.getValueFromCoords(8, y);
