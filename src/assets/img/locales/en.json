@@ -1553,7 +1553,7 @@
     "static.dataentry.notesMaxLength": "Maximum 600 characters only",
     "static.extrapolation.EachPlanningUnit": "screen for each planning unit and region you would like to extrapolate",
     "static.dataValidation.scenarioNotes": "Scenario Notes",
-    "static.realmCountryPlanningUnit.failedToUpdate": "Failed to update data as one of the one is to one mapping is missing",
+    "static.realmCountryPlanningUnit.failedToUpdate": "Cannot deactivate ARU with conversion factor = 1, please reactivate to continue",
     "static.masterDataSync.syncFailed": "Master data sync failed. Try again",
     "static.common.alphabetNumericCharOnly": "Only letters, numbers, hyphens (-), underscores (_), apostrophes (`), and forward slashes (/) allowed.",
     "static.inventory.program": "Program",
