@@ -1614,13 +1614,8 @@ class ForecastSummary extends Component {
                                                 } else {
                                                     totalForecast = null;
                                                 }
-<<<<<<< HEAD
                                                 data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast) : "";
                                                 total += Number(filterForecastSelected != undefined ? Number(totalForecast) : 0);
-=======
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast != null ? Math.round(totalForecast) : "";
-                                                total += Number(filterForecastSelected != undefined ? Math.round(totalForecast) : 0);
->>>>>>> QAT-2709A
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
                                                 if ((filterForecastSelected != undefined ? Number(totalForecast) : "") != "") {

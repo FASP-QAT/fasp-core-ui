@@ -3582,7 +3582,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                         </div>
                                         
-                                        <div className="row">
+                                    <div className="row">
                                         <div className="col-md-8 pl-lg-1">
                                                 <div className="check inline  pl-lg-3 pt-lg-3">
                                                     <div>

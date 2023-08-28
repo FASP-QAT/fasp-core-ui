@@ -2003,7 +2003,7 @@ class AddprogramPlanningUnit extends Component {
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="consumptionDataEntryTable FreezePlaningUnitColumn" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow">
+                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                     </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>

@@ -109,7 +109,8 @@ export default class PlanningUnitSetting extends Component {
             isPlanningUnitLoaded: false,
             tempSortOrder:'',
             sortOrderLoading: true,
-            tempPlanningUnitList: []
+            tempPlanningUnitList: [],
+            dropdownList: []
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -694,8 +695,21 @@ export default class PlanningUnitSetting extends Component {
             }
             if (data[i].x == 1) {
                 // console.log("-----------------onPaste---------------------42", data[i].value);
-
-                (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                let temp = data[i].value.split(" | ");
+                let temp_obj = {
+                    id: parseInt(temp[1]),
+                    name: data[i].value
+                };
+                let temp_list = this.state.dropdownList;
+                temp_list[data[i].y] = temp_obj;
+                this.setState(
+                    {
+                        dropdownList: temp_list
+                    }, () => {
+                        (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                    }
+                )
+                
             }
         }
     }
@@ -730,21 +744,61 @@ export default class PlanningUnitSetting extends Component {
 
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
-
-                // console.log("mylist--------->1112", planningUnitId);
-
-                if (tempPaList != undefined) {
-                    // let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
-                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
-                    // console.log("mylist--------->1113", obj);
-                    if (typeof obj != 'undefined') {
-                        this.el.setValueFromCoords(8, y, obj.price, true);
-                    } else {
-                        // this.el.setValueFromCoords(8, y, '', true);
-                        let q = '';
-                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
+                .then(response => {
+                    if (response.status == 200) {
+                        if(response.data.length > 0){
+                            let obj = response.data[0].procurementAgentPriceList.filter(c => c.id == value)[0];
+                            if (typeof obj != 'undefined') {
+                                this.el.setValueFromCoords(8, y, obj.price, true);
+                            } else {
+                                // this.el.setValueFromCoords(8, y, '', true);
+                                let q = '';
+                                q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                            }
+                        }
                     }
-                }
+                }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+        
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                );
 
             } else {
                 // console.log("Value--------------->ELSE");
@@ -2006,14 +2060,13 @@ export default class PlanningUnitSetting extends Component {
         let outPutListArray = [];
         let count = 0;
         let indexVar = 1;
-        let dropdownList = [];
-
+        let dropdownList = this.state.dropdownList;
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            dropdownList.push({
+            dropdownList[j] = {
                 id: outPutList[j].planningUnit.id,
                 name : outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
-            });
+            };
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
@@ -2068,7 +2121,7 @@ export default class PlanningUnitSetting extends Component {
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = outPutListArray;
-
+        this.setState({dropdownList: dropdownList})
         var options = {
             data: data,
             columnDrag: true,
@@ -2649,301 +2702,492 @@ export default class PlanningUnitSetting extends Component {
             for(let i=0; i < tableJson.length; i++){
                 planningUnitIds.push(parseInt(tableJson[i][1]));
             }
-            PlanningUnitService.getPlanningUnitByIds(planningUnitIds).then(response => {
-                this.setState({
-                    allPlanningUnitList: response.data,
-                    originalPlanningUnitList: response.data,
-                    planningUnitList: response.data,
-                }, () => {
-                    for (var i = 0; i < tableJson.length; i++) {
-                        var map1 = new Map(Object.entries(tableJson[i]));
-        
-                        // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                        let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
-                        let procurementAgentObj = "";
-                        if (parseInt(map1.get("7")) === -1) {
-                            procurementAgentObj = null
-                        } else {
-                            procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
-                        }
-        
-                        if (parseInt(map1.get("11")) == 1) {//new row added
-                            let tempJson = {
-                                "programPlanningUnitId": parseInt(map1.get("9")),
-                                "planningUnit": {
-                                    "id": parseInt(map1.get("1")),
-                                    "label": planningUnitObj.label,
-                                    "unit": planningUnitObj.unit,
-                                    "multiplier": planningUnitObj.multiplier,
-                                    "forecastingUnit": {
-                                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                                        "label": planningUnitObj.forecastingUnit.label,
-                                        "unit": planningUnitObj.forecastingUnit.unit,
-                                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                                    },
-                                    "idString": "" + parseInt(map1.get("1"))
-                                },
-                                "consuptionForecast": map1.get("2"),
-                                "treeForecast": map1.get("3"),
-                                // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
-                                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
-                                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                "procurementAgent": (procurementAgentObj == null ? null : {
-                                    "id": parseInt(map1.get("7")),
-                                    "label": procurementAgentObj.label,
-                                    "code": procurementAgentObj.code,
-                                    "idString": "" + parseInt(map1.get("7"))
-                                }),
-                                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                "higherThenConsumptionThreshold": null,
-                                "lowerThenConsumptionThreshold": null,
-                                "planningUnitNotes": map1.get("15"),
-                                "consumptionDataType": 2,
-                                "otherUnit": null,
-                                "selectedForecastMap": map1.get("12"),
-                                "createdBy": null,
-                                "createdDate": null,
-                                "active": map1.get("16"),
+            if(isSiteOnline()){
+                PlanningUnitService.getPlanningUnitByIds(planningUnitIds).then(response => {
+                    this.setState({
+                        allPlanningUnitList: response.data,
+                        originalPlanningUnitList: response.data,
+                        planningUnitList: response.data,
+                    }, () => {
+                        for (var i = 0; i < tableJson.length; i++) {
+                            var map1 = new Map(Object.entries(tableJson[i]));
+            
+                            // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
+                            let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
+                            let procurementAgentObj = "";
+                            if (parseInt(map1.get("7")) === -1) {
+                                procurementAgentObj = null
+                            } else {
+                                procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
                             }
-                            planningUnitList.push(tempJson);
-                        } else {
-        
-                            let planningUnitobj1 = originalPlanningUnitList[indexVar];
-                            let tempJson = {
-                                "programPlanningUnitId": parseInt(map1.get("9")),
-                                "planningUnit": {
-                                    "id": parseInt(map1.get("1")),
-                                    "label": planningUnitObj.label,
-                                    "unit": planningUnitObj.unit,
-                                    "multiplier": planningUnitObj.multiplier,
-                                    "forecastingUnit": {
-                                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                                        "label": planningUnitObj.forecastingUnit.label,
-                                        "unit": planningUnitObj.forecastingUnit.unit,
-                                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+            
+                            if (parseInt(map1.get("11")) == 1) {//new row added
+                                let tempJson = {
+                                    "programPlanningUnitId": parseInt(map1.get("9")),
+                                    "planningUnit": {
+                                        "id": parseInt(map1.get("1")),
+                                        "label": planningUnitObj.label,
+                                        "unit": planningUnitObj.unit,
+                                        "multiplier": planningUnitObj.multiplier,
+                                        "forecastingUnit": {
+                                            "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                            "label": planningUnitObj.forecastingUnit.label,
+                                            "unit": planningUnitObj.forecastingUnit.unit,
+                                            "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                            "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                            "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                        },
+                                        "idString": "" + parseInt(map1.get("1"))
                                     },
-                                    "idString": "" + parseInt(map1.get("1"))
-                                },
-                                "consuptionForecast": map1.get("2"),
-                                "treeForecast": map1.get("3"),
-                                // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                                // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
-                                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                                // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
-                                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                "procurementAgent": (procurementAgentObj == null ? null : {
-                                    "id": parseInt(map1.get("7")),
-                                    "label": procurementAgentObj.label,
-                                    "code": procurementAgentObj.code,
-                                    "idString": "" + parseInt(map1.get("7"))
-                                }),
-                                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
-                                "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
-                                // "consumptionNotes": planningUnitobj1.consumptionNotes,
-                                "planningUnitNotes": map1.get("15"),
-                                "consumptionDataType": planningUnitobj1.consumptionDataType,
-                                "otherUnit": planningUnitobj1.otherUnit,
-                                "selectedForecastMap": map1.get("12"),
-                                "createdBy": planningUnitobj1.createdBy,
-                                "createdDate": planningUnitobj1.createdDate,
-                                "active": map1.get("16"),
+                                    "consuptionForecast": map1.get("2"),
+                                    "treeForecast": map1.get("3"),
+                                    // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                                    "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                                    "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                                    "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "procurementAgent": (procurementAgentObj == null ? null : {
+                                        "id": parseInt(map1.get("7")),
+                                        "label": procurementAgentObj.label,
+                                        "code": procurementAgentObj.code,
+                                        "idString": "" + parseInt(map1.get("7"))
+                                    }),
+                                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "higherThenConsumptionThreshold": null,
+                                    "lowerThenConsumptionThreshold": null,
+                                    "planningUnitNotes": map1.get("15"),
+                                    "consumptionDataType": 2,
+                                    "otherUnit": null,
+                                    "selectedForecastMap": map1.get("12"),
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "active": map1.get("16"),
+                                }
+                                planningUnitList.push(tempJson);
+                            } else {
+            
+                                let planningUnitobj1 = originalPlanningUnitList[indexVar];
+                                let tempJson = {
+                                    "programPlanningUnitId": parseInt(map1.get("9")),
+                                    "planningUnit": {
+                                        "id": parseInt(map1.get("1")),
+                                        "label": planningUnitObj.label,
+                                        "unit": planningUnitObj.unit,
+                                        "multiplier": planningUnitObj.multiplier,
+                                        "forecastingUnit": {
+                                            "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                            "label": planningUnitObj.forecastingUnit.label,
+                                            "unit": planningUnitObj.forecastingUnit.unit,
+                                            "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                            "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                            "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                        },
+                                        "idString": "" + parseInt(map1.get("1"))
+                                    },
+                                    "consuptionForecast": map1.get("2"),
+                                    "treeForecast": map1.get("3"),
+                                    // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                    // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                                    "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                                    // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                                    "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "procurementAgent": (procurementAgentObj == null ? null : {
+                                        "id": parseInt(map1.get("7")),
+                                        "label": procurementAgentObj.label,
+                                        "code": procurementAgentObj.code,
+                                        "idString": "" + parseInt(map1.get("7"))
+                                    }),
+                                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
+                                    "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
+                                    // "consumptionNotes": planningUnitobj1.consumptionNotes,
+                                    "planningUnitNotes": map1.get("15"),
+                                    "consumptionDataType": planningUnitobj1.consumptionDataType,
+                                    "otherUnit": planningUnitobj1.otherUnit,
+                                    "selectedForecastMap": map1.get("12"),
+                                    "createdBy": planningUnitobj1.createdBy,
+                                    "createdDate": planningUnitobj1.createdDate,
+                                    "active": map1.get("16"),
+                                }
+                                planningUnitList.push(tempJson);
+            
+            
+                                indexVar = indexVar + 1;
                             }
-                            planningUnitList.push(tempJson);
-        
-        
-                            indexVar = indexVar + 1;
+            
+            
+                            // let tempJson = {
+                            //     "programPlanningUnitId": parseInt(map1.get("9")),
+                            //     "planningUnit": {
+                            //         "id": parseInt(map1.get("1")),
+                            //         "label": planningUnitObj.label,
+                            //         "forecastingUnit": {
+                            //             "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                            //             "label": planningUnitObj.forecastingUnit.label,
+                            //             "tracerCategory": {
+                            //                 "id": planningUnitObj.forecastingUnit.tracerCategory.id,
+                            //                 "label": planningUnitObj.forecastingUnit.tracerCategory.label,
+                            //                 "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
+                            //             },
+                            //             "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                            //         },
+                            //         "idString": "" + parseInt(map1.get("1"))
+                            //     },
+                            //     "consuptionForecast": map1.get("2"),
+                            //     "treeForecast": map1.get("3"),
+                            //     "stock": map1.get("4"),
+                            //     "existingShipments": map1.get("5"),
+                            //     "monthsOfStock": map1.get("6"),
+                            //     "procurementAgent": (procurementAgentObj == null ? null : {
+                            //         "id": parseInt(map1.get("7")),
+                            //         "label": procurementAgentObj.label,
+                            //         "code": procurementAgentObj.code,
+                            //         "idString": "" + parseInt(map1.get("7"))
+                            //     }),
+                            //     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            //     "selectedForecastMap":map1.get("12")
+                            // }
+            
+                            //logic for null PU Node
+                            if (map1.get("3") == false && map1.get("14") == true) {
+                                listOfDisablePuNode.push(parseInt(map1.get("1")));
+                            }
+            
+                            if (map1.get("16") == false && map1.get("17") == true) {
+                                listOfDisablePuNode.push(parseInt(map1.get("1")));
+                            }
+            
+            
+            
                         }
-        
-        
-                        // let tempJson = {
-                        //     "programPlanningUnitId": parseInt(map1.get("9")),
-                        //     "planningUnit": {
-                        //         "id": parseInt(map1.get("1")),
-                        //         "label": planningUnitObj.label,
-                        //         "forecastingUnit": {
-                        //             "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                        //             "label": planningUnitObj.forecastingUnit.label,
-                        //             "tracerCategory": {
-                        //                 "id": planningUnitObj.forecastingUnit.tracerCategory.id,
-                        //                 "label": planningUnitObj.forecastingUnit.tracerCategory.label,
-                        //                 "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
-                        //             },
-                        //             "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                        //         },
-                        //         "idString": "" + parseInt(map1.get("1"))
-                        //     },
-                        //     "consuptionForecast": map1.get("2"),
-                        //     "treeForecast": map1.get("3"),
-                        //     "stock": map1.get("4"),
-                        //     "existingShipments": map1.get("5"),
-                        //     "monthsOfStock": map1.get("6"),
-                        //     "procurementAgent": (procurementAgentObj == null ? null : {
-                        //         "id": parseInt(map1.get("7")),
-                        //         "label": procurementAgentObj.label,
-                        //         "code": procurementAgentObj.code,
-                        //         "idString": "" + parseInt(map1.get("7"))
-                        //     }),
-                        //     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        //     "selectedForecastMap":map1.get("12")
-                        // }
-        
-                        //logic for null PU Node
-                        if (map1.get("3") == false && map1.get("14") == true) {
-                            listOfDisablePuNode.push(parseInt(map1.get("1")));
-                        }
-        
-                        if (map1.get("16") == false && map1.get("17") == true) {
-                            listOfDisablePuNode.push(parseInt(map1.get("1")));
-                        }
-        
-        
-        
-                    }
-        
-                    console.log("Final-------------->1", planningUnitList);
-        
-                    programData.planningUnitList = planningUnitList;
-        
-        
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                    program.programData = programData;
-        
-                    programs.push(program);
-        
-                    console.log("programs to update---1", programs);
-        
-                    var db1;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
-                        this.setState({
-                            message: i18n.t('static.program.errortext'),
-                            color: 'red'
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['datasetData'], 'readwrite');
-                        var programTransaction = transaction.objectStore('datasetData');
-                        programs.forEach(program => {
-                            var programRequest = programTransaction.put(program);
-                            console.log("---hurrey---");
-                        })
-                        transaction.oncomplete = function (event) {
-                            console.log("in side datasetDetails")
+            
+                        console.log("Final-------------->1", planningUnitList);
+            
+                        programData.planningUnitList = planningUnitList;
+            
+            
+                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        program.programData = programData;
+            
+                        programs.push(program);
+            
+                        console.log("programs to update---1", programs);
+            
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
-                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                            datasetDetailsRequest.onsuccess = function (e) {
-                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                datasetDetailsRequestJson.changed = 1;
-                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                datasetDetailsRequest1.onsuccess = function (event) {
+                            var transaction = db1.transaction(['datasetData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('datasetData');
+                            programs.forEach(program => {
+                                var programRequest = programTransaction.put(program);
+                                console.log("---hurrey---");
+                            })
+                            transaction.oncomplete = function (event) {
+                                console.log("in side datasetDetails")
+                                db1 = e.target.result;
+                                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                    }
                                 }
-                            }
-                            // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
-                            // this.props.updateStepOneData("color", "green");
-                            // this.setState({
-                            //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                            //     color: "green",
-                            // }, () => {
-                            //     this.props.hideSecondComponent();
-                            //     this.props.finishedStepThree();
-                            //     // this.buildJExcel();
-                            // });
-        
-                            this.setState({
-                                // loading: false,
-                                message: i18n.t('static.mt.dataUpdateSuccess'),
-                                color: "green",
-                                isChanged1: false,
-                                // allowAdd: false
-                            }, () => {
-                                listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
-                                if (listOfDisablePuNode.length > 0) {
-                                    this.disablePUNode(listOfDisablePuNode);
-                                    this.disablePUConsumptionData(listOfDisablePuNode);
-                                }
-        
-                                this.getDatasetList();
-                                this.hideSecondComponent();
-                                // this.filterData();
-                                // this.setProgramId();
-                            });
-                            console.log("Data update success1");
-                            // alert("success");
-        
-        
+                                // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
+                                // this.props.updateStepOneData("color", "green");
+                                // this.setState({
+                                //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                                //     color: "green",
+                                // }, () => {
+                                //     this.props.hideSecondComponent();
+                                //     this.props.finishedStepThree();
+                                //     // this.buildJExcel();
+                                // });
+            
+                                this.setState({
+                                    // loading: false,
+                                    message: i18n.t('static.mt.dataUpdateSuccess'),
+                                    color: "green",
+                                    isChanged1: false,
+                                    // allowAdd: false
+                                }, () => {
+                                    listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
+                                    if (listOfDisablePuNode.length > 0) {
+                                        this.disablePUNode(listOfDisablePuNode);
+                                        this.disablePUConsumptionData(listOfDisablePuNode);
+                                    }
+            
+                                    this.getDatasetList();
+                                    this.hideSecondComponent();
+                                    // this.filterData();
+                                    // this.setProgramId();
+                                });
+                                console.log("Data update success1");
+                                // alert("success");
+            
+            
+                            }.bind(this);
+                            transaction.onerror = function (event) {
+                                this.setState({
+                                    loading: false,
+                                    // message: 'Error occured.',
+                                    color: "red",
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                console.log("Data update errr");
+                            }.bind(this);
                         }.bind(this);
-                        transaction.onerror = function (event) {
+                    });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
                             this.setState({
-                                loading: false,
-                                // message: 'Error occured.',
-                                color: "red",
-                            }, () => {
-                                this.hideSecondComponent();
+                                message: 'static.unkownError',
+                                loading: false
                             });
-                            console.log("Data update errr");
-                        }.bind(this);
-                    }.bind(this);
-                });
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
+                );
+            }else{
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+    
+                    // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
+                    let planningUnitObj = originalPlanningUnitList.filter(c => c.planningUnit.Id == parseInt(map1.get("1")))[0];
+                    let procurementAgentObj = "";
+                    if (parseInt(map1.get("7")) === -1) {
+                        procurementAgentObj = null
+                    } else {
+                        procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                    }
+                    if (parseInt(map1.get("11")) == 1) {//new row added
+                        let tempJson = {
+                            "programPlanningUnitId": parseInt(map1.get("9")),
+                            "planningUnit": {
+                                "id": parseInt(map1.get("1")),
+                                "label": planningUnitObj.label,
+                                "unit": planningUnitObj.unit,
+                                "multiplier": planningUnitObj.multiplier,
+                                "forecastingUnit": {
+                                    "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                    "label": planningUnitObj.forecastingUnit.label,
+                                    "unit": planningUnitObj.forecastingUnit.unit,
+                                    "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                    "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                    "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                                },
+                                "idString": "" + parseInt(map1.get("1"))
+                            },
+                            "consuptionForecast": map1.get("2"),
+                            "treeForecast": map1.get("3"),
+                            // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                            "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                            "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                            "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "procurementAgent": (procurementAgentObj == null ? null : {
+                                "id": parseInt(map1.get("7")),
+                                "label": procurementAgentObj.label,
+                                "code": procurementAgentObj.code,
+                                "idString": "" + parseInt(map1.get("7"))
+                            }),
+                            "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "higherThenConsumptionThreshold": null,
+                            "lowerThenConsumptionThreshold": null,
+                            "planningUnitNotes": map1.get("15"),
+                            "consumptionDataType": 2,
+                            "otherUnit": null,
+                            "selectedForecastMap": map1.get("12"),
+                            "createdBy": null,
+                            "createdDate": null,
+                            "active": map1.get("16"),
+                        }
+                        planningUnitList.push(tempJson);
+                    } else {
+    
+                        let planningUnitobj1 = originalPlanningUnitList[indexVar];
+                        let tempJson = {
+                            "programPlanningUnitId": parseInt(map1.get("9")),
+                            "planningUnit": planningUnitobj1.planningUnit,
+                            "consuptionForecast": map1.get("2"),
+                            "treeForecast": map1.get("3"),
+                            // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                            // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                            "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                            // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                            "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "procurementAgent": (procurementAgentObj == null ? null : {
+                                "id": parseInt(map1.get("7")),
+                                "label": procurementAgentObj.label,
+                                "code": procurementAgentObj.code,
+                                "idString": "" + parseInt(map1.get("7"))
+                            }),
+                            "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
+                            "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
+                            // "consumptionNotes": planningUnitobj1.consumptionNotes,
+                            "planningUnitNotes": map1.get("15"),
+                            "consumptionDataType": planningUnitobj1.consumptionDataType,
+                            "otherUnit": planningUnitobj1.otherUnit,
+                            "selectedForecastMap": map1.get("12"),
+                            "createdBy": planningUnitobj1.createdBy,
+                            "createdDate": planningUnitobj1.createdDate,
+                            "active": map1.get("16"),
+                        }
+                        planningUnitList.push(tempJson);
+    
+    
+                        indexVar = indexVar + 1;
+                    }
+    
+                    //logic for null PU Node
+                    if (map1.get("3") == false && map1.get("14") == true) {
+                        listOfDisablePuNode.push(parseInt(map1.get("1")));
+                    }
+    
+                    if (map1.get("16") == false && map1.get("17") == true) {
+                        listOfDisablePuNode.push(parseInt(map1.get("1")));
+                    }
+    
                 }
-            );
+    
+                console.log("Final-------------->1", planningUnitList);
+    
+                programData.planningUnitList = planningUnitList;
+    
+    
+                programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                program.programData = programData;
+    
+                programs.push(program);
+    
+                console.log("programs to update---1", programs);
+    
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('datasetData');
+                    programs.forEach(program => {
+                        var programRequest = programTransaction.put(program);
+                        console.log("---hurrey---");
+                    })
+                    transaction.oncomplete = function (event) {
+                        console.log("in side datasetDetails")
+                        db1 = e.target.result;
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest1.onsuccess = function (event) {
+                            }
+                        }
+    
+                        this.setState({
+                            // loading: false,
+                            message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            isChanged1: false,
+                            // allowAdd: false
+                        }, () => {
+                            listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
+                            if (listOfDisablePuNode.length > 0) {
+                                this.disablePUNode(listOfDisablePuNode);
+                                this.disablePUConsumptionData(listOfDisablePuNode);
+                            }
+    
+                            this.getDatasetList();
+                            this.hideSecondComponent();
+                            // this.filterData();
+                            // this.setProgramId();
+                        });
+                        console.log("Data update success1");
+                        // alert("success");
+    
+    
+                    }.bind(this);
+                    transaction.onerror = function (event) {
+                        this.setState({
+                            loading: false,
+                            // message: 'Error occured.',
+                            color: "red",
+                        }, () => {
+                            this.hideSecondComponent();
+                        });
+                        console.log("Data update errr");
+                    }.bind(this);
+                }.bind(this);
+            }
         }
     }
 
@@ -3191,7 +3435,7 @@ export default class PlanningUnitSetting extends Component {
 
     }
     getPlanningUnitList(callBy) {
-        if (!this.state.isPlanningUnitLoaded || callBy == 0) {
+        if (callBy == 0) {
             var pID = document.getElementById("forecastProgramId").value;
             if (pID != 0) {
                 this.setState({

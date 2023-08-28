@@ -1938,7 +1938,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         </Modal>
                         {/* Consumption modal */}
                         <div className="col-md-12 pl-0">
-                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable TableWidth100">
                             </div>
                         </div>
                         <div className="col-md-12 pl-0">
@@ -2003,7 +2003,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </FormGroup>
                             </Row>
                             <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                                <div id="tableDiv" className="RemoveStriped">
+                                <div id="tableDiv" className="RemoveStriped TableWidth100">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
                                         </div> */}

@@ -1003,12 +1003,12 @@ export default class CommitTreeComponent extends React.Component {
                                 if (planningUnitList.findIndex(c => c.id == mergedPlanningUnitList[pul].planningUnit.id) == -1) {
                                     planningUnitList.push({ id: mergedPlanningUnitList[pul].planningUnit.id, name: getLabelText(mergedPlanningUnitList[pul].planningUnit.label, this.state.lang) });
                                 }
-                                if (!(mergedPlanningUnitList[pul].price === "" || mergedPlanningUnitList[pul].price == null || mergedPlanningUnitList[pul].price == undefined) ? "" : (mergedPlanningUnitList[pul].procurementAgent == null || mergedPlanningUnitList[pul].procurementAgent == undefined)) {
+                                // if (!(mergedPlanningUnitList[pul].price === "" || mergedPlanningUnitList[pul].price == null || mergedPlanningUnitList[pul].price == undefined) ? "" : (mergedPlanningUnitList[pul].procurementAgent == null || mergedPlanningUnitList[pul].procurementAgent == undefined)) {
                                     if(mergedPlanningUnitList[pul].procurementAgent!=null && mergedPlanningUnitList[pul].procurementAgent!="" && mergedPlanningUnitList[pul].procurementAgent!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=null && mergedPlanningUnitList[pul].procurementAgent.id!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=""){
                                     if (procurementAgentList.findIndex(c => c.id == mergedPlanningUnitList[pul].procurementAgent.id) == -1) {
-                                        procurementAgentList.push({ id: mergedPlanningUnitList[pul].procurementAgent.id, name: getLabelText(mergedPlanningUnitList[pul].procurementAgent.label, this.state.lang) });
+                                        procurementAgentList.push({ id: mergedPlanningUnitList[pul].procurementAgent.id, name: mergedPlanningUnitList[pul].procurementAgent.code });
                                     }
-                                }
+                                // }
                                 }
                                 data = [];
                                 data[0] = mergedPlanningUnitList[pul].planningUnit.forecastingUnit.productCategory.id;
@@ -2255,12 +2255,15 @@ export default class CommitTreeComponent extends React.Component {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         elInstance.options.editable = true;
         for (var c = 0; c < jsonData.length; c++) {
-            elInstance.setStyle(("C").concat(parseInt(c) + 1), "pointer-events", "");
-            elInstance.setStyle(("C").concat(parseInt(c) + 1), "pointer-events", "none");
-            elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
-            elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
-            elInstance.setStyle(("K").concat(parseInt(c) + 1), "pointer-events", "");
-            elInstance.setStyle(("K").concat(parseInt(c) + 1), "pointer-events", "none");
+            elInstance.getCell(("C").concat(parseInt(c) + 1)).firstChild.disabled=true;
+            elInstance.getCell(("D").concat(parseInt(c) + 1)).firstChild.disabled=true;
+            elInstance.getCell(("K").concat(parseInt(c) + 1)).firstChild.disabled=true;
+            // elInstance.setStyle(("C").concat(parseInt(c) + 1), "pointer-events", "");
+            // elInstance.setStyle(("C").concat(parseInt(c) + 1), "pointer-events", "none");
+            // elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+            // elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+            // elInstance.setStyle(("K").concat(parseInt(c) + 1), "pointer-events", "");
+            // elInstance.setStyle(("K").concat(parseInt(c) + 1), "pointer-events", "none");
             if ((jsonData[c])[12] == "" && (jsonData[c])[13] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2866,6 +2869,7 @@ export default class CommitTreeComponent extends React.Component {
                                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"", null);
                                 var datasetJson = JSON.parse(datasetData);
                                 var programJson = this.state.finalProgramJson;
+                                console.log("Program Json in sync Test@123",programJson)
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
                                 // console.log("ProgramJson+++", programJson);
@@ -2879,6 +2883,7 @@ export default class CommitTreeComponent extends React.Component {
                                 // }
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
+                                    console.log("Tree Test@123",tree)
                                     var scenarioList = tree.scenarioList;
                                     var scenarioIdsSet = [...new Set(scenarioList.map(ele => Number(ele.id)))];
                                     // console.log("Scenario Ids Set Test@123", scenarioIdsSet);
@@ -2934,9 +2939,9 @@ export default class CommitTreeComponent extends React.Component {
                                     }
                                     tree.tree.flatList = completeFlatList;
                                     // console.log("commit*** tree---", tree);
-                                    var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
+                                    // var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
                                     // console.log("commit*** findTreeIndex---", findTreeIndex);
-                                    treeList[findTreeIndex] = tree;
+                                    treeList[tl] = tree;
                                     // console.log("commit*** treeList---", treeList);
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
