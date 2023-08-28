@@ -1179,6 +1179,7 @@ export default class CreateTreeTemplate extends Component {
                 data[15] = missingPUListForCreateTree[j].otherUnit;
                 data[16] = missingPUListForCreateTree[j].createdBy;
                 data[17] = missingPUListForCreateTree[j].createdDate; 
+                data[18] = true;
                 dataArray[count] = data;
                 count++;
             }
@@ -1325,6 +1326,10 @@ export default class CreateTreeTemplate extends Component {
                     title: 'createdDate',
                     type: 'hidden',
                     readOnly: true //17P
+                },
+                {
+                    title:i18n.t("static.common.select"),
+                    type:'checkbox'
                 }
             ],
             // text: {
@@ -1388,6 +1393,38 @@ export default class CreateTreeTemplate extends Component {
     }
 
     changedMissingPUForCreateTree = function (instance, cell, x, y, value) {
+        if(x==18){
+            console.log("Value Test@123",value)
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
+            if(value.toString()=="false"){
+                console.log("In changed Test@123")
+                this.el.setValueFromCoords(2,y,this.state.missingPUListForCreateTree[y].consuptionForecast,true);
+                this.el.setValueFromCoords(3,y,this.state.missingPUListForCreateTree[y].treeForecast,true);
+                this.el.setValueFromCoords(4,y,this.state.missingPUListForCreateTree[y].stock,true);
+                this.el.setValueFromCoords(5,y,this.state.missingPUListForCreateTree[y].existingShipments,true);
+                this.el.setValueFromCoords(6,y,this.state.missingPUListForCreateTree[y].monthsOfStock,true);
+                this.el.setValueFromCoords(7,y,(this.state.missingPUListForCreateTree[y].price==="" || this.state.missingPUListForCreateTree[y].price==null || this.state.missingPUListForCreateTree[y].price==undefined)?"":(this.state.missingPUListForCreateTree[y].procurementAgent == null || this.state.missingPUListForCreateTree[y].procurementAgent == undefined ? -1 : this.state.missingPUListForCreateTree[y].procurementAgent.id),true);
+                this.el.setValueFromCoords(8,y,this.state.missingPUListForCreateTree[y].price,true);
+                this.el.setValueFromCoords(9,y,this.state.missingPUListForCreateTree[y].planningUnitNotes,true);
+                this.el.setValueFromCoords(10,y,this.state.missingPUListForCreateTree[y].planningUnit.id,true);
+                this.el.setValueFromCoords(11,y,this.state.missingPUListForCreateTree[y].programPlanningUnitId,true);
+                this.el.setValueFromCoords(12,y,this.state.missingPUListForCreateTree[y].higherThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(13,y,this.state.missingPUListForCreateTree[y].lowerThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(14,y,this.state.missingPUListForCreateTree[y].selectedForecastMap,true);
+                this.el.setValueFromCoords(15,y,this.state.missingPUListForCreateTree[y].otherUnit,true);
+                this.el.setValueFromCoords(16,y,this.state.missingPUListForCreateTree[y].createdBy,true);
+                this.el.setValueFromCoords(17,y,this.state.missingPUListForCreateTree[y].createdDate,true);
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
         if (x == 7) {
             if (value != -1 && value !== null && value !== '') {
                 console.log("Value--------------->IF");
@@ -1936,7 +1973,9 @@ export default class CreateTreeTemplate extends Component {
         var planningUnitList = [];
         var programs = [];
         var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
+        var updatedMissingPUList=[];
         for (var i = 0; i < tableJson.length; i++) {
+            if(tableJson[i][18].toString()=="true"){
             var map1 = new Map(Object.entries(tableJson[i]));
             let procurementAgentObj = "";
                 if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "" ) {
@@ -1988,6 +2027,9 @@ export default class CreateTreeTemplate extends Component {
                 "active": true
             }
             planningUnitList.push(tempJson);
+        }else{
+            updatedMissingPUList.push(missingPUListForCreateTree[i])
+        }
         }
         var db1;
         getDatabase();
@@ -2064,8 +2106,12 @@ export default class CreateTreeTemplate extends Component {
                         this.setState({
                             // message: i18n.t('static.mt.dataUpdateSuccess'),
                             color: "green",
-                            missingPUListForCreateTree: [],
+                            missingPUListForCreateTree: updatedMissingPUList,
                             datasetListJexcelForCreateTree:downloadedProgramData
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.buildMissingPUJexcelForCreateTree();
+                            }
                         });
                     }.bind(this)
                 }.bind(this)
@@ -13208,17 +13254,17 @@ export default class CreateTreeTemplate extends Component {
                                                     </div>
 
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')+" "} : <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
                                                             <div id="missingPUJexcelForCreateTree" className="RowClickable">
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree</Button>}
-                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
-                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
-                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>All template Planning Units are in the program.</strong>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         
                                                         &nbsp;
 

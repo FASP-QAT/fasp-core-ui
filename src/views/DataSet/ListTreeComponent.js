@@ -192,6 +192,7 @@ export default class ListTreeComponent extends Component {
         this.getPrograms = this.getPrograms.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.saveMissingPUs = this.saveMissingPUs.bind(this);
+        this.updateMissingPUs = this.updateMissingPUs.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.changed = this.changed.bind(this);  
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
@@ -386,7 +387,9 @@ export default class ListTreeComponent extends Component {
                 data[14] = missingPUList[j].selectedForecastMap;
                 data[15] = missingPUList[j].otherUnit;
                 data[16] = missingPUList[j].createdBy;
-                data[17] = missingPUList[j].createdDate; 
+                data[17] = missingPUList[j].createdDate;
+                data[18] = true;
+                data[19] = missingPUList[j].exists;
                 dataArray[count] = data;
                 count++;
             }
@@ -422,16 +425,16 @@ export default class ListTreeComponent extends Component {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true 
+                    // editable: isSiteOnline() ? true : false,
+                    // readOnly: isSiteOnline() ? false : true 
                 },
                 {
                     //3D
                     title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    // editable: isSiteOnline() ? true : false,
+                    // readOnly: isSiteOnline() ? false : true
                 },
                 {
                     //4E
@@ -533,6 +536,16 @@ export default class ListTreeComponent extends Component {
                     title: 'createdDate',
                     type: 'hidden',
                     readOnly: true //17P
+                },
+                {
+                    title:i18n.t("static.common.select"),
+                    type:'checkbox',
+                    // readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    title:'exists',
+                    type:'hidden',
+                    readOnly:true
                 }
             ],
             pagination: localStorage.getItem("sesRecordCount"),
@@ -546,6 +559,7 @@ export default class ListTreeComponent extends Component {
             allowExport: false,
             onchange: this.changed,
             onload: this.loadedMissingPU,
+            onchangepage: this.onchangepageMissingPU,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
@@ -562,7 +576,79 @@ export default class ListTreeComponent extends Component {
         }
         );
     }
+
+    onchangepageMissingPU(el, pageNo, oldPageNo) {
+            if(!isSiteOnline()){
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var colArr=['C','D','E','F','G','H','I','J','S'];
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            var colArr=['C','D','E','F','G','H','I','J','S'];
+            if(json[y][19].toString()=="true"){
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }else{
+                var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
+                elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
+                elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
+                elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
+                elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
+                elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
+            }
+        }
+        }
+    }
+
     changed = function (instance, cell, x, y, value) {
+        console.log("X Test@123",x)
+        if(x==18){
+            console.log("Value Test@123",value)
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
+            if(value.toString()=="false"){
+                console.log("In changed Test@123")
+                this.el.setValueFromCoords(2,y,this.state.missingPUList[y].consuptionForecast,true);
+                this.el.setValueFromCoords(3,y,this.state.missingPUList[y].treeForecast,true);
+                this.el.setValueFromCoords(4,y,this.state.missingPUList[y].stock,true);
+                this.el.setValueFromCoords(5,y,this.state.missingPUList[y].existingShipments,true);
+                this.el.setValueFromCoords(6,y,this.state.missingPUList[y].monthsOfStock,true);
+                this.el.setValueFromCoords(7,y,(this.state.missingPUList[y].price==="" || this.state.missingPUList[y].price==null || this.state.missingPUList[y].price==undefined)?"":(this.state.missingPUList[y].procurementAgent == null || this.state.missingPUList[y].procurementAgent == undefined ? -1 : this.state.missingPUList[y].procurementAgent.id),true);
+                this.el.setValueFromCoords(8,y,this.state.missingPUList[y].price,true);
+                this.el.setValueFromCoords(9,y,this.state.missingPUList[y].planningUnitNotes,true);
+                this.el.setValueFromCoords(10,y,this.state.missingPUList[y].planningUnit.id,true);
+                this.el.setValueFromCoords(11,y,this.state.missingPUList[y].programPlanningUnitId,true);
+                this.el.setValueFromCoords(12,y,this.state.missingPUList[y].higherThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(13,y,this.state.missingPUList[y].lowerThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(14,y,this.state.missingPUList[y].selectedForecastMap,true);
+                this.el.setValueFromCoords(15,y,this.state.missingPUList[y].otherUnit,true);
+                this.el.setValueFromCoords(16,y,this.state.missingPUList[y].createdBy,true);
+                this.el.setValueFromCoords(17,y,this.state.missingPUList[y].createdDate,true);
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
         if (x == 7) {
             if (value != -1 && value !== null && value !== '') {
                 console.log("Value--------------->IF");
@@ -836,6 +922,44 @@ export default class ListTreeComponent extends Component {
         tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
+        if(!isSiteOnline()){
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr=['C','D','E','F','G','H','I','J','S'];
+        for (var j = 0; j < jsonLength; j++) {
+            if(json[j][19].toString()=="true"){
+            for (var c = 0; c < colArr.length; c++) {
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            }
+        }else{
+            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("D").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            elInstance.setStyle(("C").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("C").concat(parseInt(j) + 1), "pointer-events", "none");
+            elInstance.setStyle(("D").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("D").concat(parseInt(j) + 1), "pointer-events", "none");
+            elInstance.setStyle(("S").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("S").concat(parseInt(j) + 1), "pointer-events", "none");
+        }
+        }
+    }
     }
 
     checkValidation() {
@@ -1022,7 +1146,9 @@ export default class ListTreeComponent extends Component {
         var planningUnitList = [];
         var programs = [];
         var missingPUList = this.state.missingPUList;
+        var updatedMissingPUList=[];
         for (var i = 0; i < tableJson.length; i++) {
+            if(tableJson[i][18].toString()=="true"){
             console.log("validation Inside for loop ");
        
             var map1 = new Map(Object.entries(tableJson[i]));
@@ -1078,7 +1204,11 @@ export default class ListTreeComponent extends Component {
             }
             console.log("validation tempJson ",tempJson);
             planningUnitList.push(tempJson);
+        }else{
+            updatedMissingPUList.push(missingPUList[i])
         }
+        }
+        console.log("Updated Missing Pu List ",updatedMissingPUList)
         console.log("validation planningUnitList ",planningUnitList);
            
         var db1;
@@ -1156,9 +1286,141 @@ export default class ListTreeComponent extends Component {
                         this.setState({
                             // message: i18n.t('static.mt.dataUpdateSuccess'),
                             color: "green",
-                            missingPUList: [],
+                            missingPUList: updatedMissingPUList,
                             downloadedProgramData:downloadedProgramData,
                             datasetListJexcel:datasetListJexcel
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.buildMissingPUJexcel();
+                            }
+                        });
+                    }.bind(this)
+                }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+    }
+
+    updateMissingPUs(){
+        var validation = this.checkValidation();
+       console.log("validation",validation)
+       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+       var curUser = AuthenticationService.getLoggedInUserId();   
+       console.log("validation curDate",curDate)
+       
+       console.log("validation curUser",curUser)
+       
+       let indexVar = 0;
+       if (validation == true) {
+        console.log("validation Inside if loop ");
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+
+                var program = filteredGetRequestList.filter(x => x.id == (this.state.datasetIdModal+"_uId_" + userId).replace("~","_"))[0];
+                console.log("program------",program);
+                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                console.log("programData------",programData);
+                var planningFullList=programData.planningUnitList;
+                // console.log("1Aug planningUnitList------",planningUnitList);
+                console.log("1Aug programData------Before",programData.planningUnitList);
+                var tableJson = this.el.getJson(null, false);
+                var updatedMissingPUList=[];
+                tableJson.forEach((p,index) => {
+                    if(p[19].toString()=="true" && p[18].toString()=="true"){
+                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==this.state.missingPUList[index].planningUnit.id)
+
+                    console.log("1Aug indexVar------",indexVar);
+                    if(indexVar!=-1){
+                        let procurementAgentObj = "";
+                        if (parseInt(p[7]) === -1 || (p[7]) == "" ) {
+                            procurementAgentObj = null
+                        } else {
+                            procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(p[7]))[0];
+                        }
+                        planningFullList[indexVar].consuptionForecast = p[2];
+                        planningFullList[indexVar].treeForecast = p[3];
+                        planningFullList[indexVar].stock = this.el.getValue(`E${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].existingShipments = this.el.getValue(`F${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].monthsOfStock = this.el.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].procurementAgent=(procurementAgentObj == null ? null : {
+                            "id": parseInt(p[7]),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(p[7])
+                        });
+                        planningFullList[indexVar].price=this.el.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].planningUnitNotes=p[9];
+
+
+                    }
+            }else{
+                updatedMissingPUList.push(this.state.missingPUList[index])
+            }
+                    console.log("1Aug planningFullList------1",planningFullList);
+                })
+                console.log("1Aug planningFullList------",planningFullList);
+                
+            programData.planningUnitList = planningFullList;
+            var datasetListJexcel=programData;
+            console.log("1Aug programData------after",programData.planningUnitList);
+            let downloadedProgramData = this.state.downloadedProgramData;
+            console.log("DPD Test@123",downloadedProgramData);
+            var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+            console.log("Index Test@123",index)
+            downloadedProgramData[index]=programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+                programTransaction.put(program);
+            // })
+            
+            transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var id = (this.state.datasetIdModal+"_uId_" + userId).replace("~","_");
+                
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+            
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            // message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            missingPUList: updatedMissingPUList,
+                            downloadedProgramData:downloadedProgramData,
+                            datasetListJexcel:datasetListJexcel
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.buildMissingPUJexcel();
+                            }
                         });
                     }.bind(this)
                 }.bind(this)
@@ -1335,7 +1597,8 @@ export default class ListTreeComponent extends Component {
                             selectedForecastMap: existingPU[0].selectedForecastMap,
                             programPlanningUnitId: existingPU[0].programPlanningUnitId,
                             createdBy:existingPU[0].createdBy,
-                            createdDate:existingPU[0].createdDate
+                            createdDate:existingPU[0].createdDate,
+                            exists:true
                         }
                         missingPUList.push(json);    
                         }else{
@@ -1357,7 +1620,8 @@ export default class ListTreeComponent extends Component {
                                 selectedForecastMap: {},
                                 programPlanningUnitId: 0,        
                                 createdBy: null,
-                                createdDate: null
+                                createdDate: null,
+                                exists:false
                             };
                             missingPUList.push(json);
                         }
@@ -3393,18 +3657,19 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')+" "} : <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Create Tree</Button>}
-                                                        {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
-                                                        {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
-                                                        {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>Note* You should be online to create the missing PUs</strong>}                                                      
-                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>All template Planning Units are in the program.</strong>}
+                                                        {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                        {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                        {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                        {!isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
+                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         &nbsp;
 
                                                     </FormGroup>

@@ -22,7 +22,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker';
 import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
+import { NUMBER_NODE_ID, JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -72,6 +72,8 @@ import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
+import PlanningUnitService from '../../api/PlanningUnitService';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -711,6 +713,7 @@ export default class BuildTree extends Component {
             maxNodeDataId: '',
             message1: '',
             updatedPlanningUnitList: [],
+            fullPlanningUnitList:[],
             nodeId: '',
             nodeDataMomList: [],
             scenarioActionType: '',
@@ -935,7 +938,9 @@ export default class BuildTree extends Component {
             missingPUList: [],
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
-            programDataListForPuCheck:[]
+            programDataListForPuCheck:[],
+            planningUnitObjList:[],
+            allProcurementAgentList: [],
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -1074,20 +1079,969 @@ export default class BuildTree extends Component {
         this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
         this.autoCalculate = this.autoCalculate.bind(this);
         this.toggleTooltipAuto = this.toggleTooltipAuto.bind(this);
+        this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
+        this.changedMissingPU=this.changedMissingPU.bind(this);
+        this.procurementAgentList = this.procurementAgentList.bind(this);
+        this.saveMissingPUs = this.saveMissingPUs.bind(this);
+        this.updateMissingPUs = this.updateMissingPUs.bind(this);
+        this.checkValidationForMissingPUs=this.checkValidationForMissingPUs.bind(this)
     }
 
+    checkValidationForMissingPUs() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        console.log("json.length-------", json);
+        for (var y = 0; y < json.length; y++) {
+            //tracer category
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //planning unit
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getRowData(parseInt(y))[1];
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y && map.get("16").toString() == "true" && json[y][16].toString() == "true") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+//planningUnitSetting.stockEndOf
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            console.log("value------------->E", value);
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+// planningUnitSetting.existingShipments
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var value = this.el.getValueFromCoords(6, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+                } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+    saveMissingPUs(){
+        var validation = this.checkValidationForMissingPUs();
+       console.log("validation",validation)
+       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+       var curUser = AuthenticationService.getLoggedInUserId();   
+       console.log("validation curDate",curDate)
+       
+       console.log("validation curUser",curUser)
+       
+       let indexVar = 0;
+       if (validation == true) {
+        console.log("validation Inside if loop ");
+       
+        var tableJson = this.el.getJson(null, false);
+        var planningUnitList = [];
+        var programs = [];
+        var missingPUList = this.state.missingPUList;
+        var updatedMissingPUList=[];
+        var dataSetObj=this.state.dataSetObj;
+        for (var i = 0; i < tableJson.length; i++) {
+            if(tableJson[i][18].toString()=="true"){
+            console.log("validation Inside for loop ");
+       
+            var map1 = new Map(Object.entries(tableJson[i]));
+            console.log("validation map1 ",map1);
+            let procurementAgentObj = "";
+                if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "" ) {
+                    procurementAgentObj = null
+                } else {
+                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                }
+                var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUList[i].planningUnit.id)[0];         
+            let tempJson = {
+                "programPlanningUnitId": map1.get("11"),
+                "planningUnit": {
+                    "id": planningUnitObj.planningUnitId,
+                    "label":planningUnitObj.label,
+                    "unit": planningUnitObj.unit,
+                    "multiplier": planningUnitObj.multiplier,
+                    "forecastingUnit": {
+                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                        "label": planningUnitObj.forecastingUnit.label,
+                        "unit": planningUnitObj.forecastingUnit.unit,
+                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                    },
+                    "idString": "" + planningUnitObj.planningUnitId
+                },
+                "consuptionForecast": map1.get("2"),
+                "treeForecast": map1.get("3"),
+                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "procurementAgent": (procurementAgentObj == null ? null : {
+                    "id": parseInt(map1.get("7")),
+                    "label": procurementAgentObj.label,
+                    "code": procurementAgentObj.code,
+                    "idString": "" + parseInt(map1.get("7"))
+                }),
+                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "higherThenConsumptionThreshold": map1.get("12"),
+                "lowerThenConsumptionThreshold": map1.get("13"),
+                "planningUnitNotes": map1.get("9"),
+                "consumptionDataType": 2,
+                "otherUnit": map1.get("15")==""?null:map1.get("15"),
+                "selectedForecastMap":map1.get("14"),
+                "createdBy":
+                {
+                  "userId": map1.get("16")==""? curUser:map1.get("16"),
+                }, 
+                "createdDate": map1.get("17")==""? curDate:map1.get("17"),
+                "active": true,
+            }
+            console.log("validation tempJson ",tempJson);
+            planningUnitList.push(tempJson);
+        }else{
+            updatedMissingPUList.push(missingPUList[i])
+        }
+        }
+        console.log("Updated Missing Pu List ",updatedMissingPUList)
+        console.log("validation planningUnitList ",planningUnitList);
+           
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+
+                var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
+                console.log("program------",program);
+                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                console.log("programData------",programData);
+                var planningFullList=programData.planningUnitList;
+                console.log("1Aug planningUnitList------",planningUnitList);
+                console.log("1Aug programData------Before",programData.planningUnitList);
+                
+                planningUnitList.forEach(p => {
+                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==p.planningUnit.id)
+
+                    console.log("1Aug indexVar------",indexVar);
+                    if(indexVar!=-1){
+                        planningFullList[indexVar] = p;
+                    }else{
+                        planningFullList = planningFullList.concat(p);
+                    }
+                    console.log("1Aug planningFullList------1",planningFullList);
+                })
+                console.log("1Aug planningFullList------",planningFullList);
+                
+            programData.planningUnitList = planningFullList;
+            var programDataListForPuCheck=this.state.programDataListForPuCheck;
+            var indexForPuCheck=programDataListForPuCheck.findIndex(c=>c.id==dataSetObj.id);
+            programDataListForPuCheck[indexForPuCheck].programData=programData;
+            dataSetObj.programData=programData;
+            // var datasetListJexcel=programData;
+            console.log("1Aug programData------after",programData.planningUnitList);
+            // let downloadedProgramData = this.state.downloadedProgramData;
+            // console.log("DPD Test@123",downloadedProgramData);
+            // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+            // console.log("Index Test@123",index)
+            // downloadedProgramData[index]=programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+                programTransaction.put(program);
+            // })
+            
+            transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var id = this.state.dataSetObj.id;
+                
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+            
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            // message: i18n.t('static.mt.dataUpdateSuccess'),
+                            // color: "green",
+                            missingPUList: updatedMissingPUList,
+                            dataSetObj:dataSetObj,
+                            fullPlanningUnitList:planningFullList,
+                            programDataListForPuCheck:programDataListForPuCheck
+                            // downloadedProgramData:downloadedProgramData,
+                            // datasetListJexcel:datasetListJexcel
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.getMissingPuListBranchTemplate();
+                            }
+                        });
+                    }.bind(this)
+                }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+    }
+
+    updateMissingPUs(){
+        var validation = this.checkValidation();
+       console.log("validation",validation)
+       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+       var curUser = AuthenticationService.getLoggedInUserId();   
+       console.log("validation curDate",curDate)
+       
+       console.log("validation curUser",curUser)
+       
+       let indexVar = 0;
+       if (validation == true) {
+        console.log("validation Inside if loop ");
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var dataSetObj=this.state.dataSetObj;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+
+                var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
+                console.log("program------",program);
+                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                console.log("programData------",programData);
+                var planningFullList=programData.planningUnitList;
+                // console.log("1Aug planningUnitList------",planningUnitList);
+                console.log("1Aug programData------Before",programData.planningUnitList);
+                var tableJson = this.el.getJson(null, false);
+                var updatedMissingPUList=[];
+                tableJson.forEach((p,index) => {
+                    if(p[19].toString()=="true" && p[18].toString()=="true"){
+                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==this.state.missingPUList[index].planningUnit.id)
+
+                    console.log("1Aug indexVar------",indexVar);
+                    if(indexVar!=-1){
+                        let procurementAgentObj = "";
+                        if (parseInt(p[7]) === -1 || (p[7]) == "" ) {
+                            procurementAgentObj = null
+                        } else {
+                            procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(p[7]))[0];
+                        }
+                        planningFullList[indexVar].consuptionForecast = p[2];
+                        planningFullList[indexVar].treeForecast = p[3];
+                        planningFullList[indexVar].stock = this.el.getValue(`E${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].existingShipments = this.el.getValue(`F${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].monthsOfStock = this.el.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].procurementAgent=(procurementAgentObj == null ? null : {
+                            "id": parseInt(p[7]),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(p[7])
+                        });
+                        planningFullList[indexVar].price=this.el.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                        planningFullList[indexVar].planningUnitNotes=p[9];
+
+
+                    }
+            }else{
+                updatedMissingPUList.push(this.state.missingPUList[index])
+            }
+                    console.log("1Aug planningFullList------1",planningFullList);
+                })
+                console.log("1Aug planningFullList------",planningFullList);
+                
+            programData.planningUnitList = planningFullList;
+            dataSetObj.programData=programData;
+            var programDataListForPuCheck=this.state.programDataListForPuCheck;
+            var indexForPuCheck=programDataListForPuCheck.findIndex(c=>c.id==dataSetObj.id);
+            programDataListForPuCheck[indexForPuCheck].programData=programData;
+            var datasetListJexcel=programData;
+            console.log("1Aug programData------after",programData.planningUnitList);
+            // let downloadedProgramData = this.state.downloadedProgramData;
+            // console.log("DPD Test@123",downloadedProgramData);
+            // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+            // console.log("Index Test@123",index)
+            // downloadedProgramData[index]=programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+                programTransaction.put(program);
+            // })
+            
+            transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var id = (this.state.datasetIdModal+"_uId_" + userId).replace("~","_");
+                
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+            
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            // message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            missingPUList: updatedMissingPUList,
+                            dataSetObj:dataSetObj,
+                            fullPlanningUnitList:planningFullList,
+                            programDataListForPuCheck:programDataListForPuCheck
+                            // downloadedProgramData:downloadedProgramData,
+                            // datasetListJexcel:datasetListJexcel
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.getMissingPuListBranchTemplate();
+                            }
+                        });
+                    }.bind(this)
+                }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+    }
+
+    procurementAgentList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+            var procurementAgentRequest = procurementAgentOs.getAll();
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
+                // Handle errors!
+                this.setState({
+                    message: 'unknown error occured', loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            };
+            procurementAgentRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = procurementAgentRequest.result;
+                var listArray = myResult;
+                listArray.sort((a, b) => {
+                    var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                let tempList = [];
+
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: listArray[i].procurementAgentCode,
+                            id: parseInt(listArray[i].procurementAgentId),
+                            active: listArray[i].active,
+                            code: listArray[i].procurementAgentCode,
+                            label: listArray[i].label
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                tempList.unshift({
+                    name: 'CUSTOM',
+                    id: -1,
+                    active: true,
+                    code: 'CUSTOM',
+                    label: {}
+                });
+                this.setState({
+                    allProcurementAgentList: tempList,
+                    })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    changedMissingPU = function (instance, cell, x, y, value) {
+        console.log("X Test@123",x)
+        if(x==18){
+            console.log("Value Test@123",value)
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
+            if(value.toString()=="false"){
+                console.log("In changed Test@123")
+                this.el.setValueFromCoords(2,y,this.state.missingPUList[y].consuptionForecast,true);
+                this.el.setValueFromCoords(3,y,this.state.missingPUList[y].treeForecast,true);
+                this.el.setValueFromCoords(4,y,this.state.missingPUList[y].stock,true);
+                this.el.setValueFromCoords(5,y,this.state.missingPUList[y].existingShipments,true);
+                this.el.setValueFromCoords(6,y,this.state.missingPUList[y].monthsOfStock,true);
+                this.el.setValueFromCoords(7,y,(this.state.missingPUList[y].price==="" || this.state.missingPUList[y].price==null || this.state.missingPUList[y].price==undefined)?"":(this.state.missingPUList[y].procurementAgent == null || this.state.missingPUList[y].procurementAgent == undefined ? -1 : this.state.missingPUList[y].procurementAgent.id),true);
+                this.el.setValueFromCoords(8,y,this.state.missingPUList[y].price,true);
+                this.el.setValueFromCoords(9,y,this.state.missingPUList[y].planningUnitNotes,true);
+                this.el.setValueFromCoords(10,y,this.state.missingPUList[y].planningUnit.id,true);
+                this.el.setValueFromCoords(11,y,this.state.missingPUList[y].programPlanningUnitId,true);
+                this.el.setValueFromCoords(12,y,this.state.missingPUList[y].higherThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(13,y,this.state.missingPUList[y].lowerThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(14,y,this.state.missingPUList[y].selectedForecastMap,true);
+                this.el.setValueFromCoords(15,y,this.state.missingPUList[y].otherUnit,true);
+                this.el.setValueFromCoords(16,y,this.state.missingPUList[y].createdBy,true);
+                this.el.setValueFromCoords(17,y,this.state.missingPUList[y].createdDate,true);
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
+        if (x == 7) {
+            if (value != -1 && value !== null && value !== '') {
+                console.log("Value--------------->IF");
+                let planningUnitId = this.el.getValueFromCoords(10, y);
+                
+                let planningUnitObjList = this.state.planningUnitObjList;
+                let tempPaList = planningUnitObjList.filter(c => c.planningUnitId == planningUnitId)[0];
+
+                console.log("mylist--------->1112", planningUnitId);
+
+                if (tempPaList != undefined) {
+                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
+                    console.log("mylist--------->1113", obj);
+                    if (typeof obj != 'undefined') {
+                        this.el.setValueFromCoords(8, y, obj.price, true);
+                    } else {
+                        this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : this.el.setValueFromCoords(8, y, '', true);
+                    }
+                }
+
+            } else {
+                console.log("Value--------------->ELSE");
+                this.el.setValueFromCoords(8, y, '', true);
+            }
+
+        }
+
+        if (x == 0) {
+            let q = '';
+            q = (this.el.getValueFromCoords(1, y) != '' ? this.el.setValueFromCoords(1, y, '', true) : '');
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(1, y, '', true);
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+        if (x == 1) {
+            let q = '';
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+
+        //productCategory
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //planning unit
+        if (x == 1) {
+            var json = this.el.getJson(null, false);
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                // console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    // console.log("i=---------->", i, "y----------->", y);
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    // console.log("Planning Unit value in change", map.get("1"));
+                    // console.log("Value----->", value);
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                        i = -1;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                    }
+                }
+            }
+        }
+
+        //stock
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // console.log("Stock------------------->1", value);
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            // console.log("Stock------------------->2", value);
+
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
+            }
+
+        }
+
+        //existing shipments
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //desired months of stock
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+               }
+        }
+        if(this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","")>0 && this.el.getValue(`H${parseInt(y) + 1}`, true)==""){
+            this.el.setValueFromCoords(7,y,-1,true);
+        }
+
+
+        //unit price
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            // this.el.setValueFromCoords(10, y, 1, true);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(8, y);
+            }
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'))
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        // this.setState({
+        //     isChanged1: true,
+        // });
+
+        // if (x == 11) {
+        //     this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+        //     this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
+        //     if (value == 1 || value == "") {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //     } else {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //     }
+        // }
+    }
+
+    onchangepageMissingPU(el, pageNo, oldPageNo) {
+        if(!isSiteOnline()){
+    var elInstance = el;
+    var json = elInstance.getJson(null, false);
+    var colArr=['C','D','E','F','G','H','I','J','S'];
+    var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+    if (jsonLength == undefined) {
+        jsonLength = 15
+    }
+    if (json.length < jsonLength) {
+        jsonLength = json.length;
+    }
+    var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+    for (var y = start; y < jsonLength; y++) {
+        var colArr=['C','D','E','F','G','H','I','J','S'];
+        if(json[y][19].toString()=="true"){
+            for (var c = 0; c < colArr.length; c++) {
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            }
+        }else{
+            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
+            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
+            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
+        }
+    }
+    }
+}
+
+    getPlanningUnitWithPricesByIds(){
+        console.log("semma----",this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()));
+        PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
+          .then(response => {
+              console.log("Output---",response.data)
+              var listArray = response.data;
+              this.setState({
+                  planningUnitObjList:response.data
+              });
+          }).catch(
+              error => {
+                  if (error.message === "Network Error") {
+                      this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                      });
+                  } else {
+                      switch (error.response ? error.response.status : "") {
+  
+                          // case 401:
+                          //     this.props.history.push(`/login/static.message.sessionExpired`)
+                          //     break;
+                          case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                          case 500:
+                          case 404:
+                          case 406:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          case 412:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          default:
+                              this.setState({
+                                  message: 'static.unkownError',
+                                  loading: false
+                              });
+                              break;
+                      }
+                  }
+              }
+          );
+      }
+
     buildMissingPUJexcel() {
+        if(isSiteOnline()){
+            this.getPlanningUnitWithPricesByIds();
+        }
         var missingPUList = this.state.missingPUList;
         console.log("missingPUList--->", missingPUList);
         var dataArray = [];
         let count = 0;
         if (missingPUList.length > 0) {
             for (var j = 0; j < missingPUList.length; j++) {
+                console.log("missingPUList--->missingPUList[j].treeForecast", missingPUList[j].treeForecast);
                 data = [];
                 // data[0] = missingPUList[j].month
                 // data[1] = missingPUList[j].startValue
                 data[0] = getLabelText(missingPUList[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
+                data[2] = missingPUList[j].consuptionForecast;
+                data[3] = missingPUList[j].treeForecast;
+                data[4] = missingPUList[j].stock;
+                data[5] = missingPUList[j].existingShipments;
+                data[6] = missingPUList[j].monthsOfStock;
+                data[7] = (missingPUList[j].price==="" || missingPUList[j].price==null || missingPUList[j].price==undefined)?"":(missingPUList[j].procurementAgent == null || missingPUList[j].procurementAgent == undefined ? -1 : missingPUList[j].procurementAgent.id);
+                data[8] = missingPUList[j].price;
+                data[9] = missingPUList[j].planningUnitNotes;
+                data[10] = missingPUList[j].planningUnit.id;
+                data[11] = missingPUList[j].programPlanningUnitId;
+                data[12] = missingPUList[j].higherThenConsumptionThreshold;
+                data[13] = missingPUList[j].lowerThenConsumptionThreshold;
+                data[14] = missingPUList[j].selectedForecastMap;
+                data[15] = missingPUList[j].otherUnit;
+                data[16] = missingPUList[j].createdBy;
+                data[17] = missingPUList[j].createdDate;
+                data[18] = true;
+                data[19] = missingPUList[j].exists;
                 dataArray[count] = data;
                 count++;
             }
@@ -1101,42 +2055,163 @@ export default class BuildTree extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 80],
+            colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    // 0
+                    // 0A
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
-                    // readOnly: true
+                    editable: false,
+                    readOnly: true
                 },
                 {
-                    // 1
+                    // 1B
                     title: i18n.t('static.product.product'),
                     type: 'text',
-                    // readOnly: true
-
+                    editable: false,
+                    readOnly: true
+                },
+                {
+                    //2C
+                    title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    // editable: isSiteOnline() ? true : false,
+                    // readOnly: isSiteOnline() ? false : true 
+                },
+                {
+                    //3D
+                    title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    // editable: isSiteOnline() ? true : false,
+                    // readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //4E
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //5F
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //6G
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    disabledMaskOnEdition: true,
+                    width: '150',
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //7H
+                    title: i18n.t('static.forecastReport.priceType'),
+                    type: 'autocomplete',
+                    source: this.state.allProcurementAgentList,
+                    width: '120',
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //8I
+                    title: i18n.t('static.forecastReport.unitPrice'),
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##.00',
+                    width: '120',
+                    disabledMaskOnEdition: true,
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    //9J
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    editable: isSiteOnline() ? true : false,
+                    readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    title: 'planningUnitId',
+                    type: 'hidden',
+                    readOnly: true //10K
+                },
+                {
+                    title: 'programPlanningUnitId',
+                    type: 'hidden',
+                    readOnly: true //11L
+                },
+                {
+                    title: 'higherThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //12M
+                },
+                {
+                    title: 'lowerThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //13N
+                },
+                {
+                    title: 'selectedForecastMap',
+                    type: 'hidden',
+                    readOnly: true //14O
+                },
+                {
+                    title: 'otherUnit',
+                    type: 'hidden',
+                    readOnly: true //15P
+                },
+                {
+                    title: 'createdBy',
+                    type: 'hidden',
+                    readOnly: true //16P
+                },
+                {
+                    title: 'createdDate',
+                    type: 'hidden',
+                    readOnly: true //17P
+                },
+                {
+                    title:i18n.t("static.common.select"),
+                    type:'checkbox',
+                    // readOnly: isSiteOnline() ? false : true
+                },
+                {
+                    title:'exists',
+                    type:'hidden',
+                    readOnly:true
                 }
-
             ],
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
-            editable: false,
-            onload: this.loadedMissingPU,
             pagination: localStorage.getItem("sesRecordCount"),
             search: false,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             copyCompatibility: true,
             allowExport: false,
+            onchange: this.changedMissingPU,
+            onload: this.loadedMissingPU,
+            onchangepage: this.onchangepageMissingPU,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
@@ -1157,15 +2232,72 @@ export default class BuildTree extends Component {
     loadedMissingPU = function (instance, cell, x, y, value) {
         console.log("loaded 2---", document.getElementsByClassName('jexcel'));
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
+        console.log("pp instance",instance)
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        console.log("pp asterisk",asterisk)
+        
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
+
+        tr.children[5].title = i18n.t('static.tooltip.Stock');
+        tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
+        tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
+        tr.children[8].title = i18n.t('static.tooltip.PriceType');
+        if(!isSiteOnline()){
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr=['C','D','E','F','G','H','I','J','S'];
+        for (var j = 0; j < jsonLength; j++) {
+            if(json[j][19].toString()=="true"){
+            for (var c = 0; c < colArr.length; c++) {
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            }
+        }else{
+            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("D").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            elInstance.setStyle(("C").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("C").concat(parseInt(j) + 1), "pointer-events", "none");
+            elInstance.setStyle(("D").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("D").concat(parseInt(j) + 1), "pointer-events", "none");
+            elInstance.setStyle(("S").concat(parseInt(j) + 1), "pointer-events", "");
+            elInstance.setStyle(("S").concat(parseInt(j) + 1), "pointer-events", "none");
+        }
+        }
+    }
     }
 
     getMissingPuListBranchTemplate() {
         if (this.state.branchTemplateId != "") {
-            console.log("In function Test@@@@@@@@@")
+            console.log("In function Test@@@@@@@@@",this.state)
             var missingPUList = [];
             var json;
             var treeTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == this.state.branchTemplateId)[0];
-            console.log("dataset Id template---", this.state.datasetIdModal);
+            // console.log("dataset Id template---", this.state.datasetIdModal);
             // if (1==1) {
             // var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
             // console.log("dataset---", dataset);
@@ -1173,17 +2305,65 @@ export default class BuildTree extends Component {
             var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
             console.log("puNodeList---", puNodeList);
             console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
-            var planningUnitList = this.state.updatedPlanningUnitList;
+            var planningUnitList = this.state.fullPlanningUnitList;
             for (let i = 0; i < puNodeList.length; i++) {
+                if (planningUnitList.filter(x => x.treeForecast == true && x.active == true && x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                 console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-                if (planningUnitList.filter(x => x.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
-                    var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
-                    console.log("parentNodeData---", parentNodeData);
-                    json = {
-                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
-                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
-                    };
-                    missingPUList.push(json);
+                var productCategory="";
+                productCategory=parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
+                if(productCategory==undefined){
+                    var forecastingUnit=this.state.forecastingUnitList.filter(c=>c.forecastingUnitId==parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id);
+                    productCategory=forecastingUnit[0].productCategory;
+                }
+                let existingPU=planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                if(existingPU.length > 0 ){
+                    json ={
+                        productCategory: productCategory,    
+                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                        consuptionForecast: existingPU[0].consuptionForecast,
+                        treeForecast: true,
+                        stock: existingPU[0].stock,
+                        existingShipments: existingPU[0].existingShipments,
+                        monthsOfStock: existingPU[0].monthsOfStock,
+                        procurementAgent: existingPU[0].procurementAgent,
+                        price: existingPU[0].price,
+                        higherThenConsumptionThreshold: existingPU[0].higherThenConsumptionThreshold,
+                        lowerThenConsumptionThreshold: existingPU[0].lowerThenConsumptionThreshold,
+                        planningUnitNotes: existingPU[0].planningUnitNotes,
+                        consumptionDataType: existingPU[0].consumptionDataType,
+                        otherUnit: existingPU[0].otherUnit,
+                        selectedForecastMap: existingPU[0].selectedForecastMap,
+                        programPlanningUnitId: existingPU[0].programPlanningUnitId,
+                        createdBy:existingPU[0].createdBy,
+                        createdDate:existingPU[0].createdDate,
+                        exists:true
+                    }
+                    missingPUList.push(json);    
+                    }else{
+                        json = {
+                            productCategory: productCategory,
+                            planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                            consuptionForecast: "",
+                            treeForecast: true,
+                            stock: "",
+                            existingShipments: "",
+                            monthsOfStock: "",
+                            procurementAgent: "",
+                            price: "",
+                            higherThenConsumptionThreshold: "",
+                            lowerThenConsumptionThreshold: "",
+                            planningUnitNotes: "",
+                            consumptionDataType: "",
+                            otherUnit: "",
+                            selectedForecastMap: {},
+                            programPlanningUnitId: 0,        
+                            createdBy: null,
+                            createdDate: null,
+                            exists:false
+                        };
+                        missingPUList.push(json);
+                    }
                 }
             }
             // }
@@ -1572,6 +2752,7 @@ export default class BuildTree extends Component {
         console.log("programData---%%%%%%%", programData);
         var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
         var updatedPlanningUnitList = [];
+        var fullPlanningUnitList=[];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
         planningUnitList.map(item => {
@@ -1582,6 +2763,9 @@ export default class BuildTree extends Component {
             })
         })
         console.log("forecastingUnitListNew---", forecastingUnitList);
+        programData.planningUnitList.map(item=>{
+            fullPlanningUnitList.push(item)
+        })
         planningUnitList.map(item => {
             updatedPlanningUnitList.push({
                 label: item.planningUnit.label, id: item.planningUnit.id,
@@ -1612,7 +2796,8 @@ export default class BuildTree extends Component {
             tracerCategoryList,
             forecastingUnitList,
             planningUnitList: updatedPlanningUnitList,
-            updatedPlanningUnitList
+            updatedPlanningUnitList,
+            fullPlanningUnitList:fullPlanningUnitList
         }, () => {
             if (forecastingUnitListNew.length > 0) {
                 var fuIds = forecastingUnitListNew.map(x => x.id).join(", ");
@@ -7399,6 +8584,7 @@ export default class BuildTree extends Component {
             this.getDatasetList();
             this.getModelingTypeList();
             this.getRegionList();
+            this.procurementAgentList();
             // this.getBranchTemplateList();
             // if (this.props.match.params.scenarioId != null && this.props.match.params.scenarioId != "") {
             //     this.callAfterScenarioChange(this.props.match.params.scenarioId);
@@ -12427,7 +13613,7 @@ export default class BuildTree extends Component {
 
             {/* Branch Template Start */}
             <Modal isOpen={this.state.isBranchTemplateModalOpen}
-                className={'modal-md ' + this.props.className}>
+                className={'modal-lg modalWidth ' + this.props.className}>
                 <ModalHeader>
                     <strong>{i18n.t('static.dataset.BranchTreeTemplate')}</strong>
                     <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -12497,6 +13683,7 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </FormGroup>
+                                                    
 
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
@@ -12504,17 +13691,20 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-
+                                                    {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
                                                 </div>
                                             </div>
-                                            <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                &nbsp;
-
-                                            </FormGroup>
-                                        </div>
-                                    </Form>
+                                                    {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
+                                                    {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
+                                                    {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                    {!isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
+                                                    {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId!=0 && this.state.branchTemplateId!=undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </div>
+                                        </Form>
 
                                 )} />
 
