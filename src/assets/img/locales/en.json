@@ -2206,7 +2206,7 @@
     "static.country.languagetext": "Select language",
     "static.extrapolation.errorOccured": "An error occurred while trying to calculate extrapolation",
     "static.language.languageCode": "Language display name",
-    "static.listTree.missingPlanningUnits": "Missing Planning Units",
+    "static.listTree.missingPlanningUnits": "Planning Units that are missing, inactive or unchecked for Tree Forecast in current program: (To see full list of current Planning Units, see",
     "static.common.datasetLevel": "Program Level",
     "static.dataentry.downloadTemplate": "Download template",
     "static.compareAndSelect.forecastErrorMonths": "Forecast Error (# Months Used)",
@@ -3205,5 +3205,13 @@
     "static.tooltip.diffTargetVsCalculatedPer": "(Calculated Total - Target) / Target. This difference will be large if the annual change varies significantly between years",
     "static.modelingCalculator.confirmAlert": "Do you want to replace the existing table ?",
     "static.commitVersion.treeAndConsumptionLastModifiedDateTooltip":"This date refers to when the data element was last edited in this particular version.",
-    "static.commitVersion.exclude":"Exclude local changes"
+    "static.commitVersion.exclude":"Exclude local changes",
+    "static.tree.createTree":"Create Tree",
+    "static.tree.createTreeWithoutPU":"Create Tree Without Adding Planning Units",
+    "static.tree.addAbovePUs":"Add selected planning units",
+    "static.tree.youMustBeOnlineToCreatePU":"Note: You must be online to create planning units.",
+    "static.tree.allTemplatePUAreInProgram":"All template Planning Units are in the program, active, and checked for Tree Forecast.",
+    "static.tree.updateSelectedPU":"Update selected planning units",
+    "static.tree.addBranchWithoutPU":"Add Branch Without Adding Planning Units",
+    "static.tree.addBranch":"Add Branch"
 }
