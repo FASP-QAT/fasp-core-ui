@@ -2869,6 +2869,7 @@ export default class CommitTreeComponent extends React.Component {
                                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"", null);
                                 var datasetJson = JSON.parse(datasetData);
                                 var programJson = this.state.finalProgramJson;
+                                console.log("Program Json in sync Test@123",programJson)
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
                                 // console.log("ProgramJson+++", programJson);
@@ -2882,6 +2883,7 @@ export default class CommitTreeComponent extends React.Component {
                                 // }
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
+                                    console.log("Tree Test@123",tree)
                                     var scenarioList = tree.scenarioList;
                                     var scenarioIdsSet = [...new Set(scenarioList.map(ele => Number(ele.id)))];
                                     // console.log("Scenario Ids Set Test@123", scenarioIdsSet);
@@ -2937,9 +2939,9 @@ export default class CommitTreeComponent extends React.Component {
                                     }
                                     tree.tree.flatList = completeFlatList;
                                     // console.log("commit*** tree---", tree);
-                                    var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
+                                    // var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
                                     // console.log("commit*** findTreeIndex---", findTreeIndex);
-                                    treeList[findTreeIndex] = tree;
+                                    treeList[tl] = tree;
                                     // console.log("commit*** treeList---", treeList);
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
