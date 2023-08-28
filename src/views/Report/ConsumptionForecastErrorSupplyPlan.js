@@ -1463,7 +1463,11 @@ fetchData(){
                             
                                 for(let ij = 0; ij < dataList_arr[0].length; ij++){
                                     if(monthArray[ii].date == dataList_arr[0][ij].month){
-                                        temp_forecastQty += dataList_arr[0][ij].forecastQty===''?'':Number(dataList_arr[0][ij].forecastQty);
+                                        if(dataList_arr[0][ij].forecastQty === ''){
+                                            temp_forecastQty = temp_forecastQty;
+                                        }else{
+                                            temp_forecastQty = Number(temp_forecastQty) + Number(dataList_arr[0][ij].forecastQty); 
+                                        }
                                         if(dataList_arr[0][ij].actualQty === ''){
                                             temp_actualQty = temp_actualQty;
                                         }else{
