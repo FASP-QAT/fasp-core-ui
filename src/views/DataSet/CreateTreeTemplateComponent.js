@@ -980,7 +980,8 @@ export default class CreateTreeTemplate extends Component {
         this.changed3 = this.changed3.bind(this);
         this.cancelNodeDataClicked = this.cancelNodeDataClicked.bind(this);
         this.createTree = this.createTree.bind(this)
-        this.modelOpenCloseForCreateTree = this.modelOpenCloseForCreateTree.bind(this)
+        this.modelOpenCloseForCreateTree = this.modelOpenCloseForCreateTree.bind(this);
+        this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
     }
 
     cancelNodeDataClicked() {
@@ -2604,7 +2605,7 @@ export default class CreateTreeTemplate extends Component {
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
-                        if (value == "") {
+                        if (value === "") {
                             this.state.modelingEl.setStyle(col, "background-color", "transparent");
                             this.state.modelingEl.setStyle(col, "background-color", "yellow");
                             this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -2626,7 +2627,7 @@ export default class CreateTreeTemplate extends Component {
                     if (rowData[4] == 2) {
                         var col = ("H").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(7, y);
-                        if (value == "") {
+                        if (value === "") {
                             this.state.modelingEl.setStyle(col, "background-color", "transparent");
                             this.state.modelingEl.setStyle(col, "background-color", "yellow");
                             this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -2704,17 +2705,18 @@ export default class CreateTreeTemplate extends Component {
         stopOptions.source = this.state.monthList;
         this.state.modelingEl.setProperty(2, stopOptions);
 
-        var dataArr = []
         const reversedList = [...json].reverse();
-        for (var i = 1; i < reversedList.length - 1; i++) {
+        for (var i = 0; i < reversedList.length - 1; i++) {
             var map = new Map(Object.entries(reversedList[i]));
             var data = []
-            data[0] = "Monthly change for " + map.get("7") + " to " + map.get("8") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            var stopDate = map.get("8");
+            var data2 = (i == 0) ? (map.get("8") - 6) : stopDate;
+            data[0] = "Monthly change for " + map.get("7") + " to " + data2 + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
             data[1] = map.get("7");
-            data[2] = map.get("8");
+            data[2] = data2;
             data[3] = '';
             data[4] = this.state.currentModelingType;
-            data[5] = 1;
+            data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;;
             data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
             data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
             data[8] = cleanUp
@@ -4520,7 +4522,7 @@ export default class CreateTreeTemplate extends Component {
                             currentEndValue: '',
                             currentEndValueEdit: false,
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
-                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? parseInt((rowData[2] - rowData[1]) / 12) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (parseInt((rowData[2] - rowData[1]) / 12) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget)
                         }, () => {
                             // this.calculateMOMData(0, 3);
@@ -4558,7 +4560,7 @@ export default class CreateTreeTemplate extends Component {
                                 currentEndValue: '',
                                 currentEndValueEdit: false,
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
-                                yearsOfTarget: parseInt((rowData[2] - rowData[1]) / 12),
+                                yearsOfTarget: (1 + parseInt((rowData[2] - rowData[1]) / 12)),
                                 firstMonthOfTarget: rowData[1]
                             }, () => {
                                 console.log("showCalculatorFields===", this.state.treeTemplate.monthsInPast)
@@ -4583,6 +4585,10 @@ export default class CreateTreeTemplate extends Component {
             }
         }
     }.bind(this)
+
+    resetModelingCalculatorData = function (instance, cell, x, y, value) {
+        
+    }.bind(this);
 
     changed1 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
@@ -4800,11 +4806,11 @@ export default class CreateTreeTemplate extends Component {
                     instance.setStyle(col, "background-color", "yellow");
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setStyle(col, "background-color", "yellow");
-                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     instance.setStyle(col, "background-color", "transparent");
+                //     instance.setStyle(col, "background-color", "yellow");
+                //     instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     instance.setStyle(col, "background-color", "transparent");
                     instance.setComments(col, "");
@@ -4841,11 +4847,11 @@ export default class CreateTreeTemplate extends Component {
                     instance.setStyle(col, "background-color", "yellow");
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setStyle(col, "background-color", "yellow");
-                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     instance.setStyle(col, "background-color", "transparent");
+                //     instance.setStyle(col, "background-color", "yellow");
+                //     instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     instance.setStyle(col, "background-color", "transparent");
                     instance.setComments(col, "");
@@ -8481,7 +8487,6 @@ export default class CreateTreeTemplate extends Component {
         var monthListForModelingCalculator = this.state.monthList;
 
         let count = this.state.yearsOfTarget;
-        count = Number(Number(count) + 1);
         var srt = this.state.currentCalculatorStartDate == 1 ? (this.state.currentCalculatorStartDate + 1) : this.state.currentCalculatorStartDate
         for (var j = 0; j <= count; j++) {
             var startdate = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 12) + (j * 12)))[0].name;
@@ -8495,7 +8500,7 @@ export default class CreateTreeTemplate extends Component {
             data[5] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
             data[6] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',((E${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100))`;//(F21-D21)/D21--Difference (Target vs Calculated, %)
             data[7] = j == 0 ? "" : modifyStartDate1//H
-            data[8] = modifyStopDate1
+            data[8] = j == count ? stopDate : modifyStopDate1
             dataArray[j] = data;
         }
 
@@ -8613,149 +8618,90 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var abc = 0;
-
-        if (x == 1) {
-
-            console.log("modelingCalculater after saving datasonal1", x, "==", y)
-            var elInstance = instance;
-            var dataArray1 = [];
-            let modelingType = document.getElementById("modelingType").value;
-            var rowData = elInstance.getRowData(y);
-            if (y == 0) {
-                elInstance.setValueFromCoords(9, 0, parseFloat(Number(rowData[1].toString().replaceAll(",", "")) / 12).toFixed(6), true);
-            }
-            if (y > 0) {
-                var rowData1 = elInstance.getRowData(y - 1);
-                var index = (elInstance).getValue(`B${parseInt(y) + 1}`, true);
-                if (index !== "" || index != null || index != undefined) {
-                    var calculatedTotal = parseFloat(rowData1[9]).toFixed(4);
-                    var arr = [];
-                    var start = rowData[7] - 6
-                    var stop = rowData[8] + 6
-                    var count = 1;
-                    var calculatedTotal1 = parseFloat(rowData1[9]).toFixed(4);
-                    while (start <= stop) {
-                        start = (start == 0 ? (start + 1) : start)
-
-                        if (modelingType == "active1") {
-                            var monthlyChange = parseFloat((Math.pow(rowData[1] / rowData1[1], (1 / 12)) - 1) * 100).toFixed(6);
-                            elInstance.setValueFromCoords(3, y, monthlyChange, true);//M32*(1+monthlyChange)
-                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
-                        } else {
-                            var monthlyChange = parseFloat(((rowData[1] - rowData1[1]) / rowData1[1]) / 12 * 100).toFixed(6);
-                            elInstance.setValueFromCoords(3, y, monthlyChange, true);//M32*(1+monthlyChange)
-                            var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
-                            console.log("dataArray1===>", calculatedTotal, "===", monthlyChange, "===", y, "==", count)
-
-                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
-
-                        }
-                        var programJson = {
-                            date: start,
-                            calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                            startDate: rowData[0].split("to")[0],
-                            stopDate: rowData[0].split("to")[1]
-                        }
-
-                        arr.push(programJson)
-                        start++;
-                        count++;
-                    }
-
-                    elInstance.setValueFromCoords(9, y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
-                    dataArray1 = dataArray1.concat(arr)
-                    const arraySum = dataArray1
-
-                    for (var i = 6; i <= 17; i++) {
-                        console.log("dataArray1=1", i, "===", arraySum)
-
-                        abc = abc + Number(arraySum[i].calculatedTotal)
-                    }
-                    instance.setValueFromCoords(4, y, Math.round(abc), true);
-                }
-            }
-        }
-    }
-
     changed3() {
-        this.setState({
-            isCalculateClicked: true
-        });
         var elInstance = this.state.modelingCalculatorEl;
         var dataArr = elInstance.records;
         var dataArray = [];
         var dataArrayTotal = [];
+        var valid = true;
 
         let modelingType = document.getElementById("modelingType").value;
         for (var j = 0; j < dataArr.length; j++) {
             var monthlyChange = "";
             var rowData = dataArr[j];
-            if (j == 0) {
-                elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
-            }
-            if (j > 0) {
-                var rowData1 = dataArr[j - 1];
-                elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
-                if (modelingType == "active1") {
-                    monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
-                } else {
-                    monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
+            if (rowData[1].v === "") {
+                var col = ("B").concat(parseInt(j) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+                valid = false;
+            } else {
+                if (j == 0) {
+                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
                 }
-                elInstance.setValueFromCoords(3, j, monthlyChange, true);
-                var start = rowData[7].v
-                var stop = rowData[8].v
-                var count = 1;
-                var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
-                var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
-                var arr = [];
-
-                while (start <= stop) {
-                    start = (start == 0 ? (start + 1) : start)
+                if (j > 0) {
+                    var rowData1 = dataArr[j - 1];
+                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
                     if (modelingType == "active1") {
-                        calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
                     } else {
-                        var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
-                        calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
                     }
+                    elInstance.setValueFromCoords(3, j, monthlyChange, true);
+                    var start = rowData[7].v
+                    var stop = rowData[8].v
+                    var count = 1;
+                    var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
+                    var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
+                    var arr = [];
 
-                    var programJson = {
-                        date: start,
-                        calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                        // startDate: rowData[0].split("to")[0],
-                        // stopDate: rowData[0].split("to")[1],
-                        yCord: j
+                    while (start <= stop) {
+                        start = (start == 0 ? (start + 1) : start)
+                        if (modelingType == "active1") {
+                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                        } else {
+                            var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
+                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                        }
+
+                        var programJson = {
+                            date: start,
+                            calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
+                            // startDate: rowData[0].split("to")[0],
+                            // stopDate: rowData[0].split("to")[1],
+                            yCord: j
+                        }
+                        dataArrayTotal.push(programJson);
+                        arr.push(programJson)
+                        count++;
+                        start++;
                     }
-                    dataArrayTotal.push(programJson);
-                    arr.push(programJson)
-                    count++;
-                    start++;
+                    elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
                 }
-                elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
+                dataArray[j] = rowData[1].v;
             }
-            dataArray[j] = rowData[1].v;
         }
-        const arraySum = dataArrayTotal
+        if (valid) {
+            const arraySum = dataArrayTotal
 
-        for (var i = 6; i < arraySum.length - 12; i = (i + 12)) {
-            var abc = 0;
-            for (var j = i; j <= (i + 11); j++) {
-                if (arraySum[j] != undefined) {
-                    abc = abc + Number(arraySum[j].calculatedTotal)
+            for (var i = 6; i < arraySum.length - 12; i = (i + 12)) {
+                var abc = 0;
+                for (var j = i; j <= (i + 11); j++) {
+                    if (arraySum[j] != undefined) {
+                        abc = abc + Number(arraySum[j].calculatedTotal)
+                    }
                 }
+                elInstance.setValueFromCoords(4, arraySum[i].yCord, Math.round(abc), true);
             }
-            elInstance.setValueFromCoords(4, arraySum[i].yCord, Math.round(abc), true);
+            this.setState({
+                actualOrTargetValueList: dataArray,
+                isCalculateClicked: true
+            });
         }
-        this.setState({
-            actualOrTargetValueList: dataArray
-        });
     }
 
     loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
         jExcelLoadedFunction(instance);
-        let count = document.getElementById("targetYears").value;
-        count = Number(Number(count) + 1);
         var elInstance = instance.worksheets[0];
         elInstance.setValueFromCoords(2, 0, "", true)
         elInstance.setValueFromCoords(3, 0, "", true)
@@ -8763,11 +8709,6 @@ export default class CreateTreeTemplate extends Component {
         elInstance.setValueFromCoords(5, 0, "", true)
         elInstance.setValueFromCoords(6, 0, "", true)
         elInstance.setValueFromCoords(7, 0, "", true)
-
-        elInstance.setValueFromCoords(3, count, "", true)
-        elInstance.setValueFromCoords(4, count, "", true)
-        elInstance.setValueFromCoords(5, count, "", true)
-        elInstance.setValueFromCoords(6, count, "", true)
 
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -8789,12 +8730,6 @@ export default class CreateTreeTemplate extends Component {
         var cell = elInstance.getCell("F1");
         cell.classList.add('shipmentEntryDoNotInclude');
         var cell = elInstance.getCell("G1");
-        cell.classList.add('shipmentEntryDoNotInclude');
-        var cell = elInstance.getCell(("E").concat(Number(Number(count) + 1)));
-        cell.classList.add('shipmentEntryDoNotInclude');
-        var cell = elInstance.getCell(("F").concat(Number(Number(count) + 1)));
-        cell.classList.add('shipmentEntryDoNotInclude');
-        var cell = elInstance.getCell(("G").concat(Number(Number(count) + 1)));
         cell.classList.add('shipmentEntryDoNotInclude');
     }
 
@@ -10753,6 +10688,7 @@ export default class CreateTreeTemplate extends Component {
                                                 showCalculatorFields: false
                                             });
                                         }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
+                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         {this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
                                         {!this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.changed3}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
                                     </FormGroup>

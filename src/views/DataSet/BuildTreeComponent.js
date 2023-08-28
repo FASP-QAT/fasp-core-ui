@@ -1093,7 +1093,7 @@ export default class BuildTree extends Component {
         this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
         this.changeModelingCalculatorJexcel = this.changeModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
-        this.onChangeModelingCalculator = this.onChangeModelingCalculator.bind(this);
+        this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -3737,7 +3737,7 @@ export default class BuildTree extends Component {
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
-                        if (value == "") {
+                        if (value === "") {
                             this.state.modelingEl.setStyle(col, "background-color", "transparent");
                             this.state.modelingEl.setStyle(col, "background-color", "yellow");
                             this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -3759,7 +3759,7 @@ export default class BuildTree extends Component {
                     if (rowData[4] == 2) {
                         var col = ("H").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(7, y);
-                        if (value == "") {
+                        if (value === "") {
                             this.state.modelingEl.setStyle(col, "background-color", "transparent");
                             this.state.modelingEl.setStyle(col, "background-color", "yellow");
                             this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -3830,20 +3830,19 @@ export default class BuildTree extends Component {
         for (var i = 0; i < count; i++) {
             this.state.modelingEl.deleteRow(i);
         }
-        console.log("====>", count)
-
         var dataArr = []
-
         const reversedList = [...json].reverse();
-        for (var i = 1; i < reversedList.length - 1; i++) {
+        for (var i = 0; i < reversedList.length - 1; i++) {
             var map = new Map(Object.entries(reversedList[i]));
             var data = []
-            data[0] = "Monthly change for " + map.get("7") + " - " + map.get("8") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            var stopDate = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
+            var data2 = (i == 0) ? moment(stopDate, "YYYY-MM-DD").subtract(6, "months").format("YYYY-MM-DD") : stopDate;
+            data[0] = "Monthly change for " + map.get("7") + " - " + moment(data2).format("MMM YYYY") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
             data[1] = moment("01 " + map.get("7"), "DD MMM YYYY").format("YYYY-MM-DD");
-            data[2] = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
+            data[2] = data2;
             data[3] = '';
             data[4] = this.state.currentModelingType;
-            data[5] = 1;
+            data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;
             data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
             data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
             data[8] = cleanUp
@@ -4606,7 +4605,7 @@ export default class BuildTree extends Component {
                             currentEndValue: '',
                             currentEndValueEdit: false,
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
-                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget)
                         }, () => {
                             // this.calculateMOMData(0, 3);
@@ -4646,7 +4645,7 @@ export default class BuildTree extends Component {
                                 currentEndValue: '',
                                 currentEndValueEdit: false,
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
-                                yearsOfTarget: (moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1),
+                                yearsOfTarget: ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1),
                                 firstMonthOfTarget: rowData[1]
                             }, () => {
                                 if (this.state.showCalculatorFields) {
@@ -4668,68 +4667,13 @@ export default class BuildTree extends Component {
         }
     }.bind(this)
 
-    onChangeModelingCalculator = function (instance, cell, x, y, value) {
-        var z = -1;
-        var dataArr = [];
-        var dataArray1 = [];
-        var elInstance = instance.worksheets[0];
-        var data1 = elInstance.records;
-        let modelingType = document.getElementById("modelingType").value;
-        for (var i = 0; i < data1.length; i++) {
-            var data = data1[i]
-            if (z != data[i].y) {
-                var rowData = elInstance.getRowData(data[i].y);
-                if (data[i].y == 0) {
-                    elInstance.setValueFromCoords(9, 0, parseFloat(Number(rowData[1].toString().replaceAll(",", "")) / 12).toFixed(6), true);
-                }
-                if (data[i].y > 0) {
-                    var rowData1 = elInstance.getRowData(data[i].y - 1);
-                    var index = (elInstance).getValue(`B${parseInt(data[i].y) + 1}`, true);
-                    if (index !== "" || index != null || index != undefined) {
-                        var calculatedTotal = parseFloat(rowData1[9]).toFixed(4);
-                        var arr = [];
-                        var start = moment(moment(rowData[7], 'MMM YYYY'))
-                        var stop = moment(moment(rowData[8], 'MMM YYYY'))
-                        var count = 1;
-                        var calculatedTotal1 = parseFloat(rowData1[9]).toFixed(4);
-                        while (start.isSameOrBefore(stop)) {
-
-                            if (modelingType == "active1") {
-                                var monthlyChange = ((Math.pow(rowData[1] / rowData1[1], (1 / 12)) - 1) * 100);
-                                elInstance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
-                                calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
-                            } else {
-                                var monthlyChange = (((rowData[1] - rowData1[1]) / rowData1[1]) / 12 * 100);
-                                elInstance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
-                                var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
-                                calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
-                            }
-                            var programJson = {
-                                date: moment(start.format('MMM YYYY')),
-                                calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                                startDate: moment(moment(rowData[0].split("-")[0], 'MMM YYYY')),
-                                stopDate: moment(moment(rowData[0].split("-")[1], 'MMM YYYY'))
-                            }
-                            arr.push(programJson)
-                            start.add(1, 'months');
-                            count++;
-                        }
-                        elInstance.setValueFromCoords(9, data[i].y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
-                        z = data[i].y;
-                        dataArray1 = dataArray1.concat(arr)
-                    }
-                }
-                dataArr.push(rowData[1]);
-            }
-        }
-        const arraySum = dataArray1.map(c => (c.date.year()))
-        const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
-
-        for (var i = 1; i < arraySum1.length - 1; i++) {
-            const abc = dataArray1.filter(c => c.date.year() == arraySum1[i]).map(c => Number(c.calculatedTotal))
-                .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
-            elInstance.setValueFromCoords(4, i, Math.round(abc), true);
-        }
+    resetModelingCalculatorData = function (instance, cell, x, y, value) {
+        this.setState({
+            currentModelingType: 2,
+            yearsOfTarget: 3
+        }, () => {
+            this.buildModelingCalculatorJexcel();
+        })
     }.bind(this);
 
     changed1 = function (instance, cell, x, y, value) {
@@ -4998,11 +4942,11 @@ export default class BuildTree extends Component {
                     instance.setStyle(col, "background-color", "yellow");
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setStyle(col, "background-color", "yellow");
-                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     instance.setStyle(col, "background-color", "transparent");
+                //     instance.setStyle(col, "background-color", "yellow");
+                //     instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     instance.setStyle(col, "background-color", "transparent");
                     instance.setComments(col, "");
@@ -5039,11 +4983,11 @@ export default class BuildTree extends Component {
                     instance.setStyle(col, "background-color", "yellow");
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setStyle(col, "background-color", "yellow");
-                    instance.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     instance.setStyle(col, "background-color", "transparent");
+                //     instance.setStyle(col, "background-color", "yellow");
+                //     instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     instance.setStyle(col, "background-color", "transparent");
                     instance.setComments(col, "");
@@ -9009,8 +8953,7 @@ export default class BuildTree extends Component {
 
         var dataArray = [];
         var actualOrTargetValueList = this.state.actualOrTargetValueList;
-        let count1 = this.state.yearsOfTarget;
-        var count = Number(Number(count1) + 1);
+        let count = this.state.yearsOfTarget;
 
         for (var j = 0; j <= count; j++) {
             let startdate = moment(moment(this.state.currentCalculatorStartDate, "YYYY-MM-DD").subtract(1, "years").add(j, "years")).format("MMM YYYY")
@@ -9025,7 +8968,7 @@ export default class BuildTree extends Component {
             data[5] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
             data[6] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',((E${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100))`;//(F21-D21)/D21--Difference (Target vs Calculated, %)
             data[7] = j == 0 ? "" : modifyStartDate1
-            data[8] = modifyStopDate1
+            data[8] = j == count ? stopDate : modifyStopDate1
             dataArray[j] = data;
         }
         var data = dataArray;
@@ -9143,6 +9086,7 @@ export default class BuildTree extends Component {
     changed3() {
 
         var elInstance = this.state.modelingCalculatorEl;
+        var valid = true;
         var dataArray = [];
         var dataArrayTotal = [];
         let modelingType = document.getElementById("modelingType").value;
@@ -9153,66 +9097,77 @@ export default class BuildTree extends Component {
         for (var j = 0; j < dataArr.length; j++) {
             var monthlyChange = "";
             var rowData = dataArr[j];
-            if (j == 0) {
-                elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
-            }
-            if (j > 0) {
-                var rowData1 = dataArr[j - 1];
-                elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
-                if (modelingType == "active1") {
-                    monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
-                } else {
-                    monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
+            if (rowData[1].v === "") {
+                var col = ("B").concat(parseInt(j) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+                valid = false;
+            } else {
+                if (j == 0) {
+                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
                 }
-                elInstance.setValueFromCoords(3, j, monthlyChange, true);
-
-                var start = moment(moment(rowData[7].v, 'MMM YYYY'))
-                var stop = moment(moment(rowData[8].v, 'MMM YYYY'))
-                var count = 1;
-                var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
-                var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
-                var arr = [];
-
-                while (start.isSameOrBefore(stop)) {
+                if (j > 0) {
+                    var rowData1 = dataArr[j - 1];
+                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
                     if (modelingType == "active1") {
-                        calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
                     } else {
-                        var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
-                        calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
                     }
+                    elInstance.setValueFromCoords(3, j, monthlyChange, true);
 
-                    var programJson = {
-                        date: moment(start.format('MMM YYYY')).format("YYYY"),
-                        calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                        startDate: moment(moment(rowData[0].v.split("-")[0], 'MMM YYYY')),
-                        stopDate: moment(moment(rowData[0].v.split("-")[1], 'MMM YYYY'))
+                    var start = moment(moment(rowData[7].v, 'MMM YYYY'))
+                    var stop = moment(moment(rowData[8].v, 'MMM YYYY'))
+                    var count = 1;
+                    var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
+                    var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
+                    var arr = [];
+
+                    while (start.isSameOrBefore(stop)) {
+                        if (modelingType == "active1") {
+                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                        } else {
+                            var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
+                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                        }
+
+                        var programJson = {
+                            date: moment(start.format('MMM YYYY')).format("YYYY"),
+                            calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
+                            startDate: moment(moment(rowData[0].v.split("-")[0], 'MMM YYYY')),
+                            stopDate: moment(moment(rowData[0].v.split("-")[1], 'MMM YYYY'))
+                        }
+                        arr.push(programJson)
+                        dataArrayTotal.push(programJson);
+                        start.add(1, 'months');
+                        count++;
                     }
-                    arr.push(programJson)
-                    dataArrayTotal.push(programJson);
-                    start.add(1, 'months');
-                    count++;
+                    elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
+                    var col = ("B").concat(parseInt(j) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
-                elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
+                dataArray[j] = rowData[1].v;
             }
-            dataArray[j] = rowData[1].v;
         }
-        const arraySum = dataArrayTotal.map(c => c.date)
-        const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
-        for (var i = 1; i <= arraySum1.length; i++) {
-            var abc = Math.round(dataArrayTotal.filter(c => c.date == arraySum1[i]).map(c => Number(c.calculatedTotal))
-                .reduce((accumulator, currentItem) => accumulator + currentItem, 0));
-            elInstance.setValueFromCoords(4, i, abc, true);
+        if (valid) {
+            const arraySum = dataArrayTotal.map(c => c.date)
+            const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+            for (var i = 1; i <= arraySum1.length; i++) {
+                var abc = Math.round(dataArrayTotal.filter(c => c.date == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                    .reduce((accumulator, currentItem) => accumulator + currentItem, 0));
+                elInstance.setValueFromCoords(4, i, abc, true);
+            }
+            this.setState({
+                actualOrTargetValueList: dataArray,
+                isCalculateClicked: true
+            });
         }
-        this.setState({
-            actualOrTargetValueList: dataArray,
-            isCalculateClicked: true
-        });
     }
 
     loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
         jExcelLoadedFunction(instance);
-        let count = document.getElementById("targetYears").value;
-        count = Number(Number(count) + 1);
         var elInstance = instance.worksheets[0];
         elInstance.setValueFromCoords(2, 0, "", true)
         elInstance.setValueFromCoords(3, 0, "", true)
@@ -9221,14 +9176,9 @@ export default class BuildTree extends Component {
         elInstance.setValueFromCoords(6, 0, "", true)
         elInstance.setValueFromCoords(7, 0, "", true)
 
-        // elInstance.setValueFromCoords(4, count, "", true)
-        // elInstance.setValueFromCoords(5, count, "", true)
-        // elInstance.setValueFromCoords(6, count, "", true)
-
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
 
-        // tr.children[2].title = i18n.t('static.tooltip.actualOrTarget');
         tr.children[3].title = i18n.t('static.tooltip.annualChangePer');
         tr.children[5].title = i18n.t('static.tooltip.calculatedTotal');
         tr.children[6].title = i18n.t('static.tooltip.diffTargetVsCalculatedNo');
@@ -9248,12 +9198,6 @@ export default class BuildTree extends Component {
         cell.classList.add('shipmentEntryDoNotInclude');
         var cell = elInstance.getCell("G1");
         cell.classList.add('shipmentEntryDoNotInclude');
-        // var cell = elInstance.getCell(("E").concat(Number(Number(count) + 1)));
-        // cell.classList.add('shipmentEntryDoNotInclude');
-        // var cell = elInstance.getCell(("F").concat(Number(Number(count) + 1)));
-        // cell.classList.add('shipmentEntryDoNotInclude');
-        // var cell = elInstance.getCell(("G").concat(Number(Number(count) + 1)));
-        // cell.classList.add('shipmentEntryDoNotInclude');
 
     }
     changeModelingCalculatorJexcel = function (instance, cell, x, y, value) {
@@ -11241,6 +11185,7 @@ export default class BuildTree extends Component {
                                                 showCalculatorFields: false
                                             });
                                         }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
+                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         {this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
                                         {!this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.changed3}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
                                     </FormGroup>
