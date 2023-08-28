@@ -4587,7 +4587,7 @@ export default class BuildTree extends Component {
                         currentCalculatorStopDate: '',
                         currentCalculatorStartValue: '',
                     }, () => {
-                        console.log("x row data===>", rowData[13]);
+                        console.log("x row data===>", ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1));
                         var startValue = this.getMomValueForDateRange(rowData[1]);
                         this.setState({
                             currentRowIndex: x,
@@ -4628,7 +4628,7 @@ export default class BuildTree extends Component {
                         }, () => {
                             // console.log("x row data===>", this.el.getRowData(x));
                             var startValue = this.getMomValueForDateRange(rowData[1]);
-                            console.log("***MOM final start value--->>>", rowData[13])
+                            console.log("***MOM final start value--->>>", (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1))
                             this.setState({
                                 currentRowIndex: x,
                                 showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
@@ -4645,7 +4645,7 @@ export default class BuildTree extends Component {
                                 currentEndValue: '',
                                 currentEndValueEdit: false,
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
-                                yearsOfTarget: ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1),
+                                yearsOfTarget: (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1),
                                 firstMonthOfTarget: rowData[1]
                             }, () => {
                                 if (this.state.showCalculatorFields) {
