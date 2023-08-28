@@ -1209,7 +1209,8 @@ export default class CreateTreeTemplate extends Component {
                 data[14] = missingPUListForCreateTree[j].selectedForecastMap;
                 data[15] = missingPUListForCreateTree[j].otherUnit;
                 data[16] = missingPUListForCreateTree[j].createdBy;
-                data[17] = missingPUListForCreateTree[j].createdDate;
+                data[17] = missingPUListForCreateTree[j].createdDate; 
+                data[18] = true;
                 dataArray[count] = data;
                 count++;
             }
@@ -1356,6 +1357,10 @@ export default class CreateTreeTemplate extends Component {
                     title: 'createdDate',
                     type: 'hidden',
                     readOnly: true //17P
+                },
+                {
+                    title:i18n.t("static.common.select"),
+                    type:'checkbox'
                 }
             ],
             // text: {
@@ -1419,6 +1424,38 @@ export default class CreateTreeTemplate extends Component {
     }
 
     changedMissingPUForCreateTree = function (instance, cell, x, y, value) {
+        if(x==18){
+            console.log("Value Test@123",value)
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
+            if(value.toString()=="false"){
+                console.log("In changed Test@123")
+                this.el.setValueFromCoords(2,y,this.state.missingPUListForCreateTree[y].consuptionForecast,true);
+                this.el.setValueFromCoords(3,y,this.state.missingPUListForCreateTree[y].treeForecast,true);
+                this.el.setValueFromCoords(4,y,this.state.missingPUListForCreateTree[y].stock,true);
+                this.el.setValueFromCoords(5,y,this.state.missingPUListForCreateTree[y].existingShipments,true);
+                this.el.setValueFromCoords(6,y,this.state.missingPUListForCreateTree[y].monthsOfStock,true);
+                this.el.setValueFromCoords(7,y,(this.state.missingPUListForCreateTree[y].price==="" || this.state.missingPUListForCreateTree[y].price==null || this.state.missingPUListForCreateTree[y].price==undefined)?"":(this.state.missingPUListForCreateTree[y].procurementAgent == null || this.state.missingPUListForCreateTree[y].procurementAgent == undefined ? -1 : this.state.missingPUListForCreateTree[y].procurementAgent.id),true);
+                this.el.setValueFromCoords(8,y,this.state.missingPUListForCreateTree[y].price,true);
+                this.el.setValueFromCoords(9,y,this.state.missingPUListForCreateTree[y].planningUnitNotes,true);
+                this.el.setValueFromCoords(10,y,this.state.missingPUListForCreateTree[y].planningUnit.id,true);
+                this.el.setValueFromCoords(11,y,this.state.missingPUListForCreateTree[y].programPlanningUnitId,true);
+                this.el.setValueFromCoords(12,y,this.state.missingPUListForCreateTree[y].higherThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(13,y,this.state.missingPUListForCreateTree[y].lowerThenConsumptionThreshold,true);
+                this.el.setValueFromCoords(14,y,this.state.missingPUListForCreateTree[y].selectedForecastMap,true);
+                this.el.setValueFromCoords(15,y,this.state.missingPUListForCreateTree[y].otherUnit,true);
+                this.el.setValueFromCoords(16,y,this.state.missingPUListForCreateTree[y].createdBy,true);
+                this.el.setValueFromCoords(17,y,this.state.missingPUListForCreateTree[y].createdDate,true);
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
         if (x == 7) {
             if (value != -1 && value !== null && value !== '') {
                 console.log("Value--------------->IF");
@@ -1958,154 +1995,163 @@ export default class CreateTreeTemplate extends Component {
 
     saveMissingPUs() {
         var validation = this.checkValidationForMissingPUList();
-        console.log("validation", validation)
-        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-        var curUser = AuthenticationService.getLoggedInUserId();
-        let indexVar = 0;
-        if (validation == true) {
-            var tableJson = this.el.getJson(null, false);
-            var planningUnitList = [];
-            var programs = [];
-            var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                let procurementAgentObj = "";
-                if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "") {
+       console.log("validation",validation)
+       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+       var curUser = AuthenticationService.getLoggedInUserId();                     
+       let indexVar = 0;
+       if (validation == true) {
+        var tableJson = this.el.getJson(null, false);
+        var planningUnitList = [];
+        var programs = [];
+        var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
+        var updatedMissingPUList=[];
+        for (var i = 0; i < tableJson.length; i++) {
+            if(tableJson[i][18].toString()=="true"){
+            var map1 = new Map(Object.entries(tableJson[i]));
+            let procurementAgentObj = "";
+                if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "" ) {
                     procurementAgentObj = null
                 } else {
                     procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
                 }
-                var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUListForCreateTree[i].planningUnit.id)[0]
-                let tempJson = {
-                    "programPlanningUnitId": map1.get("11"),
-                    "planningUnit": {
-                        "id": planningUnitObj.planningUnitId,
-                        "label": planningUnitObj.label,
-                        "unit": planningUnitObj.unit,
-                        "multiplier": planningUnitObj.multiplier,
-                        "forecastingUnit": {
-                            "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                            "label": planningUnitObj.forecastingUnit.label,
-                            "unit": planningUnitObj.forecastingUnit.unit,
-                            "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                            "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                            "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                        },
-                        "idString": "" + planningUnitObj.planningUnitId
+            var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUListForCreateTree[i].planningUnit.id)[0]         
+            let tempJson = {
+                "programPlanningUnitId": map1.get("11"),
+                "planningUnit": {
+                    "id": planningUnitObj.planningUnitId,
+                    "label":planningUnitObj.label,
+                    "unit": planningUnitObj.unit,
+                    "multiplier": planningUnitObj.multiplier,
+                    "forecastingUnit": {
+                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                        "label": planningUnitObj.forecastingUnit.label,
+                        "unit": planningUnitObj.forecastingUnit.unit,
+                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
                     },
-                    "consuptionForecast": map1.get("2"),
-                    "treeForecast": map1.get("3"),
-                    "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "procurementAgent": (procurementAgentObj == null ? null : {
-                        "id": parseInt(map1.get("7")),
-                        "label": procurementAgentObj.label,
-                        "code": procurementAgentObj.code,
-                        "idString": "" + parseInt(map1.get("7"))
-                    }),
-                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "higherThenConsumptionThreshold": map1.get("12"),
-                    "lowerThenConsumptionThreshold": map1.get("13"),
-                    "planningUnitNotes": map1.get("9"),
-                    "consumptionDataType": 2,
-                    "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
-                    "selectedForecastMap": map1.get("14"),
-                    "createdBy":
-                    {
-                        "userId": map1.get("16") == "" ? curUser : map1.get("16"),
-                    },
-                    "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
-                    "active": true
-                }
-                planningUnitList.push(tempJson);
+                    "idString": "" + planningUnitObj.planningUnitId
+                },
+                "consuptionForecast": map1.get("2"),
+                "treeForecast": map1.get("3"),
+                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "procurementAgent": (procurementAgentObj == null ? null : {
+                    "id": parseInt(map1.get("7")),
+                    "label": procurementAgentObj.label,
+                    "code": procurementAgentObj.code,
+                    "idString": "" + parseInt(map1.get("7"))
+                }),
+                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "higherThenConsumptionThreshold": map1.get("12"),
+                "lowerThenConsumptionThreshold": map1.get("13"),
+                "planningUnitNotes": map1.get("9"),
+                "consumptionDataType": 2,
+                "otherUnit": map1.get("15")==""?null:map1.get("15"),
+                "selectedForecastMap":map1.get("14"),
+                "createdBy":
+                {
+                  "userId": map1.get("16")==""? curUser:map1.get("16"),
+                }, 
+                "createdDate": map1.get("17")==""? curDate:map1.get("17"),
+                "active": true
             }
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
+            planningUnitList.push(tempJson);
+        }else{
+            updatedMissingPUList.push(missingPUListForCreateTree[i])
+        }
+        }
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                console.log("this.state.datasetIdModal------",this.state.datasetIdModal);
+                var programId = this.state.datasetIdModalForCreateTree.split("_")[0];
+                var versionId = (this.state.datasetIdModalForCreateTree.split("_")[1]).split("v")[1];
+                console.log("this.state.datasetIdModal------programId",programId);
+                console.log("this.state.datasetIdModal------versionId",versionId.split("v"));
+                
+                var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
+                console.log("this.state.datasetIdModal------program------",program);
+                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                console.log("this.state.datasetIdModal------programData------",programData);
+                var planningFullList=programData.planningUnitList;
+                console.log("this.state.datasetIdModal------1Aug planningUnitList------",planningUnitList);
+                console.log("this.state.datasetIdModal------1Aug programData------Before",programData.planningUnitList);
+                
+                planningUnitList.forEach(p => {
+                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==p.planningUnit.id)
+
+                    console.log("this.state.datasetIdModal------1Aug indexVar------",indexVar);
+                    if(indexVar!=-1){
+                        planningFullList[indexVar] = p;
+                    }else{
+                        planningFullList = planningFullList.concat(p);
+                    }
+                    console.log("this.state.datasetIdModal------1Aug planningFullList------1",planningFullList);
+                })
+                console.log("this.state.datasetIdModal------1Aug planningFullList------",planningFullList);
+                
+            programData.planningUnitList = planningFullList;
+            console.log("this.state.datasetIdModal------1Aug programData------after",programData.planningUnitList);
+            let downloadedProgramData = programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+                programTransaction.put(program);
+            // })
+            
+            transaction.oncomplete = function (event) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var program = transaction.objectStore('datasetData');
-                var getRequest = program.getAll();
-                getRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
-
-                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                    var filteredGetRequestList = myResult.filter(c => c.userId == userId);
-                    console.log("this.state.datasetIdModal------", this.state.datasetIdModal);
-                    var programId = this.state.datasetIdModalForCreateTree.split("_")[0];
-                    var versionId = (this.state.datasetIdModalForCreateTree.split("_")[1]).split("v")[1];
-                    console.log("this.state.datasetIdModal------programId", programId);
-                    console.log("this.state.datasetIdModal------versionId", versionId.split("v"));
-
-                    var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
-                    console.log("this.state.datasetIdModal------program------", program);
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    console.log("this.state.datasetIdModal------programData------", programData);
-                    var planningFullList = programData.planningUnitList;
-                    console.log("this.state.datasetIdModal------1Aug planningUnitList------", planningUnitList);
-                    console.log("this.state.datasetIdModal------1Aug programData------Before", programData.planningUnitList);
-
-                    planningUnitList.forEach(p => {
-                        indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
-
-                        console.log("this.state.datasetIdModal------1Aug indexVar------", indexVar);
-                        if (indexVar != -1) {
-                            planningFullList[indexVar] = p;
-                        } else {
-                            planningFullList = planningFullList.concat(p);
-                        }
-                        console.log("this.state.datasetIdModal------1Aug planningFullList------1", planningFullList);
-                    })
-                    console.log("this.state.datasetIdModal------1Aug planningFullList------", planningFullList);
-
-                    programData.planningUnitList = planningFullList;
-                    console.log("this.state.datasetIdModal------1Aug programData------after", programData.planningUnitList);
-                    let downloadedProgramData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                    program.programData = programData;
-                    var transaction = db1.transaction(['datasetData'], 'readwrite');
-                    var programTransaction = transaction.objectStore('datasetData');
-                    // programs.forEach(program => {
-                    programTransaction.put(program);
-                    // })
-
-                    transaction.oncomplete = function (event) {
-                        db1 = e.target.result;
-                        var id = this.state.datasetIdModalForCreateTree;
-
-                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                        var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-
-                        datasetDetailsRequest.onsuccess = function (e) {
-                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                            datasetDetailsRequestJson.changed = 1;
-                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                            console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
-
-                            datasetDetailsRequest1.onsuccess = function (event) {
-                                this.setState({
-                                    // message: i18n.t('static.mt.dataUpdateSuccess'),
-                                    color: "green",
-                                    missingPUListForCreateTree: [],
-                                    datasetListJexcelForCreateTree: downloadedProgramData
-                                });
-                            }.bind(this)
-                        }.bind(this)
-                    }.bind(this);
-                    transaction.onerror = function (event) {
-                    }.bind(this);
+                var id = this.state.datasetIdModalForCreateTree;
+                
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+            
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            // message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            missingPUListForCreateTree: updatedMissingPUList,
+                            datasetListJexcelForCreateTree:downloadedProgramData
+                        },()=>{
+                            if(this.state.missingPUList.length>0){
+                                this.buildMissingPUJexcelForCreateTree();
+                            }
+                        });
+                    }.bind(this)
+                }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
                 }.bind(this);
             }.bind(this);
-        }
+        }.bind(this);
+    }
     }
 
     handleRegionChangeForCreateTree = (regionIds) => {
@@ -13611,177 +13657,179 @@ export default class CreateTreeTemplate extends Component {
                                     setFieldTouched
                                 }) => (
                                     <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                        {/* <CardBody> */}
-                                        <div className="col-md-12">
-                                            <div className="">
-                                                <div className='row'>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                        <div className="controls">
+                                                {/* <CardBody> */}
+                                                <div className="col-md-12">
+                                                    <div className="">
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
 
-                                                            <Input
-                                                                type="select"
-                                                                name="datasetIdModalForCreateTree"
-                                                                id="datasetIdModalForCreateTree"
-                                                                bsSize="sm"
-                                                                valid={!errors.datasetIdModalForCreateTree && this.state.datasetIdModalForCreateTree != null ? this.state.datasetIdModalForCreateTree : '' != ''}
-                                                                invalid={touched.datasetIdModalForCreateTree && !!errors.datasetIdModalForCreateTree}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                value={this.state.datasetIdModalForCreateTree}
-                                                            >
-                                                                <option value="">{i18n.t('static.mt.selectProgram')}</option>
-                                                                {downloadedDatasetsForCreateTree}
-                                                            </Input>
-                                                            <FormFeedback>{errors.datasetIdModalForCreateTree}</FormFeedback>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="datasetIdModalForCreateTree"
+                                                                        id="datasetIdModalForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.datasetIdModalForCreateTree && this.state.datasetIdModalForCreateTree != null ? this.state.datasetIdModalForCreateTree : '' != ''}
+                                                                        invalid={touched.datasetIdModalForCreateTree && !!errors.datasetIdModalForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.datasetIdModalForCreateTree}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.mt.selectProgram')}</option>
+                                                                        {downloadedDatasetsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.datasetIdModalForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
+
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="forecastMethodIdForCreateTree"
+                                                                        id="forecastMethodIdForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.forecastMethodIdForCreateTree && this.state.forecastMethodForCreateTree.id != null ? this.state.forecastMethodForCreateTree.id : '' != ''}
+                                                                        invalid={touched.forecastMethodIdForCreateTree && !!errors.forecastMethodIdForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        required
+                                                                        value={this.state.forecastMethodForCreateTree.id}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                        {forecastMethodsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodIdForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
                                                         </div>
-
-                                                    </FormGroup>
-
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
-                                                        <div className="controls">
-
-                                                            <Input
-                                                                type="select"
-                                                                name="forecastMethodIdForCreateTree"
-                                                                id="forecastMethodIdForCreateTree"
-                                                                bsSize="sm"
-                                                                valid={!errors.forecastMethodIdForCreateTree && this.state.forecastMethodForCreateTree.id != null ? this.state.forecastMethodForCreateTree.id : '' != ''}
-                                                                invalid={touched.forecastMethodIdForCreateTree && !!errors.forecastMethodIdForCreateTree}
-                                                                onBlur={handleBlur}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                required
-                                                                value={this.state.forecastMethodForCreateTree.id}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.forecastmethod')}</option>
-                                                                {forecastMethodsForCreateTree}
-                                                            </Input>
-                                                            <FormFeedback>{errors.forecastMethodIdForCreateTree}</FormFeedback>
-                                                        </div>
-
-                                                    </FormGroup>
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <FormGroup className={"col-md-6"}>
-                                                    <Label for="number1">{i18n.t('static.common.treeName')}<span className="red Reqasterisk">*</span></Label>
-                                                    <div className="controls">
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="treeNameForCreateTree"
-                                                            id="treeNameForCreateTree"
-                                                            valid={!errors.treeNameForCreateTree && this.state.treeNameForCreateTree != ''}
-                                                            invalid={touched.treeNameForCreateTree && !!errors.treeNameForCreateTree}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.treeNameForCreateTree}
-                                                        />
-                                                        <FormFeedback className="red">{errors.treeNameForCreateTree}</FormFeedback>
                                                     </div>
+                                                    <div className="row">
+                                                        <FormGroup className={"col-md-6"}>
+                                                            <Label for="number1">{i18n.t('static.common.treeName')}<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Input type="text"
+                                                                    bsSize="sm"
+                                                                    name="treeNameForCreateTree"
+                                                                    id="treeNameForCreateTree"
+                                                                    valid={!errors.treeNameForCreateTree && this.state.treeNameForCreateTree != ''}
+                                                                    invalid={touched.treeNameForCreateTree && !!errors.treeNameForCreateTree}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                    value={this.state.treeNameForCreateTree}
+                                                                />
+                                                                <FormFeedback className="red">{errors.treeNameForCreateTree}</FormFeedback>
+                                                            </div>
 
-                                                </FormGroup>
-                                                <FormGroup className="col-md-6" >
-                                                    <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
-                                                    <div className="controls">
-                                                        <Select
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.regionIdForCreateTree },
-                                                                { 'is-invalid': (touched.regionIdForCreateTree && !!errors.regionIdForCreateTree || this.state.regionValuesForCreateTree.length == 0) }
-                                                            )}
-                                                            bsSize="sm"
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue("regionIdForCreateTree", e);
-                                                                this.handleRegionChangeForCreateTree(e);
-                                                            }}
-                                                            onBlur={() => setFieldTouched("regionIdForCreateTree", true)}
-                                                            multi
-                                                            options={this.state.regionMultiListForCreateTree}
-                                                            value={this.state.regionValuesForCreateTree}
-                                                        />
-                                                        <FormFeedback>{errors.regionIdForCreateTree}</FormFeedback>
-                                                    </div>
-
-                                                </FormGroup>
-                                            </div>
-                                            <div >
-                                                <div className='row'>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                                                        <div className="controls">
-                                                            <Input type="textarea"
-                                                                id="notesForCreateTree"
-                                                                name="notesForCreateTree"
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                                value={this.state.notesForCreateTree}
-                                                            ></Input>
-                                                        </div>
-
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6 mt-lg-4">
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active10ForCreateTree"
-                                                                name="activeForCreateTree"
-                                                                value={true}
-                                                                checked={this.state.activeForCreateTree === true}
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
                                                         </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active11ForCreateTree"
-                                                                name="activeForCreateTree"
-                                                                value={false}
-                                                                checked={this.state.activeForCreateTree === false}
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                </div>
-                                            </div>
+                                                        <FormGroup className="col-md-6" >
+                                                            <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Select
+                                                                    className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                        { 'is-valid': !errors.regionIdForCreateTree },
+                                                                        { 'is-invalid': (touched.regionIdForCreateTree && !!errors.regionIdForCreateTree || this.state.regionValuesForCreateTree.length == 0) }
+                                                                    )}
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        setFieldValue("regionIdForCreateTree", e);
+                                                                        this.handleRegionChangeForCreateTree(e);
+                                                                    }}
+                                                                    onBlur={() => setFieldTouched("regionIdForCreateTree", true)}
+                                                                    multi
+                                                                    options={this.state.regionMultiListForCreateTree}
+                                                                    value={this.state.regionValuesForCreateTree}
+                                                                />
+                                                                <FormFeedback>{errors.regionIdForCreateTree}</FormFeedback>
+                                                            </div>
 
-                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
-                                                    <div id="missingPUJexcelForCreateTree" className="RowClickable">
+                                                        </FormGroup>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
-                                                <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree</Button>}
-                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
-                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
-                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>All template Planning Units are in the program.</strong>}
+                                                    <div >
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <div className="controls">
+                                                                    <Input type="textarea"
+                                                                        id="notesForCreateTree"
+                                                                        name="notesForCreateTree"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.notesForCreateTree}
+                                                                    ></Input>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6 mt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={true}
+                                                                        checked={this.state.activeForCreateTree === true}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={false}
+                                                                        checked={this.state.activeForCreateTree === false}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')+" "} : <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <div id="missingPUJexcelForCreateTree" className="RowClickable">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                        
                                                         &nbsp;
-                                            </FormGroup>
-                                        </div>
 
-                                        {/* <CardFooter>
+                                                    </FormGroup>
+                                                </div>
+
+                                                {/* <CardFooter>
                                                         <FormGroup>
                                                             <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
                                                         </FormGroup>
                                                     </CardFooter> */}
-                                    </Form>
+                                            </Form>
 
                                 )} />
 
