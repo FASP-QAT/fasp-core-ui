@@ -9167,7 +9167,7 @@ export default class BuildTree extends Component {
     }
 
     loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
         var elInstance = instance.worksheets[0];
         elInstance.setValueFromCoords(2, 0, "", true)
         elInstance.setValueFromCoords(3, 0, "", true)
