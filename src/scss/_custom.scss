@@ -10533,3 +10533,27 @@ border-top: 1px solid #c8ced3 !important;
 .NotesNnputBoxHeight{
   height: 309px!important;
 }
+
+.typing-en::before{
+  content: "Start typing to search";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-fr::before{
+  content: "Commencez à taper pour rechercher";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-sp::before{
+  content: "Empieza a escribir para buscar";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-pr::before{
+  content: "Comece a digitar para pesquisar";
+  color: #a9a9a9;
+  font-style: italic;
+}

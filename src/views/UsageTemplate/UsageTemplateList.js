@@ -2674,6 +2674,7 @@ class usageTemplate extends Component {
         this.el.insertRow(
             data, 0, 1
         );
+        this.el.getCell("E1").classList.add('typing-'+this.state.lang);
     };
 
     formSubmit = function () {
@@ -3596,6 +3597,7 @@ class usageTemplate extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    this.el.getCell(("E").concat(parseInt(y) + 1)).classList.remove('typing-'+this.state.lang);
                 }
             }
         }
