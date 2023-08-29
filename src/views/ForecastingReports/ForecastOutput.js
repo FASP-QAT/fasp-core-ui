@@ -1228,7 +1228,7 @@ class ForecastOutput extends Component {
                                                                     consumptionDate: m.month,
                                                                     // consumptionQty: m.amount
                                                                     // consumptionQty: parseInt(m.amount)
-                                                                    consumptionQty: (m.amount == null ? 0 : Math.round(m.amount / convertToEu))
+                                                                    consumptionQty: (m.amount == null ? 0 : (m.amount / convertToEu))
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0], graphId: 0 }
@@ -1240,7 +1240,7 @@ class ForecastOutput extends Component {
                                                                     consumptionDate: m.month,
                                                                     // consumptionQty: m.amount
                                                                     // consumptionQty: parseInt(m.amount)
-                                                                    consumptionQty: (m.amount == null ? 0 : Math.round(m.amount))
+                                                                    consumptionQty: (m.amount == null ? 0 : (m.amount))
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0], graphId: 0 }
@@ -1491,7 +1491,7 @@ class ForecastOutput extends Component {
                                                                 let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
-                                                                        consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier / convertToEu)
+                                                                        consumptionQty: (m.amount * forecastingUniObj[l].planningUnit.multiplier / convertToEu)
                                                                     }
                                                                 });
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1521,7 +1521,7 @@ class ForecastOutput extends Component {
                                                                 let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
-                                                                        consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier)
+                                                                        consumptionQty: (m.amount * forecastingUniObj[l].planningUnit.multiplier)
                                                                     }
                                                                 });
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
