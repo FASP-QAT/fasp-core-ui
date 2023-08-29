@@ -77,6 +77,7 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
+const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -2016,6 +2017,13 @@ export default class BuildTree extends Component {
         console.log("missingPUList--->", missingPUList);
         var dataArray = [];
         let count = 0;
+        let forecastStartDate = this.state.dataSetObj.programData.currentVersion.forecastStartDate;
+        let forecastStopDate = this.state.dataSetObj.programData.currentVersion.forecastStopDate;
+        let beforeEndDateDisplay = new Date(forecastStartDate);
+        beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+        beforeEndDateDisplay= (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear());
+        var startDateDisplay= (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY")));
+        var endDateDisplay= (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY")));
         if (missingPUList.length > 0) {
             for (var j = 0; j < missingPUList.length; j++) {
                 console.log("missingPUList--->missingPUList[j].treeForecast", missingPUList[j].treeForecast);
@@ -2090,7 +2098,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     //4E
-                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + beforeEndDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     mask: '#,##',
@@ -2101,7 +2109,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     //5F
-                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + startDateDisplay + ' - ' + endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     mask: '#,##',
@@ -2112,7 +2120,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     //6G
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + endDateDisplay + ')',
                     type: 'numeric',
                     textEditor: true,
                     mask: '#,##',
