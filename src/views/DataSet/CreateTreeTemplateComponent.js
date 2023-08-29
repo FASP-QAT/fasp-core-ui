@@ -982,6 +982,8 @@ export default class CreateTreeTemplate extends Component {
         this.createTree = this.createTree.bind(this)
         this.modelOpenCloseForCreateTree = this.modelOpenCloseForCreateTree.bind(this);
         this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
+        this.validFieldData = this.validFieldData.bind(this);
+        this.changeModelingCalculatorJexcel = this.changeModelingCalculatorJexcel.bind(this);
     }
 
     cancelNodeDataClicked() {
@@ -4527,7 +4529,8 @@ export default class CreateTreeTemplate extends Component {
                         }, () => {
                             // this.calculateMOMData(0, 3);
                             if (this.state.showCalculatorFields) {
-                                treeTemplate.monthsInFuture = (6 + Number(this.state.treeTemplate.monthsInFuture));
+                                treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
+                                treeTemplate.monthsInFuture = (12 + Number(this.state.treeTemplate.monthsInFuture));
                                 this.generateMonthList();
                             }
                         });
@@ -4566,8 +4569,8 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("showCalculatorFields===", this.state.treeTemplate.monthsInPast)
 
                                 if (this.state.showCalculatorFields) {
-                                    treeTemplate.monthsInPast = (12 - Number(this.state.currentCalculatorStartDate));
-                                    treeTemplate.monthsInFuture = (6 + Number(this.state.currentCalculatorStopDate));
+                                    treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
+                                    treeTemplate.monthsInFuture = (12 + Number(this.state.currentCalculatorStopDate));
                                     this.generateMonthList();
                                 }
                             });
@@ -4587,7 +4590,12 @@ export default class CreateTreeTemplate extends Component {
     }.bind(this)
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
-        
+        this.setState({
+            currentModelingType: 2,
+            yearsOfTarget: 3
+        }, () => {
+            this.buildModelingCalculatorJexcel();
+        })
     }.bind(this);
 
     changed1 = function (instance, cell, x, y, value) {
@@ -5256,6 +5264,7 @@ export default class CreateTreeTemplate extends Component {
         var tempArray = [];
         var tempJson = {};
         var tempTree = {};
+        var annualTargetCalculator = {};
         // var curMonth = moment(new Date()).format('YYYY-MM-DD');
         // console
         var curMonth = moment(program.currentVersion.forecastStartDate).format('YYYY-MM-DD');
@@ -5263,11 +5272,12 @@ export default class CreateTreeTemplate extends Component {
         // console.log("treeTemplateId===", treeTemplateId);
         // if (treeTemplateId != "" && treeTemplateId != 0) {
         var treeTemplate = this.state.treeTemplateForCreateTree;
-        // console.log("treeTemplate 123----", treeTemplate);
+        console.log("treeTemplate 123----", treeTemplate.flatList);
         var flatList = JSON.parse(JSON.stringify(treeTemplate.flatList));
         for (let i = 0; i < flatList.length; i++) {
             nodeDataMap = {};
             tempArray = [];
+            annualTargetCalculator = {}
             if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
                 for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
                     var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
@@ -5292,11 +5302,15 @@ export default class CreateTreeTemplate extends Component {
                 var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
                 tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
             }
+            if (flatList[i].payload.nodeDataMap[0][0].annualTargetCalculator.actualOrTargetValueList.length != 0) {
+                var firstMonthOfTarget = flatList[i].payload.nodeDataMap[0][0].annualTargetCalculator.firstMonthOfTarget;
+                flatList[i].payload.nodeDataMap[0][0].annualTargetCalculator.firstMonthOfTarget = moment(curMonth).startOf('month').add(firstMonthOfTarget < 0 ? firstMonthOfTarget : parseInt(firstMonthOfTarget - 1), 'months').format("YYYY-MM-DD");
+            }
             tempArray.push(tempJson);
             nodeDataMap[1] = tempArray;
             flatList[i].payload.nodeDataMap = nodeDataMap;
         }
-        // console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
+        console.log("treeTemplate@@@@@@@@@@@@@@", flatList)
         tempTree = {
             treeId: treeId,
             active: this.state.activeForCreateTree,
@@ -8487,20 +8501,18 @@ export default class CreateTreeTemplate extends Component {
         var monthListForModelingCalculator = this.state.monthList;
 
         let count = this.state.yearsOfTarget;
-        var srt = this.state.currentCalculatorStartDate == 1 ? (this.state.currentCalculatorStartDate + 1) : this.state.currentCalculatorStartDate
         for (var j = 0; j <= count; j++) {
-            var startdate = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 12) + (j * 12)))[0].name;
-            var stopDate = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 1) + (j * 12)))[0].name;
-            var modifyStartDate1 = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 7) + (j * 12)))[0].id;
-            var modifyStopDate1 = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) + 4) + (j * 12)))[0].id;
-
+            var startdate = monthListForModelingCalculator[j * 12].name;
+            var stopDate = monthListForModelingCalculator[Number(j * 12 + 11)];
+            var modifyStartDate1 = monthListForModelingCalculator[Number(j * 12 + 5)].id;
+            var modifyStopDate1 = monthListForModelingCalculator[Number(j * 12 + 16)].id;
             var data = [];
-            data[0] = startdate + " to " + stopDate//year
+            data[0] = startdate + " to " + stopDate.name//year
             data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
             data[5] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
             data[6] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',((E${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100))`;//(F21-D21)/D21--Difference (Target vs Calculated, %)
             data[7] = j == 0 ? "" : modifyStartDate1//H
-            data[8] = j == count ? stopDate : modifyStopDate1
+            data[8] = modifyStopDate1
             dataArray[j] = data;
         }
 
@@ -8588,6 +8600,7 @@ export default class CreateTreeTemplate extends Component {
             editable: true,
             onload: this.loadedModelingCalculatorJexcel,
             pagination: localStorage.getItem("sesRecordCount"),
+            onchange: this.changeModelingCalculatorJexcel,
             search: false,
             columnSorting: false,
             wordWrap: true,
@@ -8618,24 +8631,41 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
-    changed3() {
-        var elInstance = this.state.modelingCalculatorEl;
-        var dataArr = elInstance.records;
-        var dataArray = [];
-        var dataArrayTotal = [];
+    validFieldData() {
+        var json = this.state.modelingCalculatorEl.getJson(null, false);
         var valid = true;
+        for (var j = 0; j < json.length; j++) {
+            var col = ("B").concat(parseInt(j) + 1);
+            var value = this.state.modelingCalculatorEl.getValueFromCoords(1, j);
+            console.log("value", value);
 
-        let modelingType = document.getElementById("modelingType").value;
-        for (var j = 0; j < dataArr.length; j++) {
-            var monthlyChange = "";
-            var rowData = dataArr[j];
-            if (rowData[1].v === "") {
-                var col = ("B").concat(parseInt(j) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+            if (value === "") {
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
+                this.state.modelingCalculatorEl.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
                 valid = false;
             } else {
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setComments(col, "");
+            }
+        }
+        return valid;
+    }
+
+    changed3() {
+        var elInstance = this.state.modelingCalculatorEl;
+        var validation = this.validFieldData();
+        console.log("validd--->>", this.state.monthList)
+        var monthListForModelingCalculator = this.state.monthList;
+
+        if (validation) {
+            var dataArr = elInstance.records;
+            var dataArray = [];
+            var dataArrayTotal = [];
+            let modelingType = document.getElementById("modelingType").value;
+            for (var j = 0; j < dataArr.length; j++) {
+                var monthlyChange = "";
+                var rowData = dataArr[j];
                 if (j == 0) {
                     elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
                 }
@@ -8680,23 +8710,25 @@ export default class CreateTreeTemplate extends Component {
                 }
                 dataArray[j] = rowData[1].v;
             }
-        }
-        if (valid) {
-            const arraySum = dataArrayTotal
+            console.log("dataArrayTotal====>", dataArrayTotal)
+            if (dataArrayTotal.length > 0) {
+                const arraySum = dataArrayTotal
+                for (var i = 6; i < arraySum.length; i = (i + 12)) {
+                    var abc = 0;
+                    for (var j = i; j <= (i + 11); j++) {
+                        if (arraySum[j] != undefined) {
+                            abc = abc + Number(arraySum[j].calculatedTotal)
+                            console.log("arraySum[j]==", j, "===", arraySum[j], "===", abc)
 
-            for (var i = 6; i < arraySum.length - 12; i = (i + 12)) {
-                var abc = 0;
-                for (var j = i; j <= (i + 11); j++) {
-                    if (arraySum[j] != undefined) {
-                        abc = abc + Number(arraySum[j].calculatedTotal)
+                        }
                     }
+                    elInstance.setValueFromCoords(4, arraySum[i].yCord, Math.round(abc), true);
                 }
-                elInstance.setValueFromCoords(4, arraySum[i].yCord, Math.round(abc), true);
+                this.setState({
+                    actualOrTargetValueList: dataArray,
+                    isCalculateClicked: true
+                });
             }
-            this.setState({
-                actualOrTargetValueList: dataArray,
-                isCalculateClicked: true
-            });
         }
     }
 
@@ -8731,6 +8763,15 @@ export default class CreateTreeTemplate extends Component {
         cell.classList.add('shipmentEntryDoNotInclude');
         var cell = elInstance.getCell("G1");
         cell.classList.add('shipmentEntryDoNotInclude');
+    }
+
+    changeModelingCalculatorJexcel = function (instance, cell, x, y, value) {
+
+        if (x == 1) {
+            if (this.state.isCalculateClicked != false) {
+                this.setState({ isCalculateClicked: false });
+            }
+        }
     }
 
     tabPane1() {

@@ -1094,6 +1094,7 @@ export default class BuildTree extends Component {
         this.changeModelingCalculatorJexcel = this.changeModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
         this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
+        this.validFieldData = this.validFieldData.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -4589,6 +4590,7 @@ export default class BuildTree extends Component {
                     }, () => {
                         console.log("x row data===>", ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1));
                         var startValue = this.getMomValueForDateRange(rowData[1]);
+                        var targetYears = ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1) < 3 ? 3 : ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1);
                         this.setState({
                             currentRowIndex: x,
                             showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
@@ -4605,7 +4607,7 @@ export default class BuildTree extends Component {
                             currentEndValue: '',
                             currentEndValueEdit: false,
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
-                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget)
                         }, () => {
                             // this.calculateMOMData(0, 3);
@@ -4628,6 +4630,7 @@ export default class BuildTree extends Component {
                         }, () => {
                             // console.log("x row data===>", this.el.getRowData(x));
                             var startValue = this.getMomValueForDateRange(rowData[1]);
+                            var targetYears = (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1) < 3 ? 3 : (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1)
                             console.log("***MOM final start value--->>>", (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1))
                             this.setState({
                                 currentRowIndex: x,
@@ -4645,7 +4648,7 @@ export default class BuildTree extends Component {
                                 currentEndValue: '',
                                 currentEndValueEdit: false,
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
-                                yearsOfTarget: (Number(moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1),
+                                yearsOfTarget: targetYears,
                                 firstMonthOfTarget: rowData[1]
                             }, () => {
                                 if (this.state.showCalculatorFields) {
@@ -8962,7 +8965,6 @@ export default class BuildTree extends Component {
             let modifyStartDate1 = moment(modifyStartDate, "MMM YYYY").add(1, "months").format("MMM YYYY");
             let modifyStopDate1 = moment(modifyStartDate1, "MMM YYYY").add(11, "months").format("MMM YYYY");
             var data = [];
-            console.log("===", this.state.currentCalculatorStartDate, "===", startdate, "===", stopDate, "===", modifyStartDate, "===", modifyStartDate1, "===", modifyStopDate1)
             data[0] = startdate + " - " + stopDate//year
             data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
             data[5] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
@@ -9083,27 +9085,44 @@ export default class BuildTree extends Component {
         });
     }
 
+    validFieldData() {
+        var json = this.state.modelingCalculatorEl.getJson(null, false);
+        var valid = true;
+        for (var j = 0; j < json.length; j++) {
+            var col = ("B").concat(parseInt(j) + 1);
+            var value = this.state.modelingCalculatorEl.getValueFromCoords(1, j);
+            console.log("value", value);
+
+            if (value === "") {
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
+                this.state.modelingCalculatorEl.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+                valid = false;
+            } else {
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setComments(col, "");
+            }
+        }
+        return valid;
+    }
+
     changed3() {
 
         var elInstance = this.state.modelingCalculatorEl;
-        var valid = true;
-        var dataArray = [];
-        var dataArrayTotal = [];
-        let modelingType = document.getElementById("modelingType").value;
-        var calculatedTotal = 0;
-        var calculatedTotal1 = 0;
-        var dataArr = elInstance.records;
+        var validation = this.validFieldData();
 
-        for (var j = 0; j < dataArr.length; j++) {
-            var monthlyChange = "";
-            var rowData = dataArr[j];
-            if (rowData[1].v === "") {
-                var col = ("B").concat(parseInt(j) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
-                valid = false;
-            } else {
+        if (validation) {
+            var dataArray = [];
+            var dataArrayTotal = [];
+            let modelingType = document.getElementById("modelingType").value;
+            var calculatedTotal = 0;
+            var calculatedTotal1 = 0;
+            var dataArr = elInstance.records;
+            for (var j = 0; j < dataArr.length; j++) {
+                console.log("validd--->>", dataArr[j])
+
+                var monthlyChange = "";
+                var rowData = dataArr[j];
                 if (j == 0) {
                     elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
                 }
@@ -9143,26 +9162,24 @@ export default class BuildTree extends Component {
                         start.add(1, 'months');
                         count++;
                     }
+                    console.log("aaaa", arr)
                     elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
-                    var col = ("B").concat(parseInt(j) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
                 }
                 dataArray[j] = rowData[1].v;
             }
-        }
-        if (valid) {
-            const arraySum = dataArrayTotal.map(c => c.date)
-            const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
-            for (var i = 1; i <= arraySum1.length; i++) {
-                var abc = Math.round(dataArrayTotal.filter(c => c.date == arraySum1[i]).map(c => Number(c.calculatedTotal))
-                    .reduce((accumulator, currentItem) => accumulator + currentItem, 0));
-                elInstance.setValueFromCoords(4, i, abc, true);
+            if (dataArrayTotal.length > 0) {
+                const arraySum = dataArrayTotal.map(c => c.date)
+                const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+                for (var i = 1; i <= arraySum1.length; i++) {
+                    var abc = Math.round(dataArrayTotal.filter(c => c.date == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                        .reduce((accumulator, currentItem) => accumulator + currentItem, 0));
+                    elInstance.setValueFromCoords(4, i, abc, true);
+                }
+                this.setState({
+                    actualOrTargetValueList: dataArray,
+                    isCalculateClicked: true
+                });
             }
-            this.setState({
-                actualOrTargetValueList: dataArray,
-                isCalculateClicked: true
-            });
         }
     }
 
