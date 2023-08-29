@@ -1068,8 +1068,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                         <CardBody className="p-0">
                             <Col xs="12" sm="12">
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="mapPlanningUnit">
+                                <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div id="mapPlanningUnit" className='TableWidth100'>
                                     </div>
                                 </div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>

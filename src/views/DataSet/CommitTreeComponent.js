@@ -395,7 +395,7 @@ export default class CommitTreeComponent extends React.Component {
                     // readOnly: true //3D
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.stockEndOf'),
+                    title: i18n.t('static.planningUnitSetting.stockEndOf').split("(")[0],
                     type: 'numeric',
                     textEditor: true,
                     // decimal: '.',
@@ -405,7 +405,7 @@ export default class CommitTreeComponent extends React.Component {
                     // readOnly: true //4E
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.existingShipments'),
+                    title: i18n.t('static.planningUnitSetting.existingShipments').split("(")[0],
                     type: 'numeric',
                     textEditor: true,
                     // decimal: '.',
@@ -415,7 +415,7 @@ export default class CommitTreeComponent extends React.Component {
                     // readOnly: true //5F
                 },
                 {
-                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock'),
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock').split("(")[0],
                     type: 'numeric',
                     textEditor: true,
                     // decimal: '.',
@@ -1079,7 +1079,7 @@ export default class CommitTreeComponent extends React.Component {
                                         // readOnly: true //3D
                                     },
                                     {
-                                        title: i18n.t('static.planningUnitSetting.stockEndOf'),
+                                        title: i18n.t('static.planningUnitSetting.stockEndOf').split("(")[0],
                                         type: 'numeric',
                                         textEditor: true,
                                         // decimal: '.',
@@ -1089,7 +1089,7 @@ export default class CommitTreeComponent extends React.Component {
                                         // readOnly: true //4E
                                     },
                                     {
-                                        title: i18n.t('static.planningUnitSetting.existingShipments'),
+                                        title: i18n.t('static.planningUnitSetting.existingShipments').split("(")[0],
                                         type: 'numeric',
                                         textEditor: true,
                                         // decimal: '.',
@@ -1099,7 +1099,7 @@ export default class CommitTreeComponent extends React.Component {
                                         // readOnly: true //5F
                                     },
                                     {
-                                        title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock'),
+                                        title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock').split("(")[0],
                                         type: 'numeric',
                                         textEditor: true,
                                         // decimal: '.',
@@ -1371,8 +1371,11 @@ export default class CommitTreeComponent extends React.Component {
                                                 obj.setStyle(col, "background-color", "transparent");
                                                 var col = ("F").concat(parseInt(y) + 1);
                                                 obj.setStyle(col, "background-color", "transparent");
-                                                obj.setValueFromCoords(3, y, "", true);
+                                                // obj.setValueFromCoords(3, y, "", true);
                                                 obj.setValueFromCoords(6, y, 2, true);
+                                                obj.setStyle(("F").concat(parseInt(y) + 1), "pointer-events", "");
+                                                obj.setStyle(("F").concat(parseInt(y) + 1), "pointer-events", "auto");
+                                                obj.setStyle(("F").concat(parseInt(y) + 1), "background-color", "transparent");
                                                 obj.options.editable = false;
                                                 this.setState({
                                                     conflictsCountConsumption: this.state.conflictsCountConsumption - 1
@@ -1399,7 +1402,7 @@ export default class CommitTreeComponent extends React.Component {
                                                 obj.setStyle(col, "background-color", "transparent");
                                                 var col = ("F").concat(parseInt(y) + 1);
                                                 obj.setStyle(col, "background-color", "transparent");
-                                                obj.setValueFromCoords(2, y, "", true);
+                                                // obj.setValueFromCoords(2, y, "", true);
                                                 obj.setValueFromCoords(6, y, 3, true);
                                                 obj.options.editable = false;
                                                 this.setState({
@@ -1566,8 +1569,11 @@ export default class CommitTreeComponent extends React.Component {
                                                 obj.setStyle(col, "background-color", "transparent");
                                                 var col = ("D").concat(parseInt(y) + 1);
                                                 obj.setStyle(col, "background-color", "transparent");
-                                                obj.setValueFromCoords(1, y, "", true);
+                                                // obj.setValueFromCoords(1, y, "", true);
                                                 obj.setValueFromCoords(6, y, 2, true);
+                                                obj.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
+                                                obj.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "auto");
+                                                obj.setStyle(("D").concat(parseInt(y) + 1), "background-color", "transparent");
                                                 obj.options.editable = false;
                                                 this.setState({
                                                     conflictsCountTree: this.state.conflictsCountTree - 1
@@ -1587,7 +1593,7 @@ export default class CommitTreeComponent extends React.Component {
                                                 obj.setStyle(col, "background-color", "transparent");
                                                 var col = ("D").concat(parseInt(y) + 1);
                                                 obj.setStyle(col, "background-color", "transparent");
-                                                obj.setValueFromCoords(0, y, "", true);
+                                                // obj.setValueFromCoords(0, y, "", true);
                                                 obj.setValueFromCoords(6, y, 3, true);
                                                 obj.options.editable = false;
                                                 this.setState({
@@ -2205,11 +2211,16 @@ export default class CommitTreeComponent extends React.Component {
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F']
         elInstance.options.editable = true;
+        var localDataChanged = 0;
+        var serverDataChanged = 0;
         for (var c = 0; c < jsonData.length; c++) {
+            localDataChanged=0;
+            serverDataChanged=0;
             var oldData = (jsonData[c])[6];
             var latestData = (jsonData[c])[7];
             var downloadedData = (jsonData[c])[8];
             for (var j = 0; j < 6; j++) {
+                if((jsonData[c])[9]!=1){
                 if (oldData[j] == latestData[j]) {
                     var col = (colArr[j]).concat(parseInt(c) + 1);
                     elInstance.setStyle(col, "background-color", "#fff");
@@ -2219,6 +2230,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(9, c, 2, true);
                     (jsonData[c])[9] = 2;
+                    localDataChanged+=1;
                 } else if (oldData[j] == downloadedData[j]) {
                     var col = (colArr[j]).concat(parseInt(c) + 1);
                     elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2226,6 +2238,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(9, c, 3, true);
                     (jsonData[c])[9] = 3;
+                    serverDataChanged+=1;
                 } else {
                     this.setState({
                         conflictsCountVersionSettings: this.state.conflictsCountVersionSettings + 1
@@ -2238,7 +2251,20 @@ export default class CommitTreeComponent extends React.Component {
                         elInstance.setStyle(col, "background-color", "yellow");
                     }
                 }
+                }
 
+            }
+            if (localDataChanged > 0 && serverDataChanged > 0) {
+                this.setState({
+                    conflictsCountVersionSettings: this.state.conflictsCountVersionSettings + 1
+                })
+                elInstance.setValueFromCoords(9, c, 1, true);
+                (jsonData[c])[9] = 1;
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(c) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                }
             }
 
         }
@@ -2254,7 +2280,11 @@ export default class CommitTreeComponent extends React.Component {
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         elInstance.options.editable = true;
+        var localDataChanged=0;
+        var serverDataChanged=0;
         for (var c = 0; c < jsonData.length; c++) {
+            localDataChanged=0;
+            serverDataChanged=0;
             elInstance.getCell(("C").concat(parseInt(c) + 1)).firstChild.disabled=true;
             elInstance.getCell(("D").concat(parseInt(c) + 1)).firstChild.disabled=true;
             elInstance.getCell(("K").concat(parseInt(c) + 1)).firstChild.disabled=true;
@@ -2271,6 +2301,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(14, c, 2, true);
                 }
+                localDataChanged+=1;
             } else if ((jsonData[c])[11] == "" && (jsonData[c])[13] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2279,6 +2310,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(14, c, 3, true);
                 }
+                serverDataChanged+=1;
             } else if ((jsonData[c])[12] != "" && (jsonData[c])[11] != "" && (jsonData[c])[14] != 1) {
                 var oldData = (jsonData[c])[11];
                 var latestData = (jsonData[c])[12];
@@ -2295,12 +2327,14 @@ export default class CommitTreeComponent extends React.Component {
                             elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                             elInstance.setValueFromCoords(14, c, 3, true);
                             (jsonData[c])[14] = 3;
+                            serverDataChanged+=1;
                         } else if ((jsonData[c])[13] != "" && latestData[j] == downloadedData[j]) {
                             var col = (colArr[j]).concat(parseInt(c) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                             elInstance.setValueFromCoords(14, c, 2, true);
                             (jsonData[c])[14] = 2;
+                            localDataChanged+=1;
                         } else {
                             this.setState({
                                 conflictsCountPlanningUnits: this.state.conflictsCountPlanningUnits + 1
@@ -2314,6 +2348,18 @@ export default class CommitTreeComponent extends React.Component {
                             }
                         }
                     }
+                }
+            }
+            if(localDataChanged>0 && serverDataChanged>0){
+                this.setState({
+                    conflictsCountPlanningUnits: this.state.conflictsCountPlanningUnits + 1
+                })
+                elInstance.setValueFromCoords(14, c, 1, true);
+                (jsonData[c])[14] = 1;
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(c) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
                 }
             }
         }
@@ -2340,6 +2386,7 @@ export default class CommitTreeComponent extends React.Component {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F']
         elInstance.options.editable = true;
         for (var c = 0; c < jsonData.length; c++) {
+            elInstance.getCell(("F").concat(parseInt(c) + 1)).removeAttribute("disabled");
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
             if ((jsonData[c])[8] == "" && (jsonData[c])[7] != "" && (jsonData[c])[9] == "") {
@@ -2349,6 +2396,10 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 2, true);
                 }
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[7] == "" && (jsonData[c])[8] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2357,6 +2408,10 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 3, true);
                 }
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[7] != (jsonData[c])[8] && (jsonData[c])[6] != 1) {
                 var oldData = (jsonData[c])[7];
                 var latestData = (jsonData[c])[8];
@@ -2367,6 +2422,10 @@ export default class CommitTreeComponent extends React.Component {
                         var col = (colArr[j]).concat(parseInt(c) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                     }
+                    elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                    elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                    elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                    elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                 } else {
                     if ((jsonData[c])[9] != "" && oldData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
@@ -2376,6 +2435,10 @@ export default class CommitTreeComponent extends React.Component {
                         // }
                         elInstance.setValueFromCoords(6, c, 3, true);
                         (jsonData[c])[6] = 3;
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                     } else if ((jsonData[c])[9] != "" && latestData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
                         var col = ("C").concat(parseInt(c) + 1);
@@ -2395,9 +2458,19 @@ export default class CommitTreeComponent extends React.Component {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", "yellow");
                         }
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                        elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                     }
                 }
                 // }
+            }
+            if((jsonData[c])[6] == 4){
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             }
         }
         elInstance.orderBy(6, 0);
@@ -2423,6 +2496,7 @@ export default class CommitTreeComponent extends React.Component {
         var colArr = ['A', 'B', 'C', 'D']
         elInstance.options.editable = true;
         for (var c = 0; c < jsonData.length; c++) {
+            elInstance.getCell(("D").concat(parseInt(c) + 1)).removeAttribute("disabled");
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
             // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
             if ((jsonData[c])[8] == "" && (jsonData[c])[7] != "" && (jsonData[c])[9] == "") {
@@ -2432,6 +2506,10 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 2, true);
                 }
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[7] == "" && (jsonData[c])[8] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2439,6 +2517,10 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(6, c, 3, true);
                 }
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[8] != (jsonData[c])[7] && (jsonData[c])[6] != 1) {
                 var oldData = (jsonData[c])[7];
                 var latestData = (jsonData[c])[8];
@@ -2449,6 +2531,10 @@ export default class CommitTreeComponent extends React.Component {
                         var col = (colArr[j]).concat(parseInt(c) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                     }
+                    elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                    elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                    elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                    elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                 } else {
                     if ((jsonData[c])[9] != "" && oldData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
@@ -2458,6 +2544,10 @@ export default class CommitTreeComponent extends React.Component {
                         // }
                         elInstance.setValueFromCoords(6, c, 3, true);
                         (jsonData[c])[6] = 3;
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                     } else if ((jsonData[c])[9] != "" && latestData == downloadedData) {
                         // for (var j = 0; j < colArr.length; j++) {
                         var col = ("A").concat(parseInt(c) + 1);
@@ -2477,9 +2567,19 @@ export default class CommitTreeComponent extends React.Component {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", "yellow");
                         }
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                        elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
                     }
                 }
                 // }
+            }
+            if(jsonData[c][6]==4){
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             }
         }
         elInstance.orderBy(6, 0);
@@ -2494,7 +2594,11 @@ export default class CommitTreeComponent extends React.Component {
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         elInstance.options.editable = true;
+        var localDataChanged=0;
+        var serverDataChanged=0;
         for (var c = 0; c < jsonData.length; c++) {
+            localDataChanged=0;
+            serverDataChanged=0;
             if (((jsonData[c])[13] == undefined || (jsonData[c])[13] == "") && ((jsonData[c])[12] != undefined && (jsonData[c])[12] != "")) {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2502,6 +2606,7 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                     elInstance.setValueFromCoords(11, c, 2, true);
                 }
+                localDataChanged+=1;
             } if (((jsonData[c])[12] == undefined || (jsonData[c])[12] == "") && ((jsonData[c])[13] != undefined && (jsonData[c])[13] != "")) {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2510,11 +2615,13 @@ export default class CommitTreeComponent extends React.Component {
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                     elInstance.setValueFromCoords(11, c, 3, true);
                 }
+                serverDataChanged+=1;
             } else if ((jsonData[c])[12] != undefined && (jsonData[c])[12] != "" && (jsonData[c])[13] != undefined && (jsonData[c])[13] != "" && (jsonData[c])[11] != 1) {
                 var startPt = 2;
                 var startPt1 = 5;
                 var startPt2 = 8;
                 for (var i = 0; startPt < startPt1 && (jsonData[c])[11] != 1; i++) {
+                    if(startPt!=3){
                     var local = (jsonData[c])[startPt]
                     var server = (jsonData[c])[startPt1 + i]
                     var downloaded = (jsonData[c])[startPt2 + i]
@@ -2531,13 +2638,14 @@ export default class CommitTreeComponent extends React.Component {
                             elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                             elInstance.setValueFromCoords(11, c, 3, true);
                             (jsonData[c])[11] = 3;
-
+                            serverDataChanged+=1;
                         } else if (server == downloaded) {
                             var col = (colArr[startPt]).concat(parseInt(c) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             elInstance.setValueFromCoords(11, c, 2, true);
                             (jsonData[c])[11] = 2;
+                            localDataChanged+=1;
                         } else {
                             this.setState({
                                 conflictsCountSelectedForecast: this.state.conflictsCountSelectedForecast + 1
@@ -2552,7 +2660,21 @@ export default class CommitTreeComponent extends React.Component {
                             }
                         }
                     }
+                }
                     startPt += 1;
+                }
+            }
+            if(localDataChanged>0 && serverDataChanged>0){
+                this.setState({
+                    conflictsCountSelectedForecast: this.state.conflictsCountSelectedForecast + 1
+                })
+                elInstance.setValueFromCoords(11, c, 1, true);
+                (jsonData[c])[11] = 1;
+                for (var j = 0; j < colArr.length; j++) {
+                    var col = (colArr[j]).concat(parseInt(c) + 1);
+                    console.log("Col Test@123", col)
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
                 }
             }
         }
