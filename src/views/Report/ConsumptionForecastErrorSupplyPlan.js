@@ -93,6 +93,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     toggleAccordion(consumptionUnitId) {
         var consumptionUnitShowArr = this.state.consumptionUnitShowArr;
+        console.log("regionList---> consumptionUnitShowArr",consumptionUnitShowArr)
+        console.log("regionList---> consumptionUnitId",consumptionUnitId)
+        
         if (consumptionUnitShowArr.includes(consumptionUnitId)) {
             consumptionUnitShowArr = consumptionUnitShowArr.filter(c => c != consumptionUnitId);
         } else {
@@ -244,6 +247,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }
                     }
                 }
+                console.log("proList---->",proList)
                 var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
@@ -399,7 +403,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         if (programId != 0) {
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            console.log("Program",program)
             console.log("program[0].regionList----",program[0].regionList)
             if (program.length == 1) {
                 if (isSiteOnline()) {
@@ -414,7 +418,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             regions: program[0].regionList.filter(function (x, i, a) {
                                 return a.indexOf(x) === i;
                             })
-                        }, () => { this.consolidatedRegionList(programId) });
+                        }, () => { this.consolidatedRegionList(programId) 
+                        });
                     });
                 } else {
                     this.setState({
@@ -468,28 +473,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 // if (regionList.length == 0) {
                     for (var i = 0; i < myResult.length; i++) {
-                        if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        if (myResult[i].userId == userId && myResult[i].programId == programId && myResult[i].version+" (Local)" ==document.getElementById("versionId").value) {
                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                             var programData = databytes.toString(CryptoJS.enc.Utf8)
                             var region = JSON.parse(programData).regionList;
-                            regionList=region
-                            console.log("regionList region--->",region)
-                            console.log("regionList regionList.concat(region)--->",regionList.concat(region))
-                            
+                            regionList=region               
                         }
                     }
                 // }
-                console.log("regionList--->",regionList)
                 var regionIds = regionList.map((item, i) => {
                     return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
-                }, this)
-           this.setState({
+                }, this)            
+                this.setState({
                     regions: regionList,
                     regionValues: regionIds.map(ele => ele),
                     regionLabels: regionIds.map(ele => ele.label),
-                    loading: false
+                    loading: false,
+                    consumptionUnitShowArr:regionIds.map(ele => ele.value)
                 }, () => {
                     this.getEquivalencyUnitData();
                 })
@@ -867,6 +869,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             loading:false
         }, () => {
             localStorage.setItem("sesVersionIdReport", this.state.versionId);
+            this.filterRegion();
             this.getPlanningUnitAndForcastingUnit();
           })
     }
@@ -882,6 +885,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
+            consumptionUnitShowArr:regionIds.map(ele => ele.value),
             regionListFiltered: event,
             show: false,
             loading:false
