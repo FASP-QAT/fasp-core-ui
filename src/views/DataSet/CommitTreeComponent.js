@@ -2081,13 +2081,24 @@ export default class CommitTreeComponent extends React.Component {
                 if (treeJson[t][6] == 3 || treeJson[t][10].toString()=="true") {
                     var treeFromServerIndex = programDataServer.treeList.findIndex(c => c.treeAnchorId == treeJson[t][4]);
                     if (treeFromServerIndex != -1) {
-                        var treeFromLocalIndex = programDataJson.treeList.findIndex(c => c.treeAnchorId == treeJson[t][4]);
+                        var treeFromLocalIndex = programDataJson.treeList.findIndex(c => treeJson[t][4]>0?c.treeAnchorId == treeJson[t][4]:c.tempTreeAnchorId==treeJson[t][5]);
                         if (treeFromLocalIndex == -1) {
                             programDataJson.treeList.push(programDataServer.treeList[treeFromServerIndex]);
                         } else {
                             programDataJson.treeList[treeFromLocalIndex] = programDataServer.treeList[treeFromServerIndex];
                         }
+                    }else{
+                        if(treeJson[t][10].toString()=="true"){
+                            console.log("In if Test@123")
+                            var treeFromLocalIndex = programDataJson.treeList.findIndex(c => treeJson[t][4]>0?c.treeAnchorId == treeJson[t][4]:c.tempTreeAnchorId==treeJson[t][5]);
+                            console.log("Tree From local index Test@123",treeFromLocalIndex);
+                            if(treeFromLocalIndex!=-1){
+                                console.log("In if 1 Test@123")
+                                programDataJson.treeList.splice(treeFromLocalIndex,1)
+                            }
+                        }
                     }
+
                 }
             }
             for (var tl = 0; tl < programDataJson.treeList.length; tl++) {
@@ -2394,20 +2405,22 @@ export default class CommitTreeComponent extends React.Component {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setValueFromCoords(6, c, 2, true);
                 }
-                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
-                elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
-                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
-                elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
+                elInstance.setValueFromCoords(6, c, 2, true);
+                (jsonData[c])[6] = 2;
+                // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
+                // elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
+                // elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
+                // elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[7] == "" && (jsonData[c])[8] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
 
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-                    elInstance.setValueFromCoords(6, c, 3, true);
                 }
+                elInstance.setValueFromCoords(6, c, 3, true);
+                (jsonData[c])[6] = 3;
                 elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "");
                 elInstance.setStyle(("F").concat(parseInt(c) + 1), "pointer-events", "none");
                 elInstance.setStyle(("F").concat(parseInt(c) + 1), "background-color", "transparent");
@@ -2504,19 +2517,21 @@ export default class CommitTreeComponent extends React.Component {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setValueFromCoords(6, c, 2, true);
                 }
-                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
-                elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
-                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
-                elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
+                elInstance.setValueFromCoords(6, c, 2, true);
+                (jsonData[c])[6] = 2;
+                // elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
+                // elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
+                // elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
+                // elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "#cfcdc9");
             } else if ((jsonData[c])[7] == "" && (jsonData[c])[8] != "" && (jsonData[c])[9] == "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var col = (colArr[i]).concat(parseInt(c) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-                    elInstance.setValueFromCoords(6, c, 3, true);
                 }
+                elInstance.setValueFromCoords(6, c, 3, true);
+                (jsonData[c])[6] = 3;
                 elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "");
                 elInstance.setStyle(("D").concat(parseInt(c) + 1), "pointer-events", "none");
                 elInstance.setStyle(("D").concat(parseInt(c) + 1), "background-color", "transparent");
