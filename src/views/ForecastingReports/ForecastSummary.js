@@ -3068,6 +3068,7 @@ class ForecastSummary extends Component {
                 // console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
                 if (json[j][(k + 1) * 3] != "") {
                     var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
+                    if(tsList.length>0){
                     dataList.push({
                         planningUnit: json[j][1],
                         scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
@@ -3077,6 +3078,7 @@ class ForecastSummary extends Component {
                         notes: json[j][((k + 1) * 3) + 2],
                         region: this.state.regRegionList[k]
                     })
+                }
                 } else {
                     // console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
                     if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
