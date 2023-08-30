@@ -1103,7 +1103,7 @@ export default class BuildTree extends Component {
         this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
         this.changeModelingCalculatorJexcel = this.changeModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
-        this.onChangeModelingCalculator = this.onChangeModelingCalculator.bind(this);
+        // this.onChangeModelingCalculator = this.onChangeModelingCalculator.bind(this);
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
         this.changedMissingPU=this.changedMissingPU.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
