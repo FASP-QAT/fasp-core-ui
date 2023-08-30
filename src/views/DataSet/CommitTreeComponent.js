@@ -2030,6 +2030,27 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     mergeData() {
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+
+            var programRequest = programTransaction.get(this.state.programId);
+            programRequest.onerror = function (event) {
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+                var dataset = programRequest.result;
+                var programDataJson = programRequest.result.programData;
+                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJsonOriginal = JSON.parse(datasetData);
         console.log("In merge data Test@123")
         if (this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0) {
             console.log("In if merge data Test@123")
@@ -2126,7 +2147,7 @@ export default class CommitTreeComponent extends React.Component {
                     }
                 }
             }
-            
+            console.log("datasetJsonOriginal Test@123",datasetJsonOriginal)
             for(var fpu=0;fpu<programDataJson.planningUnitList.length;fpu++){
                 for(var rl=0;rl<this.state.regionSet.length;rl++){
                     var selectedForecastMap=programDataJson.planningUnitList[fpu].selectedForecastMap[this.state.regionSet[rl]];
@@ -2140,15 +2161,15 @@ export default class CommitTreeComponent extends React.Component {
                         if(selectedScenarioId>0){
                             var checkIfTreeExists=programDataJson.treeList.findIndex(c=>c.treeId==selectedTreeId);
                             if(checkIfTreeExists==-1){
-                                var checkIfExistsInLocalVersion=programDataLocal.treeList.findIndex(c=>c.treeId==selectedTreeId);
+                                var checkIfExistsInLocalVersion=datasetJsonOriginal.treeList.findIndex(c=>c.treeId==selectedTreeId);
                                 if(checkIfExistsInLocalVersion!=-1){
                                     // Means vo tree local pe hai but final pe nhi hai
-                                    var localTreeAnchorId=programDataLocal.treeList[checkIfExistsInLocalVersion].treeAnchorId;
-                                    var localTempTreeAnchorId=programDataLocal.treeList[checkIfExistsInLocalVersion].tempTreeAnchorId;
+                                    var localTreeAnchorId=datasetJsonOriginal.treeList[checkIfExistsInLocalVersion].treeAnchorId;
+                                    var localTempTreeAnchorId=datasetJsonOriginal.treeList[checkIfExistsInLocalVersion].tempTreeAnchorId;
                                     var checkIfLocalTreeAnchorIdExistsInFinal=programDataJson.treeList.findIndex(c=>localTreeAnchorId>0?c.treeAnchorId==localTreeAnchorId:c.tempTreeAnchorId==localTempTreeAnchorId);
                                     if(checkIfLocalTreeAnchorIdExistsInFinal!=-1){
                                         finalSelectedTreeId=programDataJson.treeList[checkIfLocalTreeAnchorIdExistsInFinal].treeId;
-                                        var scenarioIndex=programDataLocal.treeList[checkIfExistsInLocalVersion].scenarioList.findIndex(c=>c.id==selectedScenarioId);
+                                        var scenarioIndex=datasetJsonOriginal.treeList[checkIfExistsInLocalVersion].scenarioList.findIndex(c=>c.id==selectedScenarioId);
                                         finalSelectedScenarioId=programDataJson.treeList[checkIfLocalTreeAnchorIdExistsInFinal].scenarioList[scenarioIndex].id;
                                     }
                                 }else{
@@ -2169,10 +2190,10 @@ export default class CommitTreeComponent extends React.Component {
                         }else{
                             var checkIfExtrapolationExists=programDataJson.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
                             if(checkIfExtrapolationExists==-1){
-                                var checkIfExistsInLocalVersion=programDataLocal.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
+                                var checkIfExistsInLocalVersion=datasetJsonOriginal.consumptionExtrapolation.findIndex(c=>c.consumptionExtrapolationId==selectedConsumptionExtrapolationId);
                                 if(checkIfExistsInLocalVersion!=-1){
                                     // Means vo extrapolation local pe hai but final pe nhi hai
-                                    var extrapolationMethodId=programDataLocal.consumptionExtrapolation[checkIfExistsInLocalVersion].extrapolationMethod.id;
+                                    var extrapolationMethodId=datasetJsonOriginal.consumptionExtrapolation[checkIfExistsInLocalVersion].extrapolationMethod.id;
                                     var finalConsumptionExtrapolation=programDataJson.consumptionExtrapolation.findIndex(c=>c.planningUnit.id==programDataJson.planningUnitList[fpu].planningUnit.id && c.region.id==this.state.regionSet[rl] && c.extrapolationMethod.id==extrapolationMethodId);
                                     if(finalConsumptionExtrapolation!=-1){
                                         finalSelectedConsumptionExtrapolationId=programDataJson.consumptionExtrapolation[finalConsumptionExtrapolation].consumptionExtrapolationId;
@@ -2208,6 +2229,8 @@ export default class CommitTreeComponent extends React.Component {
                 loading: false
             })
         }
+    }.bind(this)
+}.bind(this)
     }
 
     loadedFunctionForVersionSettings = function (instance) {
