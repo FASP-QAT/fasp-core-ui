@@ -12405,9 +12405,9 @@ export default class BuildTree extends Component {
                                             </Input>
                                         </FormGroup>
                                     </div>
-                                    <FormGroup className="col-md-12">
+                                    <FormGroup className="col-md-12 pl-lg-0 pr-lg-0">
                                         <div className="calculatorimg calculatorTable consumptionDataEntryTable">
-                                            <div id="modelingCalculatorJexcel" className={"RowClickable ScalingTable"} >
+                                            <div id="modelingCalculatorJexcel" className={"RowClickable ScalingTable TableWidth100"} >
                                             </div>
                                         </div>
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
