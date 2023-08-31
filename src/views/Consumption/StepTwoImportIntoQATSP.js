@@ -6,7 +6,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import {
     Button,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
+    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody
 } from 'reactstrap';
 import Picker from 'react-month-picker';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -18,7 +18,14 @@ import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_
 import moment from "moment";
 import CryptoJS from 'crypto-js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-
+import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
+import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
+import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
+import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -45,6 +52,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.filterData = this.filterData.bind(this);
 
+    }
+
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
     }
 
     formSubmit = function () {
@@ -401,7 +414,34 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-
+                <div className="Card-header-addicon pb-0">
+                    <div className="card-header-actions" style={{ marginTop: '-25px' }}>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                        <a className="card-header-action">
+                            <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        </a>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                    </div>
+                </div>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-xl ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    listImportIntoQATSupplyPlanEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        listImportIntoQATSupplyPlanFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            listImportIntoQATSupplyPlanSp :
+                                            listImportIntoQATSupplyPlanPr
+                            }} />
+                        </ModalBody>
+                    </div>
+                </Modal>
                 <div className="consumptionDataEntryTable">
 
                     <div id="mapRegion" style={{ display: this.props.items.loading ? "none" : "block" }}>

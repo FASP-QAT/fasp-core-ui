@@ -9,7 +9,14 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import ReportService from '../../api/ReportService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-
+import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
+import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
+import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
+import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 
 import {
     // Badge,
@@ -38,6 +45,7 @@ import {
     FormGroup, Input, InputGroup,
     // InputGroupAddon, 
     Label,
+    Modal, ModalHeader, ModalFooter, ModalBody
     // Form
 } from 'reactstrap';
 // import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -93,6 +101,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
     }
+
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
     updateState(parameterName, value) {
 
         this.setState({
@@ -877,7 +892,34 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
-
+                <div className="Card-header-addicon pb-0">
+                    <div className="card-header-actions" style={{ marginTop: '-25px' }}>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                        <a className="card-header-action">
+                            <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        </a>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                    </div>
+                </div>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-xl ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    listImportIntoQATSupplyPlanEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        listImportIntoQATSupplyPlanFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            listImportIntoQATSupplyPlanSp :
+                                            listImportIntoQATSupplyPlanPr
+                            }} />
+                        </ModalBody>
+                    </div>
+                </Modal>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
                         <FormGroup className="col-md-4">
@@ -977,6 +1019,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
+
+                <p>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
 
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
