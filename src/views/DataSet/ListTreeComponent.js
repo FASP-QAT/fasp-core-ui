@@ -2474,7 +2474,7 @@ export default class ListTreeComponent extends Component {
 
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
-                                                            <div id="missingPUJexcel" className="RowClickable">
+                                                            <div id="missingPUJexcel" className="RowClickable TableWidth100">
                                                             </div>
                                                         </div>
                                                     </div>
