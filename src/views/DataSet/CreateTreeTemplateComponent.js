@@ -180,7 +180,7 @@ const validationSchemaNodeData = function (values) {
             .test('nodeValue', 'Please enter a valid number having less than or equal to 10 digits.',
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
@@ -11693,8 +11693,8 @@ export default class CreateTreeTemplate extends Component {
                                             </Input>
                                         </FormGroup>
 
-                                        <div className="col-md-12 pl-lg-0 pr-lg-0">
-                                            <div id="modelingCalculatorJexcel" className={"consumptionDataEntryTable RowClickable"}>
+                                        <div className="col-md-12 pl-lg-2 pr-lg-2">
+                                            <div id="modelingCalculatorJexcel" className={"consumptionDataEntryTable RowClickable TableWidth100"}>
                                             </div>
                                         </div>
                                     </div>
