@@ -482,6 +482,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             regionList=region               
                         }
                     }
+                    console.log("regionList---",regionList)
                 // }
                 var regionIds = regionList.map((item, i) => {
                     return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
@@ -504,7 +505,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var selectedText = e.map(item => item.label);
         this.setState({
             planningUnitIds: e,
-            planningUnitLabel: selectedText,
+            planningUnitLabels: selectedText,
             show: false,
             dataList: [],
             consumptionAdjForStockOutId:false,
@@ -925,7 +926,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var selectedText = e.map(item => item.label);
         this.setState({
             forecastingUnitIds: e,
-            forecastingUnitLabel: selectedText,
+            forecastingUnitLabels: selectedText,
             dataList: [],
             consumptionAdjForStockOutId:false,
             loading:false
@@ -1934,12 +1935,15 @@ fetchData(){
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].label.label_en).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         if (this.state.viewById == 1) {
-            csvRow.push('"' + ('Planning Unit' + ': ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            var PUList = this.state.planningUnitLabels.map(ele =>ele)
+            csvRow.push('"' + ('Planning Unit' + ': ' + (PUList)).replaceAll(' ', '%20') + '"')
         } else {
-            csvRow.push('"' + ('Forecasting unit' + ': ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        }
-        this.state.regions.map(ele =>
-            csvRow.push('"' + ('Region' + ': ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
+            var FUList = this.state.forecastingUnitLabels.map(ele => ele)
+            csvRow.push('"' + ('Forecasting unit' + ': ' + (FUList)).replaceAll(' ', '%20') + '"')
+        }    
+        console.log("this.state.regionLabels",this.state.regionLabels)
+        var RegionList= this.state.regionLabels.map(ele =>ele)
+            csvRow.push('"' + ('Region' + ': ' + (RegionList)).replaceAll(' ', '%20') + '"')
         this.state.consumptionAdjForStockOutId ? csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + "Yes").replaceAll(' ', '%20') + '"'):
         csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + "No").replaceAll(' ', '%20') + '"')
         csvRow.push('"'+(i18n.t('static.report.timeWindow')+': ' + (document.getElementById("timeWindow").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
@@ -2187,16 +2191,49 @@ fetchData(){
                     doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
+                    var y = 110;
+                    if(this.state.viewById == 1){         
+                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        y = y + 10;
+                        for (var i = 0; i < planningText.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        }
+                        doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+                        y = y + 10;
+                        }
+
+                    }else{
+                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.forecastingUnit') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        y = y + 10;
+                        for (var i = 0; i < planningText.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        }
+                        doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+                        y = y + 10;
+                        }    
+                    }
                     var regionText = doc.splitTextToSize(('Region' + ': ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 120, regionText)
-                    doc.text('Show consumption adjusted for stock out' + ': '+(this.state.consumptionAdjForStockOutId ? "Yes" : "No"), doc.internal.pageSize.width / 8, 130, {
+                    y = y;
+                    for (var i = 0; i < regionText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    }
+                    doc.text(doc.internal.pageSize.width / 8, y, regionText[i]);
+                    y = y + 10;
+                    }    
+                    doc.text('Show consumption adjusted for stock out' + ': '+(this.state.consumptionAdjForStockOutId ? "Yes" : "No"), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.timeWindow') + ': '+document.getElementById("timeWindow").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
+                    doc.text(i18n.t('static.report.timeWindow') + ': '+document.getElementById("timeWindow").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y+10), {
                         align: 'left'
                     })
                     if(document.getElementById("yaxisEquUnit").value>0){
-                    doc.text("Y-axis in equivalency unit" + ': '+document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text("Y-axis in equivalency unit" + ': '+document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y+20), {
                         align: 'left'
                     })
                     }
