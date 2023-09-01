@@ -11693,8 +11693,8 @@ export default class CreateTreeTemplate extends Component {
                                             </Input>
                                         </FormGroup>
 
-                                        <div className="col-md-12 pl-lg-0 pr-lg-0">
-                                            <div id="modelingCalculatorJexcel" className={"consumptionDataEntryTable RowClickable"}>
+                                        <div className="col-md-12 pl-lg-2 pr-lg-2">
+                                            <div id="modelingCalculatorJexcel" className={"consumptionDataEntryTable RowClickable TableWidth100"}>
                                             </div>
                                         </div>
                                     </div>
