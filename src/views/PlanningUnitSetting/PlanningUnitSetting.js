@@ -2194,7 +2194,8 @@ export default class PlanningUnitSetting extends Component {
                     // decimal: '.',
                     mask: '#,##',
                     width: '150',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //4E
                 },
                 {
@@ -2204,7 +2205,8 @@ export default class PlanningUnitSetting extends Component {
                     // decimal: '.',
                     mask: '#,##',
                     width: '150',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //5F
                 },
                 {
@@ -2214,14 +2216,16 @@ export default class PlanningUnitSetting extends Component {
                     // decimal: '.',
                     mask: '#,##',
                     disabledMaskOnEdition: true,
-                    width: '150'
+                    width: '150',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //6G
                 },
                 {
                     title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width: '120'
+                    width: '120',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -2232,7 +2236,8 @@ export default class PlanningUnitSetting extends Component {
                     decimal: '.',
                     mask: '#,##.00',
                     width: '120',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // readOnly: true //8I
                 },
                 {
@@ -2268,6 +2273,7 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                     // width: 400 //15P
                 },
                 {
@@ -2347,7 +2353,7 @@ export default class PlanningUnitSetting extends Component {
 
                     // Insert new row before
                     if (isSiteOnline()) {
-                        if (obj.options.allowInsertRow == true) {
+                        if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -3698,7 +3704,14 @@ export default class PlanningUnitSetting extends Component {
                                 <p>{i18n.t("static.planningUnitSetting.offlineMsg")}</p>
                             </div>
                         </Col>}
-
+                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                            <p>
+                                {i18n.t('static.versionSettings.note')}: 
+                                <i>
+                                    {i18n.t("static.PUSettingList.notes")}
+                                </i>
+                            </p>
+                        }
                         <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div style={{width: '100%'}} id="tableDiv">
                             </div>
