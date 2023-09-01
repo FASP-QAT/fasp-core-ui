@@ -4819,7 +4819,7 @@ class EditSupplyPlanStatus extends Component {
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className={this.state.submitColor} id="div3">{i18n.t(this.state.submitMessage)}</h5>
 
-                <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <ProblemListFormulas ref="formulaeChild" />
                         <div className="Card-header-addicon">
