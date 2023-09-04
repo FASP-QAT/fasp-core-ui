@@ -136,7 +136,7 @@ const validationSchemaNodeData = function (values) {
             .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
@@ -564,7 +564,7 @@ function addCommas(cell1, row) {
         console.log("Comma---x---", x);
         var x1 = x[0];
         console.log("Comma---x1---", x1);
-        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
         console.log("Comma---x2---", x2);
         var rgx = /(\d+)(\d{3})/;
         console.log("Comma---reg");
@@ -592,7 +592,7 @@ function addCommasNodeValue(cell1, row) {
         console.log("Comma---x---", x);
         var x1 = x[0];
         console.log("Comma---x1---", x1);
-        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
         console.log("Comma---x2---", x2);
         var rgx = /(\d+)(\d{3})/;
         console.log("Comma---reg");
@@ -2743,18 +2743,18 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
-            data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = parseFloat(momList[j].manualChange).toFixed(4)
-            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),2)`
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
-            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(4) : 0;
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},4)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},4)`;
+            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},4)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
-            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
+            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
@@ -2791,7 +2791,7 @@ export default class BuildTree extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=(O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -2823,14 +2823,14 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
                     type: 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: i18n.t('static.tree.calculatedChange'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -2838,27 +2838,27 @@ export default class BuildTree extends Component {
                     type: 'numeric',
                     disabledMaskOnEdition: true,
                     textEditor: true,
-                    mask: '#,##0.0000%', decimal: '.',
+                    mask: '#,##0.00%', decimal: '.',
                     readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
 
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'hidden' : 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -2869,7 +2869,7 @@ export default class BuildTree extends Component {
                 {
                     title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -2967,12 +2967,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}),4)`
-            data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),4)`;
-            data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(4)
-            data[5] = parseFloat(momList[j].manualChange).toFixed(4)
-            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},4)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}),2)`
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
+            data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
+            data[5] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentScenario.manualChangesEffectFuture;
             dataArray[count] = data;
@@ -3011,7 +3011,7 @@ export default class BuildTree extends Component {
                     // title: 'A',
                     // type: 'text',
                     // visible: false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
@@ -3019,14 +3019,14 @@ export default class BuildTree extends Component {
                     // 2
                     title: i18n.t('static.tree.calculatedChange+-'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     // 3
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -3036,7 +3036,7 @@ export default class BuildTree extends Component {
                     // visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
                     textEditor: true,
-                    mask: '#,##0.0000%', decimal: '.',
+                    mask: '#,##0.00%', decimal: '.',
                     readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
@@ -3044,13 +3044,13 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.manualChange+-'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     // visible: this.state.seasonality == true ? true : false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {

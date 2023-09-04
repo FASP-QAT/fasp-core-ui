@@ -481,7 +481,7 @@ class CompareVersion extends Component {
                             // planningUnitList[puList].totalForecast=
                             list.push({
                                 selectedForecast: label,
-                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Math.round(total) : "",
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Number(total).toFixed(2) : "",
                                 notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {
@@ -659,7 +659,7 @@ class CompareVersion extends Component {
                             // planningUnitList[puList].totalForecast=
                             list.push({
                                 selectedForecast: label,
-                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Math.round(total) : "",
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Number(total).toFixed(2) : "",
                                 notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {

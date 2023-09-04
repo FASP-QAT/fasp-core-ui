@@ -31,7 +31,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import csvicon from '../../assets/img/csv.png';
 import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
 import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
-import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.jpg';
+import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
+import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
 import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
 import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
 import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
