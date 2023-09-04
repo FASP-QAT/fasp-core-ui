@@ -769,7 +769,7 @@ export default class PlanningUnitSetting extends Component {
             let q = '';
             q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
             q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
-
+            this.el.getCell(("B").concat(parseInt(y) + 1)).classList.remove('typing-'+this.state.lang);
             // this.el.setValueFromCoords(7, y, '', true);
             // this.el.setValueFromCoords(8, y, '', true);
         }
@@ -3501,6 +3501,7 @@ export default class PlanningUnitSetting extends Component {
         this.el.insertRow(
             data
         );
+        this.el.getCell(("B").concat(parseInt(json.length) + 1)).classList.add('typing-'+this.state.lang);
     };
 
     toggleProgramSetting() {
