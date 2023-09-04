@@ -930,6 +930,8 @@ class DefaultLayout extends Component {
   componentDidMount() {
     // console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
+    window.addEventListener('blur', this.handleBlur);
+    window.addEventListener('click', this.handleFocus);
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
@@ -974,6 +976,28 @@ class DefaultLayout extends Component {
     }
 
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('blur', this.handleBlur);
+    window.removeEventListener('click', this.handleFocus);
+  }
+
+  handleBlur = () => {
+    var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
+    if(temp_time > this.state.timeout){
+      this.props.history.push('/logout/static.message.sessionExpired')
+    }
+  };
+
+  handleFocus = () => {
+    var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
+    if(temp_time > this.state.timeout){
+      this.props.history.push('/logout/static.message.sessionExpired')
+    }
+    localStorage.setItem("lastFocus", new Date())
+  };
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
