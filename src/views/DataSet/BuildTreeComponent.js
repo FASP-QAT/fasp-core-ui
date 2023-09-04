@@ -655,6 +655,7 @@ export default class BuildTree extends Component {
         this.pickAMonth1 = React.createRef()
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
+        this.pickAMonth6 = React.createRef()
         this.state = {
             isBranchTemplateModalOpen: false,
             branchTemplateList: [],
@@ -941,14 +942,14 @@ export default class BuildTree extends Component {
             hideActionButtons: false,
             programDataListForPuCheck: [],
             calculatedTotalForModelingCalculator: [],
-            targetSelect: true,
+            targetSelect: 0,
             firstMonthOfTarget: "",
             yearsOfTarget: "",
             actualOrTargetValueList: [],
             programDataListForPuCheck: [],
             toggleArray: [],
             collapseState: false,
-            isCalculateClicked: false,
+            isCalculateClicked: 0,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -1095,6 +1096,7 @@ export default class BuildTree extends Component {
         this.changed3 = this.changed3.bind(this);
         this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
         this.validFieldData = this.validFieldData.bind(this);
+        this.acceptValue1 = this.acceptValue1.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -3499,6 +3501,7 @@ export default class BuildTree extends Component {
                                 obj.increaseDecrease = map1.get("5");
                                 obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
                                 obj.nodeDataModelingId = map1.get("10")
+                                obj.modelingSource = map1.get("14")
                                 // data[itemIndex] = obj;
                                 // dataArr.push(obj);
                             } else {
@@ -3512,7 +3515,8 @@ export default class BuildTree extends Component {
                                     stopDate: stopDate,
                                     increaseDecrease: map1.get("5"),
                                     dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
-                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    nodeDataModelingId: parseInt(maxModelingId) + 1,
+                                    modelingSource: map1.get("14")
                                 }
                                 maxModelingId++;
                             }
@@ -3801,10 +3805,69 @@ export default class BuildTree extends Component {
             // this.filterScalingDataByMonth(this.state.scalingMonth);
         });
     }
+
+    acceptValue1() {
+        // console.log(">>>>", this.state.currentRowIndex);
+        var elInstance = this.state.modelingEl;
+        if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
+            // Linear % point
+            if (this.state.currentModelingType == 5) {
+
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
+                if (this.state.currentTransferData == "") {
+                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
+                }
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+            }
+        } else {
+            // Linear #
+            if (this.state.currentModelingType == 2) {
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                if (this.state.currentTransferData == "") {
+                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
+                }
+                var startDate = this.state.currentCalculatorStartDate;
+                var endDate = this.state.currentCalculatorStopDate;
+                var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+            } else if (this.state.currentModelingType == 3) { //Linear %
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                if (this.state.currentTransferData == "") {
+                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
+                }
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+            } else if (this.state.currentModelingType == 4) { // Exponential %
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                if (this.state.currentTransferData == "") {
+                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
+                }
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+            }
+        }
+        this.setState({ showCalculatorFields: false });
+
+    }
+
     acceptValue() {
-        var json = this.state.modelingEl.getJson(null, false);
-        var map1 = new Map(Object.entries(json[0]));
-        if (map1.get("0") == "" && map1.get("4") == "" && map1.get("5") == "" && map1.get("6") == "" && map1.get("7") == "") {
+        // var json = this.state.modelingEl.getJson(null, false);
+        // var map1 = new Map(Object.entries(json[0]));
+        if (!this.state.targetSelectDisable) {
             this.callJexcelBuildFuntion();
         } else {
             var cf = window.confirm(i18n.t("static.modelingCalculator.confirmAlert"));
@@ -3844,18 +3907,19 @@ export default class BuildTree extends Component {
             data[3] = '';
             data[4] = this.state.currentModelingType;
             data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;
-            data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
-            data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
+            data[6] = this.state.currentModelingType != 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
+            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
             data[8] = cleanUp
             data[9] = '';
             data[10] = ''
             data[11] = ''
             data[12] = 0
             data[13] = {
-                firstMonthOfTarget: this.state.firstMonthOfTarget,
+                firstMonthOfTarget: moment(this.state.firstMonthOfTarget, "YYYY-MM-DD").format("YYYY-MM"),
                 yearsOfTarget: this.state.yearsOfTarget,
                 actualOrTargetValueList: this.state.actualOrTargetValueList
             }
+            data[14] = this.state.targetSelect;// 0 for Manual or Old calculator method; 1 for Annual Target Calculator
             dataArr.push(map.get("1"))
             this.state.modelingEl.insertRow(
                 data, 0, 1
@@ -4190,6 +4254,7 @@ export default class BuildTree extends Component {
                 yearsOfTarget: "",
                 actualOrTargetValueList: []
             }
+            data[14] = ""
             dataArray[count] = data;
             count++;
         }
@@ -4223,6 +4288,7 @@ export default class BuildTree extends Component {
                     yearsOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.yearsOfTarget : this.state.currentScenario.annualTargetCalculator.yearsOfTarget,
                     actualOrTargetValueList: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.actualOrTargetValueList : this.state.currentScenario.annualTargetCalculator.actualOrTargetValueList
                 }
+                data[14] = scalingList[j].modelingSource
                 scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
                 dataArray[count] = data;
                 count++;
@@ -4251,11 +4317,8 @@ export default class BuildTree extends Component {
             data[10] = nodeTransferDataList[j].nodeDataModelingId
             data[11] = 0
             data[12] = 1
-            data[13] = {
-                firstMonthOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.firstMonthOfTarget : moment(moment(this.state.currentScenario.annualTargetCalculator.firstMonthOfTarget, "YYYY-MM")).format("YYYY-MM-DD"),
-                yearsOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.yearsOfTarget : this.state.currentScenario.annualTargetCalculator.yearsOfTarget,
-                actualOrTargetValueList: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.actualOrTargetValueList : this.state.currentScenario.annualTargetCalculator.actualOrTargetValueList
-            }
+            data[13] = ""
+            data[14] = ""
 
             scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
             dataArray[count] = data;
@@ -4347,45 +4410,30 @@ export default class BuildTree extends Component {
                 {
                     title: 'nodeDataModelingId',
                     type: 'hidden'
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
                 },
                 {
                     title: 'isChanged',
                     type: 'hidden'
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
                 },
                 {
                     title: 'isTransfer',
                     type: 'hidden'
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
                 },
                 {
                     title: 'modelingCalculator',
                     type: 'hidden'
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
+                },
+                {
+                    title: 'modelingSource',
+                    type: 'hidden'
                 }
 
             ],
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             editable: true,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -4483,6 +4531,7 @@ export default class BuildTree extends Component {
                                     yearsOfTarget: "",
                                     actualOrTargetValueList: []
                                 }
+                                data[14] = ""
                                 obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
@@ -4513,6 +4562,7 @@ export default class BuildTree extends Component {
                                             yearsOfTarget: "",
                                             actualOrTargetValueList: []
                                         }
+                                        data[14] = ""
                                         obj.insertRow(data, 0, 1);
                                         obj.deleteRow(parseInt(y) + 1);
                                         var col = ("C").concat(parseInt(0) + 1);
@@ -4587,6 +4637,9 @@ export default class BuildTree extends Component {
                         currentCalculatorStartDate: '',
                         currentCalculatorStopDate: '',
                         currentCalculatorStartValue: '',
+                        firstMonthOfTarget: "",
+                        yearsOfTarget: "",
+                        actualOrTargetValueList: []
                     }, () => {
                         console.log("x row data===>", ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1));
                         var startValue = this.getMomValueForDateRange(rowData[1]);
@@ -4608,10 +4661,13 @@ export default class BuildTree extends Component {
                             currentEndValueEdit: false,
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
-                            firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget)
+                            firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            targetSelect: rowData[14],
+                            targetSelectDisable: true,
+                            isCalculateClicked: 0
                         }, () => {
                             // this.calculateMOMData(0, 3);
-                            console.log("showCalculatorFields===", this.state.currentCalculatorStartDate)
+                            console.log("showCalculatorFields===", this.state.targetSelect)
                             if (this.state.showCalculatorFields) {
                                 this.buildModelingCalculatorJexcel();
                             }
@@ -4627,6 +4683,9 @@ export default class BuildTree extends Component {
                             currentCalculatorStartDate: '',
                             currentCalculatorStopDate: '',
                             currentCalculatorStartValue: '',
+                            firstMonthOfTarget: "",
+                            yearsOfTarget: "",
+                            actualOrTargetValueList: []
                         }, () => {
                             // console.log("x row data===>", this.el.getRowData(x));
                             var startValue = this.getMomValueForDateRange(rowData[1]);
@@ -4649,7 +4708,10 @@ export default class BuildTree extends Component {
                                 currentEndValueEdit: false,
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
                                 yearsOfTarget: targetYears,
-                                firstMonthOfTarget: rowData[1]
+                                firstMonthOfTarget: rowData[1],
+                                modelingSource: rowData[14],
+                                targetSelectDisable: false,
+                                isCalculateClicked: 0
                             }, () => {
                                 if (this.state.showCalculatorFields) {
                                     this.buildModelingCalculatorJexcel();
@@ -4673,7 +4735,8 @@ export default class BuildTree extends Component {
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
             currentModelingType: 2,
-            yearsOfTarget: 3
+            yearsOfTarget: 3,
+            isCalculateClicked: 1
         }, () => {
             this.buildModelingCalculatorJexcel();
         })
@@ -5040,6 +5103,7 @@ export default class BuildTree extends Component {
             yearsOfTarget: "",
             actualOrTargetValueList: []
         }
+        data[14] = ""
         elInstance.insertRow(
             data, 0, 1
         );
@@ -8030,18 +8094,18 @@ export default class BuildTree extends Component {
 
 
         if (event.target.name == "modelingType") {
-            console.log("event.target.id", event.target.id)
+            console.log("event.target.id", event.target.value)
             if (event.target.value == "active1") {
-                this.setState({ currentModelingType: 4 })
+                this.setState({ currentModelingType: 4, targetSelect: 0, targetSelectDisable: true })
             }
             else if (event.target.value == "active2") {
-                this.setState({ currentModelingType: 3 })
+                this.setState({ currentModelingType: 3, targetSelect: 0, targetSelectDisable: true })
             }
             else if (event.target.value == "active3") {
-                this.setState({ currentModelingType: 2 })
+                this.setState({ currentModelingType: 2, targetSelect: 1, targetSelectDisable: false })
             }
             else {
-                this.setState({ currentModelingType: 5 })
+                this.setState({ currentModelingType: 5, targetSelect: 0, targetSelectDisable: true })
             }
             if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
                 console.log("inside if calculator radio button");
@@ -8050,18 +8114,20 @@ export default class BuildTree extends Component {
                     currentEndValueEdit: false
                 });
             }
+            this.setState({ isCalculateClicked: 1 })
             this.buildModelingCalculatorJexcel();
         }
 
         if (event.target.name === "targetSelect") {
             this.setState({
-                targetSelect: event.target.value == "target1" ? true : false
+                targetSelect: event.target.value == "target1" ? 1 : 0
             });
         }
 
         if (event.target.name === "targetYears") {
             this.setState({
-                yearsOfTarget: event.target.value
+                yearsOfTarget: event.target.value,
+                isCalculateClicked: 1
             }, () => {
                 this.buildModelingCalculatorJexcel();
             });
@@ -9176,8 +9242,7 @@ export default class BuildTree extends Component {
                     elInstance.setValueFromCoords(4, i, abc, true);
                 }
                 this.setState({
-                    actualOrTargetValueList: dataArray,
-                    isCalculateClicked: true
+                    actualOrTargetValueList: dataArray
                 });
             }
         }
@@ -9220,8 +9285,8 @@ export default class BuildTree extends Component {
     changeModelingCalculatorJexcel = function (instance, cell, x, y, value) {
 
         if (x == 1) {
-            if (this.state.isCalculateClicked != false) {
-                this.setState({ isCalculateClicked: false });
+            if (this.state.isCalculateClicked != 1) {
+                this.setState({ isCalculateClicked: 1 });
             }
         }
     }
@@ -11135,77 +11200,309 @@ export default class BuildTree extends Component {
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
+                                                        disabled={this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
-                                                        <option value="target1" selected={true}>{'Annual Target'}</option>
-                                                        <option value="target2">{'Ending Value Target / Change'}</option>
+                                                        <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
+                                                        <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
                                                     </Input>
                                                 </div>}
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-12" style={{ display: this.state.targetSelect ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.annualTargetLabel')}</Label>
-                                        </FormGroup>
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover25" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
-                                                <PopoverBody>{i18n.t('static.tooltip.FirstMonthOfTarget')}</PopoverBody>
-                                            </Popover>
-                                        </div>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Picker
-                                                ref={this.pickAMonth4}
-                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
-                                                lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange4}
-                                                // onDismiss={this.handleAMonthDissmis4}
-                                                id="firstMonthOfTarget"
-                                                name="firstMonthOfTarget"
+                                    </div>
+                                    <div style={{ display: this.state.targetSelect == 1 ? 'block' : 'none' }}>
+                                        <div className="row">
+                                            <FormGroup className="col-md-12">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.annualTargetLabel')}</Label>
+                                            </FormGroup>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover25" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.FirstMonthOfTarget')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Picker
+                                                    ref={this.pickAMonth4}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
+                                                    lang={pickerLang.months}
+                                                    onChange={this.handleAMonthChange4}
+                                                    // onDismiss={this.handleAMonthDissmis4}
+                                                    id="firstMonthOfTarget"
+                                                    name="firstMonthOfTarget"
 
-                                            >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
-                                            </Picker>
-                                        </FormGroup>
-                                        <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover26" trigger="hover" toggle={this.toggleYearsOfTarget}>
-                                                <PopoverBody>{i18n.t('static.tooltip.yearsOfTarget')}</PopoverBody>
-                                            </Popover>
+                                                >
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
+                                                </Picker>
+                                            </FormGroup>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover26" trigger="hover" toggle={this.toggleYearsOfTarget}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.yearsOfTarget')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Input type="select"
+                                                    id="targetYears"
+                                                    name="targetYears"
+                                                    bsSize="sm"
+                                                    required
+                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    value={this.state.yearsOfTarget}>
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option key={3} value={3}>3</option>
+                                                    <option key={4} value={4}>4</option>
+                                                    <option key={5} value={5}>5</option>
+                                                    <option key={6} value={6}>6</option>
+                                                    <option key={7} value={7}>7</option>
+                                                    <option key={8} value={8}>8</option>
+                                                    <option key={9} value={9}>9</option>
+                                                    <option key={10} value={10}>10</option>
+                                                </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-12">
+                                                <div className="calculatorimg calculatorTable consumptionDataEntryTable">
+                                                    <div id="modelingCalculatorJexcel" className={"RowClickable ScalingTable"} >
+                                                    </div>
+                                                </div>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                                    this.setState({
+                                                        showCalculatorFields: false
+                                                    });
+                                                }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
+                                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                {this.state.isCalculateClicked == 2 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
+                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(); this.setState({ isCalculateClicked: 2 }) }}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
+                                            </FormGroup>
                                         </div>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="select"
-                                                id="targetYears"
-                                                name="targetYears"
-                                                bsSize="sm"
-                                                required
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.yearsOfTarget}>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                <option key={3} value={3}>3</option>
-                                                <option key={4} value={4}>4</option>
-                                                <option key={5} value={5}>5</option>
-                                                <option key={6} value={6}>6</option>
-                                                <option key={7} value={7}>7</option>
-                                                <option key={8} value={8}>8</option>
-                                                <option key={9} value={9}>9</option>
-                                                <option key={10} value={10}>10</option>
-                                            </Input>
+                                    </div>
+                                    <div className='col-md-12' style={{ display: this.state.targetSelect != 1 ? 'block' : 'none' }}>
+                                        <div className="row">
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
+                                                <Picker
+                                                    ref={this.pickAMonth6}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
+                                                    lang={pickerLang.months}
+                                                    onChange={this.handleAMonthChange5}
+                                                // onDismiss={this.handleAMonthDissmis5}
+                                                >
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
+                                                </Picker>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
+                                                <Picker
+                                                    ref={this.pickAMonth5}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={{ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
+                                                    lang={pickerLang.months}
+                                                    onChange={this.handleAMonthChange5}
+                                                    onDismiss={this.handleAMonthDissmis5}
+                                                >
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
+                                                </Picker>
+                                            </FormGroup>
+                                            {this.state.currentItemConfig.context.payload.nodeType.id <= 2 &&
+                                                <>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenStartValueModelingTool} target="Popover53" trigger="hover" toggle={this.toggleStartValueModelingTool}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.StartValueModelingTool')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Input type="text"
+                                                            id="startValue"
+                                                            name="startValue"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            value={addCommas(this.state.currentCalculatorStartValue)}
+
+                                                        >
+                                                        </Input>
+                                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                                    </FormGroup>
+                                                </>
+                                            }
+                                            {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input type="text"
+                                                    id="startPercentage"
+                                                    name="startPercentage"
+                                                    bsSize="sm"
+                                                    readOnly={true}
+                                                    value={this.state.currentCalculatorStartValue}
+
+                                                >
+                                                </Input>
+                                                {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                            </FormGroup>
+                                            }
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenTargetEndingValue} target="Popover25" trigger="hover" toggle={this.toggleTargetEndingValue}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.TargetEndingValue')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-5">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleTargetEndingValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Input type="text"
+                                                    id="currentEndValue"
+                                                    name="currentEndValue"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
+                                                    value={addCommas(this.state.currentEndValue)}
+                                                    readOnly={this.state.currentEndValueEdit}
+                                                >
+                                                </Input>
+
+                                                {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                            </FormGroup>
+                                            <FormGroup className="col-md-1 mt-lg-4">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.or')}</Label>
+                                            </FormGroup>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenTargetChangePercent} target="Popover26" trigger="hover" toggle={this.toggleTargetChangePercent}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
+                                            <FormGroup className="col-md-5">
+                                                <Label htmlFor="currencyId">
+                                                    {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
+                                                    <span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Input type="text"
+                                                    id="currentTargetChangePercentage"
+                                                    name="currentTargetChangePercentage"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInPercent(e) }}
+                                                    value={addCommas(this.state.currentTargetChangePercentage)}
+                                                    readOnly={this.state.currentTargetChangePercentageEdit}
+
+                                                >
+                                                </Input>
+                                                {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                            </FormGroup>
+                                            {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-1 mt-lg-4">
+                                                <Label htmlFor="currencyId">or</Label>
+                                            </FormGroup>
+                                            }
+                                            {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
+                                            {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input type="text"
+                                                    id="currentTargetChangeNumber"
+                                                    name="currentTargetChangeNumber"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
+                                                    value={addCommas(this.state.currentTargetChangeNumber)}
+                                                    readOnly={this.state.currentTargetChangeNumberEdit}
+                                                >
+                                                </Input>
+                                                {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                            </FormGroup>
+                                            }
+                                        </div>
+                                        <div className="row col-md-12 pl-lg-0">
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenCalculatedMonthOnMonthChnage} target="Popover27" trigger="hover" toggle={this.toggleCalculatedMonthOnMonthChnage}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.CalculatedMonthOnMonthChnage')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.CalculatedMonth-on-MonthChange')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover27" onClick={this.toggleCalculatedMonthOnMonthChnage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Input type="text"
+                                                    id="calculatedMomChange"
+                                                    name="calculatedMomChange"
+                                                    bsSize="sm"
+                                                    readOnly={true}
+                                                    value={addCommas(this.state.currentCalculatedMomChange)}>
+                                                </Input>
+                                                {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                            </FormGroup>
+                                            {/* <FormGroup className="col-md-6" >
+                                                    <div className="check inline  pl-lg-1 pt-lg-2">
+                                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="modelingType"
+                                                                checked={this.state.currentModelingType == 4 ? true : false}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            // onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{'Exponential (%)'}</b>
+                                                            </Label>
+                                                        </div>}
+                                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
+                                                            <Input
+                                                                className="form-check-input Radioactive checkboxMargin"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="modelingType"
+                                                                checked={(this.state.currentItemConfig.context.payload.nodeType.id > 2 || this.state.currentModelingType == 3) ? true : false}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{'Linear (%)'}</b>
+                                                            </Label>
+                                                        </div>
+                                                        }
+                                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="radio"
+                                                                id="active3"
+                                                                name="modelingType"
+                                                                checked={this.state.currentModelingType == 2 ? true : false}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{'Linear (#)'}</b>
+                                                            </Label>
+                                                        </div>}
+                                                        {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <div className="col-md-12 form-group">
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="radio"
+                                                                id="active4"
+                                                                name="modelingType"
+                                                                checked={this.state.currentModelingType == 5 ? true : false}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{'Linear (% point)'}</b>
+                                                            </Label>
+                                                        </div>}
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                </FormGroup> */}
+                                        </div>
+                                        <FormGroup className="col-md-12">
+                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                                this.setState({
+                                                    showCalculatorFields: false
+                                                });
+                                            }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
+                                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue1}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
+
                                         </FormGroup>
                                     </div>
-                                    <FormGroup className="col-md-12">
-                                        <div className="calculatorimg calculatorTable consumptionDataEntryTable">
-                                            <div id="modelingCalculatorJexcel" className={"RowClickable ScalingTable"} >
-                                            </div>
-                                        </div>
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                            this.setState({
-                                                showCalculatorFields: false
-                                            });
-                                        }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
-                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        {this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
-                                        {!this.state.isCalculateClicked && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.changed3}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
-                                    </FormGroup>
                                     {/* </div> */}
                                 </fieldset>
                             </div>
@@ -11513,10 +11810,37 @@ export default class BuildTree extends Component {
             currentCalculatorStartDate: date, currentCalculatorStartValue,
             firstMonthOfTarget: "",
             // yearsOfTarget: "",
-            actualOrTargetValueList: []
+            actualOrTargetValueList: [],
+            isCalculateClicked: 1
         }, () => {
             this.buildModelingCalculatorJexcel();
 
+            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+                console.log("Inside if modeling calculator");
+            } else {
+                console.log("Inside else modeling calculator");
+                if (!this.state.currentEndValueEdit) {
+                    this.calculateMomByEndValue();
+                } else if (!this.state.currentTargetChangePercentageEdit) {
+                    this.calculateMomByChangeInPercent();
+                } else if (!this.state.currentTargetChangeNumberEdit) {
+                    this.calculateMomByChangeInNumber();
+                }
+            }
+        });
+
+    }
+    handleAMonthChange5 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        var date = year + "-" + month + "-01";
+        var currentCalculatorStartValue = this.getMomValueForDateRange(date);
+        console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
+        console.log("month change currentEndValueEdit---", this.state.currentEndValueEdit);
+        console.log("month change currentTargetChangePercentageEdit---", this.state.currentTargetChangePercentageEdit);
+        console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
+
+        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
             if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
                 console.log("Inside if modeling calculator");
             } else {
