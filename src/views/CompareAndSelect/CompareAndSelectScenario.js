@@ -2300,7 +2300,7 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
                                             <div className="RemoveStriped removeOddColor">
-                                                <div id="table1" className="compareAndSelect"></div>
+                                                <div id="table1" className="compareAndSelect TableWidth100"></div>
                                             </div>
 
                                             <br></br>
@@ -2503,7 +2503,7 @@ class CompareAndSelectScenario extends Component {
                                                 {/* <div className="col-md-12 pl-0 pr-0"> */}
                                                 <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                     <div className="col-md-12 pl-0 pr-0">
-                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>
                                                 </div>
