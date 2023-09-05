@@ -1954,7 +1954,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/dataset/loadDeleteDataSet',
-                            icon: 'fa fa-download',
+                            icon: 'cui-cloud-download FontBoldIcon',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
