@@ -1241,13 +1241,17 @@ fetchData(){
     }
     planningUnitIds = this.state.planningUnitIds.map(item => item.value.toString());
     forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value.toString());
+    console.log("Program Id Test@123",programId);
+    console.log("PlanningUnitIds Test@123",planningUnitIds);
+    console.log("Forecasting Unit Ids Test@123",forecastingUnitIds);
+    console.log("Version Id Test@123",versionId)
     if (programId > 0 && (planningUnitIds.length > 0 || forecastingUnitIds.length > 0) && versionId != 0) {
         if (versionId.includes('Local')) {
             this.setState({ loading: true })
             var db1;
             getDatabase();
             // View by planningUnit
-            if (planningUnitIds.length > 0){
+            if (planningUnitIds.length > 0 && this.state.viewById==1){
 
                 var monthArray_arr = [];
                 var dataList_arr = [];
@@ -1511,7 +1515,7 @@ fetchData(){
                 //     yaxisEquUnit:equivalencyUnitId
                 // })                             
             } // View by forecastingUnit
-            else if(forecastingUnitIds.length > 0){
+            else if(forecastingUnitIds.length > 0 && this.state.viewById==2){
                 var planningUnitIdList;
                 var monthArray_arr = [];
                 var dataList_arr = [];
