@@ -797,6 +797,10 @@ class EditUserComponent extends Component {
     } else {
       proList = this.state.programListForFilter;
     }
+    var orgvalue = this.state.addUserEL.getJson(null, false)[r][3];
+    if(orgvalue!=-1){
+      proList=proList.filter(c=>c.id==-1 || c.organisation.id==orgvalue)
+    }
     return proList;
   }.bind(this);
 
@@ -829,6 +833,7 @@ class EditUserComponent extends Component {
           id: parseInt(selProgram[i].id),
           realmCountryId: selProgram[i].realmCountry.id,
           healthAreaList: selProgram[i].healthAreaList,
+          organisation:selProgram[i].organisation
         };
         programList[i] = paJson;
       }

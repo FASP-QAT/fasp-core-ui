@@ -827,20 +827,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             myArray[a].closingBalanceWps = 0;
                         }
                     }
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalance);
-                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
-                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
-                            unallocatedFEFO = 0;
-                        } else {
-                            myArray[a].closingBalance = 0;
-                            myArray[a].calculatedFEFO = Number(tempCB);
-                            unallocatedFEFO -= Number(tempCB);
-                        }
-                        myArray[a].qty = Number(myArray[a].closingBalance);
-                    }
 
                     if (Number(unallocatedLEFO) != 0) {
                         for (var a = (myArray.length) - 1; a >= 0; a--) {
@@ -859,21 +845,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 myArray[a].qty = Number(myArray[a].closingBalance);
                             }
                         }
-                    }
-
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalanceWps);
-                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
-                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
-                            unallocatedFEFOWps = 0;
-                        } else {
-                            myArray[a].closingBalanceWps = 0;
-                            myArray[a].calculatedFEFOWps = Number(tempCB);
-                            unallocatedFEFOWps -= Number(tempCB);
-                        }
-                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
                     }
 
                     if (Number(unallocatedLEFOWps) != 0) {
@@ -968,6 +939,35 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         }
                     }
 
+                    for (var a = 0; a < myArray.length; a++) {
+                        var tempCB = Number(myArray[a].closingBalance);
+                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
+                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
+                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
+                            unallocatedFEFO = 0;
+                        } else {
+                            myArray[a].closingBalance = 0;
+                            myArray[a].calculatedFEFO = Number(tempCB);
+                            unallocatedFEFO -= Number(tempCB);
+                        }
+                        myArray[a].qty = Number(myArray[a].closingBalance);
+                    }
+
+                    for (var a = 0; a < myArray.length; a++) {
+                        var tempCB = Number(myArray[a].closingBalanceWps);
+                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
+                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
+                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
+                            unallocatedFEFOWps = 0;
+                        } else {
+                            myArray[a].closingBalanceWps = 0;
+                            myArray[a].calculatedFEFOWps = Number(tempCB);
+                            unallocatedFEFOWps -= Number(tempCB);
+                        }
+                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
+                    }
 
                     myArray = myArray.filter(c => (
                         (c.openingBalance != 0 && c.openingBalance != undefined) ||
