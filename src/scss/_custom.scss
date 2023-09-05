@@ -12152,6 +12152,13 @@ and (max-width: 1366px)
   width: 100%!important;
 }
 
+@media screen and (min-width: 768px){
+.pickerRangeBox .month-picker > .rmp-container .rmp-popup.range {
+    width: 17rem !important;
+    padding: 0.6rem;
+    margin-left: -38px!important;
+}
+}
 @media (min-width: 768px){
 .SelectdivTree {
     position: absolute;
@@ -12337,6 +12344,13 @@ and (max-width: 1366px)
   height: 309px!important;
 }
 
+@media screen and (min-width: 768px){
+.pickerRangeBox .month-picker > .rmp-container .rmp-popup.range {
+    width: 17rem !important;
+    padding: 0.6rem;
+    margin-left: -38px!important;
+}
+}
 .typing-en::before{
   content: "Start typing to search";
   color: #a9a9a9;
@@ -12359,4 +12373,24 @@ and (max-width: 1366px)
   content: "Comece a digitar para pesquisar";
   color: #a9a9a9;
   font-style: italic;
+}
+
+.compareAndSelect.jtabs .jtabs-headers-container {
+  display: flex!important;
+  align-items: center;
+}
+.compareAndSelect.jtabs .jtabs-headers > div.jtabs-selected {
+  background-color: #e8e8e8;
+  color: #000;
+  display: none!important;
+}
+
+.PeginationBottom .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 6px;
+    left: 0px;
+}
+
+.PeginationBottom .jss_pagination{
+  margin-left: 48px;
 }
