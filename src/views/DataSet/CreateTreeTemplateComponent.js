@@ -12094,18 +12094,23 @@ export default class CreateTreeTemplate extends Component {
                                         var items = this.state.items;
                                         console.log("items---", items);
                                         var flatList = [];
+                                        var curMonth = moment(this.state.forecastStartDate).format('YYYY-MM-DD');
                                         for (var i = 0; i < items.length; i++) {
                                             console.log("i============", i);
                                             var item = items[i];
                                             console.log("item---", item);
                                             var nodeDataModelingList = (item.payload.nodeDataMap[0])[0].nodeDataModelingList;
                                             var nodeDataModelingListUpdated = [];
+                                            var annualTargetCalculator = [];
                                             for (var nml = 0; nml < nodeDataModelingList.length; nml++) {
                                                 if (nodeDataModelingList[nml].dataValue !== "" && nodeDataModelingList[nml].dataValue !== "NaN" && nodeDataModelingList[nml].dataValue !== undefined && nodeDataModelingList[nml].increaseDecrease !== "") {
                                                     if (nodeDataModelingList[nml].transferNodeDataId == "null" || nodeDataModelingList[nml].transferNodeDataId === "") {
                                                         nodeDataModelingList[nml].transferNodeDataId = null;
                                                     }
                                                     nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
+                                                }
+                                                if (nodeDataModelingList[nml].modelingSource == 1) {
+                                                    annualTargetCalculator.push(nodeDataModelingList[nml]);
                                                 }
                                             }
                                             var json = {
@@ -12141,11 +12146,12 @@ export default class CreateTreeTemplate extends Component {
                                                                 nodeDataModelingList: nodeDataModelingListUpdated,
                                                                 nodeDataMomList: (item.payload.nodeDataMap[0])[0].nodeDataMomList,
                                                                 nodeDataOverrideList: (item.payload.nodeDataMap[0])[0].nodeDataOverrideList,
-                                                                annualTargetCalculator: {
-                                                                    firstMonthOfTarget: this.state.firstMonthOfTarget,
-                                                                    yearsOfTarget: this.state.yearsOfTarget,
-                                                                    actualOrTargetValueList: this.state.actualOrTargetValueList
-                                                                }
+                                                                annualTargetCalculator: (annualTargetCalculator.length > 1 ?
+                                                                    {
+                                                                        firstMonthOfTarget: moment(curMonth).startOf('month').add(this.state.firstMonthOfTarget, 'months').format("YYYY-MM"),
+                                                                        yearsOfTarget: this.state.yearsOfTarget,
+                                                                        actualOrTargetValueList: this.state.actualOrTargetValueList
+                                                                    } : null)
                                                             }
                                                         ]
                                                     }
