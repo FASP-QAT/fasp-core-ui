@@ -9,7 +9,14 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import ReportService from '../../api/ReportService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-
+import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
+import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
+import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
+import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 
 import {
     // Badge,
@@ -38,6 +45,7 @@ import {
     FormGroup, Input, InputGroup,
     // InputGroupAddon, 
     Label,
+    Modal, ModalHeader, ModalFooter, ModalBody
     // Form
 } from 'reactstrap';
 // import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -93,6 +101,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
     }
+
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
     updateState(parameterName, value) {
 
         this.setState({
@@ -528,6 +543,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         let primaryConsumptionData = response.data;
                         // var count1 = 1;
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
+                            let rem = 0;
                             for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
                                 // for (let k = 0; k < selectedSupplyPlan.length; k++) {
                                 // for (let l = 0; l < supplyPlanRegionList.length; l++) {
@@ -539,14 +555,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
                                     var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
+                                    rem = rem + Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) % 1;
+                                    let temp_consumptionQty = Math.floor(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)
+                                    if(rem > 1){
+                                        temp_consumptionQty += 1;
+                                        rem -= 1;
+                                    }
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
                                         v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
-                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
+                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)).toFixed(2),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
-                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
+                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number((Number(temp_consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)).toFixed(2),// Multiplication
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
                                         v9: checkConsumptionData.length > 0 ? true : false,// Check
                                         v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
@@ -861,7 +883,34 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
-
+                <div className="Card-header-addicon pb-0">
+                    <div className="card-header-actions" style={{ marginTop: '-25px' }}>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                        <a className="card-header-action">
+                            <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        </a>
+                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                    </div>
+                </div>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-xl ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    listImportIntoQATSupplyPlanEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        listImportIntoQATSupplyPlanFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            listImportIntoQATSupplyPlanSp :
+                                            listImportIntoQATSupplyPlanPr
+                            }} />
+                        </ModalBody>
+                    </div>
+                </Modal>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
                         <FormGroup className="col-md-4">
@@ -961,6 +1010,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
+
+                <p>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
 
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}

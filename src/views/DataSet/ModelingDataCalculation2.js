@@ -751,7 +751,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 // if (parentNodeNodeData.fuNode.usageType.id == 2) {
                                                 if (i >= lag) {
                                                     var percentageOfEndValue = (lag == 0 ? endValue : nodeDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"))[0].endValue);
-                                                    calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
+                                                    calculatedMmdValue = Number((noOfFus * percentageOfEndValue / 100) / fuPerPu);
                                                 } else {
                                                     calculatedMmdValue = 0;
                                                 }

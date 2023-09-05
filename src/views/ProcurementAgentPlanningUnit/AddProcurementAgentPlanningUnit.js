@@ -2128,8 +2128,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-                                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="paputableDiv" >
+                                <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div id="paputableDiv" className='TableWidth100'>
                                     </div>
                                 </div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>

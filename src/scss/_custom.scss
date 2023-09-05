@@ -7748,7 +7748,8 @@ label.arrow_label:before {
   border: none !important;
   background: none;
   padding-top: 1px;
-  margin-left: -2px;
+  // margin-left: -2px;
+  margin-left: 0px;
 }
 
 .TreeIconStyle i {
@@ -10532,4 +10533,55 @@ border-top: 1px solid #c8ced3 !important;
 
 .NotesNnputBoxHeight{
   height: 309px!important;
+}
+
+@media screen and (min-width: 768px){
+.pickerRangeBox .month-picker > .rmp-container .rmp-popup.range {
+    width: 17rem !important;
+    padding: 0.6rem;
+    margin-left: -38px!important;
+}
+}
+.typing-en::before{
+  content: "Start typing to search";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-fr::before{
+  content: "Commencez à taper pour rechercher";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-sp::before{
+  content: "Empieza a escribir para buscar";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.typing-pr::before{
+  content: "Comece a digitar para pesquisar";
+  color: #a9a9a9;
+  font-style: italic;
+}
+
+.compareAndSelect.jtabs .jtabs-headers-container {
+  display: flex!important;
+  align-items: center;
+}
+.compareAndSelect.jtabs .jtabs-headers > div.jtabs-selected {
+  background-color: #e8e8e8;
+  color: #000;
+  display: none!important;
+}
+
+.PeginationBottom .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 6px;
+    left: 0px;
+}
+
+.PeginationBottom .jss_pagination{
+  margin-left: 48px;
 }
