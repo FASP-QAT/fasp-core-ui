@@ -698,13 +698,14 @@ export default class WhatIfReportComponent extends React.Component {
                 //     parseFloat(this.state.generalProgramJson.arrivedToDeliveredLeadTime));
                 var dt1 = new Date();
                 dt1.setMonth(dt.getMonth() + 18);
-                var procurementAgentTBD = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == TBD_PROCUREMENT_AGENT_ID)[0];
-                var fundingSourceTBD = this.state.fundingSourceListForWhatIf.filter(c => c.fundingSourceId == TBD_FUNDING_SOURCE)[0];
+                var procurementAgentTBD = this.state.procurementAgentListForWhatIf.filter(c => c.active && this.state.procurementAgentsUsed.includes(Number(c.procurementAgentId))).filter(c => c.procurementAgentId == TBD_PROCUREMENT_AGENT_ID)[0];
+                var fundingSourceTBD = this.state.fundingSourceListForWhatIf.filter(c => c.active && this.state.fundingSourceUsed.includes(Number(c.fundingSourceId))).filter(c => c.fundingSourceId == TBD_FUNDING_SOURCE)[0];
+
                 var budgetList = this.state.budgetListForWhatIf.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE)
                 this.setState({
                     rangeValue1: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
-                    procurementAgents: [{ label: procurementAgentTBD.procurementAgentCode, value: procurementAgentTBD.procurementAgentId }],
-                    fundingSources: [{ label: fundingSourceTBD.fundingSourceCode, value: fundingSourceTBD.fundingSourceId }],
+                    procurementAgents: procurementAgentTBD!=undefined?[{ label: procurementAgentTBD.procurementAgentCode, value: procurementAgentTBD.procurementAgentId }]:[],
+                    fundingSources: fundingSourceTBD!=undefined?[{ label: fundingSourceTBD.fundingSourceCode, value: fundingSourceTBD.fundingSourceId }]:[],
                     procurementAgentIdSingle: TBD_PROCUREMENT_AGENT_ID,
                     fundingSourceIdSingle: TBD_FUNDING_SOURCE,
                     budgetIdSingle: budgetList.length == 1 ? budgetList[0].budgetId : "",
@@ -1870,9 +1871,9 @@ export default class WhatIfReportComponent extends React.Component {
                     if (actionList == undefined) {
                         actionList = []
                     }
-                    var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => ele.value))];
-                    var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => ele.value))];
-                    var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
+                    var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => Number(ele.value)))];
+                    var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => Number(ele.value)))];
+                    var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(Number(c.procurementAgent.id)) && fundingSourceIds.includes(Number(c.fundingSource.id)));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
@@ -3003,7 +3004,7 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                         this.setState({
                             procurementAgentListForWhatIf: listArrays,
-                            procurementAgentsUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (ele1.procurementAgent.id)))]
+                            procurementAgentsUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (Number(ele1.procurementAgent.id))))]
                         },()=>{
                             var procurementAgentIdSingle=this.state.procurementAgentIdSingle;    
                             var procurementAgentListFilterTBD=this.state.procurementAgentListForWhatIf.filter(c=>c.procurementAgentId==TBD_PROCUREMENT_AGENT_ID);
@@ -3025,7 +3026,7 @@ export default class WhatIfReportComponent extends React.Component {
                             fsResult = fsRequest.result.filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
                             this.setState({
                                 fundingSourceListForWhatIf: fsResult,
-                                fundingSourceUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (ele1.fundingSource.id)))]
+                                fundingSourceUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (Number(ele1.fundingSource.id))))]
                             })
 
                             var cTransaction = db1.transaction(['currency'], 'readwrite');
@@ -4840,7 +4841,7 @@ export default class WhatIfReportComponent extends React.Component {
                 a = a.procurementAgentCode.toLowerCase();
                 b = b.procurementAgentCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
-            }).filter(c => c.active && this.state.procurementAgentsUsed.includes(c.procurementAgentId)).map((item, i) => {
+            }).filter(c => c.active && this.state.procurementAgentsUsed.includes(Number(c.procurementAgentId))).map((item, i) => {
                 return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
 
             }, this);
@@ -4851,7 +4852,7 @@ export default class WhatIfReportComponent extends React.Component {
                 a = a.fundingSourceCode.toLowerCase();
                 b = b.fundingSourceCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
-            }).filter(c => c.active && this.state.fundingSourceUsed.includes(c.fundingSourceId)).map((item, i) => {
+            }).filter(c => c.active && this.state.fundingSourceUsed.includes(Number(c.fundingSourceId))).map((item, i) => {
                 return ({ label: item.fundingSourceCode, value: item.fundingSourceId })
 
             }, this);
