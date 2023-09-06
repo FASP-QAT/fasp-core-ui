@@ -121,7 +121,8 @@ class usageTemplate extends Component {
             lang: localStorage.getItem('lang'),
             tempTracerCategoryId: '',
             tracerCategoryLoading: true,
-            tempForecastingUnitList: []
+            tempForecastingUnitList: [],
+            tcListBasedOnProgram:[]
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -360,8 +361,8 @@ class usageTemplate extends Component {
     }
 
     getTracerCategory() {
-        // TracerCategoryService.getTracerCategoryListAll()
-        DropdownService.getTracerCategoryDropdownList()
+        TracerCategoryService.getTracerCategoryListAll()
+        // DropdownService.getTracerCategoryDropdownList()
             .then(response => {
                 if (response.status == 200) {
                     // console.log("TracerCategory------->123", response.data);
@@ -377,9 +378,9 @@ class usageTemplate extends Component {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
                                 name: getLabelText(listArray[i].label, this.state.lang),
-                                id: parseInt(listArray[i].id)
-                                // active: listArray[i].active,
-                                // healthAreaId: listArray[i].healthArea.id
+                                id: parseInt(listArray[i].tracerCategoryId),
+                                active: listArray[i].active,
+                                healthAreaId: listArray[i].healthArea.id
                             }
                             tempList[i] = paJson
                         }
@@ -1028,7 +1029,7 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '90',
+                    width: '180',
                     textEditor: true,//2 C
                 },
                 {
@@ -2364,21 +2365,14 @@ class usageTemplate extends Component {
     }.bind(this)
 
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
-        var mylist = this.state.tracerCategoryList;
+        var mylist = this.state.tracerCategoryList.filter(c=>c.active);
         var programList = this.state.typeList;
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.dataEl.getJson(null, false)[r])[1];
 
         value = Number(value);
         if (value != -1 && value != 0) {
-            let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
-            let programHealthAreaList = programObj.healthAreaList;
-            let tempMyList = [];
-
-            for (let k = 0; k < programHealthAreaList.length; k++) {
-                tempMyList = tempMyList.concat(mylist.filter(c => c.healthAreaId == programHealthAreaList[k].id));
-            }
-            mylist = tempMyList;
+            return this.state.tcListBasedOnProgram.filter(c=>c.active)
         }
         // console.log("check---------------->3", mylist);
         return mylist;
@@ -2674,6 +2668,7 @@ class usageTemplate extends Component {
         this.el.insertRow(
             data, 0, 1
         );
+        this.el.getCell("E1").classList.add('typing-'+this.state.lang);
     };
 
     formSubmit = function () {
@@ -3596,6 +3591,7 @@ class usageTemplate extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    this.el.getCell(("E").concat(parseInt(y) + 1)).classList.remove('typing-'+this.state.lang);
                 }
             }
         }
@@ -3625,6 +3621,46 @@ class usageTemplate extends Component {
                     this.el.setComments(col, "");
                 }
             }
+
+            let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
+            if(value!=-1){
+        TracerCategoryService.getTracerCategoryByProgramIds(realmId, [value])
+          .then(response => {
+            // console.log("tc respons==>", response.data);
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var tcList=[];
+            listArray.map(item=>{
+                tcList.push({
+                    name: getLabelText(item.label, this.state.lang),
+                    id: parseInt(item.tracerCategoryId),
+                    active: item.active,
+                    healthAreaId: item.healthArea.id
+                })
+            })
+            this.setState({
+              tcListBasedOnProgram: tcList
+            }, () => {
+            });
+          }).catch(
+            error => {
+              this.setState({
+                tcListBasedOnProgram: []
+              }, () => {
+              });
+              
+            }
+          );
+        }else{
+            this.setState({
+                tcListBasedOnProgram: []
+              }, () => {
+              });
+        }
         }
 
         //Usage Name
@@ -5120,7 +5156,7 @@ class usageTemplate extends Component {
                             {/* <h5>{i18n.t("static.placeholder.usageTemplate")}</h5> */}
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
-                            <div className="UsageTemplateTable leftAlignTable1">
+                            <div className="UsageTemplateTable leftAlignTable1 UsageTemplateTableFilter">
                                 <div id="paputableDiv" className="consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>

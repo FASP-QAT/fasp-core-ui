@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL, } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -180,7 +180,7 @@ const validationSchemaNodeData = function (values) {
             .test('nodeValue', 'Please enter a valid number having less than or equal to 10 digits.',
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
@@ -514,7 +514,7 @@ function addCommas(cell1, row) {
         cell1 += '';
         var x = cell1.replaceAll(",", "").split('.');
         var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -594,6 +594,7 @@ function addCommasThreeDecimal(cell1, row) {
         return "";
     }
 }
+const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 
 export default class CreateTreeTemplate extends Component {
     constructor(props) {
@@ -871,6 +872,11 @@ export default class CreateTreeTemplate extends Component {
             collapseState: false,
             isCalculateClicked: false,
             isCalculateClicked: 0,
+            allProcurementAgentList: [],
+            planningUnitObjList: [],
+            startDateDisplay: '',
+            endDateDisplay: '',
+            beforeEndDateDisplay: ''
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -977,6 +983,14 @@ export default class CreateTreeTemplate extends Component {
         this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
+        this.cancelNodeDataClicked = this.cancelNodeDataClicked.bind(this);
+        this.createTree = this.createTree.bind(this)
+        this.modelOpenCloseForCreateTree = this.modelOpenCloseForCreateTree.bind(this);
+        this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this);
+        this.saveMissingPUs = this.saveMissingPUs.bind(this);
+        this.procurementAgentList = this.procurementAgentList.bind(this);
+        this.checkValidationForMissingPUList = this.checkValidationForMissingPUList.bind(this);
+        this.changedMissingPUForCreateTree = this.changedMissingPUForCreateTree.bind(this);
         this.buildModelingCalculatorJexcel = this.buildModelingCalculatorJexcel.bind(this);
         this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
@@ -1097,19 +1111,73 @@ export default class CreateTreeTemplate extends Component {
         var missingPUListForCreateTree = [];
         var json;
         var treeTemplateForCreateTree = this.state.treeTemplateForCreateTree;
+        let forecastStartDate;
+        let forecastStopDate;
+        let beforeEndDateDisplay;
         if (this.state.datasetIdModalForCreateTree != "" && this.state.datasetIdModalForCreateTree != null) {
             var dataset = this.state.datasetListJexcelForCreateTree;
+            console.log("dataset----", dataset)
+            forecastStartDate = dataset.currentVersion.forecastStartDate;
+            forecastStopDate = dataset.currentVersion.forecastStopDate;
+            beforeEndDateDisplay = new Date(forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+            console.log("dataset----forecastStartDate----", forecastStartDate)
+            console.log("dataset----forecastStopDate----", forecastStopDate)
+            console.log("dataset----beforeEndDateDisplay----", beforeEndDateDisplay)
+
             var puNodeList = treeTemplateForCreateTree.flatList.filter(x => x.payload.nodeType.id == 5);
-            var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            var planningUnitList = dataset.planningUnitList;
             for (let i = 0; i < puNodeList.length; i++) {
-                if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                if (planningUnitList.filter(x => x.treeForecast == true && x.active == true && x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
                     var parentNodeData = treeTemplateForCreateTree.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                     var productCategory = parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
-                    json = {
-                        productCategory: productCategory != undefined ? productCategory : { id: "", label: { label_en: "" } },
-                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
-                    };
-                    missingPUListForCreateTree.push(json);
+                    let existingPU = planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                    console.log("existingPU", existingPU)
+                    if (existingPU.length > 0) {
+                        json = {
+                            productCategory: productCategory != undefined ? productCategory : { id: "", label: { label_en: "" } },
+                            planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                            consuptionForecast: existingPU[0].consuptionForecast,
+                            treeForecast: true,
+                            stock: existingPU[0].stock,
+                            existingShipments: existingPU[0].existingShipments,
+                            monthsOfStock: existingPU[0].monthsOfStock,
+                            procurementAgent: existingPU[0].procurementAgent,
+                            price: existingPU[0].price,
+                            higherThenConsumptionThreshold: existingPU[0].higherThenConsumptionThreshold,
+                            lowerThenConsumptionThreshold: existingPU[0].lowerThenConsumptionThreshold,
+                            planningUnitNotes: existingPU[0].planningUnitNotes,
+                            consumptionDataType: existingPU[0].consumptionDataType,
+                            otherUnit: existingPU[0].otherUnit,
+                            selectedForecastMap: existingPU[0].selectedForecastMap,
+                            programPlanningUnitId: existingPU[0].programPlanningUnitId,
+                            createdBy: existingPU[0].createdBy,
+                            createdDate: existingPU[0].createdDate
+                        }
+                        missingPUListForCreateTree.push(json);
+                    } else {
+                        json = {
+                            productCategory: productCategory != undefined ? productCategory : { id: "", label: { label_en: "" } },
+                            planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                            consuptionForecast: "",
+                            treeForecast: true,
+                            stock: "",
+                            existingShipments: "",
+                            monthsOfStock: "",
+                            procurementAgent: "",
+                            price: "",
+                            higherThenConsumptionThreshold: "",
+                            lowerThenConsumptionThreshold: "",
+                            planningUnitNotes: "",
+                            consumptionDataType: "",
+                            otherUnit: "",
+                            selectedForecastMap: {},
+                            programPlanningUnitId: 0,
+                            createdBy: null,
+                            createdDate: null
+                        };
+                        missingPUListForCreateTree.push(json);
+                    }
                 }
             }
         }
@@ -1117,13 +1185,17 @@ export default class CreateTreeTemplate extends Component {
             missingPUListForCreateTree = missingPUListForCreateTree.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
         }
         this.setState({
-            missingPUListForCreateTree
+            missingPUListForCreateTree: missingPUListForCreateTree,
+            beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+            startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+            endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
         }, () => {
             this.buildMissingPUJexcelForCreateTree();
         });
     }
 
     buildMissingPUJexcelForCreateTree() {
+        this.getPlanningUnitWithPricesByIds();
         var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
         var dataArray = [];
         let count = 0;
@@ -1134,6 +1206,23 @@ export default class CreateTreeTemplate extends Component {
                 // data[1] = missingPUList[j].startValue
                 data[0] = getLabelText(missingPUListForCreateTree[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUListForCreateTree[j].planningUnit.label, this.state.lang) + " | " + missingPUListForCreateTree[j].planningUnit.id
+                data[2] = missingPUListForCreateTree[j].consuptionForecast;
+                data[3] = missingPUListForCreateTree[j].treeForecast;
+                data[4] = missingPUListForCreateTree[j].stock;
+                data[5] = missingPUListForCreateTree[j].existingShipments;
+                data[6] = missingPUListForCreateTree[j].monthsOfStock;
+                data[7] = (missingPUListForCreateTree[j].price === "" || missingPUListForCreateTree[j].price == null || missingPUListForCreateTree[j].price == undefined) ? "" : (missingPUListForCreateTree[j].procurementAgent == null || missingPUListForCreateTree[j].procurementAgent == undefined ? -1 : missingPUListForCreateTree[j].procurementAgent.id);
+                data[8] = missingPUListForCreateTree[j].price;
+                data[9] = missingPUListForCreateTree[j].planningUnitNotes;
+                data[10] = missingPUListForCreateTree[j].planningUnit.id;
+                data[11] = missingPUListForCreateTree[j].programPlanningUnitId;
+                data[12] = missingPUListForCreateTree[j].higherThenConsumptionThreshold;
+                data[13] = missingPUListForCreateTree[j].lowerThenConsumptionThreshold;
+                data[14] = missingPUListForCreateTree[j].selectedForecastMap;
+                data[15] = missingPUListForCreateTree[j].otherUnit;
+                data[16] = missingPUListForCreateTree[j].createdBy;
+                data[17] = missingPUListForCreateTree[j].createdDate;
+                data[18] = true;
                 dataArray[count] = data;
                 count++;
             }
@@ -1151,19 +1240,140 @@ export default class CreateTreeTemplate extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    // 0
+                    // 0A
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
-                    // readOnly: true
+                    editable: false,
+                    readOnly: true
                 },
                 {
-                    // 1
+                    // 1B
                     title: i18n.t('static.product.product'),
                     type: 'text',
-                    // readOnly: true
-
+                    editable: false,
+                    readOnly: true
+                },
+                {
+                    //2C
+                    title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //3D
+                    title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //4E
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //5F
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //6G
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    disabledMaskOnEdition: true,
+                    width: '150',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //7H
+                    title: i18n.t('static.forecastReport.priceType'),
+                    type: 'autocomplete',
+                    source: this.state.allProcurementAgentList,
+                    width: '120',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //8I
+                    title: i18n.t('static.forecastReport.unitPrice'),
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##.00',
+                    width: '120',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //9J
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    title: 'planningUnitId',
+                    type: 'hidden',
+                    readOnly: true //10K
+                },
+                {
+                    title: 'programPlanningUnitId',
+                    type: 'hidden',
+                    readOnly: true //11L
+                },
+                {
+                    title: 'higherThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //12M
+                },
+                {
+                    title: 'lowerThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //13N
+                },
+                {
+                    title: 'selectedForecastMap',
+                    type: 'hidden',
+                    readOnly: true //14O
+                },
+                {
+                    title: 'otherUnit',
+                    type: 'hidden',
+                    readOnly: true //15P
+                },
+                {
+                    title: 'createdBy',
+                    type: 'hidden',
+                    readOnly: true //16P
+                },
+                {
+                    title: 'createdDate',
+                    type: 'hidden',
+                    readOnly: true //17P
+                },
+                {
+                    title: i18n.t("static.common.select"),
+                    type: 'checkbox'
                 }
-
             ],
             // text: {
             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -1171,8 +1381,9 @@ export default class CreateTreeTemplate extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: false,
+            // editable: false,
             onload: this.loadedMissingPUForCreateTree,
+            onchange: this.changedMissingPUForCreateTree,
             pagination: localStorage.getItem("sesRecordCount"),
             search: false,
             columnSorting: true,
@@ -1202,6 +1413,757 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMissingPUForCreateTree = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
+        console.log("pp instance", instance)
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        console.log("pp asterisk", asterisk)
+
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
+
+        tr.children[5].title = i18n.t('static.tooltip.Stock');
+        tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
+        tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
+        tr.children[8].title = i18n.t('static.tooltip.PriceType');
+
+    }
+
+    changedMissingPUForCreateTree = function (instance, cell, x, y, value) {
+        if (x == 18) {
+            console.log("Value Test@123", value)
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+            if (value.toString() == "false") {
+                console.log("In changed Test@123")
+                this.el.setValueFromCoords(2, y, this.state.missingPUListForCreateTree[y].consuptionForecast, true);
+                this.el.setValueFromCoords(3, y, this.state.missingPUListForCreateTree[y].treeForecast, true);
+                this.el.setValueFromCoords(4, y, this.state.missingPUListForCreateTree[y].stock, true);
+                this.el.setValueFromCoords(5, y, this.state.missingPUListForCreateTree[y].existingShipments, true);
+                this.el.setValueFromCoords(6, y, this.state.missingPUListForCreateTree[y].monthsOfStock, true);
+                this.el.setValueFromCoords(7, y, (this.state.missingPUListForCreateTree[y].price === "" || this.state.missingPUListForCreateTree[y].price == null || this.state.missingPUListForCreateTree[y].price == undefined) ? "" : (this.state.missingPUListForCreateTree[y].procurementAgent == null || this.state.missingPUListForCreateTree[y].procurementAgent == undefined ? -1 : this.state.missingPUListForCreateTree[y].procurementAgent.id), true);
+                this.el.setValueFromCoords(8, y, this.state.missingPUListForCreateTree[y].price, true);
+                this.el.setValueFromCoords(9, y, this.state.missingPUListForCreateTree[y].planningUnitNotes, true);
+                this.el.setValueFromCoords(10, y, this.state.missingPUListForCreateTree[y].planningUnit.id, true);
+                this.el.setValueFromCoords(11, y, this.state.missingPUListForCreateTree[y].programPlanningUnitId, true);
+                this.el.setValueFromCoords(12, y, this.state.missingPUListForCreateTree[y].higherThenConsumptionThreshold, true);
+                this.el.setValueFromCoords(13, y, this.state.missingPUListForCreateTree[y].lowerThenConsumptionThreshold, true);
+                this.el.setValueFromCoords(14, y, this.state.missingPUListForCreateTree[y].selectedForecastMap, true);
+                this.el.setValueFromCoords(15, y, this.state.missingPUListForCreateTree[y].otherUnit, true);
+                this.el.setValueFromCoords(16, y, this.state.missingPUListForCreateTree[y].createdBy, true);
+                this.el.setValueFromCoords(17, y, this.state.missingPUListForCreateTree[y].createdDate, true);
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
+        if (x == 7) {
+            if (value != -1 && value !== null && value !== '') {
+                console.log("Value--------------->IF");
+                let planningUnitId = this.el.getValueFromCoords(10, y);
+
+                let planningUnitObjList = this.state.planningUnitObjList;
+                let tempPaList = planningUnitObjList.filter(c => c.planningUnitId == planningUnitId)[0];
+
+                console.log("mylist--------->1112", planningUnitId);
+
+                if (tempPaList != undefined) {
+                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
+                    console.log("mylist--------->1113", obj);
+                    if (typeof obj != 'undefined') {
+                        this.el.setValueFromCoords(8, y, obj.price, true);
+                    } else {
+                        let q = '';
+                        this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : this.el.setValueFromCoords(8, y, '', true)
+                    }
+                }
+
+            } else {
+                console.log("Value--------------->ELSE");
+                this.el.setValueFromCoords(8, y, '', true);
+                // let q = '';
+                // q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+            }
+
+        }
+
+        if (x == 0) {
+            let q = '';
+            q = (this.el.getValueFromCoords(1, y) != '' ? this.el.setValueFromCoords(1, y, '', true) : '');
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(1, y, '', true);
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+        if (x == 1) {
+            let q = '';
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+
+        //productCategory
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //planning unit
+        if (x == 1) {
+            var json = this.el.getJson(null, false);
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                // console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    // console.log("i=---------->", i, "y----------->", y);
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    // console.log("Planning Unit value in change", map.get("1"));
+                    // console.log("Value----->", value);
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                        i = -1;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                    }
+                }
+            }
+        }
+
+        //stock
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // console.log("Stock------------------->1", value);
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            // console.log("Stock------------------->2", value);
+
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
+            }
+
+        }
+
+        //existing shipments
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //desired months of stock
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "") > 0 && this.el.getValue(`H${parseInt(y) + 1}`, true) == "") {
+            this.el.setValueFromCoords(7, y, -1, true);
+        }
+
+
+        //unit price
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            // this.el.setValueFromCoords(10, y, 1, true);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(8, y);
+            }
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'))
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        this.setState({
+            isChanged1: true,
+        });
+
+        // if (x == 11) {
+        //     this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+        //     this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
+        //     if (value == 1 || value == "") {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //     } else {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //     }
+        // }
+    }
+    getPlanningUnitWithPricesByIds() {
+        console.log("semma----", this.state.missingPUListForCreateTree.map(ele => (ele.planningUnit.id).toString()));
+        PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUListForCreateTree.map(ele => (ele.planningUnit.id).toString()))
+            .then(response => {
+                console.log("Output---", response.data)
+                var listArray = response.data;
+                this.setState({
+                    planningUnitObjList: response.data
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            // case 401:
+                            //     this.props.history.push(`/login/static.message.sessionExpired`)
+                            //     break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    procurementAgentList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+            var procurementAgentRequest = procurementAgentOs.getAll();
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
+                // Handle errors!
+                this.setState({
+                    message: 'unknown error occured', loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            };
+            procurementAgentRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = procurementAgentRequest.result;
+                var listArray = myResult;
+                listArray.sort((a, b) => {
+                    var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                let tempList = [];
+
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: listArray[i].procurementAgentCode,
+                            id: parseInt(listArray[i].procurementAgentId),
+                            active: listArray[i].active,
+                            code: listArray[i].procurementAgentCode,
+                            label: listArray[i].label
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                tempList.unshift({
+                    name: 'CUSTOM',
+                    id: -1,
+                    active: true,
+                    code: 'CUSTOM',
+                    label: {}
+                });
+                this.setState({
+                    allProcurementAgentList: tempList,
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    checkValidationForMissingPUList() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        console.log("json.length-------", json);
+        for (var y = 0; y < json.length; y++) {
+            //tracer category
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //planning unit
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getRowData(parseInt(y))[1];
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y && map.get("16").toString() == "true" && json[y][16].toString() == "true") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            console.log("value------------->E", value);
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var value = this.el.getValueFromCoords(6, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+    saveMissingPUs() {
+        var validation = this.checkValidationForMissingPUList();
+        console.log("validation", validation)
+        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+        var curUser = AuthenticationService.getLoggedInUserId();
+        let indexVar = 0;
+        if (validation == true) {
+            var tableJson = this.el.getJson(null, false);
+            var planningUnitList = [];
+            var programs = [];
+            var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
+            var updatedMissingPUList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                if (tableJson[i][18].toString() == "true") {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    let procurementAgentObj = "";
+                    if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "") {
+                        procurementAgentObj = null
+                    } else {
+                        procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                    }
+                    var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUListForCreateTree[i].planningUnit.id)[0]
+                    let tempJson = {
+                        "programPlanningUnitId": map1.get("11"),
+                        "planningUnit": {
+                            "id": planningUnitObj.planningUnitId,
+                            "label": planningUnitObj.label,
+                            "unit": planningUnitObj.unit,
+                            "multiplier": planningUnitObj.multiplier,
+                            "forecastingUnit": {
+                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "label": planningUnitObj.forecastingUnit.label,
+                                "unit": planningUnitObj.forecastingUnit.unit,
+                                "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                            },
+                            "idString": "" + planningUnitObj.planningUnitId
+                        },
+                        "consuptionForecast": map1.get("2"),
+                        "treeForecast": map1.get("3"),
+                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "procurementAgent": (procurementAgentObj == null ? null : {
+                            "id": parseInt(map1.get("7")),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(map1.get("7"))
+                        }),
+                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "higherThenConsumptionThreshold": map1.get("12"),
+                        "lowerThenConsumptionThreshold": map1.get("13"),
+                        "planningUnitNotes": map1.get("9"),
+                        "consumptionDataType": 2,
+                        "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
+                        "selectedForecastMap": map1.get("14"),
+                        "createdBy":
+                        {
+                            "userId": map1.get("16") == "" ? curUser : map1.get("16"),
+                        },
+                        "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
+                        "active": true
+                    }
+                    planningUnitList.push(tempJson);
+                } else {
+                    updatedMissingPUList.push(missingPUListForCreateTree[i])
+                }
+            }
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var program = transaction.objectStore('datasetData');
+                var getRequest = program.getAll();
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                    console.log("this.state.datasetIdModal------", this.state.datasetIdModal);
+                    var programId = this.state.datasetIdModalForCreateTree.split("_")[0];
+                    var versionId = (this.state.datasetIdModalForCreateTree.split("_")[1]).split("v")[1];
+                    console.log("this.state.datasetIdModal------programId", programId);
+                    console.log("this.state.datasetIdModal------versionId", versionId.split("v"));
+
+                    var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
+                    console.log("this.state.datasetIdModal------program------", program);
+                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    console.log("this.state.datasetIdModal------programData------", programData);
+                    var planningFullList = programData.planningUnitList;
+                    console.log("this.state.datasetIdModal------1Aug planningUnitList------", planningUnitList);
+                    console.log("this.state.datasetIdModal------1Aug programData------Before", programData.planningUnitList);
+
+                    planningUnitList.forEach(p => {
+                        indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
+
+                        console.log("this.state.datasetIdModal------1Aug indexVar------", indexVar);
+                        if (indexVar != -1) {
+                            planningFullList[indexVar] = p;
+                        } else {
+                            planningFullList = planningFullList.concat(p);
+                        }
+                        console.log("this.state.datasetIdModal------1Aug planningFullList------1", planningFullList);
+                    })
+                    console.log("this.state.datasetIdModal------1Aug planningFullList------", planningFullList);
+
+                    programData.planningUnitList = planningFullList;
+                    console.log("this.state.datasetIdModal------1Aug programData------after", programData.planningUnitList);
+                    let downloadedProgramData = programData;
+                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    program.programData = programData;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('datasetData');
+                    // programs.forEach(program => {
+                    programTransaction.put(program);
+                    // })
+
+                    transaction.oncomplete = function (event) {
+                        db1 = e.target.result;
+                        var id = this.state.datasetIdModalForCreateTree;
+
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+
+                            datasetDetailsRequest1.onsuccess = function (event) {
+                                this.setState({
+                                    // message: i18n.t('static.mt.dataUpdateSuccess'),
+                                    color: "green",
+                                    missingPUListForCreateTree: updatedMissingPUList,
+                                    datasetListJexcelForCreateTree: downloadedProgramData
+                                }, () => {
+                                    if (this.state.missingPUList.length > 0) {
+                                        this.buildMissingPUJexcelForCreateTree();
+                                    }
+                                });
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this);
+                    transaction.onerror = function (event) {
+                    }.bind(this);
+                }.bind(this);
+            }.bind(this);
+        }
     }
 
     handleRegionChangeForCreateTree = (regionIds) => {
@@ -1348,6 +2310,7 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             levelModal: false,
             treeTemplate,
+            isTemplateChanged: true
         }, () => {
             // this.saveTreeData(false)
             // console.log("final tab list---", this.state.items);
@@ -2094,6 +3057,14 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     tree.flatList = items;
+                    tree.lastModifiedBy = {
+                        userId: AuthenticationService.getLoggedInUserId()
+                    };
+                    tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    tree.createdBy = {
+                        userId: AuthenticationService.getLoggedInUserId()
+                    };
+                    tree.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     console.log("TempTreeId Test@123", this.state.tempTreeId)
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                     console.log("Tree Test@123", tree)
@@ -2312,7 +3283,7 @@ export default class CreateTreeTemplate extends Component {
                 if (modelingTypeId == 3) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3") != "" ? (c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3").split('_')[0] : (c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == startDate)
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == startDate)
@@ -2325,7 +3296,7 @@ export default class CreateTreeTemplate extends Component {
                 if (modelingTypeId == 4) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3") != "" ? (c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3").split('_')[0] : (c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == scalingDate)
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == scalingDate)
@@ -2442,7 +3413,7 @@ export default class CreateTreeTemplate extends Component {
                                 obj.increaseDecrease = map1.get("5");
                                 obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
                                 obj.nodeDataModelingId = map1.get("10")
-                                obj.modelingSource = map1.get("14")
+                                obj.modelingSource = map1.get("14") == "" ? 0 : map1.get("14")
                                 // data[itemIndex] = obj;
                             } else {
                                 console.log("maxModelingId---", maxModelingId);
@@ -2457,7 +3428,7 @@ export default class CreateTreeTemplate extends Component {
                                     stopDateNo: stopDate,
                                     dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
                                     nodeDataModelingId: parseInt(maxModelingId) + 1,
-                                    modelingSource: map1.get("14")
+                                    modelingSource: map1.get("14") == "" ? 0 : map1.get("14")
                                 }
                                 maxModelingId++;
                                 console.log("obj to push---", obj);
@@ -3640,18 +4611,18 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
-            data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = parseFloat(momList[j].manualChange).toFixed(4)
-            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),2)`
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             var momListParentForMonth = momListParent.filter(c => c.month == momList[j].month);
-            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(4) : 0;
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},4)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},4)`;
+            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
-            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
+            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`
             data[10] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
             // data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
@@ -3691,7 +4662,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=(O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -3728,14 +4699,14 @@ export default class CreateTreeTemplate extends Component {
                     // title: 'A',
                     // type: 'text',
                     // visible: false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: i18n.t('static.tree.calculatedChange'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -3743,20 +4714,20 @@ export default class CreateTreeTemplate extends Component {
                     type: 'numeric',
                     disabledMaskOnEdition: true,
                     textEditor: true,
-                    mask: '#,##0.0000%', decimal: '.',
+                    mask: '#,##0.00%', decimal: '.',
                     readOnly: this.state.editable ? false : true,
 
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                     type: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? 'hidden' : 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                     type: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? 'hidden' : 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
@@ -3764,7 +4735,7 @@ export default class CreateTreeTemplate extends Component {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'hidden' : 'numeric',
                     // visible: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? false : true,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -3779,7 +4750,7 @@ export default class CreateTreeTemplate extends Component {
                     title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
                     // visible: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? true : false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -3897,12 +4868,12 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}),4)`
-            data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),4)`;
-            data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(4)
-            data[5] = parseFloat(momList[j].manualChange).toFixed(4)
-            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},4)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}),2)`
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
+            data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
+            data[5] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             data[8] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
             dataArray[count] = data;
@@ -3943,7 +4914,7 @@ export default class CreateTreeTemplate extends Component {
                     // title: 'A',
                     // type: 'text',
                     // visible: false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
 
                 },
@@ -3951,14 +4922,14 @@ export default class CreateTreeTemplate extends Component {
                     // 2
                     title: i18n.t('static.tree.calculatedChange+-'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     // 3
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -3968,20 +4939,20 @@ export default class CreateTreeTemplate extends Component {
                     // visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
                     textEditor: true,
-                    mask: '#,##0.0000%', decimal: '.',
+                    mask: '#,##0.00%', decimal: '.',
                 },
                 {
                     // 5
                     title: i18n.t('static.tree.manualChange+-'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     // visible: this.state.seasonality == true ? true : false,
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
 
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
-                    mask: '#,##0.0000', decimal: '.',
+                    mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -4560,7 +5531,7 @@ export default class CreateTreeTemplate extends Component {
                         yearsOfTarget: "",
                         actualOrTargetValueList: []
                     }, () => {
-                        console.log("x row data===>", rowData[1], "==", rowData[2]);
+                        console.log("x row data===>", rowData[13].yearsOfTarget, "==", rowData[13].actualOrTargetValueList, "==", rowData[13].firstMonthOfTarget, "==", rowData[14]);
                         var startValue = this.getMomValueForDateRange(rowData[1]);
                         this.setState({
                             currentRowIndex: x,
@@ -6497,6 +7468,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
+        this.procurementAgentList();
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             var listArray = response.data.filter(x => x.forecastMethodTypeId == 1);
             listArray.sort((a, b) => {
@@ -7391,6 +8363,11 @@ export default class CreateTreeTemplate extends Component {
         }
         else if (nodeTypeId == 4) {
             // Forecasting unit node
+            if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
+                if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != null && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != "" && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode != undefined && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != null && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != "" && currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit != undefined && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != "" && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != null && (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != undefined) {
+                    currentItemConfig.context.payload.label.label_en = getLabelText((currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label, this.state.lang).trim();
+                }
+            }
             if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == undefined) {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode = {
                     oneTimeUsage: "false",
@@ -9418,7 +10395,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Input type="text"
                                                         id="parentValue"
                                                         name="parentValue"
-                                                        readOnly={!this.state.editable}
+                                                        // readOnly={!this.state.editable}
                                                         bsSize="sm"
                                                         readOnly={true}
                                                         onChange={(e) => { this.dataChange(e) }}
@@ -12148,7 +13125,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 nodeDataOverrideList: (item.payload.nodeDataMap[0])[0].nodeDataOverrideList,
                                                                 annualTargetCalculator: (annualTargetCalculator.length > 1 ?
                                                                     {
-                                                                        firstMonthOfTarget: moment(curMonth).startOf('month').add(this.state.firstMonthOfTarget, 'months').format("YYYY-MM"),
+                                                                        firstMonthOfTarget: this.state.firstMonthOfTarget,
                                                                         yearsOfTarget: this.state.yearsOfTarget,
                                                                         actualOrTargetValueList: this.state.actualOrTargetValueList
                                                                     } : null)
@@ -12954,7 +13931,9 @@ export default class CreateTreeTemplate extends Component {
                         )} />
             </Modal>
             <Modal isOpen={this.state.isModalForCreateTree}
-                className={'modal-lg ' + this.props.className}>
+                // className={'modal-lg ' + this.props.className}>
+                className={'modal-dialog modal-lg modalWidth'}>
+
                 <ModalHeader>
                     <strong>{i18n.t('static.listTree.treeDetails')}</strong>
                     <Button size="md" onClick={this.modelOpenCloseForCreateTree} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -13162,14 +14141,18 @@ export default class CreateTreeTemplate extends Component {
                                             </div>
 
                                             <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
-                                                    <div id="missingPUJexcelForCreateTree" className="RowClickable">
+                                                <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits') + " "} : <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                    <div id="missingPUJexcelForCreateTree" className="RowClickable TableWidth100">
                                                     </div>
                                                 </div>
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                {this.state.missingPUListForCreateTree.length == 0 && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+
                                                 &nbsp;
 
                                             </FormGroup>
@@ -13191,6 +14174,6 @@ export default class CreateTreeTemplate extends Component {
                     <br />
                 </ModalBody>
             </Modal>
-        </div>
+        </div >
     }
 }

@@ -30,7 +30,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { isSiteOnline, decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import cleanUp from '../../assets/img/cleanUp.png';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
@@ -1363,6 +1363,7 @@ class LoadDeleteDataSet extends Component {
                             DatasetService.getAllDatasetData(checkboxesChecked)
                                 .then(response => {
                                     // console.log("response>>>", response.data);
+                                    response.data = decompressJson(response.data);
                                     var json = response.data;
                                     var deleteDatasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                                     var deleteDatasetOs = deleteDatasetTransaction.objectStore('datasetData');

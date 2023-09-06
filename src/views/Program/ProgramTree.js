@@ -27,7 +27,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { isSiteOnline, compressJson, decompressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import cleanUp from '../../assets/img/cleanUp.png';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
@@ -1072,6 +1072,7 @@ class Program extends Component {
                     .then(response => {
                         // console.log("ProgramThenCount", programThenCount)
                         // console.log("Response data", response.data)
+                        response.data = decompressJson(response.data);
                         var json = response.data;
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {

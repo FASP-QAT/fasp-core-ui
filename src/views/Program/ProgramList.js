@@ -754,7 +754,7 @@ export default class ProgramList extends Component {
     DropdownService.getUpdateProgramInfoDetailsBasedRealmCountryId(
       PROGRAM_TYPE_SUPPLY_PLAN,
       -1,
-      1
+      -1
     )
       .then((response) => {
         if (response.status == 200) {

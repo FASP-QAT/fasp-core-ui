@@ -696,21 +696,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             myArray[a].closingBalanceWps = 0;
                                         }
                                     }
-                                    for (var a = 0; a < myArray.length; a++) {
-                                        var tempCB = Number(myArray[a].closingBalance);
-                                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
-                                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
-                                            unallocatedFEFO = 0;
-                                        } else {
-                                            myArray[a].closingBalance = 0;
-                                            myArray[a].calculatedFEFO = Number(tempCB);
-                                            unallocatedFEFO -= Number(tempCB);
-                                        }
-                                        myArray[a].qty = Number(myArray[a].closingBalance);
-                                    }
-
                                     if (Number(unallocatedLEFO) != 0) {
                                         for (var a = (myArray.length) - 1; a >= 0; a--) {
                                             if (Number(unallocatedLEFO) != 0) {
@@ -729,22 +714,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-
-                                    for (var a = 0; a < myArray.length; a++) {
-                                        var tempCB = Number(myArray[a].closingBalanceWps);
-                                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
-                                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
-                                            unallocatedFEFOWps = 0;
-                                        } else {
-                                            myArray[a].closingBalanceWps = 0;
-                                            myArray[a].calculatedFEFOWps = Number(tempCB);
-                                            unallocatedFEFOWps -= Number(tempCB);
-                                        }
-                                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
-                                    }
-
                                     if (Number(unallocatedLEFOWps) != 0) {
                                         for (var a = (myArray.length) - 1; a >= 0; a--) {
                                             if (Number(unallocatedLEFOWps) != 0) {
@@ -835,6 +804,36 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                             myArray.push(json);
                                         }
+                                    }
+
+                                    for (var a = 0; a < myArray.length; a++) {
+                                        var tempCB = Number(myArray[a].closingBalance);
+                                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
+                                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
+                                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
+                                            unallocatedFEFO = 0;
+                                        } else {
+                                            myArray[a].closingBalance = 0;
+                                            myArray[a].calculatedFEFO = Number(tempCB);
+                                            unallocatedFEFO -= Number(tempCB);
+                                        }
+                                        myArray[a].qty = Number(myArray[a].closingBalance);
+                                    }
+
+                                    for (var a = 0; a < myArray.length; a++) {
+                                        var tempCB = Number(myArray[a].closingBalanceWps);
+                                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
+                                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
+                                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
+                                            unallocatedFEFOWps = 0;
+                                        } else {
+                                            myArray[a].closingBalanceWps = 0;
+                                            myArray[a].calculatedFEFOWps = Number(tempCB);
+                                            unallocatedFEFOWps -= Number(tempCB);
+                                        }
+                                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
                                     }
 
 
@@ -980,7 +979,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (totalMonths == 0) {
                                         amc = null;
                                     } else {
-                                        amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                        amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                                     }
 
 
@@ -1013,12 +1012,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var maxStock = 0;
                                     if (programPlanningUnitList[ppL].planBasedOn == 2) {
                                         minStock = programPlanningUnitList[ppL].minQty;
-                                        maxStock = Math.round(Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)));
-                                        minStockMoSQty = Number(programPlanningUnitList[ppL].minQty) / Number(amc);
-                                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths));
+                                        maxStock = Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)).toFixed(8);
+                                        minStockMoSQty = Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)).toFixed(8);
+                                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths)).toFixed(8);
                                     } else {
-                                        minStock = Number(amc) * Number(minStockMoSQty);
-                                        maxStock = Number(amc) * Number(maxStockMoSQty);
+                                        minStock = Number(Number(amc) * Number(minStockMoSQty)).toFixed(8);
+                                        maxStock = Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8);
                                     }
 
                                     // Calculations of Closing balance
@@ -1043,8 +1042,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
                                     }
 
-
-                                    // Calculations of unmet demand
                                     var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
                                     // console.log("diffBetweenTrueDemandAndConsumption###", diffBetweenTrueDemandAndConsumption, "STart Month", startDate)
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
@@ -1063,7 +1060,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     var mos = "";
                                     if (closingBalance != 0 && amc != 0 && amc != null) {
-                                        mos = Number(closingBalance / amc).toFixed(4);
+                                        mos = Number(closingBalance / amc).toFixed(8);
                                     } else if (amc == 0 || amc == null) {
                                         mos = null;
                                     } else {
@@ -1072,7 +1069,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     var mosWps = "";
                                     if (closingBalanceWps != 0 && amc != 0 && amc != null) {
-                                        mosWps = Number(closingBalanceWps / amc).toFixed(4);
+                                        mosWps = Number(closingBalanceWps / amc).toFixed(8);
                                     } else if (amc == 0 || amc == null) {
                                         mosWps = null;
                                     } else {
