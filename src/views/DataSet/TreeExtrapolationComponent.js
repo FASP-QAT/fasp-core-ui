@@ -2912,7 +2912,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             // pointRadius: 1,
             pointHitRadius: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals > 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
+            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals >= 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
         })
 
         let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
