@@ -858,13 +858,6 @@ export default class CreateTreeTemplate extends Component {
                     label_en: ""
                 }
             },
-            programDataListForPuCheck: [],
-            calculatedTotalForModelingCalculator: [],
-            targetSelect: true,
-            firstMonthOfTarget: "",
-            yearsOfTarget: "",
-            actualOrTargetValueList: [],
-            monthListForModelingCalculator: [],
             datasetIdModalForCreateTree: "",
             regionIdForCreateTree: '',
             regionListForCreateTree: [],
@@ -883,7 +876,6 @@ export default class CreateTreeTemplate extends Component {
             startDateDisplay: '',
             endDateDisplay: '',
             beforeEndDateDisplay: '',
-            toggleArray: [],
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
