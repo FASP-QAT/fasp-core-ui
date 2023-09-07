@@ -12414,7 +12414,7 @@ export default class BuildTree extends Component {
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
-                                                        disabled={this.state.targetSelectDisable}
+                                                        disabled={this.state.currentModelingType == 2 ? false : this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
                                                         <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
                                                         <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
