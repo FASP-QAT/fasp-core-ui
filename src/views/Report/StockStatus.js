@@ -1,51 +1,26 @@
-import React, { Component, lazy, Suspense, DatePicker } from 'react';
-import { Bar, Line, Pie } from 'react-chartjs-2';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
+import { Bar } from 'react-chartjs-2';
 import {
-  Badge,
   Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
   Card,
   CardBody,
-  // CardFooter,
-  CardHeader,
-  CardTitle,
   Col,
-  Widgets,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Progress,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Row,
-  CardColumns,
-  Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
+  Table, FormGroup, Input, InputGroup, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
-import Pdf from "react-to-pdf"
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
-import actualIcon from '../../assets/img/actual.png';
 import csvicon from '../../assets/img/csv.png'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -54,24 +29,13 @@ import ReportService from '../../api/ReportService'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from "react-multi-select-component";
+import DropdownService from '../../api/DropdownService';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
 const entityname1 = i18n.t('static.dashboard.stockstatus')
 
-const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
-// const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
-
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-
-
-
-
 
 //Random Numbers
 function random(min, max) {
@@ -92,8 +56,6 @@ const pickerLang = {
   months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   from: 'From', to: 'To',
 }
-
-
 
 class StockStatus extends Component {
   constructor(props) {
@@ -136,13 +98,34 @@ class StockStatus extends Component {
     this.programChange = this.programChange.bind(this);
     this.versionChange = this.versionChange.bind(this);
     this.toggleExport = this.toggleExport.bind(this);
+    this.roundAMC=this.roundAMC.bind(this);
 
   }
+
+  roundAMC(amc){
+    if(amc!=null){
+    if(Number(amc).toFixed(0)>=100){
+        return Number(amc).toFixed(0);
+    }else if(Number(amc).toFixed(1)>=10){
+        return Number(amc).toFixed(1);
+    }else if(Number(amc).toFixed(2)>=1){
+        return Number(amc).toFixed(2);
+    }else{
+        return Number(amc).toFixed(3);
+    }
+  }else{
+    return null;
+  }
+}
 
   programChange(event) {
     this.setState({
       programId: event.target.value,
-      versionId: ''
+      versionId: '',
+      planningUnits: [],
+      planningUnitsMulti: [],
+      planningUnitLabel: "",
+      stockStatusList: []
     }, () => {
       // console.log("ProgramId-------->1", this.state.programId);
       localStorage.setItem("sesVersionIdReport", '');
@@ -179,13 +162,13 @@ class StockStatus extends Component {
       return ''
     }
   }
-  formatAmc = value => {
-    if (value != null) {
-      return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
-    } else {
-      return null;
-    }
-  }
+  // formatAmc = value => {
+  //   if (value != null) {
+  //     return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   formatter = value => {
     if (value != null) {
@@ -299,7 +282,7 @@ class StockStatus extends Component {
       csvRow.push(A[i].join(","))
 
     }
-    var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
+    var list = this.state.PlanningUnitDataForExport
     list.map(
       (item, index) => {
         csvRow.push("")
@@ -346,21 +329,21 @@ class StockStatus extends Component {
               item1.primeLineNo == null &&
               item1.roNo == null &&
               item1.roPrimeLineNo == null
-                ? " | N/A"
-                : (item1.roNo == null && item1.roPrimeLineNo == null
-                    ? ""
-                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                  (item1.orderNo == null && item1.primeLineNo == null
-                    ? ""
-                    : item1.orderNo == null
-                    ? ""
-                    : " | " + item1.orderNo) +
-                  (item1.primeLineNo == null
-                    ? ""
-                    : "-" + item1.primeLineNo))
+              ? " | N/A"
+              : (item1.roNo == null && item1.roPrimeLineNo == null
+                ? ""
+                : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+              (item1.orderNo == null && item1.primeLineNo == null
+                ? ""
+                : item1.orderNo == null
+                  ? ""
+                  : " | " + item1.orderNo) +
+              (item1.primeLineNo == null
+                ? ""
+                : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
         // console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
@@ -873,18 +856,18 @@ class StockStatus extends Component {
                 item1.primeLineNo == null &&
                 item1.roNo == null &&
                 item1.roPrimeLineNo == null
-                  ? " | N/A"
-                  : (item1.roNo == null && item1.roPrimeLineNo == null
-                      ? ""
-                      : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                    (item1.orderNo == null && item1.primeLineNo == null
-                      ? ""
-                      : item1.orderNo == null
-                      ? ""
-                      : " | " + item1.orderNo) +
-                    (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
+                  ? ""
+                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                (item1.orderNo == null && item1.primeLineNo == null
+                  ? ""
+                  : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.roundAMC(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundAMC(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
@@ -2836,11 +2819,21 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
-      ProgramService.getProgramList()
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
           // console.log(JSON.stringify(response.data))
+          var proList = [];
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code,
+            };
+            proList[i] = programJson;
+          }
           this.setState({
-            programs: response.data, message: '',
+            programs: proList, message: '',
             loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
@@ -3023,11 +3016,64 @@ class StockStatus extends Component {
           this.setState({
             versions: []
           }, () => {
-            this.setState({
-              versions: program[0].versionList.filter(function (x, i, a) {
-                return a.indexOf(x) === i;
-              })
-            }, () => { this.consolidatedVersionList(programId) });
+            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+              .then(response => {
+                // console.log("response===>", response.data)
+                this.setState({
+                  versions: []
+                }, () => {
+                  this.setState({
+                    versions: (response.data.filter(function (x, i, a) {
+                      return a.indexOf(x) === i;
+                    }))
+                  }, () => {
+                    this.consolidatedVersionList(programId)
+                  });
+                });
+              }).catch(
+                error => {
+                  this.setState({
+                    programs: [], loading: false
+                  })
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      loading: false
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
           });
 
 
@@ -4110,7 +4156,7 @@ class StockStatus extends Component {
 
 
                   </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 && ppu!=undefined &&
+                  {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
@@ -4212,27 +4258,24 @@ class StockStatus extends Component {
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
-                                    ? " | N/A"
-                                    : `${
-                                        item.roNo == null &&
-                                        item.roPrimeLineNo == null
-                                          ? ""
-                                          : " | " +
-                                            item.roNo +
-                                            "-" +
-                                            item.roPrimeLineNo
-                                      }   ${
-                                        item.orderNo == null &&
-                                        item.primeLineNo == null
-                                          ? ""
-                                          : item.orderNo == null
-                                          ? ""
-                                          : " | " + item.orderNo
-                                      }   ${
-                                        item.primeLineNo == null
-                                          ? ""
-                                          : "-" + item.primeLineNo
-                                      }`}</td></tr>)
+                                  ? " | N/A"
+                                  : `${item.roNo == null &&
+                                    item.roPrimeLineNo == null
+                                    ? ""
+                                    : " | " +
+                                    item.roNo +
+                                    "-" +
+                                    item.roPrimeLineNo
+                                  }   ${item.orderNo == null &&
+                                    item.primeLineNo == null
+                                    ? ""
+                                    : item.orderNo == null
+                                      ? ""
+                                      : " | " + item.orderNo
+                                  }   ${item.primeLineNo == null
+                                    ? ""
+                                    : "-" + item.primeLineNo
+                                  }`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
@@ -4246,10 +4289,10 @@ class StockStatus extends Component {
                             {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
                               <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
                             <td>
-                              {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
+                              {this.formatter(this.roundAMC(this.state.stockStatusList[idx].amc))}
                             </td>
                             <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
-                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.state.stockStatusList[idx].maxStock)}
+                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.roundAMC(this.state.stockStatusList[idx].maxStock))}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}

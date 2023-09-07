@@ -24,7 +24,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
             var compare = (curDate >= currentMonth);
             // var stockInHand = jsonList[0].closingBalance;
-            var amc = Math.round(Number(jsonList[0].amc));
+            var amc = Number(jsonList[0].amc);
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
@@ -66,9 +66,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             if (suggestShipment) {
                 var suggestedOrd = 0;
                 if (useMax) {
-                    suggestedOrd = Number((amc * Number(props.state.maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                    suggestedOrd = Number(Math.round(amc * Number(props.state.maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                 } else {
-                    suggestedOrd = Number((amc * Number(props.state.minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                    suggestedOrd = Number(Math.round(amc * Number(props.state.minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                 }
             }
         } else {
@@ -78,7 +78,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(props.state.distributionLeadTime, 'months').format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
-            var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+            var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
             var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
             var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
             var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
@@ -125,9 +125,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             if (suggestShipment) {
                 var suggestedOrd = 0;
                 if (useMax) {
-                    suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                    suggestedOrd = Number(Math.round(Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                 } else {
-                    suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                    suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                 }
             }
         }
@@ -827,20 +827,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             myArray[a].closingBalanceWps = 0;
                         }
                     }
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalance);
-                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
-                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
-                            unallocatedFEFO = 0;
-                        } else {
-                            myArray[a].closingBalance = 0;
-                            myArray[a].calculatedFEFO = Number(tempCB);
-                            unallocatedFEFO -= Number(tempCB);
-                        }
-                        myArray[a].qty = Number(myArray[a].closingBalance);
-                    }
 
                     if (Number(unallocatedLEFO) != 0) {
                         for (var a = (myArray.length) - 1; a >= 0; a--) {
@@ -859,21 +845,6 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 myArray[a].qty = Number(myArray[a].closingBalance);
                             }
                         }
-                    }
-
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalanceWps);
-                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
-                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
-                            unallocatedFEFOWps = 0;
-                        } else {
-                            myArray[a].closingBalanceWps = 0;
-                            myArray[a].calculatedFEFOWps = Number(tempCB);
-                            unallocatedFEFOWps -= Number(tempCB);
-                        }
-                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
                     }
 
                     if (Number(unallocatedLEFOWps) != 0) {
@@ -968,6 +939,35 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         }
                     }
 
+                    for (var a = 0; a < myArray.length; a++) {
+                        var tempCB = Number(myArray[a].closingBalance);
+                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
+                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
+                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
+                            unallocatedFEFO = 0;
+                        } else {
+                            myArray[a].closingBalance = 0;
+                            myArray[a].calculatedFEFO = Number(tempCB);
+                            unallocatedFEFO -= Number(tempCB);
+                        }
+                        myArray[a].qty = Number(myArray[a].closingBalance);
+                    }
+
+                    for (var a = 0; a < myArray.length; a++) {
+                        var tempCB = Number(myArray[a].closingBalanceWps);
+                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
+                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
+                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
+                            unallocatedFEFOWps = 0;
+                        } else {
+                            myArray[a].closingBalanceWps = 0;
+                            myArray[a].calculatedFEFOWps = Number(tempCB);
+                            unallocatedFEFOWps -= Number(tempCB);
+                        }
+                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
+                    }
 
                     myArray = myArray.filter(c => (
                         (c.openingBalance != 0 && c.openingBalance != undefined) ||
@@ -1111,7 +1111,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     if (totalMonths == 0) {
                         amc = null;
                     } else {
-                        amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                        amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                     }
 
 
@@ -1144,12 +1144,12 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var maxStock = 0;
                     if (programPlanningUnitList.planBasedOn == 2) {
                         minStock = programPlanningUnitList.minQty;
-                        maxStock = Math.round(Number(Number(programPlanningUnitList.minQty) + Number(programPlanningUnitList.reorderFrequencyInMonths) * Number(amc)));
-                        minStockMoSQty = Number(programPlanningUnitList.minQty) / Number(amc);
-                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)) + Number(programPlanningUnitList.reorderFrequencyInMonths));
+                        maxStock = Number(Number(programPlanningUnitList.minQty) + Number(programPlanningUnitList.reorderFrequencyInMonths) * Number(amc)).toFixed(8);
+                        minStockMoSQty = Number(Number(programPlanningUnitList.minQty) / Number(amc)).toFixed(8);
+                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)) + Number(programPlanningUnitList.reorderFrequencyInMonths)).toFixed(8);
                     } else {
-                        minStock = Number(amc) * Number(minStockMoSQty);
-                        maxStock = Number(amc) * Number(maxStockMoSQty);
+                        minStock = Number(Number(amc) * Number(minStockMoSQty)).toFixed(8);
+                        maxStock = Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8);
                     }
 
                     // Calculations of Closing balance
@@ -1193,7 +1193,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
 
                     var mos = "";
                     if (closingBalance != 0 && amc != 0 && amc != null) {
-                        mos = Number(closingBalance / amc).toFixed(4);
+                        mos = Number(closingBalance / amc).toFixed(8);
                     } else if (amc == 0 || amc == null) {
                         mos = null;
                     } else {
@@ -1202,7 +1202,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
 
                     var mosWps = "";
                     if (closingBalanceWps != 0 && amc != 0 && amc != null) {
-                        mosWps = Number(closingBalanceWps / amc).toFixed(4);
+                        mosWps = Number(closingBalanceWps / amc).toFixed(8);
                     } else if (amc == 0 || amc == null) {
                         mosWps = null;
                     } else {

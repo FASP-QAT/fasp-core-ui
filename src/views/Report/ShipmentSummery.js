@@ -679,29 +679,6 @@ class ShipmentSummery extends Component {
               align: "left",
             }
           );
-          var fundingSourceText = doc.splitTextToSize(
-            i18n.t("static.budget.fundingsource") +
-            " : " +
-            this.state.fundingSourceLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
-
-          var budgetText = doc.splitTextToSize(
-            i18n.t("static.budgetHead.budget") +
-            " : " +
-            this.state.budgetLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 190, budgetText);
-
-          var planningText = doc.splitTextToSize(
-            i18n.t("static.planningunit.planningunit") +
-            " : " +
-            this.state.planningUnitLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 210, planningText);
         }
       }
     };
@@ -713,7 +690,51 @@ class ShipmentSummery extends Component {
     const doc = new jsPDF(orientation, unit, size, true);
 
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor("#002f6c");
 
+    var y = 190;
+    var fundingSourceText = doc.splitTextToSize(
+      i18n.t("static.budget.fundingsource") +
+      " : " +
+      this.state.fundingSourceLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+
+    var budgetText = doc.splitTextToSize(
+      i18n.t("static.budgetHead.budget") +
+      " : " +
+      this.state.budgetLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    
+    y = y + 5;
+    for (var i = 0; i < budgetText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 100;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, budgetText[i]);
+      y = y + 10;
+    }
+    // doc.text(doc.internal.pageSize.width / 8, 190 + fundingSourceText.length, budgetText);
+    y = y + 20;
+    var planningText = doc.splitTextToSize(
+      i18n.t("static.planningunit.planningunit") +
+      " : " +
+      this.state.planningUnitLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 100;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
+    // doc.text(doc.internal.pageSize.width / 8, 210 + fundingSourceText.length + (budgetText.length * 6), planningText);
     // const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
     //creates image
@@ -723,7 +744,16 @@ class ShipmentSummery extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 100;
     var aspectwidth1 = width - h1;
-    let startY = 210 + this.state.planningUnitLabels.length * 3;
+    let startY = y + 10;
+    let pages = Math.ceil(startY / height)
+    let startYtable = startY - ((height - h1) * (pages - 1))
+    for (var j = 1; j < pages; j++) {
+      doc.addPage()
+    }
+    if(startY > 310){
+      doc.addPage();
+      startY = 100;
+    }
     doc.addImage(canvasImg, "png", 50, startY, 750, 260, "CANVAS");
 
     //Table1
@@ -3587,7 +3617,7 @@ class ShipmentSummery extends Component {
                       </div>
                     </div>
                   </Col>
-                  <Col md="12 pl-0">
+                  <Col md="12 pl-2">
                     <div className="row">
                       <FormGroup className="col-md-10 mt-3 ">
                         <ul className="legendcommitversion list-group">
@@ -3602,7 +3632,7 @@ class ShipmentSummery extends Component {
                         </ul>
                       </FormGroup>
                       <div
-                        className="consumptionDataEntryTable ShipmentSummeryReportMarginTop"
+                        className="consumptionDataEntryTable ShipmentSummeryReportMarginTop TableWidth100"
                         id="mytable2"
                       >
                         {/* this.props.items is undefined that's why removed this style - Sonal */}

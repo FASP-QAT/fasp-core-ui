@@ -779,7 +779,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         "userId": userId,
                                         "username": username
                                     },
-                                    "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
+                                    "createdDate": moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
                                 }
 
 
@@ -826,8 +826,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.planningUnit.id == ImportListPink[i].planningUnitId)
 
                             if (index != -1) {
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
                                 let indexObj = originalConsumptionList[index];
                                 indexObj.amount = ImportListPink[i].amount;
+                                indexObj.createdBy = {
+                                    userId: curUser
+                                  };
+                                  indexObj.createdDate = curDate;
                                 originalConsumptionList[index] = indexObj;
                             }
                         }

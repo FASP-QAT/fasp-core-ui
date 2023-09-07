@@ -380,6 +380,15 @@ export default class RealmCountryPlanningUnitList extends Component {
                     },
                     () => {
                       this.hideSecondComponent();
+                      var json=this.el.getJson(null,false);
+                      for(var j=0;j<json.length;j++){
+                        if(json[j][9]==1 && json[j][6].toString()=="false" && json[j][10]==1){
+                          var col = "G".concat(parseInt(j) + 1);
+                          this.el.setStyle(col, "background-color", "transparent");
+                          this.el.setStyle(col, "background-color", "yellow");
+                          this.el.setComments(col, i18n.t("static.realmCountryPlanningUnit.failedToUpdate"));
+                        }
+                      }
                     }
                   );
                   break;
@@ -1133,6 +1142,16 @@ export default class RealmCountryPlanningUnitList extends Component {
     });
   }
 
+  filterOptions = async (options, filter) => {
+    if (filter) {
+        return options.filter((i) =>
+            i.label.toLowerCase().includes(filter.toLowerCase())
+        );
+    } else {
+        return options;
+    }
+};
+
   filterData() {
     if (this.state.programValues.length > 0) {
       // console.log("VALUE--------->IF");
@@ -1483,7 +1502,11 @@ export default class RealmCountryPlanningUnitList extends Component {
         // // console.log(JSON.stringify(response.data))
         // console.log("Program----->", response.data);
         this.setState({
-          programs: response.data,
+          programs: response.data.sort(function (a, b) {
+            a = a.program.code.toLowerCase();
+            b = b.program.code.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        }),
           loading: false,
         });
       })
@@ -1705,6 +1728,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       options={
                         programList && programList.length > 0 ? programList : []
                       }
+                      filterOptions={this.filterOptions}
                     />
                     {!!this.props.error && this.props.touched && (
                       <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
