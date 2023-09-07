@@ -24,7 +24,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
             var compare = (curDate >= currentMonth);
             // var stockInHand = jsonList[0].closingBalance;
-            var amc = Math.round(Number(jsonList[0].amc));
+            var amc = jsonList.length>0?Math.round(Number(jsonList[0].amc)):"";
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
