@@ -89,6 +89,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             languageEl: '',
             consumptionData: [],
             monthArrayList: [],
+            realm:{}
         }
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -589,62 +590,62 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 }
                             }
 
-                            let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
-                                if (!a[v13]) {
-                                    a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
-                                } else {
-                                    a[v13].v7 += v7;
-                                    a[v13].v5 += v5;
-                                }
-                                return a;
-                            }, {}));
-                            // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
-                            this.setState({
-                                selSource: resultTrue,
-                                loading: true
-                            }, () => {
-                                this.buildJexcel();
-                            })
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
+                            if (!a[v13]) {
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
+                            } else {
+                                a[v13].v7 += v7;
+                                a[v13].v5 += v5;
+                            }
+                            return a;
+                        }, {}));
+                        // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
+                        this.setState({
+                            selSource: resultTrue,
+                            realm:realm,
+                            loading: true
+                        }, () => {
+                            this.buildJexcel();
+                        })
 
-                        }).catch(
-                            error => {
-                                // console.log("Error @@@@@@@@@@", error)
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        // message: 'static.unkownError',
-                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                    }).catch(
+                        error => {
+                            // console.log("Error @@@@@@@@@@", error)
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
                         );
@@ -1007,7 +1008,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <ul className="legendcommitversion list-group">
                     <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
                 </ul> */}
-                <div class="col-md-10 mt-2 pl-lg-0 form-group">
+                <div class="col-md-10 mt-2 pl-lg-0 form-group" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
@@ -1015,12 +1016,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                         <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
-                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {this.state.realm.forecastConsumptionMonthsInPast} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
 
-                <p>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
+                <p style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
 
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
