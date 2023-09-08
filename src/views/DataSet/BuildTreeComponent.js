@@ -1948,44 +1948,42 @@ export default class BuildTree extends Component {
     }
 
     onchangepageMissingPU(el, pageNo, oldPageNo) {
-        if (!isSiteOnline()) {
-            var elInstance = el;
-            var json = elInstance.getJson(null, false);
-            var colArr = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'S'];
-            var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-            if (jsonLength == undefined) {
-                jsonLength = 15
+        if(!localStorage.getItem('sessionType') === 'Online'){
+    var elInstance = el;
+    var json = elInstance.getJson(null, false);
+    var colArr=['C','D','E','F','G','H','I','J','S'];
+    var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+    if (jsonLength == undefined) {
+        jsonLength = 15
+    }
+    if (json.length < jsonLength) {
+        jsonLength = json.length;
+    }
+    var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+    for (var y = start; y < jsonLength; y++) {
+        var colArr=['C','D','E','F','G','H','I','J','S'];
+        if(json[y][19].toString()=="true"){
+            for (var c = 0; c < colArr.length; c++) {
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
             }
-            if (json.length < jsonLength) {
-                jsonLength = json.length;
-            }
-            var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-            for (var y = start; y < jsonLength; y++) {
-                var colArr = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'S'];
-                if (json[y][19].toString() == "true") {
-                    for (var c = 0; c < colArr.length; c++) {
-                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
-                } else {
-                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
-                    cell.classList.add('readonly');
-                    elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
-                    elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
-                    elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
-                    elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
-                    elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
-                    elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
-                }
-            }
+        }else{
+            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+            cell.classList.add('readonly');
+            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
+            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
+            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
+            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
         }
     }
-    // }
-// }
+    }
+}
 
     getPlanningUnitWithPricesByIds() {
         console.log("semma----", this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()));
@@ -2039,7 +2037,7 @@ export default class BuildTree extends Component {
     }
 
     buildMissingPUJexcel() {
-        if (isSiteOnline()) {
+        if(localStorage.getItem('sessionType') === 'Online'){
             this.getPlanningUnitWithPricesByIds();
         }
         var missingPUList = this.state.missingPUList;
@@ -2114,16 +2112,16 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    // editable: isSiteOnline() ? true : false,
-                    // readOnly: isSiteOnline() ? false : true 
+                    // editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true 
                 },
                 {
                     //3D
                     title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    // editable: isSiteOnline() ? true : false,
-                    // readOnly: isSiteOnline() ? false : true
+                    // editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //4E
@@ -2133,8 +2131,8 @@ export default class BuildTree extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //5F
@@ -2144,8 +2142,8 @@ export default class BuildTree extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //6G
@@ -2155,8 +2153,8 @@ export default class BuildTree extends Component {
                     mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //7H
@@ -2164,8 +2162,8 @@ export default class BuildTree extends Component {
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '120',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //8I
@@ -2176,15 +2174,15 @@ export default class BuildTree extends Component {
                     mask: '#,##.00',
                     width: '120',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //9J
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     title: 'planningUnitId',
@@ -2227,9 +2225,9 @@ export default class BuildTree extends Component {
                     readOnly: true //17P
                 },
                 {
-                    title: i18n.t("static.common.select"),
-                    type: 'checkbox',
-                    // readOnly: isSiteOnline() ? false : true
+                    title:i18n.t("static.common.select"),
+                    type:'checkbox',
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     title: 'exists',
@@ -2288,10 +2286,10 @@ export default class BuildTree extends Component {
         tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
-        if (!isSiteOnline()) {
-            var elInstance = instance.worksheets[0];
-            var json = elInstance.getJson(null, false);
-            var jsonLength;
+        if(!localStorage.getItem('sessionType') === 'Online'){
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
 
             if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
                 jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -14571,20 +14569,20 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}
+                                                    {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
                                                 </div>
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
-                                                {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
-                                                {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
-                                                {!isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
-                                                {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId != 0 && this.state.branchTemplateId != undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
-                                                &nbsp;
-                                            </FormGroup>
-                                        </div>
-                                    </Form>
+                                                    {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
+                                                    {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
+                                                    {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId!=0 && this.state.branchTemplateId!=undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </div>
+                                        </Form>
 
                                 )} />
 
