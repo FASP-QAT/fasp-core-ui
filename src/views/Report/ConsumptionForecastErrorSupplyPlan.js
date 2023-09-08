@@ -1261,7 +1261,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         if (viewById == 1) {
                             convertedPlanningUnits = planningUnitIds;
                         } else {
-                            convertedPlanningUnits = [...new Set(ppuList.filter(c => forecastingUnitIds.includes(c.forecastingUnit.id)).map(ele => (ele.planningUnit.id)))];
+                            convertedPlanningUnits = [...new Set(ppuList.filter(c => forecastingUnitIds.includes(c.forecastingUnit.id.toString())).map(ele => (ele.planningUnit.id)))];
                         }
                         var consumptionList = [];
                         var transaction = db1.transaction(['programData'], 'readwrite');
@@ -1297,8 +1297,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var fuMultiplier = ppuObject[0].multiplier;
                                     for (var clpu = 0; clpu < consumptionListForPlanningUnit.length; clpu++) {
                                         if (equivalencyUnitId > 0) {
-                                            var convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == ppuObject[0].planningUnit.forecastingUnit.id)[0].convertToEu;
-                                            consumptionListForPlanningUnit[clpu].consumptionQty = Number(consumptionListForPlanningUnit[clpu].consumptionQty) * Number(fuMultiplier) * Number(convertToEu);
+                                            var convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == ppuObject[0].forecastingUnit.id)[0].convertToEu;
+                                            consumptionListForPlanningUnit[clpu].consumptionQty = Number(consumptionListForPlanningUnit[clpu].consumptionQty) * Number(fuMultiplier) / Number(convertToEu);
                                         } else if ((equivalencyUnitId == -1 || equivalencyUnitId == 0) && viewById == 2) {
                                             consumptionListForPlanningUnit[clpu].consumptionQty = Number(consumptionListForPlanningUnit[clpu].consumptionQty) * Number(fuMultiplier);
                                         }
@@ -1325,7 +1325,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var daysOfStockOut = "";
                                     actualConsumptionListForCurrentMonth.map(item => {
                                         if (consumptionAdjForStockOutId) {
-                                            actualQty = Number(actualQty) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
+                                            if(noOfDays!=item.dayOfStockOut){
+                                                actualQty = Number(actualQty) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
+                                            }
                                             daysOfStockOut = item.dayOfStockOut;
                                         } else {
                                             actualQty = Number(actualQty) + Number(item.consumptionQty)
@@ -1342,7 +1344,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var sumOfActualQty = "";
                                     actualConsumptionListForLastXMonths.map(item => {
                                         if (consumptionAdjForStockOutId) {
+                                            if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
                                             sumOfActualQty = Number(sumOfActualQty) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                            }
                                         } else {
                                             sumOfActualQty = Number(sumOfActualQty) + Number(item.consumptionQty)
                                         }
@@ -1355,7 +1359,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var actualQtyForMic = "";
                                             actualConsumptionListForMic.map(item => {
                                                 if (consumptionAdjForStockOutId) {
+                                                    if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
                                                     actualQtyForMic = Number(actualQtyForMic) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                    }
                                                 } else {
                                                     actualQtyForMic = Number(actualQtyForMic) + Number(item.consumptionQty)
                                                 }
@@ -1396,7 +1402,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var actualQtyAllRegion = "";
                                 actualConsumptionListForCurrentMonthAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        actualQtyAllRegion = Number(actualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
+                                        if(Number(noOfDays)!=Number(item.dayOfStockOut)){
+                                            actualQtyAllRegion = Number(actualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
+                                        }
                                     } else {
                                         actualQtyAllRegion = Number(actualQtyAllRegion) + Number(item.consumptionQty)
                                     }
@@ -1412,7 +1420,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var sumOfActualQtyAllRegion = "";
                                 actualConsumptionListForLastXMonthsAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        sumOfActualQtyAllRegion = Number(sumOfActualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                        if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
+                                            sumOfActualQtyAllRegion = Number(sumOfActualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                        }
                                     } else {
                                         sumOfActualQtyAllRegion = Number(sumOfActualQtyAllRegion) + Number(item.consumptionQty)
                                     }
@@ -1425,7 +1435,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         var actualQtyForMicAllRegion = "";
                                         actualConsumptionListForMicAllRegion.map(item => {
                                             if (consumptionAdjForStockOutId) {
+                                                if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
                                                 actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                }
                                             } else {
                                                 actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + Number(item.consumptionQty)
                                             }
@@ -2351,7 +2363,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             });
 
             // Region daysOfStockOut     
-            this.state.consumptionAdjForStockOutId &&
+            this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 && 
                 this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
                     var datacsv = [];
                     var totalRegion = 0;
@@ -2662,7 +2674,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 }
 
                 // Region daysOfStockOut         
-                if (this.state.consumptionAdjForStockOutId) {
+                if (this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1) {
                     A = [];
                     {
                         this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
@@ -3460,7 +3472,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         )
                                                                     })}
                                                                     {/* DaysOfStockOut */}
-                                                                    {this.state.consumptionAdjForStockOutId && this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
+                                                                    {this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 && this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
                                                                         var regionDaysOfStockOutTotal = 0;
                                                                         var regionDaysOfStockOutTotalCount = 0;
                                                                         return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(r.value) ? "" : "none" }}>
