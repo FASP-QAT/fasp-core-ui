@@ -5099,6 +5099,7 @@ export default class BuildTree extends Component {
         const reversedList = [...json].reverse();
         for (var i = 0; i < reversedList.length - 1; i++) {
             var map = new Map(Object.entries(reversedList[i]));
+            var map1=new Map(Object.entries(reversedList[i+1]));
             var data = []
             var stopDate = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
             var data2 = (i == 0) ? moment(stopDate, "YYYY-MM-DD").subtract(6, "months").format("YYYY-MM-DD") : stopDate;
@@ -5109,7 +5110,7 @@ export default class BuildTree extends Component {
             data[4] = this.state.currentModelingType;
             data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;
             data[6] = this.state.currentModelingType != 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
-            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
+            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")*map1.get("9")/100).toFixed(4)) : "";
             data[8] = cleanUp
             data[9] = '';
             data[10] = ''
@@ -5152,7 +5153,9 @@ export default class BuildTree extends Component {
             currentTargetChangePercentage: '',
             percentForOneMonth: ''
         });
-        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
@@ -5201,7 +5204,9 @@ export default class BuildTree extends Component {
             currentTargetChangeNumber: '',
             percentForOneMonth: ''
         });
-        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
         currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
         console.log("currentTargetChangePercentage---", parseFloat(currentTargetChangePercentage));
@@ -9303,16 +9308,16 @@ export default class BuildTree extends Component {
         if (event.target.name == "modelingType") {
             console.log("event.target.id", event.target.value)
             if (event.target.value == "active1") {
-                this.setState({ currentModelingType: 4, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 4, targetSelectDisable: true })
             }
             else if (event.target.value == "active2") {
-                this.setState({ currentModelingType: 3, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 3, targetSelectDisable: true })
             }
             else if (event.target.value == "active3") {
-                this.setState({ currentModelingType: 2, targetSelect: 1, targetSelectDisable: false })
+                this.setState({ currentModelingType: 2, targetSelectDisable: false })
             }
             else {
-                this.setState({ currentModelingType: 5, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 5, targetSelectDisable: true })
             }
             if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
                 console.log("inside if calculator radio button");
@@ -10370,6 +10375,11 @@ export default class BuildTree extends Component {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
                 this.state.modelingCalculatorEl.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+                valid = false;
+            }else if(value == 0){
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
+                this.state.modelingCalculatorEl.setComments(col, "Actual/Target value cannot be 0");
                 valid = false;
             } else {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
@@ -12407,7 +12417,7 @@ export default class BuildTree extends Component {
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
-                                                        disabled={this.state.currentModelingType == 2 ? false : this.state.targetSelectDisable}
+                                                        disabled={(this.state.currentModelingType == 2 || this.state.currentModelingType == 3 || this.state.currentModelingType == 4) ? false : this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
                                                         <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
                                                         <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
@@ -12422,12 +12432,12 @@ export default class BuildTree extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.annualTargetLabel')}</Label>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover25" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover29" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
                                                     <PopoverBody>{i18n.t('static.tooltip.FirstMonthOfTarget')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover29" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Picker
                                                     ref={this.pickAMonth4}
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -12443,12 +12453,12 @@ export default class BuildTree extends Component {
                                                 </Picker>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover26" trigger="hover" toggle={this.toggleYearsOfTarget}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover28" trigger="hover" toggle={this.toggleYearsOfTarget}>
                                                     <PopoverBody>{i18n.t('static.tooltip.yearsOfTarget')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="select"
                                                     id="targetYears"
                                                     name="targetYears"
