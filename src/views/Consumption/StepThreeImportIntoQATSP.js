@@ -648,7 +648,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         break;
                                 }
                             }
-                        );
+                        });
 
                     // console.log("step 3-tempList--->", tempList)
                 }.bind(this)
