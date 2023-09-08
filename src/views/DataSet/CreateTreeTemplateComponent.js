@@ -3739,6 +3739,7 @@ export default class CreateTreeTemplate extends Component {
         const reversedList = [...json].reverse();
         for (var i = 0; i < reversedList.length - 1; i++) {
             var map = new Map(Object.entries(reversedList[i]));
+            var map1=new Map(Object.entries(reversedList[i+1]));
             var data = []
             var stopDate = map.get("8");
             var data2 = (i == 0) ? (map.get("8") - 6) : stopDate;
@@ -3749,7 +3750,7 @@ export default class CreateTreeTemplate extends Component {
             data[4] = this.state.currentModelingType;
             data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;;
             data[6] = this.state.currentModelingType != 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
-            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
+            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")*map1.get("9")/100).toFixed(4)) : "";
             data[8] = cleanUp
             data[9] = '';
             data[10] = ''
@@ -3787,8 +3788,11 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangePercentage: '',
             percentForOneMonth: ''
         });
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
-        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
+        var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
@@ -3845,7 +3849,10 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangeNumber: '',
             percentForOneMonth: ''
         });
-        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
+        var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
         // var monthDifference = moment(endDate).diff(startDate, 'months', true);
         // var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
@@ -8625,16 +8632,16 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name == "modelingType") {
             console.log("event.target.id", event.target.id)
             if (event.target.value == "active1") {
-                this.setState({ currentModelingType: 4, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 4, targetSelectDisable: true })
             }
             else if (event.target.value == "active2") {
-                this.setState({ currentModelingType: 3, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 3, targetSelectDisable: true })
             }
             else if (event.target.value == "active3") {
-                this.setState({ currentModelingType: 2, targetSelect: 1, targetSelectDisable: false })
+                this.setState({ currentModelingType: 2, targetSelectDisable: false })
             }
             else {
-                this.setState({ currentModelingType: 5, targetSelect: 0, targetSelectDisable: true })
+                this.setState({ currentModelingType: 5, targetSelectDisable: true })
             }
             if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
                 console.log("inside if calculator radio button");
@@ -9686,6 +9693,11 @@ export default class CreateTreeTemplate extends Component {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
                 this.state.modelingCalculatorEl.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
+                valid = false;
+            }else if(value == 0){
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
+                this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
+                this.state.modelingCalculatorEl.setComments(col, "Actual/Target value cannot be 0");
                 valid = false;
             } else {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
@@ -11696,7 +11708,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
-                                                        disabled={this.state.currentModelingType == 2 ? false : this.state.targetSelectDisable}
+                                                        disabled={(this.state.currentModelingType == 2 || this.state.currentModelingType == 3 || this.state.currentModelingType == 4) ? false : this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
                                                         <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
                                                         <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
@@ -11711,12 +11723,12 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.annualTargetLabel')}</Label>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover25" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenFirstMonthOfTarget} target="Popover29" trigger="hover" toggle={this.toggleFirstMonthOfTarget}>
                                                     <PopoverBody>{i18n.t('static.tooltip.FirstMonthOfTarget')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover29" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
                                                     type="select"
                                                     id="firstMonthOfTarget"
@@ -11738,12 +11750,12 @@ export default class CreateTreeTemplate extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover26" trigger="hover" toggle={this.toggleYearsOfTarget}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenYearsOfTarget} target="Popover28" trigger="hover" toggle={this.toggleYearsOfTarget}>
                                                     <PopoverBody>{i18n.t('static.tooltip.yearsOfTarget')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.targetYears')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleYearsOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="select"
                                                     id="targetYears"
                                                     name="targetYears"
