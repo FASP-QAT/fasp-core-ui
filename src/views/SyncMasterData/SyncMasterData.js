@@ -1285,6 +1285,40 @@ export default class SyncMasterData extends Component {
                                                                                                                                         syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                     }, () => {
+                                                                                                                                            // datasetData
+                                                                                                                                            var datasetDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+                                                                                                                                            // console.log("M sync planningUnit transaction start")
+                                                                                                                                            var datasetDataObjectStore = datasetDataTransaction.objectStore('datasetData');
+                                                                                                                                            for(var dl=0;dl<datasetList.length;dl++){
+                                                                                                                                                if (datasetList[dl].userId == userId) {
+                                                                                                                                                    var databytes = CryptoJS.AES.decrypt(datasetList[dl].programData, SECRET_KEY);
+                                                                                                                                                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                                                                                                                                                    var datasetPlanningUnitList=programData.planningUnitList;
+                                                                                                                                                    datasetPlanningUnitList.map(item=>{
+                                                                                                                                                        var planningUnitObj=response.planningUnitList.filter(c=>c.planningUnitId==item.planningUnit.id);
+                                                                                                                                                        if(planningUnitObj.length>0){
+                                                                                                                                                            item.planningUnit.label=planningUnitObj[0].label;
+                                                                                                                                                            item.planningUnit.unit=planningUnitObj[0].unit;
+                                                                                                                                                            item.planningUnit.multiplier=planningUnitObj[0].multiplier;
+                                                                                                                                                            item.planningUnit.forecastingUnit.label=planningUnitObj[0].forecastingUnit.label;
+                                                                                                                                                            item.planningUnit.forecastingUnit.unit=planningUnitObj[0].forecastingUnit.unit;
+                                                                                                                                                            item.planningUnit.forecastingUnit.productCategory=planningUnitObj[0].forecastingUnit.productCategory;
+                                                                                                                                                            item.planningUnit.forecastingUnit.tracerCategory=planningUnitObj[0].forecastingUnit.tracerCategory;
+                                                                                                                                                        }
+                                                                                                                                                    })
+                                                                                                                                                    programData.planningUnitList=datasetPlanningUnitList;
+                                                                                                                                                    datasetList[dl].programData=(CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                                                                                                                                                    
+                                                                                                                                                    datasetDataObjectStore.put(datasetList[dl]);
+                                                                                                                                                }
+
+
+                                                                                                                                            }
+                                                                                                                                            datasetDataTransaction.oncomplete = function (event) {
+                                                                                                                                                this.setState({
+                                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                }, () => {
                                                                                                                                         // procurementUnit
                                                                                                                                         var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
                                                                                                                                         // console.log("M sync procurementUnit transaction start")
@@ -1992,6 +2026,8 @@ export default class SyncMasterData extends Component {
                                                                                                                                 }.bind(this);
                                                                                                                             })
                                                                                                                         }.bind(this);
+                                                                                                                    })
+                                                                                                                }.bind(this);
                                                                                                                 //     })
                                                                                                                 // }.bind(this);
 
