@@ -12445,7 +12445,7 @@ export default class BuildTree extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover29" onClick={this.toggleFirstMonthOfTarget} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Picker
                                                     ref={this.pickAMonth4}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                                     value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
                                                     onChange={this.handleAMonthChange4}
@@ -12510,7 +12510,7 @@ export default class BuildTree extends Component {
                                                     onChange={this.handleAMonthChange5}
                                                 // onDismiss={this.handleAMonthDissmis5}
                                                 >
-                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                                 </Picker>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
