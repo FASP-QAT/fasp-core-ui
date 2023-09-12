@@ -3743,7 +3743,7 @@ export default class CreateTreeTemplate extends Component {
         const reversedList = [...json].reverse();
         for (var i = 0; i < reversedList.length - 1; i++) {
             var map = new Map(Object.entries(reversedList[i]));
-            var map1=new Map(Object.entries(reversedList[i+1]));
+            var map1 = new Map(Object.entries(reversedList[i + 1]));
             var data = []
             var stopDate = map.get("8");
             var data2 = (i == 0) ? (map.get("8") - 6) : stopDate;
@@ -3754,7 +3754,7 @@ export default class CreateTreeTemplate extends Component {
             data[4] = this.state.currentModelingType;
             data[5] = parseFloat(map.get("3")).toFixed(4) < 0 ? -1 : 1;;
             data[6] = this.state.currentModelingType != 2 ? Math.abs(parseFloat(map.get("3")).toFixed(4)) : "";
-            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3")*map1.get("9")/100).toFixed(4)) : "";
+            data[7] = this.state.currentModelingType == 2 ? Math.abs(parseFloat(map.get("3") * map1.get("9") / 100).toFixed(4)) : "";
             data[8] = cleanUp
             data[9] = '';
             data[10] = ''
@@ -9563,8 +9563,6 @@ export default class CreateTreeTemplate extends Component {
             var data = [];
             data[0] = startdate + " to " + stopDate.name//year
             data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
-            data[5] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
-            data[6] = `=IF(ISBLANK(E${parseInt(j) + 1}),'',((E${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100))`;//(F21-D21)/D21--Difference (Target vs Calculated, %)
             data[7] = j == 0 ? "" : modifyStartDate1//H
             data[8] = modifyStopDate1
             dataArray[j] = data;
@@ -9698,7 +9696,7 @@ export default class CreateTreeTemplate extends Component {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
                 this.state.modelingCalculatorEl.setComments(col, "Please provide data for all years. If actuals are unknown, please provide the best estimate or use year 1 target. If future targets are not known, please provide the best estimate or repeat the last target.");
                 valid = false;
-            }else if(value == 0){
+            } else if (value == 0) {
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "transparent");
                 this.state.modelingCalculatorEl.setStyle(col, "background-color", "yellow");
                 this.state.modelingCalculatorEl.setComments(col, "Actual/Target value cannot be 0");
@@ -9755,8 +9753,8 @@ export default class CreateTreeTemplate extends Component {
                         var programJson = {
                             date: start,
                             calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                            // startDate: rowData[0].split("to")[0],
-                            // stopDate: rowData[0].split("to")[1],
+                            startDate: start - 5,
+                            stopDate: stop - 5,
                             yCord: j
                         }
                         dataArrayTotal.push(programJson);
@@ -9781,6 +9779,9 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     elInstance.setValueFromCoords(4, arraySum[i].yCord, Math.round(abc), true);
+                    var value = elInstance.getValueFromCoords(1, arraySum[i].yCord);
+                    elInstance.setValueFromCoords(5, arraySum[i].yCord, abc != 0 ? (abc - value) : 0, true);
+                    elInstance.setValueFromCoords(6, arraySum[i].yCord, abc != 0 ? (abc - value) / value * 100 : 0, true);
                 }
                 this.setState({
                     actualOrTargetValueList: dataArray
@@ -12513,9 +12514,9 @@ export default class CreateTreeTemplate extends Component {
                                 {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div> */}
                                 <div title={itemConfig.payload.label.label_en} className="NodeTitletext">{itemConfig.payload.label.label_en}</div>
                                 <div style={{ float: 'right' }}>
-                                    {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                    {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                    {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                    {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                    {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                    {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                     <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
                                 </div>
                             </div>
@@ -12545,9 +12546,9 @@ export default class CreateTreeTemplate extends Component {
                             {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div> */}
                             <div title={itemConfig.payload.label.label_en} className="NodeTitletext">{itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
                             </div>
                         </div>
