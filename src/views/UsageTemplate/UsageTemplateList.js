@@ -919,6 +919,7 @@ class usageTemplate extends Component {
                 {
                     title: 'usageTemplateId',
                     type: 'hidden',
+                    visible: false,
                     readOnly: true //0 A
                 },
                 {
@@ -933,6 +934,7 @@ class usageTemplate extends Component {
                     type: 'text',
                     width: '180',
                     textEditor: true,//2 C
+                  
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
@@ -953,6 +955,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
                     width: '100',
+                    // visible: false, autoCasting: false,
                     textEditor: true, //5 F
                 },
                 {
@@ -984,6 +987,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
                     width: '130',
+                    // visible: false, autoCasting: false,
                     // readOnly: true
                     textEditor: true, //9 J
                 },
@@ -1001,6 +1005,7 @@ class usageTemplate extends Component {
                     width: '130',
                     // readOnly: true
                     textEditor: true,
+                    // visible: false, autoCasting: false,
                     decimal: '.', //11 L
                 },
                 {
@@ -1031,6 +1036,7 @@ class usageTemplate extends Component {
                     type: 'text',//hidden black
                     readOnly: true,
                     width: '130',
+                    // visible: false, autoCasting: false,
                     textEditor: true, //15 P
                 },
                 {
@@ -1038,23 +1044,28 @@ class usageTemplate extends Component {
                     type: 'text',
                     readOnly: true,
                     width: 180,
+                    // visible: false, autoCasting: false,
                     textEditor: true, //16 Q
                 },
                 {
                     title: 'isChange',
+                    visible: false,
                     type: 'hidden' //17 R
                 },
                 {
                     title: 'addNewRow',
+                    visible: false,
                     type: 'hidden'//18 S
                 },
                 {
                     title: 'typeId',
+                    visible: false,
                     type: 'hidden'//19 T
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'hidden',
+                    visible: false
                     // width: 400 //20 U
                 },
                 {
@@ -1067,6 +1078,7 @@ class usageTemplate extends Component {
                 {
                     title: 'createdBy',
                     type: 'hidden',
+                    visible: false
                     // width: 400 //22 W
                 },
 
