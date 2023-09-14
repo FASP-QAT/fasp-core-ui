@@ -5023,6 +5023,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         } else {
             // Linear #
@@ -5039,6 +5040,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -5046,9 +5048,10 @@ export default class BuildTree extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, !isFinite(this.state.percentForOneMonth) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 4) { // Exponential %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -5056,9 +5059,10 @@ export default class BuildTree extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, !isFinite(this.state.percentForOneMonth) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         }
         this.setState({ showCalculatorFields: false });
@@ -5123,6 +5127,7 @@ export default class BuildTree extends Component {
             }
             data[14] = this.state.targetSelect;// 0 for Manual or Old calculator method; 1 for Annual Target Calculator
             dataArr.push(map.get("1"))
+            console.log("data====>", this.state.targetSelect)
             this.state.modelingEl.insertRow(
                 data, 0, 1
             );
@@ -10355,7 +10360,7 @@ export default class BuildTree extends Component {
             var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
             if (this.state.actualOrTargetValueList.length > 0) {
-                this.changed3();
+                this.changed3(0);
             }
         });
     }
@@ -10386,12 +10391,13 @@ export default class BuildTree extends Component {
         return valid;
     }
 
-    changed3() {
+    changed3(isCalculateClicked) {
 
         var elInstance = this.state.modelingCalculatorEl;
         var validation = this.validFieldData();
 
         if (validation) {
+            this.setState({ isCalculateClicked: isCalculateClicked })
             var dataArray = [];
             var dataArrayTotal = [];
             let modelingType = document.getElementById("modelingType").value;
@@ -12489,7 +12495,7 @@ export default class BuildTree extends Component {
                                                 }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
                                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                 {this.state.isCalculateClicked == 2 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
-                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(); this.setState({ isCalculateClicked: 2 }) }}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
+                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(2); }}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
                                             </FormGroup>
                                         </div>
                                     </div>
@@ -13025,7 +13031,7 @@ export default class BuildTree extends Component {
         console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
         this.setState({
             currentCalculatorStartDate: date, currentCalculatorStartValue,
-            firstMonthOfTarget: "",
+            firstMonthOfTarget: date,
             // yearsOfTarget: "",
             actualOrTargetValueList: [],
             isCalculateClicked: 1
