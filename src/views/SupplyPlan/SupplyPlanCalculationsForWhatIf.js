@@ -649,8 +649,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             if (consumptionList[c].dayOfStockOut > 0) {
                                 var daysPerMonth = moment(startDate).daysInMonth();//days in month
                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;//days in stock
-                                var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;//Demand/day
-                                trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                if(daysOfData>0){
+                                    var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;//Demand/day
+                                    trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                }
                             } else {
                                 trueDemandPerMonth += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
                             }
@@ -1042,7 +1044,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
 
-                                actualConsumptionQtyAmc += trueDemandPerMonth1;
+                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
@@ -1083,7 +1085,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
 
-                                actualConsumptionQtyAmc += trueDemandPerMonth1;
+                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
