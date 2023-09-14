@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import ProductService from '../../api/ProductService'
-import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
 import { API_URL } from '../../Constants';
@@ -17,7 +15,6 @@ class ProductList extends Component {
       lang: localStorage.getItem('lang'),
       message: ''
     }
-
     this.options = {
       sortIndicator: true,
       hideSizePerPage: true,
@@ -30,7 +27,6 @@ class ProductList extends Component {
         this.editProduct(row);
       }.bind(this)
     }
-
     this.showProductLabel = this.showProductLabel.bind(this);
     this.showGenericLabel = this.showGenericLabel.bind(this);
     this.showRealmLabel = this.showRealmLabel.bind(this);
@@ -39,28 +35,21 @@ class ProductList extends Component {
     this.editProduct = this.editProduct.bind(this);
     this.addProduct = this.addProduct.bind(this);
   }
-
   editProduct(product) {
-    // console.log(product);
     var productId = product.productId;
     this.props.history.push({
       pathname: `/product/editProduct/${productId}`,
-      // state: { product }
     });
   }
-
   addProduct() {
     this.props.history.push({
       pathname: "/product/addProduct"
     });
   }
-
   componentDidMount() {
-    // AuthenticationService.setupAxiosInterceptors();
     ProductService.getProductList()
       .then(response => {
         if (response.status == 200) {
-          // console.log(response.data);
           this.setState({
             table: response.data
           })
@@ -72,7 +61,6 @@ class ProductList extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: error.message 
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
             });
           } else {
@@ -92,30 +80,21 @@ class ProductList extends Component {
         }
       );
   }
-
-
   showProductLabel(cell, row) {
     return getLabelText(cell, this.state.lang);
   }
-
   showGenericLabel(cell, row) {
     return getLabelText(cell, this.state.lang);
   }
-
   showRealmLabel(cell, row) {
     return getLabelText(cell.label, this.state.lang);
   }
-
-
   showProductCategoryLabel(cell, row) {
     return getLabelText(cell.label, this.state.lang);
   }
-
-
   showForcastingUnitLabel(cell, row) {
     return getLabelText(cell.label, this.state.lang);
   }
-
   showStatus(cell, row) {
     if (cell) {
       return "Active";
@@ -145,7 +124,6 @@ class ProductList extends Component {
               <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataSort>{i18n.t('static.product.realm')}</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>{i18n.t('static.product.productcategory')}</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>{i18n.t('static.product.unit')}</TableHeaderColumn>
-              {/* <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn> */}
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active">{i18n.t('static.inventory.active')}</TableHeaderColumn>
             </BootstrapTable>
           </CardBody>
@@ -154,5 +132,4 @@ class ProductList extends Component {
     )
   }
 }
-
 export default ProductList;

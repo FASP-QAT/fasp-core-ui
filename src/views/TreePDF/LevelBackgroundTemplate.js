@@ -1,14 +1,11 @@
 import { LineType, PlacementType } from '../../../node_modules/basicprimitives/src/enums';
-
 export default function LevelBackgroundTemplate(options, levelAnnotationConfig) {
   function template() {
     return {};
   }
-
   function getHashCode() {
     return 0;
   }
-
   function render(doc, position, data) {
     var annotationConfig = data.context;
     var {
@@ -18,17 +15,10 @@ export default function LevelBackgroundTemplate(options, levelAnnotationConfig) 
       lineWidth: borderWidth,
       lineType
     } = annotationConfig;
-
     doc.save();
-
-    /* item border */
     doc.rect(position.x, position.y, 50000, 120, 0)
       .fillColor(fillColor, opacity)
       .fill();
-
-    // doc.lineJoin('round').rect(150, 100, 10, 10)
-    // .stroke();
-
     position.loopEdges(function(vector, placementType) {
       var lineWidth = 0;
       switch(placementType) {
@@ -66,10 +56,8 @@ export default function LevelBackgroundTemplate(options, levelAnnotationConfig) 
           .stroke();
       }
     });
-
     doc.restore();
   }
-
   return {
     template: template,
     getHashCode: getHashCode,

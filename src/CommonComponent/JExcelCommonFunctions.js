@@ -1,9 +1,6 @@
-import i18n from '../../src/i18n';
-import { func } from 'prop-types';
 import moment from 'moment';
-import ConsumptionInSupplyPlanComponent from '../views/SupplyPlan/ConsumptionInSupplyPlan';
+import i18n from '../../src/i18n';
 import { MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY } from '../Constants';
-
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -16,17 +13,15 @@ export function jExcelLoadedFunction(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -35,53 +30,23 @@ export function jExcelLoadedFunction(instance, number) {
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(number));
-
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
-
-
-
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
-
 export function jExcelLoadedFunctionForErp(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -94,17 +59,15 @@ export function jExcelLoadedFunctionForErp(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[2];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[2]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[2]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[2]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -113,53 +76,23 @@ export function jExcelLoadedFunctionForErp(instance, number) {
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jss_pagination')[2];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[1];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(2));
-
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[2];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
-
-
-
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
-
 export function jExcelLoadedFunctionWithoutSearch(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -170,80 +103,29 @@ export function jExcelLoadedFunctionWithoutSearch(instance, number) {
     elInstance.hideIndex(0);
     var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
     pagignation.classList.add('row');
-    // var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
-    // var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    // searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    // document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
-    // var clearBtn = document.createElement('button');
-    // clearBtn.type = "button";
-    // clearBtn.classList.add('btn-default');
-    // clearBtn.classList.add('btn');
-    // clearBtn.classList.add('jexcel_clear_btn');
-
-    // var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
-    // clearBtn.setAttribute("id", "clearBtnID");
-    // clearBtn.onclick = function () {
-    // document.getElementsByClassName("jexcel_search")[number].value = "";
-    // elInstance.search('')
-    // };
-    // clearBtn.appendChild(clarText);
-    // searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(number));
-
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
-
-
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
-
 export function paginationChange(number) {
     var recordCount = document.getElementsByClassName('jss_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)
 }
-
 export function paginationChange1(number) {
     var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)
 }
-
-
 export function jExcelLoadedFunctionPipeline(instance, number) {
     var obj = {};
     obj.options = {};
@@ -253,16 +135,15 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -271,29 +152,21 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
     var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(number));
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
-
-// export function jExcelLoadedFunctionWithoutPagination(instance) {
 export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -304,11 +177,10 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     elInstance.hideIndex(0);
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.onclick = function () {
@@ -318,19 +190,15 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
 }
-
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.worksheets[0];
-    // console.log("elisn===>", instance)
     elInstance.hideIndex(0);
 }
-
 export function jExcelLoadedFunctionQuantimed(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -343,17 +211,15 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -362,36 +228,14 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(0));
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
@@ -399,7 +243,6 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 }
-
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0, colNo) {
     if (type == "text") {
         var col = (colName).concat(parseInt(rowNo) + 1);
@@ -441,16 +284,9 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            // if (moment(value).format("YYYY-MM")=="Invalid date") {
-            //     elInstance.setStyle(col, "background-color", "transparent");
-            //     elInstance.setStyle(col, "background-color", "yellow");
-            //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-            //     return false;
-            // } else {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
             return true;
-            // }
         }
     } else if (type == "dateWithInvalid") {
         var col = (colName).concat(parseInt(rowNo) + 1);
@@ -473,8 +309,6 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             }
         }
     } else if (type == "dateWithInvalidDataEntry") {
-        // console.log("Value$####", moment(value).format("YYYY-MM-DD"))
-        // console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -498,13 +332,11 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
             } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM"))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -542,13 +374,11 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
             } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM"))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -577,29 +407,23 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
         }
     }
 }
-
 export function positiveValidation(colName, rowNo, elInstance) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setComments(col, "");
 }
-
 export function inValid(colName, rowNo, message, elInstance) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setStyle(col, "background-color", "yellow");
     elInstance.setComments(col, message);
 }
-
 export function inValidWithColor(colName, rowNo, message, elInstance, color) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setStyle(col, "background-color", color);
     elInstance.setComments(col, message);
 }
-
-
-
 export function jExcelLoadedFunctionOld(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -612,17 +436,15 @@ export function jExcelLoadedFunctionOld(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
     document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -631,56 +453,26 @@ export function jExcelLoadedFunctionOld(instance, number) {
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange1(number));
-
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
-
-
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
-
 export function jExcelLoadedFunctionOnlyHideRowOld(instance) {
     var elInstance = instance.jexcel;
     elInstance.hideIndex(0);
 }
-
-export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
+export function jExcelLoadedFunctionOldForCompareAndSelect(instance, number) {
     if (number == undefined) {
         number = 0;
     }
@@ -694,13 +486,11 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
     searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
-    // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
     clearBtn.classList.add('jexcel_clear_btn');
-
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
@@ -709,49 +499,20 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
-
-    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
-    // var paginationInfo = paginationFirst.createElement('span');
-    // paginationInfo.classList.add('bottom_entries');
-    // paginationInfo.classList.add('col-md-7');
-    // paginationInfo.classList.add('order-2');
-    // paginationInfo.classList.add('pl-lg-0');
-
-
-    // var paginationPages = paginationFirst.createElement('div');
-    // paginationPages.classList.add('col-md-4');
-    // paginationPages.classList.add('order-3');
-    // paginationPages.classList.add('f-End');
-
-    // obj.pagination.appendChild(paginationInfo);
-    // obj.pagination.appendChild(paginationPages);
-    //  obj.pagination.appendChild(paginationUpdateContainer);
-
     var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
-    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
     var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
-
     pageSelect.addEventListener("change", () => paginationChange(number));
-
-
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
-
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
-
-
-
-
-    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }

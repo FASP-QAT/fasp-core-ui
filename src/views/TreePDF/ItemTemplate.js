@@ -1,22 +1,15 @@
 import { highestContrast } from '../../../node_modules/basicprimitives/src/common/colors';
 import { Colors } from '../../../node_modules/basicprimitives/src/enums';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
-
 export default function ItemTemplate(options, itemTemplateConfig) {
-  console.log("Options@@@", options)
-  console.log("Options@@@", itemTemplateConfig)
   var _config = itemTemplateConfig;
-
   function template() {
     return {};
   }
-
   function getHashCode() {
     return 0;
   }
-
   function addCommas(cell1, row) {
-
     if (cell1 != null && cell1 != "") {
       cell1 = Number(cell1).toFixed(2);
       cell1 += '';
@@ -28,35 +21,27 @@ export default function ItemTemplate(options, itemTemplateConfig) {
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
       }
       return x1 + x2;
-      // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     } else {
       return "";
     }
   }
-
-
   function render(doc, position, data) {
     var itemConfig = data.context,
       itemTitleColor = itemConfig.itemTitleColor != null ? itemConfig.itemTitleColor : Colors.RoyalBlue,
       color = highestContrast(itemTitleColor, options.itemTitleSecondFontColor, options.itemTitleFirstFontColor),
       contentSize = new Size(_config.itemSize);
-
     contentSize.width -= _config.itemBorderWidth * 2;
     contentSize.height -= _config.itemBorderWidth * 2;
-
     doc.save();
-
     /* item border */
     doc.roundedRect(position.x, position.y, 200, 110, 0)
       .lineWidth((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].isPUMappingCorrect==0?2:_config.itemBorderWidth)
       .stroke((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].isPUMappingCorrect==0?'#BA0C2F':'#dddddd');
-
     /* title background */
     doc.fillColor(itemConfig.payload.nodeType.id == 5
       || itemConfig.payload.nodeType.id == 4 ? "#002f6c" : "#a7c6ed")
       .roundedRect(position.x + 2, position.y + 2, 198, ((itemConfig.payload.label.label_en).length <= 20 ? 18 : 32), 0)
       .fill();
-    console.log("itemConfig@@@", itemConfig);
     /* title */
     doc.fillColor(itemConfig.payload.nodeType.id == 5
       || itemConfig.payload.nodeType.id == 4 ? "#FFF" : "#002f6c")
@@ -67,33 +52,11 @@ export default function ItemTemplate(options, itemTemplateConfig) {
         // height: 16,
         align: 'left',
       });
-
     // /* photo */
     // if (itemConfig.image != null) {
-
     var result = itemConfig.result;
     var result1 = itemConfig.result1;
     var result2 = itemConfig.result2;
-    // if (itemConfig.payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList.length > 0) {
-    //   result = true;
-    // } else {
-    //   var arr = itemConfig.items1.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
-    //   if (arr.length > 0) {
-    //     for (var i = 0; i <= arr.length; i++) {
-    //       if (arr[i] != null) {
-    //         console.log("arr[i]---", arr[i])
-    //         var nodeDataModelingList = arr[i].payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList;
-    //         if (nodeDataModelingList.length > 0) {
-    //           var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
-    //           if (nodedata != null && nodedata != "") {
-    //             result = true;
-    //             break;
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
     if (result2) {
       if (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5) {
         // White image
@@ -143,7 +106,6 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       doc.image(new Buffer(image.replace('data:image/png;base64,', ''), 'base64'), position.x + 180, position.y + 6, { fit: [10, 10] });
     } else if (itemConfig.payload.nodeType.id == 4) {
       if((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].fuNode.usageType.id == 2){
-        // <b style={{ fontSize: '14px', color: '#fff' }}>c </b>
         doc
         .font('Helvetica-Bold', 14)
         .fillColor('white')
@@ -178,12 +140,6 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       var image = 'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAB5ElEQVRIie2Tu2sUURSHvzM7IVFXYqMmnY1IEHdXZAn+A4LmUVlZBQTRbAaMIJhYJIWmCia4DytBsLEwIsQHpLCWLCE7m2IFwUowop3ERxzmWMxm2XF2MrfTIr9q7p1zznfPufcHe/rXko67OWcIZQZ0AKSB+LPUyq8icWcn9/HdO49bfBYHsDoX1xegeSANmkflJbnChUjs1u950CUyE3fMAb7OBh96C+1JA1PBUmZCcRlnBOEa8AvLf2oOED0BgKdl6vNb/NxfbgIHWjFnrvcj+hAQ0GlqlZo5AOsdAClxODmepvuH0yQ3do6A5z0CDgMruOWFuOIxHfi3AUVkDtv6huhdAHyC0WULk8A5kK/Y9higuwFSkZ3N6gf681WQ40AvsI7PFTZKrzntZFGeACmUS9Tur+1WPGjXVMfGeuhNrwKnUCrUSwWTtA53EKNDB+81izfo2r5pmmbWQWZiFOE5sI0lg6wXXVMzJgMyV48gdh04CtzALS2QLQyDLEePq0N/Q5JGJIj9uFl8Bbe0CLSZLsGMiYDWk+RL6EmamDERkBvPgcwBispl1hY/taUlmdEA4FsXgW6UB9SL4XmLH5gubEZtmbFNUaPt6PPqG/oGNzjQVeHjWy/0b7P6PtaMe/rv9AfrobFv0aGX2gAAAABJRU5ErkJggg==';
       doc.image(new Buffer(image.replace('data:image/png;base64,', ''), 'base64'), position.x + 180, position.y + 4, { fit: [12, 12] });
     }
-    //   doc.image(itemConfig.image, position.x + 3, position.y + 24);
-    // }
-    // /* photo frame */
-    // doc.rect(position.x + 3, position.y + 24, 50, 60)
-    //   .stroke('#cccccc');
-
     /* description */
     if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
       doc
@@ -198,13 +154,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
     } else {
       var text = "";
       if (itemConfig.payload.nodeType.id == 4) {
-        // if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-
         text = addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue) + "% of parent, " + addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].fuPerMonth) + "/" + 'Month';
-        // } else {
-        //     return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
-        // }
-
       } else if (itemConfig.payload.nodeType.id == 5) {
         text = addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].puNode.planningUnit.multiplier;
       } else {
@@ -220,9 +170,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
           align: 'center'
         });
     }
-
     if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-
     } else {
       doc
         .font('Helvetica-Oblique', 12)
@@ -233,7 +181,6 @@ export default function ItemTemplate(options, itemTemplateConfig) {
           height: 74,
           align: 'center'
         });
-
     }
     if (itemConfig.showModelingValidation) {
       var text = itemConfig.text;
@@ -254,7 +201,6 @@ export default function ItemTemplate(options, itemTemplateConfig) {
           width: (contentSize.width - 4),
           height: 74,
         })
-
       doc
         .font('Helvetica', 12)
         .fillColor(text != 100 ? 'red' : 'black')
@@ -262,11 +208,9 @@ export default function ItemTemplate(options, itemTemplateConfig) {
           width: (contentSize.width - 4),
           height: 74,
         })
-
     }
     doc.restore();
   }
-
   return {
     template: template,
     getHashCode: getHashCode,

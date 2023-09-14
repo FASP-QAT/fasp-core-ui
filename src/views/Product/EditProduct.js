@@ -1,19 +1,27 @@
+import { Formik } from 'formik';
 import React, { Component } from 'react';
 import {
-    Row, Col, Card, CardHeader,
-    CardFooter, Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input, InputGroupAddon, InputGroupText,
+    Label,
+    Row
 } from 'reactstrap';
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
+import ProductService from '../../api/ProductService';
 import RealmServcie from '../../api/RealmService';
 import UnitService from '../../api/UnitService';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText'
-import ProductService from '../../api/ProductService';
-import i18n from '../../i18n'
-import { API_URL } from '../../Constants';
+import i18n from '../../i18n';
+import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     productName: '',
     genericName: '',
@@ -36,7 +44,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.product.productunittext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -48,7 +55,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -58,10 +64,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
 export default class EditProduct extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -81,7 +84,6 @@ export default class EditProduct extends Component {
                 forecastingUnit: {
                     unitId: ''
                 }
-
             },
             lan: localStorage.getItem('lang'),
             realmList: [],
@@ -89,24 +91,13 @@ export default class EditProduct extends Component {
             unitList: [],
             message: ''
         }
-        // initialValues = {
-        //     productName: getLabelText(this.props.location.state.product.label, this.state.lan),
-        //     genericName: getLabelText(this.props.location.state.product.genericLabel, this.state.lan),
-        //     realmId: this.props.location.state.product.realm.realmId,
-        //     productCategoryId: this.props.location.state.product.productCategory.productCategoryId,
-        //     unitId: this.props.location.state.product.forecastingUnit.unitId,
-
-        // }
-
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProductDataById(this.props.match.params.productId)
             .then(response => {
-                // console.log("------>", response.data);
                 if (response.status == 200) {
                     var product = response.data;
                     this.setState({ product: product });
@@ -116,12 +107,10 @@ export default class EditProduct extends Component {
                         realmId: product.realm.realmId,
                         productCategoryId: product.productCategory.productCategoryId,
                         unitId: product.forecastingUnit.unitId,
-
                     }
                     ProductService.getProdcutCategoryListByRealmId(this.state.product.realm.realmId)
                         .then(response => {
                             if (response.status == 200) {
-                                // console.log(response.data);
                                 this.setState({
                                     productCategoryList: response.data
                                 })
@@ -133,7 +122,6 @@ export default class EditProduct extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        // message: error.message
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     });
                                 } else {
@@ -155,14 +143,12 @@ export default class EditProduct extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-
             })
             .catch(
                 error => {
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
-                                // message: error.message
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             })
                             break
@@ -174,11 +160,9 @@ export default class EditProduct extends Component {
                     }
                 }
             );
-
         RealmServcie.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         realmList: response.data
                     })
@@ -190,7 +174,6 @@ export default class EditProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message 
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -209,11 +192,9 @@ export default class EditProduct extends Component {
                     }
                 }
             );
-
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         unitList: response.data
                     })
@@ -225,7 +206,6 @@ export default class EditProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            //  message: error.message
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -244,16 +224,11 @@ export default class EditProduct extends Component {
                     }
                 }
             );
-
-
-
     }
     getDependentLists(event) {
-        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         productCategoryList: response.data
                     })
@@ -265,7 +240,6 @@ export default class EditProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -284,7 +258,6 @@ export default class EditProduct extends Component {
                     }
                 }
             );
-
     }
     dataChange(event) {
         let { product } = this.state;
@@ -312,11 +285,9 @@ export default class EditProduct extends Component {
         this.setState({
             product
         },
-            () => { 
-                // console.log(product); console.log(initialValues.realmId); 
+            () => {
             });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             productName: true,
@@ -379,12 +350,9 @@ export default class EditProduct extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // AuthenticationService.setupAxiosInterceptors();
-                                    // console.log("==============", this.state.product);
                                     ProductService.editProduct(this.state.product)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                // console.log(response);
                                                 this.props.history.push(`/product/listProduct/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -396,7 +364,6 @@ export default class EditProduct extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: error.message 
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     });
                                                 } else {
@@ -410,7 +377,6 @@ export default class EditProduct extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            // console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -436,7 +402,6 @@ export default class EditProduct extends Component {
                                                     <InputGroupAddon addonType="prepend">
                                                         <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input
-                                                            // value={getLabelText(this.state.product.label,this.state.lan)}
                                                             value={this.state.product.label.label_en}
                                                             type="text"
                                                             name="productName"
@@ -449,14 +414,12 @@ export default class EditProduct extends Component {
                                                             required />
                                                         <FormFeedback className="red" back>{errors.productName}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
                                                     <InputGroupAddon addonType="prepend">
                                                         <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input type="text"
-                                                            // value={getLabelText(this.state.product.genericLabel, this.state.lan)}
                                                             value={this.state.product.genericLabel.label_en}
                                                             name="genericName"
                                                             id="genericName"
@@ -468,7 +431,6 @@ export default class EditProduct extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.genericName}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
@@ -492,7 +454,6 @@ export default class EditProduct extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
@@ -510,15 +471,10 @@ export default class EditProduct extends Component {
                                                             required
                                                             value={this.state.product.productCategory.productCategoryId}
                                                         >
-                                                            {/* <option value="0">Please select</option> */}
-                                                            {/* <option value="1">Product Category One</option>
-                                                            <option value="2">Product Category Two</option>
-                                                            <option value="3">Product Category Three</option> */}
                                                             {productCategories}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.product.unit1')}</Label>
@@ -536,12 +492,10 @@ export default class EditProduct extends Component {
                                                             required
                                                             value={this.state.product.forecastingUnit.unitId}
                                                         >
-                                                            {/* <option value="0">Please select</option> */}
                                                             {units}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -581,8 +535,6 @@ export default class EditProduct extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-
-                                                    {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
@@ -603,5 +555,4 @@ export default class EditProduct extends Component {
     cancelClicked() {
         this.props.history.push(`/product/listProduct/` + i18n.t('static.message.cancelled', { entityname }))
     }
-
 }

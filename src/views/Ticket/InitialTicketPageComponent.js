@@ -1,61 +1,52 @@
 import React, { Component } from 'react';
-import { Badge, Button, Dropdown, DropdownItem, DropdownMenu, FormGroup, DropdownToggle, Input, Label, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row, Col, Progress } from 'reactstrap';
+import { Button, Dropdown, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import imageHelp from '../../assets/img/help-icon.png';
-import PlanningUnitTicketComponent from './PlanningUnitTicketComponent';
-import BugReportTicketComponent from './BugReportTicketComponent';
-import ForecastingUnitTicketComponent from './ForecastingUnitTicketComponent';
-import UserTicketComponent from './UserTicketComponent';
-import CountryTicketComponent from './CountryTicketComponent';
-import CurrencyTicketComponent from './CurrencyTicketComponent';
-import UnitsTicketComponent from './UnitsTicketComponent';
-import RealmTicketComponent from './RealmTicketComponent';
-import DataSourceTicketComponent from './DataSourceTicketComponent';
-import FundingSourceTicketComponent from './FundingSourceTicketComponent';
-import ProcurementAgentTicketComponent from './ProcurementAgentTicketComponent';
-import SuppliersTicketComponent from './SuppliersTicketComponent';
-import TechnicalAreaTicketComponent from './TechnicalAreaTicketComponent';
-import OrganisationTicketComponent from './OrganisationTicketComponent';
-import TracerCategoryTicketComponent from './TracerCategoryTicketComponent';
-import OrganisationTypeTicketComponent from './OrganisationTypeTicketComponent';
-import ProductCategoryTicketComponent from './ProductCategoryTicketComponent';
 import BudgetTicketComponent from './BudgetTicketComponent';
-import ProcurementUnitTicketComponent from './ProcurementUnitTicketComponent';
-import ProgramTicketComponent from './ProgramTicketComponent';
-import RealmCountryTicketComponent from './RealmCountryTicketComponent';
-import RealmCountryRegionTicketComponent from './RealmCountryRegionTicketComponent';
-import UsagePeriodTicketComponent from './UsagePeriodTicketComponent';
+import BugReportTicketComponent from './BugReportTicketComponent';
+import DataSourceTicketComponent from './DataSourceTicketComponent';
 import ForecastMethodTicketComponent from './ForecastMethodTicketComponent';
+import ForecastingUnitTicketComponent from './ForecastingUnitTicketComponent';
+import FundingSourceTicketComponent from './FundingSourceTicketComponent';
 import ModelingTypeTicketComponent from './ModelingTypeTicketComponent';
-
+import OrganisationTicketComponent from './OrganisationTicketComponent';
+import OrganisationTypeTicketComponent from './OrganisationTypeTicketComponent';
+import PlanningUnitTicketComponent from './PlanningUnitTicketComponent';
+import ProcurementAgentTicketComponent from './ProcurementAgentTicketComponent';
+import ProductCategoryTicketComponent from './ProductCategoryTicketComponent';
+import ProgramTicketComponent from './ProgramTicketComponent';
+import RealmCountryRegionTicketComponent from './RealmCountryRegionTicketComponent';
+import RealmCountryTicketComponent from './RealmCountryTicketComponent';
+import RealmTicketComponent from './RealmTicketComponent';
+import TechnicalAreaTicketComponent from './TechnicalAreaTicketComponent';
+import TracerCategoryTicketComponent from './TracerCategoryTicketComponent';
+import UsagePeriodTicketComponent from './UsagePeriodTicketComponent';
+import UserTicketComponent from './UserTicketComponent';
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import i18n from '../../i18n';
-import { Online } from 'react-detect-offline';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import AuthenticationService from '../Common/AuthenticationService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import ChangeRequestTicketComponent from './ChangeRequestTicketComponent';
 import EditBudgetTicketComponent from './EditBudgetTicketComponent';
 import EditDataSourceTicketComponent from './EditDataSourceTicketComponent';
-import EditFundingSourceTicketComponent from './EditFundingSourceTicketComponent';
-import EditForecastingUnitTicketComponent from './EditForecastingUnitTicketComponent';
-import EditOrganisationTicketComponent from './EditOrganisationTicketComponent';
-import EditPlanningUnitTicketComponent from './EditPlanningUnitTicketComponent';
-import EditProductCategoryTicketComponent from './EditProductCategoryTicketComponent';
-import EditProcurementAgentTicketComponent from './EditProcurementAgentTicketComponent';
-import EditProgramTicketComponent from './EditProgramTicketComponent';
-import EditRealmTicketComponent from './EditRealmTicketComponent';
-import EditRealmCountryTicketComponent from './EditRealmCountryTicketComponent';
-import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
-import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
-import EditOrganisationTypeTicketComponent from './EditOrganisationTypeTicketComponent';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import AuthenticationService from '../Common/AuthenticationService';
-import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
-import EditUsagePeriodTicketComponent from './EditUsagePeriodTicketComponent';
 import EditForecastMethodTicketComponent from './EditForecastMethodTicketComponent';
+import EditForecastingUnitTicketComponent from './EditForecastingUnitTicketComponent';
+import EditFundingSourceTicketComponent from './EditFundingSourceTicketComponent';
 import EditModelingTypeTicketComponent from './EditModelingTypeTicketComponent';
-import ChangeRequestTicketComponent from './ChangeRequestTicketComponent';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-
+import EditOrganisationTicketComponent from './EditOrganisationTicketComponent';
+import EditOrganisationTypeTicketComponent from './EditOrganisationTypeTicketComponent';
+import EditPlanningUnitTicketComponent from './EditPlanningUnitTicketComponent';
+import EditProcurementAgentTicketComponent from './EditProcurementAgentTicketComponent';
+import EditProductCategoryTicketComponent from './EditProductCategoryTicketComponent';
+import EditProgramTicketComponent from './EditProgramTicketComponent';
+import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
+import EditRealmCountryTicketComponent from './EditRealmCountryTicketComponent';
+import EditRealmTicketComponent from './EditRealmTicketComponent';
+import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
+import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
+import EditUsagePeriodTicketComponent from './EditUsagePeriodTicketComponent';
 export default class InitialTicketPageComponent extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -97,7 +88,6 @@ export default class InitialTicketPageComponent extends Component {
       showRealmCountryRegionData: 0,
       showAddEditMaster: 0,
       showEditMaster: 0,
-
       showUsagePeriodData: 0,
       showForecastMethodData: 0,
       showModelingTypeData: 0,
@@ -105,7 +95,6 @@ export default class InitialTicketPageComponent extends Component {
       showEquivalencyUnitMappingData: 0,
       showUsageTemplateData: 0,
       showTreeTemplateData: 0,
-
       showEditBudgetData: 0,
       showEditDataSourceData: 0,
       showEditFundingSourceData: 0,
@@ -124,10 +113,8 @@ export default class InitialTicketPageComponent extends Component {
       showEditUsagePeriodData: 0,
       showEditForecastMethodData: 0,
       showEditModelingTypeData: 0,
-
       showChangeRequest: 0
     };
-
     this.togglehelp = this.togglehelp.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
@@ -146,14 +133,10 @@ export default class InitialTicketPageComponent extends Component {
     this.backFromAddMasterForms = this.backFromAddMasterForms.bind(this);
     this.showOnlyEditMasterForms = this.showOnlyEditMasterForms.bind(this);
     this.backFromEditMasterForms = this.backFromEditMasterForms.bind(this);
-
     this.toggleChangeRequest = this.toggleChangeRequest.bind(this);
   }
-
   componentDidMount() {
-
   }
-
   togglehelp() {
     if (isSiteOnline()) {
       this.setState({
@@ -187,7 +170,6 @@ export default class InitialTicketPageComponent extends Component {
         showRealmCountryRegionData: 0,
         showAddEditMaster: 0,
         showEditMaster: 0,
-
         showUsagePeriodData: 0,
         showForecastMethodData: 0,
         showModelingTypeData: 0,
@@ -195,7 +177,6 @@ export default class InitialTicketPageComponent extends Component {
         showEquivalencyUnitMappingData: 0,
         showUsageTemplateData: 0,
         showTreeTemplateData: 0,
-
         showEditBudgetData: 0,
         showEditDataSourceData: 0,
         showEditFundingSourceData: 0,
@@ -214,7 +195,6 @@ export default class InitialTicketPageComponent extends Component {
         showEditUsagePeriodData: 0,
         showEditForecastMethodData: 0,
         showEditModelingTypeData: 0,
-
         showChangeRequest: 0
       });
     } else {
@@ -228,13 +208,11 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-
   toggleLarge() {
     this.setState({
       large: !this.state.large,
     });
   }
-
   toggleSmall(msg) {
     confirmAlert({
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
@@ -245,24 +223,18 @@ export default class InitialTicketPageComponent extends Component {
       ]
     });
   }
-
-  // Show Bug Report
   togglebugreport() {
     this.setState({
       initialPage: 0,
       showBugReport: 1
     });
   }
-
-  // Show Bug Report
   toggleChangeRequest() {
     this.setState({
       initialPage: 0,
       showChangeRequest: 1
     });
   }
-
-  //Show Initial Master page
   togglechangemaster() {
     this.setState({
       changemaster: !this.state.changemaster,
@@ -271,30 +243,24 @@ export default class InitialTicketPageComponent extends Component {
       showBugReport: 0
     });
   }
-
   toggleMasterList() {
     this.setState({
       showAddEditMaster: 0,
       showOnlyMaster: 1
     });
   }
-
   toggleEditMaster() {
     this.setState({
       showAddEditMaster: 0,
       showEditMaster: 1
     });
   }
-
-  //Show User Master Page
   toggleUserMaster() {
     this.setState({
       initialPage: 0,
       showUserData: 1
     });
   }
-
-  //Show main page back from bug report
   toggleMain() {
     this.setState({
       initialPage: 1,
@@ -303,30 +269,24 @@ export default class InitialTicketPageComponent extends Component {
       showChangeRequest: 0
     });
   }
-
-  //Show main page back from initial master page
   toggleMain1() {
     this.setState({
       initialPage: 1,
       showAddEditMaster: 0
     });
   }
-
   toggleMain2() {
     this.setState({
       showAddEditMaster: 1,
       showOnlyMaster: 0
     });
   }
-
   toggleMain3() {
     this.setState({
       showAddEditMaster: 1,
       showEditMaster: 0
     });
   }
-
-  // Show initial master page back form sub master page
   toggleMasterInitial(masterNo) {
     if (masterNo == 1) {
       this.setState({
@@ -345,8 +305,6 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-
-  //Show sub master page from inital master page
   toggleSubMaster(masterNo) {
     if (masterNo == 1) {
       this.setState({
@@ -365,7 +323,6 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-
   showOnlyAddMasterForms(formNo) {
     if (formNo == 1) {
       this.setState({
@@ -544,9 +501,7 @@ export default class InitialTicketPageComponent extends Component {
         showTreeTemplateData: 1
       });
     }
-
   }
-
   backFromAddMasterForms(masterFormNo) {
     if (masterFormNo == 1) {
       this.setState({
@@ -660,7 +615,6 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-
   showOnlyEditMasterForms(formNo) {
     if (formNo == 1) {
       this.setState({
@@ -807,9 +761,7 @@ export default class InitialTicketPageComponent extends Component {
         showEditModelingTypeData: 1
       });
     }
-
   }
-
   backFromEditMasterForms(masterFormNo) {
     if (masterFormNo == 1) {
       this.setState({
@@ -903,27 +855,18 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-
-
-
   render() {
     const checkOnline = localStorage.getItem('sessionType');
     return (
       <Dropdown nav  >
-
         {checkOnline==='Online' && <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />}
-
-
-
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} backdrop="static">
           <AuthenticationServiceComponent history={this.props.history} />
-          {/* className={'modal-info ' + this.props.className}> */}
-          <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
+                    <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
           <ModalBody className="pb-0">
             {this.state.initialPage == 1 && <div className="col-md-12">
               <div><h4><b>{i18n.t('static.ticket.header')}</b></h4>{i18n.t('static.ticket.subheader')}</div><br></br>
               <div className="mt-2 mb-2">
-
                 <ListGroup>
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')}</ListGroupItem>
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateMasterData')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -931,25 +874,13 @@ export default class InitialTicketPageComponent extends Component {
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>
                 </ListGroup>
               </div>
-
             </div>}
-
-            {/* Bug Report modal */}
-            {this.state.initialPage == 0 && this.state.showBugReport == 1 && <div isOpen={this.state.bugreport} toggle={this.togglebugreport}>
-              {/* <ModalHeader toggle={this.togglebugreport} className="ModalHead modal-info-Headher"><strong>Bug Report</strong></ModalHeader> */}
-              <BugReportTicketComponent toggleMain={this.toggleMain} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />
+                        {this.state.initialPage == 0 && this.state.showBugReport == 1 && <div isOpen={this.state.bugreport} toggle={this.togglebugreport}>
+                            <BugReportTicketComponent toggleMain={this.toggleMain} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />
             </div>}
-
-
-            {/* Change Additional Master modal */}
-
             <div isOpen={this.state.changemaster} toggle={this.togglechangemaster} className={this.props.className}>
-              {/* className={'modal-info ' + this.props.className}> */}
-              {/* <ModalHeader toggle={this.togglechangemaster} className="ModalHead modal-info-Headher"><strong>Help</strong></ModalHeader> */}
-              <ModalBody>
-
+                                          <ModalBody>
                 {this.state.showAddEditMaster == 1 && <div className="mt-2 mb-2">
-
                   <ListGroup>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleMasterList} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addMasters')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleEditMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.editMasters')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -958,11 +889,9 @@ export default class InitialTicketPageComponent extends Component {
                     <Button color="info" onClick={this.toggleMain1}><i className="fa fa-angle-double-left "></i>  Back</Button>
                   </ModalFooter>
                 </div>}
-
                 {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
                   <div><h4>{i18n.t('static.ticket.requestNewTo')}</h4></div><br></br>
                   <ListGroup>
-
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -981,22 +910,14 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(16) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Usage Period'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(17) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Forecast Method'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(18) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Modeling Type'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    {/* <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(19) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Equivalency Unit'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(20) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Equivalency Unit Mapping'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(21) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Usage Template'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(22) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Tree Template'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem> */}
-
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={this.toggleMain2}><i className="fa fa-angle-double-left "></i>  Back</Button>
-                    {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
-                  </ModalFooter>
+                                      </ModalFooter>
                 </div>}
-
                 {this.state.showEditMaster == 1 && <div className="mt-2 mb-2">
                   <div><h4>{i18n.t('static.ticket.requestUpdateTo')}</h4></div><br></br>
                   <ListGroup>
-
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -1015,18 +936,13 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(16) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Usage Period'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(17) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Forecast Method'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(18) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Modeling Type'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-
-
                   </ListGroup>
                   <ModalFooter className="pb-0 pr-0">
                     <Button color="info" onClick={this.toggleMain3}><i className="fa fa-angle-double-left "></i>  Back</Button>
-                    {/* <Button color="success" onClick={this.togglebugreport}>Submit</Button> */}
-                  </ModalFooter>
+                                      </ModalFooter>
                 </div>}
-
                 {this.state.showUserData == 1 && <UserTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showChangeRequest == 1 && <ChangeRequestTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
-
                 {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={() => this.backFromAddMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
@@ -1045,12 +961,6 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showUsagePeriodData == 1 && <UsagePeriodTicketComponent toggleMaster={() => this.backFromAddMasterForms(16)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showForecastMethodData == 1 && <ForecastMethodTicketComponent toggleMaster={() => this.backFromAddMasterForms(17)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showModelingTypeData == 1 && <ModelingTypeTicketComponent toggleMaster={() => this.backFromAddMasterForms(18)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
-                {/* {this.state.showUsagePeriodData == 1 && <EquivalencyUnitTicketComponent toggleMaster={() => this.backFromAddMasterForms(19)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
-                {this.state.showUsagePeriodData == 1 && <EquivalencyUnitMappingTicketComponent toggleMaster={() => this.backFromAddMasterForms(20)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
-                {this.state.showUsagePeriodData == 1 && <UsageTemplateTicketComponent toggleMaster={() => this.backFromAddMasterForms(21)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
-                {this.state.showUsagePeriodData == 1 && <TreeTemplateTicketComponent toggleMaster={() => this.backFromAddMasterForms(22)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />} */}
-
-
                 {this.state.showEditBudgetData == 1 && <EditBudgetTicketComponent toggleMaster={() => this.backFromEditMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditDataSourceData == 1 && <EditDataSourceTicketComponent toggleMaster={() => this.backFromEditMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditFundingSourceData == 1 && <EditFundingSourceTicketComponent toggleMaster={() => this.backFromEditMasterForms(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
@@ -1069,21 +979,11 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showEditUsagePeriodData == 1 && <EditUsagePeriodTicketComponent toggleMaster={() => this.backFromEditMasterForms(16)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditForecastMethodData == 1 && <EditForecastMethodTicketComponent toggleMaster={() => this.backFromEditMasterForms(17)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditModelingTypeData == 1 && <EditModelingTypeTicketComponent toggleMaster={() => this.backFromEditMasterForms(18)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
-
-
               </ModalBody>
-
             </div>
-
-
           </ModalBody>
-
-
-
         </Modal>
-
       </Dropdown>
     )
-
   }
 }

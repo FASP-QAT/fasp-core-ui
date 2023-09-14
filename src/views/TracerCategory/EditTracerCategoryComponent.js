@@ -1,362 +1,30 @@
-// import React, { Component } from 'react';
-// import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, FormFeedback, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
-// import { Formik } from 'formik';
-// import * as Yup from 'yup'
-// import '../Forms/ValidationForms/ValidationForms.css'
-// import i18n from '../../i18n';
-// import RealmService from "../../api/RealmService";
-// import TracerCategoryService from "../../api/TracerCategoryService";
-// import AuthenticationService from '../Common/AuthenticationService.js';
-// import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
-// import getLabelText from '../../CommonComponent/getLabelText';
-// import { BUDGET_NAME_REGEX } from '../../Constants.js';
-// const entityname = i18n.t('static.tracercategory.tracercategory');
-
-// const initialValues = {
-//     tracerCategoryName: "",
-//     submittedToApprovedLeadTime: ""
-// }
-
-// const validationSchema = function (values) {
-//     return Yup.object().shape({
-//         tracerCategoryName: Yup.string()
-//             .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
-//             .required(i18n.t('static.tracerCategory.tracercategorytext')),
-//     })
-// }
-
-// const validate = (getValidationSchema) => {
-//     return (values) => {
-//         const validationSchema = getValidationSchema(values)
-//         try {
-//             validationSchema.validateSync(values, { abortEarly: false })
-//             return {}
-//         } catch (error) {
-//             return getErrorsFromValidationError(error)
-//         }
-//     }
-// }
-
-// const getErrorsFromValidationError = (validationError) => {
-//     const FIRST_ERROR = 0
-//     return validationError.inner.reduce((errors, error) => {
-//         return {
-//             ...errors,
-//             [error.path]: error.errors[FIRST_ERROR],
-//         }
-//     }, {})
-// }
-// class EditTracerCategoryComponent extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             realms: [],
-//             // tracerCategory: this.props.location.state.tracerCategory,
-//             tracerCategory: {
-//                 realm: {
-//                     label: {
-//                         label_en: '',
-//                         label_fr: '',
-//                         label_sp: '',
-//                         label_pr: ''
-//                     }
-//                 },
-//                 label: {
-//                     label_en: '',
-//                     label_fr: '',
-//                     label_sp: '',
-//                     label_pr: ''
-//                 }
-//             },
-//             message: '',
-//             lang: localStorage.getItem('lang')
-//         }
-//         this.cancelClicked = this.cancelClicked.bind(this);
-//         this.dataChange = this.dataChange.bind(this);
-//         this.Capitalize = this.Capitalize.bind(this);
-//         this.resetClicked = this.resetClicked.bind(this);
-//         this.changeMessage = this.changeMessage.bind(this);
-//         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-//     }
-
-//     changeMessage(message) {
-//         this.setState({ message: message })
-//     }
-//     hideSecondComponent() {
-//         setTimeout(function () {
-//             document.getElementById('div2').style.display = 'none';
-//         }, 8000);
-//     }
-
-//     Capitalize(str) {
-//         if (str != null && str != "") {
-//             let { tracerCategory } = this.state;
-//             tracerCategory.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
-//         } else {
-//             return "";
-//         }
-//     }
-
-
-//     dataChange(event) {
-//         let { tracerCategory } = this.state;
-//         if (event.target.name == "realmId") {
-//             tracerCategory.realm.id = event.target.value;
-//         }
-//         if (event.target.name == "tracerCategoryName") {
-//             tracerCategory.label.label_en = event.target.value;
-//         }
-//         if (event.target.name == "active") {
-//             tracerCategory.active = event.target.id === "active2" ? false : true;
-//         }
-
-
-//         this.setState({
-//             tracerCategory
-//         },
-//             () => { });
-//     };
-
-//     touchAll(setTouched, errors) {
-//         setTouched({
-//             tracerCategoryName: true,
-//             submittedToApprovedLeadTime: true
-//         }
-//         )
-//         this.validateForm(errors)
-//     }
-//     validateForm(errors) {
-//         this.findFirstError('tracerCategoryForm', (fieldName) => {
-//             return Boolean(errors[fieldName])
-//         })
-//     }
-//     findFirstError(formName, hasError) {
-//         const form = document.forms[formName]
-//         for (let i = 0; i < form.length; i++) {
-//             if (hasError(form[i].name)) {
-//                 form[i].focus()
-//                 break
-//             }
-//         }
-//     }
-//     componentDidMount() {
-//         AuthenticationService.setupAxiosInterceptors();
-//         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
-//             if (response.status == 200) {
-//                 this.setState({
-//                     tracerCategory: response.data
-//                 });
-//             }
-//             else {
-
-//                 this.setState({
-//                     message: response.data.messageCode
-//                 },
-//                     () => {
-//                         this.hideSecondComponent();
-//                     })
-//             }
-
-//         })
-
-//     }
-//     render() {
-//         return (
-//             <div className="animated fadeIn">
-//                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-//                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-//                 <Row>
-//                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-//                         <Card>
-
-//                             {/* <CardHeader>
-//                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-//                             </CardHeader> */}
-//                             <Formik
-//                                 enableReinitialize={true}
-//                                 initialValues={
-//                                     {
-//                                         tracerCategoryCode: this.state.tracerCategory.tracerCategoryCode,
-//                                         tracerCategoryName: this.state.tracerCategory.label.label_en,
-//                                         submittedToApprovedLeadTime: this.state.tracerCategory.submittedToApprovedLeadTime
-//                                     }}
-//                                 validate={validate(validationSchema)}
-//                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-//                                     console.log("this.state.tracerCategory---", this.state.tracerCategory);
-//                                     AuthenticationService.setupAxiosInterceptors();
-//                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
-//                                         .then(response => {
-//                                             if (response.status == 200) {
-//                                                 this.props.history.push(`/tracerCategory/listTracerCategory/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-//                                             } else {
-//                                                 this.setState({
-//                                                     message: response.data.messageCode
-//                                                 },
-//                                                     () => {
-//                                                         this.hideSecondComponent();
-//                                                     })
-//                                             }
-//                                         })
-
-//                                 }}
-//                                 render={
-//                                     ({
-//                                         values,
-//                                         errors,
-//                                         touched,
-//                                         handleChange,
-//                                         handleBlur,
-//                                         handleSubmit,
-//                                         isSubmitting,
-//                                         isValid,
-//                                         setTouched
-//                                     }) => (
-//                                             <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
-//                                                 <CardBody className="pb-0">
-//                                                     <FormGroup>
-//                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
-//                                                         {/* <InputGroupAddon addonType="prepend"> */}
-//                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-//                                                         <Input
-//                                                             type="text"
-//                                                             name="realmId"
-//                                                             id="realmId"
-//                                                             bsSize="sm"
-//                                                             readOnly={true}
-//                                                             value={getLabelText(this.state.tracerCategory.realm.label, this.state.lang)}
-//                                                         >
-//                                                         </Input>
-//                                                         {/* </InputGroupAddon> */}
-//                                                     </FormGroup>
-
-//                                                     <FormGroup>
-//                                                         <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span className="red Reqasterisk">*</span></Label>
-//                                                         {/* <InputGroupAddon addonType="prepend"> */}
-//                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-//                                                         <Input type="text"
-//                                                             bsSize="sm"
-//                                                             name="tracerCategoryName"
-//                                                             id="tracerCategoryName"
-//                                                             valid={!errors.tracerCategoryName}
-//                                                             invalid={touched.tracerCategoryName && !!errors.tracerCategoryName || this.state.tracerCategory.label.label_en == ''}
-//                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-//                                                             onBlur={handleBlur}
-//                                                             required
-//                                                             value={getLabelText(this.state.tracerCategory.label, this.state.lang)}
-//                                                         />
-//                                                         {/* </InputGroupAddon> */}
-//                                                         <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
-//                                                     </FormGroup>
-//                                                     <FormGroup>
-//                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
-//                                                         <FormGroup check inline>
-//                                                             <Input
-//                                                                 className="form-check-input"
-//                                                                 type="radio"
-//                                                                 id="active1"
-//                                                                 name="active"
-//                                                                 value={true}
-//                                                                 checked={this.state.tracerCategory.active === true}
-//                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
-//                                                             />
-//                                                             <Label
-//                                                                 className="form-check-label"
-//                                                                 check htmlFor="inline-radio1">
-//                                                                 {i18n.t('static.common.active')}
-//                                                             </Label>
-//                                                         </FormGroup>
-//                                                         <FormGroup check inline>
-//                                                             <Input
-//                                                                 className="form-check-input"
-//                                                                 type="radio"
-//                                                                 id="active2"
-//                                                                 name="active"
-//                                                                 value={false}
-//                                                                 checked={this.state.tracerCategory.active === false}
-//                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
-//                                                             />
-//                                                             <Label
-//                                                                 className="form-check-label"
-//                                                                 check htmlFor="inline-radio2">
-//                                                                 {i18n.t('static.common.disabled')}
-//                                                             </Label>
-//                                                         </FormGroup>
-//                                                     </FormGroup>
-//                                                 </CardBody>
-//                                                 <CardFooter>
-//                                                     <FormGroup>
-//                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-//                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-//                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-//                                                         &nbsp;
-//                                                     </FormGroup>
-//                                                 </CardFooter>
-//                                             </Form>
-
-//                                         )} />
-
-//                         </Card>
-//                     </Col>
-//                 </Row>
-//             </div>
-//         );
-//     }
-//     cancelClicked() {
-//         this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
-//     }
-
-//     resetClicked() {
-//         AuthenticationService.setupAxiosInterceptors();
-//         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
-//             this.setState({
-//                 tracerCategory: response.data
-//             });
-
-//         })
-
-//     }
-// }
-
-// export default EditTracerCategoryComponent;
-
-// loader
-
-
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, FormFeedback, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n';
-import RealmService from "../../api/RealmService";
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import TracerCategoryService from "../../api/TracerCategoryService";
-import HealthAreaService from "../../api/HealthAreaService";
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, BUDGET_NAME_REGEX } from '../../Constants.js';
+import { API_URL } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.tracercategory.tracercategory');
-
 const initialValues = {
     tracerCategoryName: "",
     healthAreaId: "",
     submittedToApprovedLeadTime: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         tracerCategoryName: Yup.string()
-            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.healtharea.healthareatext')),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -368,7 +36,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -385,7 +52,6 @@ class EditTracerCategoryComponent extends Component {
             loading: true,
             realms: [],
             healthAreas: [],
-            // tracerCategory: this.props.location.state.tracerCategory,
             tracerCategory: {
                 realm: {
                     label: {
@@ -419,7 +85,6 @@ class EditTracerCategoryComponent extends Component {
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-
     changeMessage(message) {
         this.setState({ message: message })
     }
@@ -428,7 +93,6 @@ class EditTracerCategoryComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { tracerCategory } = this.state;
@@ -437,8 +101,6 @@ class EditTracerCategoryComponent extends Component {
             return "";
         }
     }
-
-
     dataChange(event) {
         let { tracerCategory } = this.state;
         if (event.target.name == "realmId") {
@@ -453,14 +115,11 @@ class EditTracerCategoryComponent extends Component {
         if (event.target.name == "healthAreaId") {
             tracerCategory.healthArea.id = event.target.value;
         }
-
-
         this.setState({
             tracerCategory
         },
             () => { });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             tracerCategoryName: true,
@@ -485,7 +144,6 @@ class EditTracerCategoryComponent extends Component {
         }
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response1 => {
             if (response1.status == 200) {
                 this.setState({
@@ -493,32 +151,17 @@ class EditTracerCategoryComponent extends Component {
                 }, 
                 () => {
                     let realmId = AuthenticationService.getRealmId();
-                    // HealthAreaService.getHealthAreaList()
                     DropdownService.getHealthAreaDropdownList(realmId)
                     .then(response => {
                         if (response.status == 200) {
-                //  console.log("response.data--",response.data)
                             var listArray = response.data;
                             var haArray = response.data;
                             haArray = haArray.filter( (item) => {
                                 return item.id === this.state.tracerCategory.healthArea.id;
                             });
-                            // if(haArray.length > 0){
-                            //     if(haArray[0].active==false){
-                            //         this.setState(prevState => ({
-                            //             ...prevState,
-                            //             tracerCategory:{
-                            //                 ...prevState.tracerCategory,
-                            //                 healthArea:{
-                            //                     id:''
-                            //                 }
-                            //             }
-                            //         }))
-                            //     }
-                            // }
                             listArray.sort((a, b) => {
-                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                                 return itemLabelA > itemLabelB ? 1 : -1;
                             });
                             this.setState({
@@ -533,13 +176,11 @@ class EditTracerCategoryComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -573,7 +214,6 @@ class EditTracerCategoryComponent extends Component {
                 });
             }
             else {
-
                 this.setState({
                     message: response1.data.messageCode, loading: false
                 },
@@ -581,18 +221,15 @@ class EditTracerCategoryComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -623,21 +260,16 @@ class EditTracerCategoryComponent extends Component {
                 }
             }
         );
-
-        
-
     }
     render() {
         const { healthAreas } = this.state;
         let healthAreaList = healthAreas.length > 0
             && healthAreas.map((item, i) => {
-                // if(item.active==true){
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
-                // }
             }, this);
         return (
             <div className="animated fadeIn">
@@ -646,11 +278,7 @@ class EditTracerCategoryComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
-                            <Formik
+                                                        <Formik
                                 enableReinitialize={true}
                                 initialValues={
                                     {
@@ -664,8 +292,6 @@ class EditTracerCategoryComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log("this.state.tracerCategory---", this.state.tracerCategory);
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -682,13 +308,11 @@ class EditTracerCategoryComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -719,7 +343,6 @@ class EditTracerCategoryComponent extends Component {
                                                 }
                                             }
                                         );
-
                                 }}
                                 render={
                                     ({
@@ -737,9 +360,7 @@ class EditTracerCategoryComponent extends Component {
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                    <Input
+                                                                                                                                                            <Input
                                                         type="text"
                                                         name="realmId"
                                                         id="realmId"
@@ -748,14 +369,10 @@ class EditTracerCategoryComponent extends Component {
                                                         value={getLabelText(this.state.tracerCategory.realm.label, this.state.lang)}
                                                     >
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
-                                                </FormGroup>
-
+                                                                                                    </FormGroup>
                                                 <FormGroup>
                                                     <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                    <Input type="text"
+                                                                                                                                                            <Input type="text"
                                                         bsSize="sm"
                                                         name="tracerCategoryName"
                                                         id="tracerCategoryName"
@@ -766,14 +383,11 @@ class EditTracerCategoryComponent extends Component {
                                                         required
                                                         value={getLabelText(this.state.tracerCategory.label, this.state.lang)}
                                                     />
-                                                    {/* </InputGroupAddon> */}
-                                                    <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
+                                                                                                        <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                         <Label htmlFor="healthAreaId">{i18n.t('static.healtharea.healtharea')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input
+                                                                                                                                                                        <Input
                                                             type="select"
                                                             bsSize="sm"
                                                             name="healthAreaId"
@@ -788,8 +402,7 @@ class EditTracerCategoryComponent extends Component {
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {healthAreaList}
                                                         </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                                                                                                <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
@@ -831,9 +444,7 @@ class EditTracerCategoryComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -847,38 +458,30 @@ class EditTracerCategoryComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
     cancelClicked() {
         this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
             this.setState({
                 tracerCategory: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -909,8 +512,6 @@ class EditTracerCategoryComponent extends Component {
                 }
             }
         );
-
     }
 }
-
 export default EditTracerCategoryComponent;

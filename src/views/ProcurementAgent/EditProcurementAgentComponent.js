@@ -1,40 +1,32 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, FormFeedback, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n';
-import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SketchPicker } from 'react-color';
-import reactCSS from 'reactcss'
-import getLabelText from '../../CommonComponent/getLabelText';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
-import ProgramService from "../../api/ProgramService";
-import Select from 'react-select';
 import classNames from 'classnames';
+import { Formik } from 'formik';
+import React, { Component } from 'react';
+import { SketchPicker } from 'react-color';
+import Select from 'react-select';
+import reactCSS from 'reactcss';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import ProgramService from "../../api/ProgramService";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementagent.procurementagent');
-
 const initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: "",
     approvedToShippedLeadTime: "",
-    // colorHtmlCode: "",
     procurementAgentTypeId: [],
     programId: []
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
-        // programId: Yup.string()
-        //     .required(i18n.t('static.procurementagent.programtext')),
         procurementAgentTypeId: Yup.string()
             .required(i18n.t('static.procurementagent.procurementagenttypetext')),
         procurementAgentCode: Yup.string()
-            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
@@ -44,18 +36,12 @@ const validationSchema = function (values) {
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
-
-        // colorHtmlCode: Yup.string()
-        //     .max(6, i18n.t('static.common.max6digittext'))
-        //     .required(i18n.t('static.procurementAgent.procurementAgentHTMLCode')),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -67,7 +53,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -84,7 +69,6 @@ class EditProcurementAgentComponent extends Component {
             displayColorPicker: false,
             rgba: '',
             color: {
-                // hex: '#fff'
                 r: '241',
                 g: '112',
                 b: '19',
@@ -95,7 +79,6 @@ class EditProcurementAgentComponent extends Component {
             programId: '',
             programList: [],
             proramListArray: [],
-            // procurementAgent: this.props.location.state.procurementAgent,
             procurementAgent: {
                 realm: {
                     realmId: '',
@@ -116,7 +99,6 @@ class EditProcurementAgentComponent extends Component {
                 colorHtmlCode: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
-                // localProcurementAgent: false,
                 procurementAgentType: {
                     id: ''
                 },
@@ -139,7 +121,6 @@ class EditProcurementAgentComponent extends Component {
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
-
     handleClose = () => {
         this.setState({ displayColorPicker: false })
     };
@@ -155,8 +136,7 @@ class EditProcurementAgentComponent extends Component {
             rgba,
             procurementAgent
         },
-            () => { 
-                // console.log("agent--------------", procurementAgent); 
+            () => {
             });
     };
     hideSecondComponent() {
@@ -164,11 +144,9 @@ class EditProcurementAgentComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { procurementAgent } = this.state;
@@ -177,8 +155,6 @@ class EditProcurementAgentComponent extends Component {
             return "";
         }
     }
-
-
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
@@ -208,14 +184,11 @@ class EditProcurementAgentComponent extends Component {
         if (event.target.name == "active") {
             procurementAgent.active = event.target.id === "active2" ? false : true;
         }
-
-
         this.setState({
             procurementAgent
         },
             () => { });
     };
-
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -230,30 +203,24 @@ class EditProcurementAgentComponent extends Component {
             this.setState({ programId: programId });
             var programId = programId;
         }
-
         let { procurementAgent } = this.state;
-        // this.setState({ roleId });
         var programIdArray = [];
         for (var i = 0; i < programId.length; i++) {
             programIdArray[i] = {
                 id: programId[i].value
             }
         }
-
         procurementAgent.programList = programIdArray;
-
         this.setState({
             procurementAgent,
         },
             () => { });
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             procurementAgentName: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
-            // colorHtmlCode: true,
             procurementAgentTypeId: true,
             programId: true
         }
@@ -274,9 +241,7 @@ class EditProcurementAgentComponent extends Component {
             }
         }
     }
-
     getProgramByRealmId(e) {
-        // AuthenticationService.setupAxiosInterceptors();
         if (e != 0) {
             ProgramService.getProgramList(e)
                 .then(response => {
@@ -287,11 +252,10 @@ class EditProcurementAgentComponent extends Component {
                         }
                         var listArray = programList;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        // console.log("listArray", listArray)
                         this.setState({
                             programList: listArray,
                             loading: false
@@ -309,13 +273,11 @@ class EditProcurementAgentComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -352,12 +314,9 @@ class EditProcurementAgentComponent extends Component {
             })
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             if (response.status == 200) {
-
                 this.setState({
                     procurementAgent: response.data, loading: false
                 });
@@ -379,19 +338,15 @@ class EditProcurementAgentComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -428,13 +383,12 @@ class EditProcurementAgentComponent extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
-
                     }, () => {
                         this.getProgramByRealmId(realmId)
                     })
@@ -450,13 +404,11 @@ class EditProcurementAgentComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -496,7 +448,6 @@ class EditProcurementAgentComponent extends Component {
                     height: '17px',
                     borderRadius: '2px',
                     background: `${this.state.rgba}`,
-                    // background: `rgba(${AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode)})`,
                 },
                 swatch: {
                     padding: '5px',
@@ -535,10 +486,6 @@ class EditProcurementAgentComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={
@@ -556,16 +503,12 @@ class EditProcurementAgentComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log("COLOR----->", this.state.procurementAgent);
                                     var pAgent = this.state.procurementAgent;
                                     for (var i = 0; i < pAgent.programList.length; i++) {
                                         if (pAgent.programList[i].id == 0) {
                                             pAgent.programList = []
                                         }
                                     }
-                                    // console.log("COLOR----->", pAgent);
-
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(pAgent)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -582,13 +525,11 @@ class EditProcurementAgentComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -639,8 +580,6 @@ class EditProcurementAgentComponent extends Component {
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                     <Input
                                                         type="text"
                                                         name="realmId"
@@ -650,7 +589,6 @@ class EditProcurementAgentComponent extends Component {
                                                         value={getLabelText(this.state.procurementAgent.realm.label, this.state.lang)}
                                                     >
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
@@ -671,14 +609,11 @@ class EditProcurementAgentComponent extends Component {
                                                         multi
                                                         options={this.state.programList}
                                                         value={this.state.programId}
-
                                                     />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="procurementAgentTypeId">{i18n.t('static.dashboard.procurementagenttype')}</Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                     <Input
                                                         type="select"
                                                         bsSize="sm"
@@ -694,19 +629,15 @@ class EditProcurementAgentComponent extends Component {
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {procurementAgentTypeList}
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.procurementAgentTypeId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                     <Input type="text"
                                                         bsSize="sm"
                                                         name="procurementAgentName"
                                                         id="procurementAgentName"
                                                         valid={!errors.procurementAgentName}
-                                                        // invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
                                                         invalid={(touched.procurementAgentName && !!errors.procurementAgentName) || !!errors.procurementAgentName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -714,13 +645,10 @@ class EditProcurementAgentComponent extends Component {
                                                         required
                                                         value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                     <Input type="text"
                                                         bsSize="sm"
                                                         name="procurementAgentCode"
@@ -728,11 +656,9 @@ class EditProcurementAgentComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         valid={!errors.procurementAgentCode}
                                                         invalid={(touched.procurementAgentCode && !!errors.procurementAgentCode) || !!errors.procurementAgentCode}
-                                                        // readOnly={true}
                                                         maxLength={10}
                                                         value={this.state.procurementAgent.procurementAgentCode}
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -746,25 +672,9 @@ class EditProcurementAgentComponent extends Component {
                                                         <div style={styles.cover} onClick={this.handleClose} />
                                                         <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
                                                     </div> : null}
-                                                    {/* <Input type="text"
-                                                            bsSize="sm"
-                                                            name="colorHtmlCode"
-                                                            id="colorHtmlCode"
-                                                            valid={!errors.colorHtmlCode && this.state.procurementAgent.colorHtmlCode != ''}
-                                                            invalid={touched.colorHtmlCode && !!errors.colorHtmlCode || this.state.procurementAgent.colorHtmlCode == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            maxLength={6}
-                                                            value={this.state.procurementAgent.colorHtmlCode}
-                                                        />
-                                                        <FormFeedback className="red">{errors.colorHtmlCode}</FormFeedback> */}
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
@@ -777,19 +687,15 @@ class EditProcurementAgentComponent extends Component {
                                                         min="0"
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
                                                         id="approvedToShippedLeadTime"
                                                         valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
-                                                        // invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.procurementAgent.approvedToShippedLeadTime == ''}
                                                         invalid={(touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime) || !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
@@ -797,7 +703,6 @@ class EditProcurementAgentComponent extends Component {
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
                                                         min="0"
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -840,9 +745,7 @@ class EditProcurementAgentComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -856,40 +759,32 @@ class EditProcurementAgentComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             this.setState({
                 procurementAgent: response.data, loading: false
             });
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
             this.setState({ rgba: color })
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -922,5 +817,4 @@ class EditProcurementAgentComponent extends Component {
         );
     }
 }
-
 export default EditProcurementAgentComponent;

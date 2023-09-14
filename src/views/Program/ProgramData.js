@@ -7,7 +7,6 @@ export default {
         'startDate': '2016-01-09T14:48:34-08:00',
         'stopDate': '2016-01-09T14:48:34-08:00',
         'active': 'false'
-        
       },
       {
         'id': 2,
@@ -409,7 +408,5 @@ export default {
         'stopDate': '2016-01-09T14:48:34-08:00',
         'active': 'false'
       }
-      
     ]
   };
-  

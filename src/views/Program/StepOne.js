@@ -1,37 +1,28 @@
-import React, { Component } from 'react';
-import i18n from '../../i18n';
-import HealthAreaService from "../../api/HealthAreaService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-
+import React, { Component } from 'react';
 import {
-    Row, Col,
-    Card, CardHeader, CardFooter,
-    Button, FormFeedback, CardBody,
-    FormText, Form, FormGroup, Label, Input,
-    InputGroupAddon, InputGroupText
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label
 } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-
-
+import HealthAreaService from "../../api/HealthAreaService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValues = {
     realmId: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
-
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-
-
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -43,7 +34,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -53,8 +43,6 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
 export default class StepOne extends Component {
     constructor(props) {
         super(props);
@@ -62,9 +50,7 @@ export default class StepOne extends Component {
             realmList: [],
             realmId: '',
         }
-
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true
@@ -86,17 +72,14 @@ export default class StepOne extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // console.log("-----------------------------------FIRST STEP-------->", this.props.items);
-        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -111,13 +94,11 @@ export default class StepOne extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -159,7 +140,6 @@ export default class StepOne extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -170,9 +150,7 @@ export default class StepOne extends Component {
                     }}
                     validate={validate(validationSchema)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // console.log("in succcess--------------->");
                         this.props.finishedStepOne && this.props.finishedStepOne();
-
                     }}
                     render={
                         ({
@@ -187,7 +165,6 @@ export default class StepOne extends Component {
                             setTouched
                         }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
-
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
@@ -204,17 +181,12 @@ export default class StepOne extends Component {
                                         {realms}
                                     </Input>
                                     <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-
                                 </FormGroup>
-
                                 <FormGroup className="pb-3">
                                     <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                 </FormGroup>
-
                             </Form>
                         )} />
-
             </>
         );
     }

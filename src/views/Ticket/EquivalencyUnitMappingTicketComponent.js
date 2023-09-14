@@ -1,28 +1,19 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
+import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
-import UnitService from '../../api/UnitService.js';
+import React, { Component } from 'react';
+import 'react-select/dist/react-select.min.css';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, SECRET_KEY, SPACE_REGEX } from '../../Constants';
 import EquivalancyUnitService from "../../api/EquivalancyUnitService";
-import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import HealthAreaService from '../../api/HealthAreaService';
+import JiraTikcetService from '../../api/JiraTikcetService';
 import ProgramService from '../../api/ProgramService';
-import Select from 'react-select';
-import 'react-select/dist/react-select.min.css';
-import classNames from 'classnames';
-import { SECRET_KEY, SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX, API_URL } from '../../Constants';
-import getLabelText from '../../CommonComponent/getLabelText';
-import CryptoJS from 'crypto-js';
-import { Prompt } from 'react-router';
-import { unit } from 'mathjs';
-import EquivalancyUnit from '../EquivalancyUnit/EquivalancyUnitList';
-
+import TracerCategoryService from '../../api/TracerCategoryService';
+import UnitService from '../../api/UnitService.js';
+import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.equivalancyUnit.equivalancyUnit"))
 let summaryText_2 = "Add Equivalency Unit Mapping"
 const initialValues = {
@@ -35,7 +26,6 @@ const initialValues = {
     programId: '',
     notes: '',
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -52,10 +42,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.label.fieldRequired')).min(0, i18n.t('static.program.validvaluetext')),
         programId: Yup.string()
             .required(i18n.t('static.label.fieldRequired')),
-
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -67,7 +55,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -77,9 +64,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class OrganisationTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -121,10 +106,7 @@ export default class OrganisationTicketComponent extends Component {
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
         this.getForecastingUnitByTracerCategoriesId = this.getForecastingUnitByTracerCategoriesId.bind(this);
         this.getTypeList = this.getTypeList.bind(this);
-
-
     }
-
     dataChange(event) {
         let { equivalencyUnit } = this.state
         if (event.target.name == "summary") {
@@ -154,7 +136,6 @@ export default class OrganisationTicketComponent extends Component {
                 unitId: event.target.value
             })
         }
-
         if (event.target.name == "notes") {
             equivalencyUnit.notes = event.target.value;
         }
@@ -162,7 +143,6 @@ export default class OrganisationTicketComponent extends Component {
             equivalencyUnit
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -171,7 +151,6 @@ export default class OrganisationTicketComponent extends Component {
             forecastingUnitId: true,
             typeId: true,
             conversionToEU: true
-            // notes: true,
         })
         this.validateForm(errors)
     }
@@ -189,24 +168,19 @@ export default class OrganisationTicketComponent extends Component {
             }
         }
     }
-
-
     componentDidMount() {
         this.getHealthAreaList();
     }
-
     getHealthAreaList() {
         HealthAreaService.getHealthAreaList()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log("response---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-
                     let tempList = [];
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
@@ -226,7 +200,6 @@ export default class OrganisationTicketComponent extends Component {
                         })
                 }
                 else {
-
                     this.setState({
                         message: response.data.messageCode, loading: false
                     },
@@ -234,19 +207,15 @@ export default class OrganisationTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -278,19 +247,16 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log("TracerCategory------->", response.data)
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-
                     let tempList = [];
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
@@ -303,15 +269,11 @@ export default class OrganisationTicketComponent extends Component {
                             tempList[i] = paJson
                         }
                     }
-
                     this.setState({
                         tracerCategoryList: tempList,
                         tracerCategoryList1: response.data
-                        // loading: false
                     },
                         () => {
-                            // console.log("TracerCategory------->", this.state.tracerCategoryList)
-                            // this.getForecastingUnit();
                             this.getUnitList();
                         })
                 } else {
@@ -322,18 +284,15 @@ export default class OrganisationTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -365,20 +324,15 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getUnitList() {
         UnitService.getUnitListAll().then(response => {
-            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-
-                // listArray = listArray.filter(c => c.active == true);
-
                 let tempList = [];
                 if (listArray.length > 0) {
                     for (var i = 0; i < listArray.length; i++) {
@@ -386,18 +340,14 @@ export default class OrganisationTicketComponent extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].unitId),
                             active: listArray[i].active,
-
                         }
                         tempList[i] = paJson
                     }
                 }
-
                 this.setState({
                     unitList: tempList,
-                    // loading: false
                 },
                     () => {
-                        // this.getDataSet();
                         this.getEquivalancyUnitList();
                     })
             } else {
@@ -408,19 +358,15 @@ export default class OrganisationTicketComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -452,18 +398,15 @@ export default class OrganisationTicketComponent extends Component {
             }
         );
     }
-
     getEquivalancyUnitList() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
-                // console.log("EQ1------->", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-
                 let tempList = [];
                 if (listArray.length > 0) {
                     for (var i = 0; i < listArray.length; i++) {
@@ -477,10 +420,8 @@ export default class OrganisationTicketComponent extends Component {
                         tempList[i] = paJson
                     }
                 }
-
                 this.setState({
                     equivalancyUnitList: tempList,
-                    // loading: false
                 },
                     () => {
                         this.getTypeList();
@@ -493,20 +434,17 @@ export default class OrganisationTicketComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -541,19 +479,16 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getTypeList() {
         ProgramService.getDataSetList()
             .then(response => {
-                // console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.programCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.programCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.programCode.toUpperCase();
+                        var itemLabelB = b.programCode.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-
                     let tempProgramList = [];
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
@@ -565,31 +500,22 @@ export default class OrganisationTicketComponent extends Component {
                             tempProgramList[i] = paJson
                         }
                     }
-
                     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    // console.log("decryptedUser=====>", decryptedUser);
-
                     var roleList = decryptedUser.roleList;
                     var roleArray = []
                     for (var r = 0; r < roleList.length; r++) {
                         roleArray.push(roleList[r].roleId)
                     }
-
                     tempProgramList.unshift({
-                        // name: 'All',
                         name: i18n.t('static.common.realmLevel'),
                         id: -1,
                         active: true,
                     });
-
-
                     this.setState({
                         typeList: tempProgramList,
                         roleArray: roleArray
-                        // loading: false
                     }, () => {
-                        // console.log("PROGRAM---------->111", this.state.typeList) 
                         this.getEquivalancyUnitMappingData();
                     })
                 } else {
@@ -607,13 +533,11 @@ export default class OrganisationTicketComponent extends Component {
                     }, () => { })
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -645,13 +569,10 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getEquivalancyUnitMappingData() {
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
             if (response.status == 200) {
-                // console.log("response.data---->", response.data);
                 let listArray = response.data;
-
                 listArray.sort((a, b) => {
                     if (a.equivalencyUnit.label.label_en === b.equivalencyUnit.label.label_en) {
                         return a.forecastingUnit.label.label_en < b.forecastingUnit.label.label_en ? -1 : 1
@@ -659,16 +580,12 @@ export default class OrganisationTicketComponent extends Component {
                         return a.equivalencyUnit.label.label_en < b.equivalencyUnit.label.label_en ? -1 : 1
                     }
                 })
-
                 this.setState({
                     equivalancyUnitMappingList: listArray,
                 },
                     () => {
-                        // this.buildJexcel()
                         this.getForecastingUnitByTracerCategoriesId();
-                        // this.filterData();
                     })
-
             }
             else {
                 this.setState({
@@ -678,20 +595,17 @@ export default class OrganisationTicketComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -726,7 +640,6 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getForecastingUnitByTracerCategoriesId() {
         let healthAreaList = [];
         let equivalancyUnitList = this.state.equivalancyUnitList;
@@ -735,34 +648,23 @@ export default class OrganisationTicketComponent extends Component {
             localHealthAreaList = localHealthAreaList.map(ele => ele.id)
             healthAreaList = healthAreaList.concat(localHealthAreaList);
         }
-
         let tracerCategoryIdList = [];
         let tracerCategoryList = this.state.tracerCategoryList;
         for (var i = 0; i < healthAreaList.length; i++) {
             tracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i]));
         }
-
         tracerCategoryIdList = tracerCategoryIdList.map(ele => (ele.id).toString());
-
         let tracerCategoryListOfMappingData = this.state.equivalancyUnitMappingList.map(ele => (ele.tracerCategory.id).toString());
-
         let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
         newTracerCategoryIdList = [... new Set(newTracerCategoryIdList)];
-
-        // console.log("response------->123", tracerCategoryIdList);
-        // console.log("response------->124", tracerCategoryListOfMappingData);
-        // console.log("response------->125", newTracerCategoryIdList);
-
         ForecastingUnitService.getForecastingUnitByTracerCategoriesId(newTracerCategoryIdList).then(response => {
-            // console.log("response------->126", response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-
                 let tempList = [];
                 if (listArray.length > 0) {
                     for (var i = 0; i < listArray.length; i++) {
@@ -776,14 +678,10 @@ export default class OrganisationTicketComponent extends Component {
                         tempList[i] = paJson
                     }
                 }
-
                 this.setState({
                     forecastingUnitList: tempList,
-                    // loading: false
                 },
                     () => {
-                        // this.getEquivalancyUnit();
-                        // this.filterData();
                     })
             } else {
                 this.setState({
@@ -793,19 +691,15 @@ export default class OrganisationTicketComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -837,10 +731,6 @@ export default class OrganisationTicketComponent extends Component {
             }
         );
     }
-
-
-
-
     updateFieldData(value) {
         let { equivalencyUnit } = this.state;
         this.setState({ healthAreaId: value });
@@ -852,18 +742,15 @@ export default class OrganisationTicketComponent extends Component {
         equivalencyUnit.healthAreaId = healthAreaIdArray;
         this.setState({ equivalencyUnit: equivalencyUnit });
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { equivalencyUnit } = this.state;
         equivalencyUnit.equivalencyUnitName = '';
@@ -883,9 +770,7 @@ export default class OrganisationTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { equivalancyUnitList } = this.state;
         let equivalencyUnits = equivalancyUnitList.length > 0
             && equivalancyUnitList.map((item, i) => {
@@ -893,7 +778,6 @@ export default class OrganisationTicketComponent extends Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-
         const { tracerCategoryList1 } = this.state;
         let tracerCategoryLists = tracerCategoryList1.length > 0
             && tracerCategoryList1.map((item, i) => {
@@ -901,7 +785,6 @@ export default class OrganisationTicketComponent extends Component {
                     <option key={i} value={item.tracerCategoryId}>{item.label.label_en}</option>
                 )
             }, this);
-
         const { forecastingUnitList } = this.state;
         let forecastingUnits = forecastingUnitList.length > 0
             && forecastingUnitList.map((item, i) => {
@@ -909,7 +792,6 @@ export default class OrganisationTicketComponent extends Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-
         const { typeList } = this.state;
         let types = typeList.length > 0
             && typeList.map((item, i) => {
@@ -917,7 +799,6 @@ export default class OrganisationTicketComponent extends Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -941,9 +822,7 @@ export default class OrganisationTicketComponent extends Component {
                             })
                             this.state.equivalencyUnit.summary = summaryText_2;
                             this.state.equivalencyUnit.userLanguageCode = this.state.lang;
-                            // console.log("SUBMIT---------->", this.state.equivalencyUnit);
                             JiraTikcetService.addEmailRequestIssue(this.state.equivalencyUnit).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -967,13 +846,11 @@ export default class OrganisationTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -1033,7 +910,6 @@ export default class OrganisationTicketComponent extends Component {
                                             required />
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup>
                                         <Label htmlFor="equivalencyUnitId">{i18n.t('static.equivalancyUnit.equivalancyUnitName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -1053,20 +929,16 @@ export default class OrganisationTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.equivalencyUnitId}</FormFeedback>
                                     </FormGroup>
-
                                     < FormGroup >
                                         <Label for="healthAreaName">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="healthAreaName" id="healthAreaName" readOnly={true}
                                             bsSize="sm"
-                                            // valid={!errors.healthAreaName && this.state.equivalencyUnit.summary != ''}
-                                            // invalid={touched.healthAreaName && !!errors.healthAreaName}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.equivalencyUnit.healthAreaName}
                                             required />
                                         <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup>
                                         <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -1086,7 +958,6 @@ export default class OrganisationTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup>
                                         <Label htmlFor="forecastingUnitId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -1106,13 +977,10 @@ export default class OrganisationTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                     </FormGroup>
-
                                     < FormGroup >
                                         <Label for="unitName">{i18n.t('static.dashboard.unit')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="unitName" id="unitName" readOnly={true}
                                             bsSize="sm"
-                                            // valid={!errors.unitName && this.state.equivalencyUnit.unitName != ''}
-                                            // invalid={touched.unitName && !!errors.unitName}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.equivalencyUnit.unitName}
@@ -1153,8 +1021,6 @@ export default class OrganisationTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.typeId}</FormFeedback>
                                     </FormGroup>
-
-
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                         <Input type="textarea" name="notes" id="notes"
@@ -1165,21 +1031,14 @@ export default class OrganisationTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.equivalencyUnit.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
-
-
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
                                 </Form>
                             )} />
                 </div>
@@ -1194,5 +1053,4 @@ export default class OrganisationTicketComponent extends Component {
             </div>
         );
     }
-
 }

@@ -1,7 +1,4 @@
-import moment, { months } from 'moment';
-
 export default function getProblemCriticality(criticalityId) {
-    // var criticalityJson = {};
     if (criticalityId == 3) {
         var criticalityJson = {
             id: 3,
@@ -39,7 +36,6 @@ export default function getProblemCriticality(criticalityId) {
         }
         return criticalityJson;
     } else if (criticalityId == 1) {
-
         var criticalityJson = {
             id: 1,
             label: {
@@ -58,6 +54,4 @@ export default function getProblemCriticality(criticalityId) {
         }
         return criticalityJson;
     }
-
-
 }

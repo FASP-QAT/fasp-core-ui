@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { ALPHABETS_REGEX, API_URL, LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import CurrencyService from '../../api/CurrencyService';
-import { LABEL_REGEX, ALPHABETS_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
-
+import JiraTikcetService from '../../api/JiraTikcetService';
+import i18n from '../../i18n';
 const initialValues = {
     summary: "Add Country",
     countryName: "",
@@ -19,7 +15,6 @@ const initialValues = {
     currency: "",
     notes: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -36,11 +31,8 @@ const validationSchema = function (values) {
             .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -52,7 +44,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -62,9 +53,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class CountryTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -80,13 +69,11 @@ export default class CountryTicketComponent extends Component {
             currencyList: [],
             currencyId: '',
             loading: false
-
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { country } = this.state
         if (event.target.name == "summary") {
@@ -114,7 +101,6 @@ export default class CountryTicketComponent extends Component {
             country
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -140,9 +126,7 @@ export default class CountryTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -157,13 +141,11 @@ export default class CountryTicketComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -195,21 +177,17 @@ export default class CountryTicketComponent extends Component {
             }
         );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { country } = this.state;
-        // country.summary = '';
         country.countryName = '';
         country.countryCode = '';
         country.countryCode2 = '';
@@ -220,9 +198,7 @@ export default class CountryTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { currencyList } = this.state;
         let currencyItems = currencyList.length > 0
             && currencyList.map((itemOne, i) => {
@@ -230,7 +206,6 @@ export default class CountryTicketComponent extends Component {
                     <option key={i} value={itemOne.currencyId}>{getLabelText(itemOne.label, this.state.lang)}</option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -245,7 +220,6 @@ export default class CountryTicketComponent extends Component {
                                 loading: true
                             })
                             JiraTikcetService.addEmailRequestIssue(this.state.country).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -364,7 +338,6 @@ export default class CountryTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.country.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
@@ -387,5 +360,4 @@ export default class CountryTicketComponent extends Component {
             </div>
         );
     }
-
 }

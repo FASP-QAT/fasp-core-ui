@@ -1,32 +1,29 @@
-import React, { Component } from 'react';
-import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import ProgramService from "../../api/ProgramService";
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import * as Yup from 'yup'
-import {
-    Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
-} from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import classNames from 'classnames';
+import {
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup, Label
+} from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
 import DropdownService from '../../api/DropdownService';
-
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValuesThree = {
     healthAreaId: []
 }
-
 const validationSchemaThree = function (values) {
     return Yup.object().shape({
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
     })
 }
-
 const validateThree = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -38,7 +35,6 @@ const validateThree = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationErrorThree = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -48,8 +44,6 @@ const getErrorsFromValidationErrorThree = (validationError) => {
         }
     }, {})
 }
-
-
 export default class StepThree extends Component {
     constructor(props) {
         super(props);
@@ -59,7 +53,6 @@ export default class StepThree extends Component {
         }
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
-
     touchAllThree(setTouched, errors) {
         setTouched({
             healthAreaId: true
@@ -81,7 +74,6 @@ export default class StepThree extends Component {
             }
         }
     }
-
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -90,10 +82,7 @@ export default class StepThree extends Component {
         }
         this.props.generateHealthAreaCode(healthAreaCode.slice(0, -1));
     }
-
     getHealthAreaList() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
         DropdownService.getHealthAreaDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -102,11 +91,10 @@ export default class StepThree extends Component {
                     for (var i = 0; i < json.length; i++) {
                         haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                     }
-
                     var listArray = haList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -122,13 +110,11 @@ export default class StepThree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -160,11 +146,8 @@ export default class StepThree extends Component {
                 }
             );
     }
-
     componentDidMount() {
-
     }
-
     render() {
         return (
             <>
@@ -173,9 +156,7 @@ export default class StepThree extends Component {
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // console.log("in success--");
                         this.props.finishedStepThree && this.props.finishedStepThree();
-
                     }}
                     render={
                         ({
@@ -205,7 +186,6 @@ export default class StepThree extends Component {
                                             this.props.updateFieldDataHealthArea(e);
                                             this.generateHealthAreaCode(e)
                                         }}
-
                                         onBlur={handleBlur}
                                         bsSize="sm"
                                         name="healthAreaId"
@@ -217,7 +197,6 @@ export default class StepThree extends Component {
                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                 </FormGroup>
                                 <FormGroup>
-
                                     <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
                                     <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
@@ -225,10 +204,7 @@ export default class StepThree extends Component {
                                 </FormGroup>
                             </Form>
                         )} />
-
             </>
-
         );
     }
-
 }

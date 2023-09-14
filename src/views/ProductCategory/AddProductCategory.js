@@ -1,15 +1,14 @@
 import React from "react";
-import "./style.css";
 import SortableTree, {
+    addNodeUnderParent,
+    changeNodeAtPath,
     getFlatDataFromTree,
-    getTreeFromFlatData,
-    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath
+    getTreeFromFlatData
 } from "react-sortable-tree";
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, FormText, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
-import 'react-sortable-tree/style.css'; // This only needs to be imported once in your app
+import 'react-sortable-tree/style.css';
+import { Button, Card, CardBody, CardFooter, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import i18n from '../../i18n';
-
-
+import "./style.css";
 let initialData = [
     { "productCategoryId": 1, "level": 1, "sortOrder": "1", "label": { "label_en": "CC 1: HIV / AIDS Pharmaceuticals" }, "id": 1, "parent": null, "expanded": true },
     { "productCategoryId": 2, "level": 2, "sortOrder": "1.1", "label": { "label_en": "HIV/AIDS Pharmaceuticals" }, "id": 2, "parent": 1, "expanded": true },
@@ -50,17 +49,15 @@ let initialData = [
     { "productCategoryId": 37, "level": 2, "sortOrder": "9.6", "label": { "label_en": "Warehouse Equipment" }, "id": 26, "parent": 20, "expanded": true },
     { "productCategoryId": 38, "level": 3, "sortOrder": "9.3.1", "label": { "label_en": "Test 1" }, "id": 39, "parent": 23, "expanded": true }
 ]
-
-
 export default class AddProductCategory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             treeData: getTreeFromFlatData({
                 flatData: initialData.map(node => ({ ...node, title: node.label.label_en, name: node.label.label_en })),
-                getKey: node => node.id, // resolve a node's key
-                getParentKey: node => node.parent, // resolve a node's parent's key
-                rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
+                getKey: node => node.id,
+                getParentKey: node => node.parent,
+                rootKey: null
             }),
             nodename: '',
             message: '',
@@ -73,33 +70,21 @@ export default class AddProductCategory extends React.Component {
         this.enableNode = this.enableNode.bind(this);
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
     }
-
-
-
     componentDidMount = function () {
-
         initialData.map(item => {
             if (item.id > this.state.maxId) {
                 this.setState({ maxId: item.id })
             }
-
         })
-
-
         const data = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
             ignoreCollapsed: false
         });
-
     }
-
-
     dataChange(event) {
         this.setState({ nodename: event.target.value });
     }
-
-
     addNewNode() {
         let currentMaxId = this.state.maxId + 1;
         const addNode = { id: currentMaxId, productCategoryId: '', name: this.state.nodename, parent: null, active: true, expanded: true };
@@ -111,9 +96,6 @@ export default class AddProductCategory extends React.Component {
         })
         this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
     }
-
-
-
     disableNode(rowInfo) {
         const changeNode = { id: rowInfo.node.id, name: rowInfo.node.name, active: false, expanded: rowInfo.node.expanded, children: rowInfo.node.children };
         var disabledNode = changeNodeAtPath({
@@ -123,7 +105,6 @@ export default class AddProductCategory extends React.Component {
             getNodeKey: ({ node }) => node.id
         });
         this.setState({ treeData: disabledNode });
-
         let disableChideNodes = getFlatDataFromTree({
             treeData: disabledNode,
             getNodeKey: ({ node }) => node.id,
@@ -142,7 +123,6 @@ export default class AddProductCategory extends React.Component {
                 });
                 this.setState({ treeData: disabledChildNode });
                 currentDisabledNodeId = disableNodeInfo.node.id;
-
                 disableChideNodes.map(disableNodeInfo => {
                     if (disableNodeInfo.parentNode != null && disableNodeInfo.parentNode.id == currentDisabledNodeId) {
                         const changeNode = { id: disableNodeInfo.node.id, name: disableNodeInfo.node.name, active: false, expanded: disableNodeInfo.node.expanded, children: disableNodeInfo.node.children };
@@ -157,15 +137,11 @@ export default class AddProductCategory extends React.Component {
                     }
                 }
                 )
-
             }
-
         }
         )
     }
-
     enableNode(rowInfo) {
-
         if (rowInfo.parentNode.active == true) {
             const changeNode = { id: rowInfo.node.id, name: rowInfo.node.name, active: true, expanded: rowInfo.node.expanded, children: rowInfo.node.children };
             var enabledNode = changeNodeAtPath({
@@ -174,24 +150,17 @@ export default class AddProductCategory extends React.Component {
                 newNode: { ...changeNode, title: rowInfo.node.name },
                 getNodeKey: ({ node }) => node.id
             });
-            // console.log(enabledNode);
             this.setState({ treeData: enabledNode });
         } else {
             this.setState({ message: i18n.t('static.productCategory.parentIsDisabled') });
         }
-
     }
-
-
     getSortedFaltTreeData() {
-        // console.log("---------", this.state.treeData);
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
             ignoreCollapsed: false
         });
-
-
         unsortedFlatTreeData.map(node => {
             let count = 0;
             let nodeChildrens = node.node.children;
@@ -204,22 +173,16 @@ export default class AddProductCategory extends React.Component {
                             unsorteData.node.sortOrder = count;
                         } if (unsorteData.parentNode == null) {
                             unsorteData.node.sortOrder = 0;
-
                         }
                     }
                     )
                 }
                 )
-
             } else {
-
             }
         })
-
         let nullParentNodeCount = 0;
         unsortedFlatTreeData.map(data => {
-            // if(data.parentNode != null)
-            //below if i write for the inner node to get sort as 1 instade of 0.1
             if (data.parentNode != null && data.parentNode.sortOrder != 0) {
                 data.node.sortOrder = ("" + data.parentNode.sortOrder).concat(".").concat(data.node.sortOrder);
             } else {
@@ -227,15 +190,11 @@ export default class AddProductCategory extends React.Component {
                 nullParentNodeCount++;
             }
         })
-        //        alert(unsortedFlatTreeData);
-        //console.log("sorted flate tree data------->", unsortedFlatTreeData);
         this.setState({ finalJson: [] });
         unsortedFlatTreeData.map(finalItem => {
             var json = { "productCategoryId": finalItem.node.productCategoryId, "sortOrder": finalItem.node.sortOrder, "label": { "label_en": finalItem.node.name }, "id": finalItem.node.id, "parent": finalItem.parentNode == null ? null : finalItem.parentNode.id, "active": false }
             this.state.finalJson.push(json);
-
         });
-        // console.log("input for add product category api---->", this.state.finalJson);
     }
     render() {
         return (
@@ -244,7 +203,6 @@ export default class AddProductCategory extends React.Component {
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader> <i className="icon-note"></i><strong>Add Product Category</strong></CardHeader> */}
                             <CardBody>
                                 <FormGroup>
                                     <Row>
@@ -264,49 +222,40 @@ export default class AddProductCategory extends React.Component {
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
                                             generateNodeProps={rowInfo => {
-                                                // console.log(rowInfo);
                                                 if (rowInfo.node.active == true) {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                {/* <button label='Delete' onClick={(event) => this.disableNode(rowInfo)}>Disable</button> */}
                                                                 <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
                                                             height: '35px'
                                                         }
-
                                                     }
                                                     return nodeprops;
                                                 } else {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                {/* <button label='Delete' onClick={(event) => this.enableNode(rowInfo)}>Enable</button> */}
                                                                 <a style={{ color: '#4dbd74' }} href="javascript:void();" title="Enable Product Category" onClick={(event) => this.enableNode(rowInfo)}><i className="fa fa-check"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
                                                             height: '35px', color: '#ced5de'
                                                         }
-
                                                     }
                                                     return nodeprops;
                                                 }
                                             }
                                             }
-
-                                            // onChange={treeData => this.setTreeData({ treeData })}
                                             onChange={treeData => this.setState({ treeData })}
                                         />
-
                                     </div>
                                 </FormGroup>
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    {/* <input type="button" onClick={this.submitTree} value="submit" /> */}
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 </ FormGroup>
                             </CardFooter>
@@ -317,4 +266,3 @@ export default class AddProductCategory extends React.Component {
         );
     }
 }
-

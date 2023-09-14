@@ -1,14 +1,11 @@
 import { TextOrientationType, VerticalAlignmentType } from '../../../node_modules/basicprimitives/src/enums';
-import Rect from '../../../node_modules/basicprimitives/src/graphics/structs/Rect';
 import { getTextAlign } from '../../../node_modules/basicprimitives/src/graphics/EnumValues';
-
+import Rect from '../../../node_modules/basicprimitives/src/graphics/structs/Rect';
 export function renderRotatedText({doc, textOrientation, label, fontSize, fontColor, position, titleColor, horizontalAlignment, verticalAlignment }) {
     doc.save();
-
     doc.fillColor(titleColor)
     .roundedRect(position.x, position.y, position.width - 2, position.height, 0)
     .fill();
-
     var labelPosition = new Rect(position.x + 4, position.y, position.width - 8, position.height);
     switch (textOrientation) {
       case TextOrientationType.RotateLeft:
@@ -28,11 +25,8 @@ export function renderRotatedText({doc, textOrientation, label, fontSize, fontCo
       default:
         break;
     }
-
     doc.font('Helvetica', fontSize);
-
     var textHeight = doc.currentLineHeight();
-
     switch(verticalAlignment) {
       case VerticalAlignmentType.Top:
         labelPosition.y +=2;
@@ -43,10 +37,7 @@ export function renderRotatedText({doc, textOrientation, label, fontSize, fontCo
       case VerticalAlignmentType.Bottom:
         labelPosition.y += Math.ceil(labelPosition.height - textHeight - 1);
         break;
-
     }
-
-    /* title */
     doc.fillColor(fontColor)
       .text(label, labelPosition.x, labelPosition.y, {
         ellipsis: true,

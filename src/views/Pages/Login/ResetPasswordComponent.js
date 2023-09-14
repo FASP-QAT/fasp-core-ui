@@ -11,8 +11,6 @@ import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import { API_URL } from '../../../Constants';
-
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         newPassword: Yup.string()
@@ -34,7 +32,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -46,7 +43,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -68,40 +64,19 @@ class ResetPasswordComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-
         this.showPopUp = this.showPopUp.bind(this);
     }
     showPopUp() {
         alert("1) " + i18n.t("static.message.newPasswordMinLength") + "\n2) " + i18n.t("static.message.newPasswordPassString") + "\n3) " + i18n.t("static.message.newPasswordSpecialChar") + "\n4) " + i18n.t("static.message.newPasswordNumber") + "\n5) " + i18n.t("static.message.newPasswordUppercase") + "\n6) " + i18n.t("static.message.newPasswordStartAlphabet") + "\n7) " + i18n.t("static.message.newPasswordNotSameAsUsername") + "\n8) " + i18n.t("static.message.newPasswordNotSameAsOldPassword"));
-        // confirmAlert({
-        //     message: "Anchal&lt;br /&gt;Bhashkar",
-        //     buttons: [
-        //       {
-        //         label: i18n.t('static.common.close')
-        //       }
-        //     ]
-        //   });
     }
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'block';
         }, 30000);
-
-        // setTimeout(function () {
-        //     this.setState({
-        //         message:''
-        //     },
-        //     () => { 
-        //         document.getElementById('div1').style.display = 'block';
-        //     });
-        // }, 8000);
-
     }
-
     cancelClicked() {
         this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             newPassword: true,
@@ -128,16 +103,13 @@ class ResetPasswordComponent extends Component {
         this.hideFirstComponent();
         UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
-                // console.log("Reset password 1---", response)
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
-                    // console.log("Reset password 1 error---", error)
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -149,7 +121,6 @@ class ResetPasswordComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                // console.log("Reset password 1 error 2---", error.response.data.messageCode)
                                 this.setState({ message: error.response.data.messageCode });
                                 break;
                             default:
@@ -159,7 +130,6 @@ class ResetPasswordComponent extends Component {
                     }
                 }
             );
-
     }
     render() {
         return (
@@ -186,17 +156,10 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            // console.log("Reset password on submit called 1---", values)
                                             if (isSiteOnline()) {
-                                                // console.log("Reset password on submit email id---", this.state.emailId)
-                                                // console.log("Reset password on submit token---", this.state.token)
-                                                // console.log("Reset password on submit newPassword---", values.newPassword)
-                                                // console.log("button clicked value---", this.state.buttonClicked);
                                                 if (!this.state.buttonClicked) {
-                                                    // console.log("button inside if")
                                                     UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
                                                         .then(response => {
-                                                            // console.log("Reset password on submit response---", response)
                                                             if (response.status == 200) {
                                                                 this.setState({
                                                                     buttonClicked: true
@@ -215,10 +178,8 @@ class ResetPasswordComponent extends Component {
                                                                 this.setState({
                                                                     buttonClicked: false
                                                                 });
-                                                                // console.log("Reset password error---", error)
                                                                 if (error.message === "Network Error") {
                                                                     this.setState({
-                                                                        // message: error.message
                                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                     });
                                                                     document.getElementById('div1').style.display = 'block';
@@ -233,15 +194,11 @@ class ResetPasswordComponent extends Component {
                                                                         case 403:
                                                                         case 406:
                                                                         case 412:
-                                                                            // console.log("Reset password error 2 ---", error.response.data.messageCode);
                                                                             this.setState({ message: error.response.data.messageCode },
                                                                                 () => {
-                                                                                    // console.log("inside412");
                                                                                     document.getElementById('div1').style.display = 'block';
                                                                                     this.hideFirstComponent();
                                                                                 });
-
-
                                                                             break;
                                                                         case 403:
                                                                         default:
@@ -254,7 +211,6 @@ class ResetPasswordComponent extends Component {
                                                             }
                                                         );
                                                 }
-
                                             } else {
                                                 this.setState({
                                                     message: 'static.common.onlinepasswordtext'
@@ -274,7 +230,6 @@ class ResetPasswordComponent extends Component {
                                                 setTouched
                                             }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
-
                                                     <CardBody>
                                                         <Input type="text"
                                                             name="username"
@@ -324,7 +279,6 @@ class ResetPasswordComponent extends Component {
                                                             &nbsp;
                                                         </FormGroup>
                                                     </CardFooter>
-
                                                 </Form>
                                             )} />
                                 </Card>}
@@ -336,5 +290,4 @@ class ResetPasswordComponent extends Component {
         );
     }
 }
-
 export default ResetPasswordComponent;

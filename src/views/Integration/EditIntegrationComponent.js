@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants.js';
 import IntegrationService from '../../api/IntegrationService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { ALPHABET_NUMBER_REGEX, API_URL, SPACE_REGEX } from '../../Constants.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.integration.integration');
 let initialValues = {
     realmId: '',
@@ -16,13 +14,9 @@ let initialValues = {
     folderLocation: '',
     fileName: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
-        // realmId: Yup.string()
-        //     .required(i18n.t('static.common.realmtext')),
         integrationName: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.message.spacetext'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.integration.integrationValidName')),
         integrationViewId: Yup.string()
@@ -33,7 +27,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.integration.validFileName'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -45,7 +38,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -56,11 +48,9 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 export default class UpdateDataSourceComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
-
             integration: {
                 integrationId: '',
                 integrationName: '',
@@ -86,7 +76,6 @@ export default class UpdateDataSourceComponent extends Component {
             bodyParameter: '',
             integrationViewList: []
         }
-
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -94,27 +83,22 @@ export default class UpdateDataSourceComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addParameter = this.addParameter.bind(this);
         this.clearParameter = this.clearParameter.bind(this);
-
     }
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     addParameter() {
         this.setState({ isHide: false })
     }
-
     clearParameter() {
         let { integration } = this.state
         integration.fileName = ''
         integration.bodyParameter = ''
-
         this.setState(
             {
                 integration,
@@ -122,7 +106,6 @@ export default class UpdateDataSourceComponent extends Component {
             }
         )
     }
-
     dataChange(event) {
         let { integration } = this.state
         if (event.target.name === "integrationName") {
@@ -150,14 +133,12 @@ export default class UpdateDataSourceComponent extends Component {
                 integration.fileName = fileName + '<%YMD%>';
             }
         }
-
         this.setState(
             {
                 integration
             }
         )
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
@@ -183,11 +164,7 @@ export default class UpdateDataSourceComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-
-        // AuthenticationService.setupAxiosInterceptors();
-
         IntegrationService.getIntegrationById(this.props.match.params.integrationId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -195,7 +172,6 @@ export default class UpdateDataSourceComponent extends Component {
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -203,20 +179,16 @@ export default class UpdateDataSourceComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -247,31 +219,27 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 }
             );
-
         IntegrationService.getIntegrationViewListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = (a.integrationViewDesc).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = (b.integrationViewDesc).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = (a.integrationViewDesc).toUpperCase();
+                    var itemLabelB = (b.integrationViewDesc).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
                     integrationViewList: listArray, loading: false
                 })
-
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -302,16 +270,11 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 }
             );
-
     }
-
-
     cancelClicked() {
         this.props.history.push(`/integration/listIntegration/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     render() {
-
         const { integrationViewList } = this.state;
         let viewList = integrationViewList.length > 0
             && integrationViewList.map((item, i) => {
@@ -321,7 +284,6 @@ export default class UpdateDataSourceComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -329,13 +291,9 @@ export default class UpdateDataSourceComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
-                                    // realmId: this.state.integration.realm.id,
                                     integrationName: this.state.integration.integrationName,
                                     integrationViewId: this.state.integration.integrationView.integrationViewId,
                                     folderLocation: this.state.integration.folderLocation,
@@ -346,7 +304,6 @@ export default class UpdateDataSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     IntegrationService.editIntegration(this.state.integration)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -364,13 +321,11 @@ export default class UpdateDataSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -428,7 +383,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                     >
                                                     </Input>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.integration.integration')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -443,7 +397,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.integrationName}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.integration.integrationViewName')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -465,7 +418,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.integrationViewId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.integration.folderLocation')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -480,7 +432,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.folderLocation}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.integration.fileName')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -495,13 +446,11 @@ export default class UpdateDataSourceComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.fileName}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup className="pb-3">
                                                     {this.state.isHide && <Button color="info" size="md" className="float-left mr-1" onClick={() => this.addParameter()}><i className="fa fa-plus"></i>{i18n.t('static.integration.addBodyParameter')}</Button>}
                                                     &nbsp;
                                                     <Button color="warning" size="md" className="float-left mr-1" onClick={() => this.clearParameter()}><i className="fa fa-refresh"></i>{i18n.t('static.integration.clearBodyParameter')}</Button>
                                                 </FormGroup>
-
                                                 {!this.state.isHide &&
                                                     <FormGroup>
                                                         <Label htmlFor="bodyParameter">{i18n.t('static.integration.bodyParameter')}</Label>
@@ -510,8 +459,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                             name="bodyParameter"
                                                             id="bodyParameter"
                                                             bsSize="sm"
-                                                            // valid={!errors.realmId && this.state.realm.id != ''}
-                                                            // invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => {
                                                                 handleChange(e); this.dataChange(e);
                                                             }}
@@ -529,15 +476,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.bodyParameter}</FormFeedback>
                                                     </FormGroup>
                                                 }
-
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -551,13 +495,10 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -565,26 +506,21 @@ export default class UpdateDataSourceComponent extends Component {
             </div>
         );
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getIntegrationById(this.props.match.params.integrationId).then(response => {
             this.setState({
                 integration: response.data
             });
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -615,7 +551,5 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 }
             );
-
     }
-
 }

@@ -17,7 +17,6 @@ import SupplierService from "../../api/SupplierService";
 import UnitService from "../../api/UnitService";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import { API_URL, SPACE_REGEX } from "../../Constants";
-
 const initialValues = {
     summary: 'Add Procurement Unit',
     procurementUnitName: '',
@@ -39,7 +38,6 @@ const initialValues = {
     unitsPerPallet: 0,
     notes: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -77,11 +75,8 @@ const validationSchema = function (values) {
         unitsPerContainer: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))    
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -93,7 +88,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -103,9 +97,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class ProcurementUnitTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -142,7 +134,6 @@ export default class ProcurementUnitTicketComponent extends Component {
             widthUnitId: '',
             weightUnitId: '',
             loading: false
-
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -158,9 +149,7 @@ export default class ProcurementUnitTicketComponent extends Component {
         let { procurementUnit } = this.state
         procurementUnit.procurementUnitName = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getActivePlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
@@ -179,13 +168,11 @@ export default class ProcurementUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -216,8 +203,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                     }
                 }
             );
-
-        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -236,13 +221,11 @@ export default class ProcurementUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -273,8 +256,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                     }
                 }
             );
-
-        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -293,13 +274,11 @@ export default class ProcurementUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -331,7 +310,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                 }
             );
     }
-
     dataChange(event) {
         let { procurementUnit } = this.state;
         if (event.target.name == "summary") {
@@ -413,7 +391,6 @@ export default class ProcurementUnitTicketComponent extends Component {
             procurementUnit.notes = event.target.value;
         }
         this.setState({ procurementUnit }, () => { })
-
     }
     touchAll(setTouched, errors) {
         setTouched({
@@ -454,9 +431,7 @@ export default class ProcurementUnitTicketComponent extends Component {
             }
         }
     }
-
     render() {
-
         const { planningUnitList } = this.state;
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
@@ -466,7 +441,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         const { unitList } = this.state;
         let units = unitList.length > 0
             && unitList.map((item, i) => {
@@ -476,7 +450,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         const { supplierList } = this.state;
         let suppliers = supplierList.length > 0
             && supplierList.map((item, i) => {
@@ -486,9 +459,7 @@ export default class ProcurementUnitTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
-
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.procurementUnit.procurementUnit')}</h4>
@@ -502,7 +473,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                                 loading: true
                             })
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementUnit).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -526,13 +496,11 @@ export default class ProcurementUnitTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -577,7 +545,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementUnitForm'>
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
@@ -827,7 +794,6 @@ export default class ProcurementUnitTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             value={this.state.procurementUnit.notes}
                                             maxLength={600}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
@@ -848,13 +814,10 @@ export default class ProcurementUnitTicketComponent extends Component {
                     </div>
                 </div>
             </div>
-
         );
     }
-
     resetClicked() {
         let { procurementUnit } = this.state;
-        // procurementUnit.summary = ''
         procurementUnit.procurementUnitName = ''
         procurementUnit.planningUnitId = ''
         procurementUnit.multiplier = ''
@@ -873,8 +836,6 @@ export default class ProcurementUnitTicketComponent extends Component {
         procurementUnit.unitsPerPallet = ''
         procurementUnit.unitsPerContainer = ''
         procurementUnit.notes = ''
-
         this.setState({ procurementUnit }, () => { })
-
     }
 }

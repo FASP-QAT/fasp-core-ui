@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
-import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
-} from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText'
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-
-import i18n from '../../i18n'
-
+import {
+    Button,
+    Card,
+    CardBody,
+    CardHeader,
+    Col,
+    FormGroup, Input, InputGroup, InputGroupAddon, Label
+} from 'reactstrap';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants';
-
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.subfundingsource.subfundingsource');
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
@@ -50,16 +51,13 @@ class ListSubFundingSourceComponent extends Component {
     editSubFundingSource(subFundingSource) {
         this.props.history.push({
             pathname: `/subFundingSource/editSubFundingSource/${subFundingSource.subFundingSourceId}`,
-            // state: { subFundingSource }
         });
     }
-
     addSubFundingSource(subFundingSource) {
         this.props.history.push({
             pathname: "/subFundingSource/addSubFundingSource"
         });
     }
-
     componentDidMount() {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -73,13 +71,11 @@ class ListSubFundingSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -110,8 +106,6 @@ class ListSubFundingSourceComponent extends Component {
                     }
                 }
             );
-
-
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -125,13 +119,11 @@ class ListSubFundingSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -162,13 +154,10 @@ class ListSubFundingSourceComponent extends Component {
                     }
                 }
             );
-
     }
-
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -176,7 +165,6 @@ class ListSubFundingSourceComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
         const { fundingSources } = this.state;
         let fundingSourceList = fundingSources.length > 0
             && fundingSources.map((item, i) => {
@@ -186,7 +174,6 @@ class ListSubFundingSourceComponent extends Component {
                     </option>
                 )
             }, this);
-
         const columns = [{
             dataField: 'fundingSource.label',
             text: i18n.t('static.subfundingsource.fundingsource'),
@@ -239,7 +226,6 @@ class ListSubFundingSourceComponent extends Component {
                 text: 'All', value: (this.state.selSubFundingSource ? this.state.selSubFundingSource.length : 0)
             }]
         }
-
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -247,7 +233,6 @@ class ListSubFundingSourceComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        {/* needed  className="mb-md-3" in card header for inline search select  */}
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -258,7 +243,6 @@ class ListSubFundingSourceComponent extends Component {
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                {/* className="Selectdiv" in form group for inline search and select */}
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -278,7 +262,6 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-
                         <ToolkitProvider
                             keyField="subFundingSourceId"
                             data={this.state.selSubFundingSource}

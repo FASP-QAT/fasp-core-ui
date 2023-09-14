@@ -1,27 +1,27 @@
+import CryptoJS from 'crypto-js';
 import React, { Component } from 'react';
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { MultiSelect } from "react-multi-select-component";
 import {
+  Button,
   Card,
-  CardBody, CardFooter, FormGroup, Label, Form, InputGroupAddon, Button
+  CardBody, CardFooter,
+  Form,
+  FormGroup, Label
 } from 'reactstrap';
-import i18n from '../../i18n'
-import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
-import CryptoJS from 'crypto-js'
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import AuthenticationService from '../Common/AuthenticationService.js';
-import ProgramService from "../../api/ProgramService"
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import ProgramService from "../../api/ProgramService";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-
 class DeleteLocalProgramComponent extends Component {
   constructor(props) {
     super(props);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -32,15 +32,12 @@ class DeleteLocalProgramComponent extends Component {
       message: '',
       loading: true
     };
-
     this.getPrograms = this.getPrograms.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
-
   }
   checkNewerVersions(programs) {
     if (isSiteOnline()) {
-      // console.log("T***going to call check newer versions")
       if (isSiteOnline()) {
         AuthenticationService.setupAxiosInterceptors()
         ProgramService.checkNewerVersions(programs)
@@ -51,7 +48,6 @@ class DeleteLocalProgramComponent extends Component {
       }
     }
   }
-
   confirmDeleteLocalProgram = () => {
     let programIds = this.state.programValues.length == 0 ? [] : this.state.programValues.map(ele => (ele.value).toString());
     var showAlert=false;
@@ -90,7 +86,6 @@ class DeleteLocalProgramComponent extends Component {
       this.setState({ message: i18n.t('static.common.selectProgram') });
     }
   }
-
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -99,9 +94,7 @@ class DeleteLocalProgramComponent extends Component {
       programValues: programIds.map(ele => ele),
       programLabels: programIds.map(ele => ele.label)
     })
-
   }
-
   deleteLocalProgramFromProgramData = (programIds) => {
     var db1;
     getDatabase();
@@ -113,7 +106,6 @@ class DeleteLocalProgramComponent extends Component {
           color: '#BA0C2F',
           loading: false
         })
-        // this.hideFirstComponent()
       }.bind(this);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
@@ -127,12 +119,10 @@ class DeleteLocalProgramComponent extends Component {
             color: '#BA0C2F',
             loading: false
           })
-          // this.hideFirstComponent()
         }.bind(this);
         getRequest.onsuccess = function (event) {
           var myResult = [];
           myResult = getRequest.result;
-
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
             loading: false,
@@ -147,7 +137,6 @@ class DeleteLocalProgramComponent extends Component {
     this.setState({ programs: [] })
     this.getPrograms();
   }
-
   deleteLocalProgramFromDownloadedProgramData = (programIds) => {
     var db1;
     getDatabase();
@@ -159,7 +148,6 @@ class DeleteLocalProgramComponent extends Component {
           color: '#BA0C2F',
           loading: false
         })
-        // this.hideFirstComponent()
       }.bind(this);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
@@ -173,13 +161,10 @@ class DeleteLocalProgramComponent extends Component {
             color: '#BA0C2F',
             loading: false
           })
-          // this.hideFirstComponent()
         }.bind(this);
         getRequest.onsuccess = function (event) {
           var myResult = [];
           myResult = getRequest.result;
-
-          // console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
             loading: false,
@@ -191,10 +176,7 @@ class DeleteLocalProgramComponent extends Component {
         }.bind(this);
       }.bind(this)
     }
-    // this.setState({ programs: [] })
-    // this.getPrograms();
   }
-
   deleteLocalProgramFromProgramQPLDetails = (programIds) => {
     var db1;
     getDatabase();
@@ -206,7 +188,6 @@ class DeleteLocalProgramComponent extends Component {
           color: '#BA0C2F',
           loading: false
         })
-        // this.hideFirstComponent()
       }.bind(this);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
@@ -220,13 +201,10 @@ class DeleteLocalProgramComponent extends Component {
             color: '#BA0C2F',
             loading: false
           })
-          // this.hideFirstComponent()
         }.bind(this);
         getRequest.onsuccess = function (event) {
           var myResult = [];
           myResult = getRequest.result;
-
-          // console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
             loading: false,
@@ -238,10 +216,7 @@ class DeleteLocalProgramComponent extends Component {
         }.bind(this);
       }.bind(this)
     }
-    // this.setState({ programs: [] })
-    // this.getPrograms();
   }
-
   getPrograms() {
     var db1;
     getDatabase();
@@ -252,7 +227,6 @@ class DeleteLocalProgramComponent extends Component {
         color: '#BA0C2F',
         loading: false
       })
-      // this.hideFirstComponent()
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
@@ -267,7 +241,6 @@ class DeleteLocalProgramComponent extends Component {
           color: '#BA0C2F',
           loading: false
         })
-        // this.hideFirstComponent()
       }.bind(this);
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -276,11 +249,6 @@ class DeleteLocalProgramComponent extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            // var programJson1 = JSON.parse(programData);
             var programJson = {
               label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
@@ -291,7 +259,6 @@ class DeleteLocalProgramComponent extends Component {
               programId: myResult[i].programId,
               versionId: myResult[i].version
             }
-
             proList1.push(programJson1)
           }
         }
@@ -306,38 +273,28 @@ class DeleteLocalProgramComponent extends Component {
       }.bind(this);
     }.bind(this)
   }
-
-
-
   componentDidMount() {
     this.getPrograms()
   }
-
   onRadioBtnClick(radioSelected) {
     this.setState({
       radioSelected: radioSelected,
     });
   }
-
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-
   render() {
     const { programs } = this.state;
     let programList = programs.length > 0
       && programs.map((item, i) => {
         return (
-
           { label: item.label, value: item.value }
-
         )
       }, this);
-
     return (
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
-
         <Card>
           <CardBody className="pb-lg-2 pt-lg-2">
             <div ref={ref}>
@@ -347,9 +304,7 @@ class DeleteLocalProgramComponent extends Component {
                     <FormGroup className="col-md-3">
                       <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-
                       <MultiSelect
-
                         bsSize="sm"
                         name="programIds"
                         id="programIds"
@@ -357,39 +312,30 @@ class DeleteLocalProgramComponent extends Component {
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
                       />
-
                     </FormGroup>
-
                   </div>
                 </div>
               </Form>
             </div>
-
           </CardBody>
           <div style={{ display: this.state.loading ? "none" : "block" }}></div>
           <div style={{ display: this.state.loading ? "block" : "none" }}>
             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
               <div class="align-items-center">
                 <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                 <div class="spinner-border blue ml-4" role="status">
-
                 </div>
               </div>
             </div>
           </div>
-
           <CardFooter className="pb-4">
             <FormGroup className="pb-1">
               <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.confirmDeleteLocalProgram}><i className="fa fa-trash"></i> {i18n.t('static.common.delete')}</Button>
             </FormGroup>
           </CardFooter>
         </Card>
-
-
       </div>
     );
   }
 }
-
 export default DeleteLocalProgramComponent;

@@ -1,16 +1,9 @@
-
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table-2';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import data from '../Tables/DataTable/_data';
-
-
-import FundingSourceService from "../../api/FundingSourceService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 import { API_URL } from '../../Constants';
-
+import FundingSourceService from "../../api/FundingSourceService";
 class SubFundingSourceListComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +18,6 @@ class SubFundingSourceListComponent extends Component {
             onRowClick: function (row) {
                 this.editSubFundingSource(row);
             }.bind(this)
-
         }
         this.state = {
             fundingSources: [],
@@ -40,9 +32,7 @@ class SubFundingSourceListComponent extends Component {
             state: { subFundingSource }
         });
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
@@ -53,7 +43,6 @@ class SubFundingSourceListComponent extends Component {
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
-                                // message: error.message
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             })
                             break
@@ -65,7 +54,6 @@ class SubFundingSourceListComponent extends Component {
                     }
                 }
             );
-
         FundingSourceService.getSubFundingSourceListAll()
             .then(response => {
                 this.setState({
@@ -76,7 +64,6 @@ class SubFundingSourceListComponent extends Component {
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
-                                // message: error.message
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             })
                             break
@@ -89,15 +76,12 @@ class SubFundingSourceListComponent extends Component {
                 }
             );
     }
-
     showSubFundingSourceLabel(cell, row) {
         return cell.label_en;
     }
-
     showFundingSourceLabel(cell, row) {
         return cell.label.label_en;
     }
-
     showStatus(cell, row) {
         if (cell) {
             return "Active";

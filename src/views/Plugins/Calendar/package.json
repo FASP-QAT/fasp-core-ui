@@ -1,6 +1,0 @@
-{
-  "name": "Calendar",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./Calendar.js"
-}

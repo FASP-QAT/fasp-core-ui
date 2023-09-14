@@ -1,27 +1,22 @@
+import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
 import {
-    Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
-    CardFooter, Button, Table, Col, Row, FormFeedback, Form
-
+    Button,
+    Card, CardBody,
+    CardFooter,
+    Col,
+    FormGroup
 } from 'reactstrap';
-import { Date } from 'core-js';
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import i18n from '../../i18n'
-import getLabelText from '../../CommonComponent/getLabelText';
-import IntegrationService from '../../api/IntegrationService.js';
-import AuthenticationService from "../Common/AuthenticationService";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ProgramService from "../../api/ProgramService.js";
-import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { inValid, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
-
+import IntegrationService from '../../api/IntegrationService.js';
+import ProgramService from "../../api/ProgramService.js";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.integration.programIntegration')
-
 class ProgramIntegration extends Component {
     constructor(props) {
         super(props);
@@ -54,83 +49,62 @@ class ProgramIntegration extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     filterVersionStatus = function (instance, cell, c, r, source) {
-        // var elInstance = instance.jexcel;
-        // var rowData = elInstance.getRowData(r);
-        // console.log("RESPO---------2", rowData[2]);
         var rowData = (this.state.dataEL.getJson(null, false)[r]);
-
-        // return this.state.countryArr.filter(c => c.active.toString() == "true");
-        // if (rowData[2] == 1) {
-        //     elInstance.setValueFromCoords(3, r, 1, true);
-        // }
         return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
     }.bind(this);
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getProgramIntegrationByProgramId(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
-                // console.log("getProgramIntegrationByProgramId---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
                 }
-
                 ProgramService.getProgramById(this.props.match.params.programId)
                     .then(response => {
                         if (response.status == 200) {
                             this.setState({
                                 program: response.data
                             })
-                            //A
                             IntegrationService.getIntegrationListAll().then(response => {
                                 if (response.status == 200) {
                                     var listArray = response.data;
                                     listArray.sort((a, b) => {
-                                        var itemLabelA = (a.integrationName).toUpperCase(); // ignore upper and lowercase
-                                        var itemLabelB = (b.integrationName).toUpperCase(); // ignore upper and lowercase                   
+                                        var itemLabelA = (a.integrationName).toUpperCase(); 
+                                        var itemLabelB = (b.integrationName).toUpperCase(); 
                                         return itemLabelA > itemLabelB ? 1 : -1;
                                     });
                                     this.setState({
                                         integrations: listArray
                                     })
-                                    //B
                                     ProgramService.getVersionStatusList().then(response => {
                                         if (response.status == 200) {
                                             var listArray = response.data;
                                             listArray.sort((a, b) => {
-                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             this.setState({
                                                 versionStatus: listArray
                                             })
-
-                                            //C
                                             ProgramService.getVersionTypeList().then(response => {
                                                 if (response.status == 200) {
                                                     var listArray = response.data;
                                                     listArray.sort((a, b) => {
-                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                                                         return itemLabelA > itemLabelB ? 1 : -1;
                                                     });
                                                     this.setState({
                                                         versionType: listArray
                                                     })
-                                                    //-----------------------
-
                                                     const { integrations } = this.state;
                                                     const { versionStatus } = this.state;
                                                     const { versionType } = this.state;
-
                                                     let integrationArr = [];
                                                     let versionStatusArr = [];
                                                     let versionTypeArr = [];
-
                                                     if (integrations.length > 0) {
                                                         for (var i = 0; i < integrations.length; i++) {
                                                             var paJson = {
@@ -140,7 +114,6 @@ class ProgramIntegration extends Component {
                                                             integrationArr[i] = paJson
                                                         }
                                                     }
-
                                                     if (versionStatus.length > 0) {
                                                         for (var i = 0; i < versionStatus.length; i++) {
                                                             var paJson = {
@@ -150,7 +123,6 @@ class ProgramIntegration extends Component {
                                                             versionStatusArr[i] = paJson
                                                         }
                                                     }
-
                                                     if (versionType.length > 0) {
                                                         for (var i = 0; i < versionType.length; i++) {
                                                             var paJson = {
@@ -160,34 +132,18 @@ class ProgramIntegration extends Component {
                                                             versionTypeArr[i] = paJson
                                                         }
                                                     }
-
                                                     this.setState({
                                                         integrationArr: integrationArr,
                                                         versionStatusArr: versionStatusArr,
                                                         versionTypeArr: versionTypeArr,
                                                     })
-                                                    // Jexcel starts
                                                     var papuList = this.state.rows;
                                                     var data = [];
                                                     var papuDataArr = [];
-                                                    // console.log("Success-----------", papuList);
                                                     var count = 0;
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
-
-                                                            // data = [];
-                                                            // data[0] = this.state.realm.label.label_en;
-                                                            // data[1] = parseInt(papuList[j].country.countryId);
-                                                            // data[2] = parseInt(papuList[j].defaultCurrency.currencyId);
-                                                            // data[3] = papuList[j].active;
-                                                            // data[4] = this.props.match.params.realmId;
-                                                            // data[5] = papuList[j].realmCountryId;
-                                                            // data[6] = 0;
-                                                            // papuDataArr[count] = data;
-                                                            // count++;
-
                                                             data = [];
-
                                                             data[0] = this.state.program.label.label_en;
                                                             data[1] = parseInt(papuList[j].integration.integrationId);
                                                             data[2] = parseInt(papuList[j].versionType.id);
@@ -211,9 +167,7 @@ class ProgramIntegration extends Component {
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                                    // this.el.destroy();
                                                     jexcel.destroy(document.getElementById("paputableDiv"), true);
-
                                                     var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
@@ -221,7 +175,6 @@ class ProgramIntegration extends Component {
                                                         columnDrag: true,
                                                         colWidths: [100, 100, 100, 100],
                                                         columns: [
-
                                                             {
                                                                 title: i18n.t('static.budget.program'),
                                                                 type: 'text',
@@ -231,7 +184,6 @@ class ProgramIntegration extends Component {
                                                                 title: i18n.t('static.integration.integration'),
                                                                 type: 'autocomplete',
                                                                 source: integrationArr,
-
                                                             },
                                                             {
                                                                 title: i18n.t('static.report.versiontype'),
@@ -256,44 +208,29 @@ class ProgramIntegration extends Component {
                                                                 title: 'isChange',
                                                                 type: 'hidden'
                                                             }
-
                                                         ],
                                                         updateTable: function (el, cell, x, y, source, value, id) {
                                                             if (y != null) {
                                                                 var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
-                                                                // var productCategoryId = rowData[0];
                                                                 var integrationProgramId = rowData[5];
                                                                 if (integrationProgramId == 0) {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.remove('readonly');
-
-                                                                    // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                                    // cell2.classList.remove('readonly');
-
-
                                                                 } else {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.add('readonly');
-
-                                                                    // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                                    // cell2.classList.add('readonly');
-
-
                                                                 }
                                                             }
                                                         },
                                                         onsearch: function (el) {
-                                                            // el.jexcel.updateTable();
                                                         },
                                                         onfilter: function (el) {
-                                                            // el.jexcel.updateTable();
                                                         },
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
                                                         search: true,
                                                         columnSorting: true,
-                                                        // tableOverflow: true,
                                                         wordWrap: true,
                                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                         parseFormulas: true,
@@ -310,20 +247,10 @@ class ProgramIntegration extends Component {
                                                         allowManualInsertRow: false,
                                                         license: JEXCEL_PRO_KEY,
                                                         editable: true,
-                                                        // text: {
-                                                        //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                        //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                        //     show: '',
-                                                        //     entries: '',
-                                                        // },
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {
                                                             var items = [];
-                                                            //Add consumption batch info
-
-
                                                             if (y == null) {
-                                                                // Insert a new column
                                                                 if (obj.options.allowInsertColumn == true) {
                                                                     items.push({
                                                                         title: obj.options.text.insertANewColumnBefore,
@@ -332,7 +259,6 @@ class ProgramIntegration extends Component {
                                                                         }
                                                                     });
                                                                 }
-
                                                                 if (obj.options.allowInsertColumn == true) {
                                                                     items.push({
                                                                         title: obj.options.text.insertANewColumnAfter,
@@ -341,32 +267,8 @@ class ProgramIntegration extends Component {
                                                                         }
                                                                     });
                                                                 }
-
-                                                                // Delete a column
-                                                                // if (obj.options.allowDeleteColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.deleteSelectedColumns,
-                                                                //         onclick: function () {
-                                                                //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Rename column
-                                                                // if (obj.options.allowRenameColumn == true) {
-                                                                //     items.push({
-                                                                //         title: obj.options.text.renameThisColumn,
-                                                                //         onclick: function () {
-                                                                //             obj.setHeader(x);
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                // Sorting
                                                                 if (obj.options.columnSorting == true) {
-                                                                    // Line
                                                                     items.push({ type: 'line' });
-
                                                                     items.push({
                                                                         title: obj.options.text.orderAscending,
                                                                         onclick: function () {
@@ -381,7 +283,6 @@ class ProgramIntegration extends Component {
                                                                     });
                                                                 }
                                                             } else {
-                                                                // Insert new row before
                                                                 if (obj.options.allowInsertRow == true) {
                                                                     items.push({
                                                                         title: i18n.t('static.common.insertNewRowBefore'),
@@ -398,7 +299,6 @@ class ProgramIntegration extends Component {
                                                                         }.bind(this)
                                                                     });
                                                                 }
-                                                                // after
                                                                 if (obj.options.allowInsertRow == true) {
                                                                     items.push({
                                                                         title: i18n.t('static.common.insertNewRowAfter'),
@@ -415,9 +315,7 @@ class ProgramIntegration extends Component {
                                                                         }.bind(this)
                                                                     });
                                                                 }
-                                                                // Delete a row
                                                                 if (obj.options.allowDeleteRow == true) {
-                                                                    // region id
                                                                     if (obj.getRowData(y)[5] == 0) {
                                                                         items.push({
                                                                             title: i18n.t("static.common.deleterow"),
@@ -427,46 +325,10 @@ class ProgramIntegration extends Component {
                                                                         });
                                                                     }
                                                                 }
-
                                                                 if (x) {
-                                                                    // if (obj.options.allowComments == true) {
-                                                                    //     items.push({ type: 'line' });
-
-                                                                    //     var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                    //     items.push({
-                                                                    //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                    //         onclick: function () {
-                                                                    //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                    //         }
-                                                                    //     });
-
-                                                                    //     if (title) {
-                                                                    //         items.push({
-                                                                    //             title: obj.options.text.clearComments,
-                                                                    //             onclick: function () {
-                                                                    //                 obj.setComments([x, y], '');
-                                                                    //             }
-                                                                    //         });
-                                                                    //     }
-                                                                    // }
                                                                 }
                                                             }
-
-                                                            // Line
                                                             items.push({ type: 'line' });
-
-                                                            // // Save
-                                                            // if (obj.options.allowExport) {
-                                                            //     items.push({
-                                                            //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                            //         shortcut: 'Ctrl + S',
-                                                            //         onclick: function () {
-                                                            //             obj.download(true);
-                                                            //         }
-                                                            //     });
-                                                            // }
-
                                                             return items;
                                                         }.bind(this)
                                                     };
@@ -477,8 +339,6 @@ class ProgramIntegration extends Component {
                                                         dataEL: varEL,
                                                         loading: false
                                                     })
-
-                                                    //---------------------
                                                 } else {
                                                     this.setState({
                                                         message: response.data.messageCode
@@ -492,13 +352,11 @@ class ProgramIntegration extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                // message: 'static.unkownError',
                                                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {
                                                             switch (error.response ? error.response.status : "") {
-
                                                                 case 401:
                                                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                                                     break;
@@ -529,7 +387,6 @@ class ProgramIntegration extends Component {
                                                         }
                                                     }
                                                 );
-
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -543,13 +400,11 @@ class ProgramIntegration extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -580,8 +435,6 @@ class ProgramIntegration extends Component {
                                                 }
                                             }
                                         );
-
-
                                 } else {
                                     this.setState({
                                         message: response.data.messageCode
@@ -595,13 +448,11 @@ class ProgramIntegration extends Component {
                                     error => {
                                         if (error.message === "Network Error") {
                                             this.setState({
-                                                // message: 'static.unkownError',
                                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                 loading: false
                                             });
                                         } else {
                                             switch (error.response ? error.response.status : "") {
-
                                                 case 401:
                                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                                     break;
@@ -640,19 +491,16 @@ class ProgramIntegration extends Component {
                                     this.hideSecondComponent();
                                 })
                         }
-
                     })
                     .catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -683,8 +531,6 @@ class ProgramIntegration extends Component {
                             }
                         }
                     );
-
-
             } else {
                 this.setState({
                     message: response.data.messageCode
@@ -693,19 +539,16 @@ class ProgramIntegration extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -747,7 +590,6 @@ class ProgramIntegration extends Component {
         data[4] = true;
         data[5] = 0;
         data[6] = 1;
-
         this.el.insertRow(
             data, 0, 1
         );
@@ -770,11 +612,9 @@ class ProgramIntegration extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                // console.log("6 map---" + map1.get("6"))
                 if (parseInt(map1.get("6")) === 1) {
                     let json = {
                         integration: {
@@ -795,12 +635,9 @@ class ProgramIntegration extends Component {
                     changedpapuList.push(json);
                 }
             }
-            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             IntegrationService.addprogramIntegration(changedpapuList)
                 .then(response => {
-                    // console.log(response.data);
                     if (response.status == "200") {
-                        // console.log(response);
                         this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -810,19 +647,16 @@ class ProgramIntegration extends Component {
                                 this.hideSecondComponent();
                             })
                     }
-
                 })
                 .catch(
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -834,7 +668,6 @@ class ProgramIntegration extends Component {
                                 case 406:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        // message: i18n.t('static.message.alreadExists'),
                                         loading: false
                                     });
                                     break;
@@ -855,30 +688,20 @@ class ProgramIntegration extends Component {
                     }
                 );
         } else {
-            // console.log("Something went wrong");
         }
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-
         var tr = asterisk.firstChild;
-        // tr.children[].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-
     blur = function (instance) {
-        // console.log('on blur called');
     }
-
     focus = function (instance) {
-        // console.log('on focus called');
     }
-    // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
         if(x==1 || x==2 || x==3 || x==4){
             var col = ("B").concat(parseInt(y) + 1);
@@ -894,8 +717,6 @@ class ProgramIntegration extends Component {
             this.el.setStyle(col, "background-color", "transparent");
             this.el.setComments(col, "");
         }
-
-        //Integration
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
@@ -907,7 +728,6 @@ class ProgramIntegration extends Component {
                 this.el.setComments(col, "");
             }
         }
-        //VersionType
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -919,7 +739,6 @@ class ProgramIntegration extends Component {
                 this.el.setComments(col, "");
             }
         }
-        //VersionStatus
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
@@ -931,53 +750,35 @@ class ProgramIntegration extends Component {
                 this.el.setComments(col, "");
             }
         }
-        //Active
         if (x != 6) {
             this.el.setValueFromCoords(6, y, 1, true);
         }
-
-
-
     }.bind(this);
-    // -----end of changed function
-
     onedit = function (instance, cell, x, y, value) {
-        // console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
-
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 2 && rowData[2] == 1) {
             elInstance.setValueFromCoords(3, y, 1, true);
         }
     }.bind(this);
-
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var checkDuplicate=json.filter(c=>c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
-            // console.log("check duplicate Test@123",checkDuplicate)
             if(checkDuplicate.length>1){
                 this.setState({
                     message:'static.programIntegration.duplicateIntegration',
                 },()=>{
                     this.hideSecondComponent();
                 })
-                // var colArr = ['B','C','D','E'];
-                // for (var c = 0; c < colArr.length; c++) {
-                //     inValid(colArr[c], y, i18n.t('static.programIntegration.duplicateIntegration'), this.el);
-                // }
                 valid = false;
             }else{
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
-
-                //Integration
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -987,8 +788,6 @@ class ProgramIntegration extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
-                //VersionType
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
                 if (value == "") {
@@ -1000,8 +799,6 @@ class ProgramIntegration extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
-                //VersionStatus
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 if (value == "") {
@@ -1023,7 +820,6 @@ class ProgramIntegration extends Component {
             Show: " ",
             entries: " ",
         });
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1032,23 +828,18 @@ class ProgramIntegration extends Component {
                 <div>
                     <Card>
                         <CardBody className="p-0">
-
                             <Col xs="12" sm="12">
-
                                 <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
                                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                             <div class="spinner-border blue ml-4" role="status">
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </Col>
                         </CardBody>
                         <CardFooter>
@@ -1061,15 +852,11 @@ class ProgramIntegration extends Component {
                         </CardFooter>
                     </Card>
                 </div>
-
             </div>
         )
     }
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
 }
-
 export default ProgramIntegration
-
