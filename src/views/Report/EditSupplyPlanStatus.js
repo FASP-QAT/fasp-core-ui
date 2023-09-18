@@ -43,7 +43,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import DropdownService from '../../api/DropdownService';
-
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.report.problem');
 
 const validationSchemaForAddingProblem = function (values) {
@@ -266,7 +266,8 @@ class EditSupplyPlanStatus extends Component {
             criticalities: [],
             criticalitiesList: [],
             submitMessage: "",
-            submitColor: ""
+            submitColor: "",
+            planningUnitDropdownList: []
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -286,6 +287,7 @@ class EditSupplyPlanStatus extends Component {
         this.addMannualProblem = this.addMannualProblem.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.roundAMC=this.roundAMC.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
     }
 
     roundAMC(amc){
@@ -357,6 +359,120 @@ class EditSupplyPlanStatus extends Component {
 
     }
 
+    addRow = function () {
+        // console.log("return----")
+        var json = this.el.getJson(null, false);
+        var data = [];
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = "";
+        data[8] = "";
+        data[9] = "";
+        data[10] = 1;
+        data[11] = "";
+        data[12] = 1;
+        data[13] = "";
+        data[14] = "";
+        data[15] = "";
+        data[16] = "";
+        data[17] = "";
+        data[18] = "";
+        data[19] = "";
+        data[20] = "";
+        data[21] = "";
+        data[22] = "";
+        data[23] = "";
+        console.log("Hello",this.el.getCells())
+        this.el.insertRow(
+            data, 0, 1
+        );
+        var cell = this.el.getCell(`F${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+        var cell = this.el.getCell(`H${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+        var cell = this.el.getCell(`I${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+        var cell = this.el.getCell(`J${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+        var cell = this.el.getCell(`T${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+
+    };
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("J").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("T").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+        }
+        return valid;
+    }
+
     rowChanged = function (instance, cell, x, y, value) {
         this.setState({
             problemReportChanged: 1
@@ -367,6 +483,68 @@ class EditSupplyPlanStatus extends Component {
         var rowData1 = elInstance.getRowData(y);
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
         // console.log("problemList in changed method ***", problemList);
+
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (rowData1[5] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (rowData1[7] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            if (rowData1[8] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 9) {
+            var col = ("J").concat(parseInt(y) + 1);
+            if (rowData1[9] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 19) {
+            var col = ("T").concat(parseInt(y) + 1);
+            if (rowData1[19] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if(problemList.length > 0){
         if (x == 10) {
             if (problemList[0].problemStatus.id != value) {
                 // console.log("in if 1***");
@@ -399,6 +577,7 @@ class EditSupplyPlanStatus extends Component {
             if (value.toString() == "false") {
                 elInstance.setValueFromCoords(21, y, "", true);
             }
+        }
         }
     }
     hideFirstComponent() {
@@ -2325,7 +2504,9 @@ class EditSupplyPlanStatus extends Component {
                     a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
                     b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
-                }.bind(this)), message: ''
+                }.bind(this)), 
+                planningUnitDropdownList: response.data.map((item, i) => ({id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang)})),
+                message: ''
             })
         })
             .catch(
@@ -2425,6 +2606,8 @@ class EditSupplyPlanStatus extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
+        this.getPlanningUnit();
+        this.getProblemCriticality();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
                 // console.log("===========>", response.data)
@@ -3822,6 +4005,7 @@ class EditSupplyPlanStatus extends Component {
                     <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                 </TabPane>
 
             </>
@@ -4133,7 +4317,7 @@ class EditSupplyPlanStatus extends Component {
             data[2] = ""
             data[3] = problemList[j].versionId
             data[4] = ""
-            data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
+            data[5] = problemList[j].planningUnit.id
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             data[7] = problemList[j].problemCategory.id
             data[8] = getProblemDesc(problemList[j], this.state.lang)
@@ -4149,7 +4333,7 @@ class EditSupplyPlanStatus extends Component {
             data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
             data[18] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
 
-            data[19] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            data[19] = problemList[j].realmProblem.criticality.id
             data[20] = problemList[j].reviewed
             data[21] = ''
 
@@ -4234,7 +4418,8 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
-                    type: 'text',
+                    type: 'dropdown',
+                    source: this.state.planningUnitDropdownList,
                     readOnly: true,
                     width: 80
                 },
@@ -4349,9 +4534,10 @@ class EditSupplyPlanStatus extends Component {
 
                 {
                     title: i18n.t('static.problemAction.criticality'),
-                    type: 'text',
+                    type: 'dropdown',
                     readOnly: true,
-                    width: 80
+                    width: 80,
+                    source: this.state.criticalitiesList
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
@@ -4457,7 +4643,7 @@ class EditSupplyPlanStatus extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             allowManualInsertRow: false,
             onchange: this.rowChanged,
             // onselection: this.selected,
@@ -4482,7 +4668,17 @@ class EditSupplyPlanStatus extends Component {
                             this.toggleTransView(myObj[23]);
                         }.bind(this)
                     });
-
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[12] == 0) {
+                            items1.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                        }
+                    }
                 }
                 return items1;
             }.bind(this)
@@ -5646,6 +5842,8 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                var validation = this.checkValidation();
+                                if (validation == true) {
                                 document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
@@ -5764,6 +5962,7 @@ class EditSupplyPlanStatus extends Component {
                                 } else {
                                     document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
+                                }
                                 }
 
                             }}
