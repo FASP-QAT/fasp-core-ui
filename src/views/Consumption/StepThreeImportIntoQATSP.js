@@ -89,6 +89,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             languageEl: '',
             consumptionData: [],
             monthArrayList: [],
+            realm:{}
         }
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -471,123 +472,123 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
             realmRequest.onsuccess = function (event) {
-                var realm=realmRequest.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
-            var programRequest = programDataOs.get(this.props.items.programId);
-            programRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: '#BA0C2F'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var fullConsumptionList = [];
-                var programData1 = programRequest.result.programData;
-                for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
-                    var planningUnitDataIndex = programData1.planningUnitDataList[pu];
-                    var programJson = {}
-                    if (planningUnitDataIndex != -1) {
-                        var planningUnitData = programData1.planningUnitDataList[pu];
-                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                        var programData2 = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        programJson = JSON.parse(programData2);
-                    } else {
-                        programJson = {
-                            consumptionList: [],
-                            inventoryList: [],
-                            shipmentList: [],
-                            batchInfoList: [],
-                            supplyPlan: []
-                        }
-                    }
-                    fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
-                }
-                // console.log("Props items---------------->", this.props.items);
-
-                var unitIds = ""
-                unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
-                var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
-                var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
-
-                let inputJson = {
-                    "programId": Number(this.props.items.forecastProgramId),
-                    "versionId": Number(this.props.items.versionId),
-                    "startDate": startDate,
-                    "stopDate": stopDate,
-                    "reportView": 1,
-                    "aggregateByYear": false,
-                    "unitIds": unitIds
-                }
-
-                // console.log("OnlineInputJson---------------->", inputJson);
-                // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
-
-                // console.log("RESP---------->unitDesc", unitDescArr);
-                let tempList = [];
-                let supplyPlanPlanningUnitId = [];
-                let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
-
-                let supplyPlanRegionList = this.props.items.stepTwoData;
-                // console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
-                // for (let i = 0; i < supplyPlanRegionList.length; i++) {
-                for (let j = 0; j < selectedSupplyPlan.length; j++) {
-                    supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
-                }
-                // }
-
-                ReportService.forecastOutput(inputJson)
-                    .then(response => {
-                        // console.log("RESP---------->forecastOutput", response.data);
-                        let primaryConsumptionData = response.data;
-                        // var count1 = 1;
-                        for (let i = 0; i < primaryConsumptionData.length; i++) {
-                            let rem = 0;
-                            for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
-                                // for (let k = 0; k < selectedSupplyPlan.length; k++) {
-                                // for (let l = 0; l < supplyPlanRegionList.length; l++) {
-                                // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
-                                // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
-                                var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
-                                var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
-                                if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
-                                    var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
-                                    var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
-                                    var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
-                                    rem = rem + Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) % 1;
-                                    let temp_consumptionQty = Math.floor(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)
-                                    if(rem > 1){
-                                        temp_consumptionQty += 1;
-                                        rem -= 1;
-                                    }
-                                    tempList.push({
-                                        v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
-                                        v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
-                                        v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
-                                        v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
-                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)).toFixed(2),//Forecasting module consumption qty
-                                        v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
-                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number((Number(temp_consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)).toFixed(2),// Multiplication
-                                        v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
-                                        v9: checkConsumptionData.length > 0 ? true : false,// Check
-                                        v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
-                                        v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
-                                        v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
-                                        v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
-                                        v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
-                                        v15: regionFilter[0].forecastPercentage,// % of forecast
-                                        v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
-                                        v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                        v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
-
-                                    });
-                                }
-                                // count1++;
-                                // }
-                                // }
+                var realm = realmRequest.result;
+                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('programData');
+                var programRequest = programDataOs.get(this.props.items.programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: '#BA0C2F'
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (e) {
+                    var fullConsumptionList = [];
+                    var programData1 = programRequest.result.programData;
+                    for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
+                        var planningUnitDataIndex = programData1.planningUnitDataList[pu];
+                        var programJson = {}
+                        if (planningUnitDataIndex != -1) {
+                            var planningUnitData = programData1.planningUnitDataList[pu];
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData2 = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData2);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
                             }
                         }
+                        fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
+                    }
+                    // console.log("Props items---------------->", this.props.items);
+
+                    var unitIds = ""
+                    unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
+                    var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
+                    var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
+
+                    let inputJson = {
+                        "programId": Number(this.props.items.forecastProgramId),
+                        "versionId": Number(this.props.items.versionId),
+                        "startDate": startDate,
+                        "stopDate": stopDate,
+                        "reportView": 1,
+                        "aggregateByYear": false,
+                        "unitIds": unitIds
+                    }
+
+                    // console.log("OnlineInputJson---------------->", inputJson);
+                    // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
+
+                    // console.log("RESP---------->unitDesc", unitDescArr);
+                    let tempList = [];
+                    let supplyPlanPlanningUnitId = [];
+                    let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
+
+                    let supplyPlanRegionList = this.props.items.stepTwoData;
+                    // console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
+                    // for (let i = 0; i < supplyPlanRegionList.length; i++) {
+                    for (let j = 0; j < selectedSupplyPlan.length; j++) {
+                        supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
+                    }
+                    // }
+
+                    ReportService.forecastOutput(inputJson)
+                        .then(response => {
+                            // console.log("RESP---------->forecastOutput", response.data);
+                            let primaryConsumptionData = response.data;
+                            // var count1 = 1;
+                            for (let i = 0; i < primaryConsumptionData.length; i++) {
+                                let rem = 0;
+                                for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
+                                    // for (let k = 0; k < selectedSupplyPlan.length; k++) {
+                                    // for (let l = 0; l < supplyPlanRegionList.length; l++) {
+                                    // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
+                                    // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
+                                    var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
+                                    var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
+                                    if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0 && primaryConsumptionData[i].monthlyForecastData[j].consumptionQty != null) {
+                                        var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
+                                        var isOldDate = diff < (realm.forecastConsumptionMonthsInPast + 1);
+                                        var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
+                                        rem = rem + Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) % 1;
+                                        let temp_consumptionQty = Math.floor(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)
+                                        if (rem > 1) {
+                                            temp_consumptionQty += 1;
+                                            rem -= 1;
+                                        }
+                                        tempList.push({
+                                            v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
+                                            v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
+                                            v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
+                                            v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
+                                            v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)).toFixed(2),//Forecasting module consumption qty
+                                            v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
+                                            v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number((Number(temp_consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)).toFixed(2),// Multiplication
+                                            v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
+                                            v9: checkConsumptionData.length > 0 ? true : false,// Check
+                                            v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
+                                            v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
+                                            v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
+                                            v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
+                                            v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
+                                            v15: regionFilter[0].forecastPercentage,// % of forecast
+                                            v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
+                                            v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
+                                            v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
+
+                                        });
+                                    }
+                                    // count1++;
+                                    // }
+                                    // }
+                                }
+                            }
 
                         let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
                             if (!a[v13]) {
@@ -601,6 +602,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
                         this.setState({
                             selSource: resultTrue,
+                            realm:realm,
                             loading: true
                         }, () => {
                             this.buildJexcel();
@@ -649,10 +651,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         }
                     );
 
-                // console.log("step 3-tempList--->", tempList)
+                    // console.log("step 3-tempList--->", tempList)
+                }.bind(this)
             }.bind(this)
         }.bind(this)
-    }.bind(this)
     }
 
     buildJexcel() {
@@ -998,7 +1000,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <ul className="legendcommitversion list-group">
                     <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
                 </ul> */}
-                <div class="col-md-10 mt-2 pl-lg-0 form-group">
+                <div class="col-md-10 mt-2 pl-lg-0 form-group" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
@@ -1006,12 +1008,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                         <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
-                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {this.state.realm.forecastConsumptionMonthsInPast} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
 
-                <p>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
+                <p style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
 
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}

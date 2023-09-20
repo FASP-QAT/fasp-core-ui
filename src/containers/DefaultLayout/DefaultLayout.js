@@ -930,6 +930,8 @@ class DefaultLayout extends Component {
   componentDidMount() {
     // console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
+    window.addEventListener('blur', this.handleBlur);
+    window.addEventListener('click', this.handleFocus);
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
@@ -974,6 +976,28 @@ class DefaultLayout extends Component {
     }
 
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('blur', this.handleBlur);
+    window.removeEventListener('click', this.handleFocus);
+  }
+
+  handleBlur = () => {
+    var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
+    if(temp_time > this.state.timeout){
+      this.props.history.push('/logout/static.message.sessionExpired')
+    }
+  };
+
+  handleFocus = () => {
+    var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
+    if(temp_time > this.state.timeout){
+      this.props.history.push('/logout/static.message.sessionExpired')
+    }
+    localStorage.setItem("lastFocus", new Date())
+  };
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
@@ -1954,7 +1978,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/dataset/loadDeleteDataSet',
-                            icon: 'fa fa-download',
+                            icon: 'cui-cloud-download FontBoldIcon',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
@@ -2209,7 +2233,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
                             url: '/forecastReport/forecastOutput',
-                            icon: 'fa fa-line-chart',
+                            icon: 'fa fa-bar-chart',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
@@ -3500,7 +3524,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
-                            icon: 'fa fa-cloud-download',
+                            icon: 'fa fa-download',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -3511,7 +3535,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
-                            icon: 'fa fa-sign-in',
+                            icon: 'fa fa-upload',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -3519,17 +3543,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                         ]
                       },
                       {
@@ -3738,7 +3762,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.ForecastSummary.ForecastSummary'),
                             url: '/forecastReport/forecastSummary',
-                            icon: 'fa fa-pie-chart',
+                            icon: 'fa fa-table',
                             attributes: {
                               hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
                               onClick: e => {
@@ -3817,7 +3841,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
                             url: '/inventory/addInventory',
-                            icon: 'fa fa-cube',
+                            icon: 'fa fa-archive',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -3840,7 +3864,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
                             url: '/supplyPlan',
-                            icon: 'fa fa-calculator',
+                            icon: 'fa fa-bar-chart',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -3862,7 +3886,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
-                            icon: 'fa fa-exchange',
+                            icon: 'fa fa-file-text',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -4013,7 +4037,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
                             url: '/report/problemList',
-                            icon: 'fa fa-file-text-o',
+                            icon: 'fa fa-flag',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -4024,7 +4048,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-list-ol',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
@@ -4066,7 +4090,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.stockstatusmatrix'),
                                 url: '/report/stockStatusMatrix',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-table',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4077,7 +4101,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
                                 url: '/report/stockStatusAcrossPlanningUnits',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-camera',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4099,7 +4123,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.consumption'),
                                 url: '/report/consumption',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-bar-chart',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4140,7 +4164,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.report.shipmentDetailReport'),
                                 url: '/report/shipmentSummery',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-truck',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') && this.state.activeTab == 2 ? false : true) }
                               },
                               // {
@@ -4163,7 +4187,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.report.annualshipmentcost'),
                                 url: '/report/annualShipmentCost',
-                                icon: 'fa fa-file-text',
+                                icon: 'fa fa-file-pdf-o',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4185,7 +4209,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.supplierLeadTimes'),
                                 url: '/report/supplierLeadTimes',
-                                icon: 'fa fa-wpforms',
+                                icon: 'fa fa-calendar',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4206,7 +4230,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.report.expiredInventory'),
                                 url: '/report/expiredInventory',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-exclamation-triangle',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4218,7 +4242,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.costOfInventory'),
                                 url: '/report/costOfInventory',
-                                icon: 'fa fa-exchange',
+                                icon: 'fa fa-book',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4228,7 +4252,7 @@ class DefaultLayout extends Component {
                               }, {
                                 name: i18n.t('static.dashboard.inventoryTurns'),
                                 url: '/report/inventoryTurns',
-                                icon: 'fa fa-line-chart',
+                                icon: 'fa fa-refresh',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4240,7 +4264,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',
-                                icon: 'fa fa-line-chart',
+                                icon: 'fa fa-table',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
@@ -4251,7 +4275,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.report.warehouseCapacity'),
                                 url: '/report/warehouseCapacity',
-                                icon: 'fa fa-line-chart',
+                                icon: 'fa fa-building-o',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') && this.state.activeTab == 2 ? false : true),
                                   onClick: e => {
