@@ -465,6 +465,7 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
+                                localStorage.setItem("lastFocus", new Date());
                                 AuthenticationService.setLanguageChangeFlag();
                                 i18n.changeLanguage(decoded.user.language.languageCode);
 

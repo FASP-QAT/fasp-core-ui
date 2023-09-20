@@ -35,7 +35,7 @@
     "static.tooltip.CopyFromTemplate": "Use a template to fill in all subsquent fields. Edit these in the Program Management > Usage Template screen.",
     "static.procurementAgentPlanningUnit.unitPerPallet": "Units per Pallet",
     "static.program.submittoapproveleadtime": "`Submitted to Approved` Lead Time (months)",
-    "static.supplyPlan.planMultiplePusByDate": "Plan multiple PUs by date",
+    "static.supplyPlan.planMultiplePusByDate": "Plan shipments for multiple PUs by date",
     "static.currency.currencysymboltext": "Enter currency symbol",
     "static.supplyPlan.roundUp": "Round Up",
     "static.procurementAgentProcurementUnit.vendorPrice": "Procurement Agent Price (USD)",

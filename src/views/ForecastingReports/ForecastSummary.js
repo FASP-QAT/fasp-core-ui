@@ -310,7 +310,7 @@ class ForecastSummary extends Component {
             headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
             headers.push(((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20')));
             if (!this.state.hideColumn) {
-                headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
+                headers.push((i18n.t('static.ForecastSummary.Stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
                 // headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastOutput.stockOrUnmedDemand')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
@@ -922,7 +922,7 @@ class ForecastSummary extends Component {
             let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastOutput.totalForecastQuantity')];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.forecastOutput.stockOrUnmedDemand') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.ForecastSummary.Stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.forecastOutput.stockOrUnmedDemand') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -1421,14 +1421,14 @@ class ForecastSummary extends Component {
                                     let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                     let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
                                     let planningUnit = planningUnitList[j].planningUnit;
-                                    let totalForecastedQuantity = totalForecastedQuantity0ri!=null?totalForecastedQuantity0ri.toFixed(2):totalForecastedQuantity0ri;
-                                    let stock1 = planningUnitList[j].stock;
-                                    let existingShipments = planningUnitList[j].existingShipments;
-                                    let stock2 = ((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri);
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri!=null?Number(totalForecastedQuantity0ri).toFixed(2):totalForecastedQuantity0ri;
+                                    let stock1 = Number(planningUnitList[j].stock);
+                                    let existingShipments = Number(planningUnitList[j].existingShipments);
+                                    let stock2 = (Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - (Number(totalForecastedQuantity0ri));
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
-                                    let tempProcurementGap = (((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri)) - ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
+                                    let desiredMonthOfStock2 = (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
+                                    let tempProcurementGap = ((Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri)) - (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                     procurementGap = (procurementGap)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
@@ -1436,7 +1436,7 @@ class ForecastSummary extends Component {
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                     let unitPrice = planningUnitList[j].price;
                                     // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
-                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * Number(unitPrice)).toFixed(2) : '');
                                     let notes = planningUnitList[j].consumptionNotes;
 
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2.toFixed(2), isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2.toFixed(2), procurementGap: procurementGap.toFixed(2), isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
@@ -1458,11 +1458,11 @@ class ForecastSummary extends Component {
                                     let totalForecastedQuantity = totalForecastedQuantity0ri;
                                     let stock1 = planningUnitList[j].stock;
                                     let existingShipments = planningUnitList[j].existingShipments;
-                                    let stock2 = ((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri);
+                                    let stock2 = (Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri);
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
-                                    let tempProcurementGap = (((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri)) - ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
+                                    let desiredMonthOfStock2 = (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
+                                    let tempProcurementGap = ((Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri)) - (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                     procurementGap = (procurementGap)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
@@ -1479,7 +1479,7 @@ class ForecastSummary extends Component {
 
 
                                     if (isProcurementGapRed == true) {
-                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * Number(unitPrice));
                                         // console.log("totalProductCost----------->4", totalProductCost);
                                     }
                                 }
@@ -3490,7 +3490,7 @@ class ForecastSummary extends Component {
                                                                         <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastOutput.totalForecastQuantity')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         {!this.state.hideColumn &&
                                                                             <>
-                                                                                <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.ForecastSummary.Stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                                 <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                                 {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                                 {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}

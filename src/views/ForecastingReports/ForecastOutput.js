@@ -3344,8 +3344,8 @@ class ForecastOutput extends Component {
                 intersect: false,
                 custom: CustomTooltips
             },
-            maintainAspectRatio: false
-            ,
+            maintainAspectRatio: false,
+            responsive: true,
             legend: {
                 display: true,
                 position: 'bottom',
@@ -3367,7 +3367,7 @@ class ForecastOutput extends Component {
                         {
                             var value = item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"));
                             if (value.length > 0) {
-                                consumptionValue.push(value[0].consumptionQty.toFixed(2))
+                                consumptionValue.push(value[0].consumptionQty != null ? value[0].consumptionQty.toFixed(2) : "")
                             } else {
                                 consumptionValue.push("");
                             }
@@ -3418,7 +3418,7 @@ class ForecastOutput extends Component {
                         {
                             var value = item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"));
                             if (value.length > 0) {
-                                consumptionValue.push(value[0].consumptionQty.toFixed(2))
+                                consumptionValue.push(value[0].consumptionQty != null ? value[0].consumptionQty.toFixed(2) : "")
                             } else {
                                 // consumptionValue.push("");
                             }
@@ -3847,7 +3847,7 @@ class ForecastOutput extends Component {
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12 pl-lg-0">
-                                                    <div className="chart-wrapper chart-graph-report1 pl-lg-4">
+                                                    <div className="chart-wrapper chart-graph-report-forecastOutput pl-lg-4">
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions}
                                                         // datasetKeyProvider={this.getIndexAsKey}
                                                         />
