@@ -2128,7 +2128,7 @@ export default class CreateTreeTemplate extends Component {
                             missingPUListForCreateTree: updatedMissingPUList,
                             datasetListJexcelForCreateTree:downloadedProgramData
                         },()=>{
-                            if(this.state.missingPUList.length>0){
+                            if(this.state.missingPUListForCreateTree.length>0){
                                 this.buildMissingPUJexcelForCreateTree();
                             }
                         });
