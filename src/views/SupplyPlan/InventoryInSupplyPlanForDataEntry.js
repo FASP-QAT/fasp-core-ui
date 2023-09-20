@@ -1539,12 +1539,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (parseInt(map.get("15")) != -1) {
-                inventoryDataList[parseInt(map.get("15"))].inventoryDate = moment(map.get("1")).endOf('month').format("YYYY-MM-DD");
-                inventoryDataList[parseInt(map.get("15"))].region.id = map.get("2");
-                inventoryDataList[parseInt(map.get("15"))].realmCountryPlanningUnit.id = map.get("4");
-                inventoryDataList[parseInt(map.get("15"))].adjustmentQty = (map.get("5") == 2) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
-                inventoryDataList[parseInt(map.get("15"))].actualQty = (map.get("5") == 1) ? elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
-                inventoryDataList[parseInt(map.get("15"))].dataSource.id = map.get("3");
+                var indexForFullList;
+                if(map.get("18")>0){
+                    indexForFullList=inventoryDataList.findIndex(c=>Number(c.inventoryId)==Number(map.get("18")));
+                }else{
+                    indexForFullList=inventoryDataList.findIndex(c=>Number(c.planningUnit.id)==Number(map.get("0")) && Number(c.index)==parseInt(map.get("15")));
+                }
+                inventoryDataList[Number(indexForFullList)].inventoryDate = moment(map.get("1")).endOf('month').format("YYYY-MM-DD");
+                inventoryDataList[Number(indexForFullList)].region.id = map.get("2");
+                inventoryDataList[Number(indexForFullList)].realmCountryPlanningUnit.id = map.get("4");
+                inventoryDataList[Number(indexForFullList)].adjustmentQty = (map.get("5") == 2) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                inventoryDataList[Number(indexForFullList)].actualQty = (map.get("5") == 1) ? elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                inventoryDataList[Number(indexForFullList)].dataSource.id = map.get("3");
             } else {
                 var inventoryJson = {
                     inventoryId: 0,
