@@ -8029,12 +8029,20 @@ export default class CreateTreeTemplate extends Component {
                     } else {
                         this.setState({ collapseState: false })
                     }
+                    var treeTemplateList=this.state.treeTemplateList;
+                    if(response.data.active==false){
+                        treeTemplateList.push({
+                            treeTemplateId:response.data.treeTemplateId,
+                            label:response.data.label
+                        })
+                    }
                     this.setState({
                         treeTemplate: response.data,
                         items,
                         tempItems: items,
                         toggleArray: tempToggleList,
                         loading: true,
+                        treeTemplateList:treeTemplateList
                     }, () => {
                         // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                         console.log("Tree Template---", this.state.items);
@@ -12614,7 +12622,11 @@ export default class CreateTreeTemplate extends Component {
 
         const { treeTemplateList } = this.state;
         let treeTemplates = treeTemplateList.length > 0
-            && treeTemplateList.map((item, i) => {
+            && treeTemplateList.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            }).map((item, i) => {
                 return (
                     <option key={i} value={item.treeTemplateId}>
                         {getLabelText(item.label, this.state.lang)}
