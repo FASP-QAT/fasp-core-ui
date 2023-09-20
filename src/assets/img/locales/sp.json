@@ -35,7 +35,7 @@
     "static.tooltip.CopyFromTemplate": "Utilice una plantilla para completar todos los campos subsiguientes. Edítelos en la pantalla Plantilla de uso.",
     "static.procurementAgentPlanningUnit.unitPerPallet": "Unidades por palet",
     "static.program.submittoapproveleadtime": "Tiempo de espera desde sometido hasta aprobado (meses)",
-    "static.supplyPlan.planMultiplePusByDate": "Planifique múltiples PU por fecha",
+    "static.supplyPlan.planMultiplePusByDate": "Planificar envíos para múltiples PU por fecha",
     "static.currency.currencysymboltext": "Ingresar el símbolo de la divisa",
     "static.supplyPlan.roundUp": "Redondeo",
     "static.procurementAgentProcurementUnit.vendorPrice": "Precio del agente de compras (USD)",
