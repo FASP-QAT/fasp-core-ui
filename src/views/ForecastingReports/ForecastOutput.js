@@ -3344,8 +3344,8 @@ class ForecastOutput extends Component {
                 intersect: false,
                 custom: CustomTooltips
             },
-            maintainAspectRatio: false
-            ,
+            maintainAspectRatio: false,
+            responsive: true,
             legend: {
                 display: true,
                 position: 'bottom',
@@ -3847,7 +3847,7 @@ class ForecastOutput extends Component {
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12 pl-lg-0">
-                                                    <div className="chart-wrapper chart-graph-report1 pl-lg-4">
+                                                    <div className="chart-wrapper chart-graph-report-forecastOutput pl-lg-4">
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions}
                                                         // datasetKeyProvider={this.getIndexAsKey}
                                                         />
