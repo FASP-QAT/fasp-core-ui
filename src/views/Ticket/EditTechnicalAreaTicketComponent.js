@@ -15,7 +15,7 @@ const initialValues = {
     technicalAreaName: "",
     notes: ""
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -210,7 +210,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                     <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -278,19 +278,14 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset,
-                                setFieldValue,
-                                setFieldTouched
-                            }) => (
+                                handleReset                            }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>

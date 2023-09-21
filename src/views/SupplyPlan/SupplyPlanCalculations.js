@@ -16,16 +16,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
             var programDataOs = programDataTransaction.objectStore(objectStoreName);
             var programRequest = programDataOs.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
             }.bind(this);
-            programRequest.onsuccess = function (e) {
+            programRequest.onsuccess = function () {
                 var programDataJson = programRequest.result.programData;
                 var planningUnitDataList = programDataJson.planningUnitDataList;
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
@@ -34,17 +34,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                var realmCountryPlanningUnitList = []
-                planningunitRequest.onerror = function (event) {
+                planningunitRequest.onerror = function () {
                 }.bind(this);
-                planningunitRequest.onsuccess = function (e) {
+                planningunitRequest.onsuccess = function () {
                     var myResult = [];
                     myResult = planningunitRequest.result;
                     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                     var programQPLDetailsJsonRequest = programQPLDetailsOs.get(programId);
-                    programQPLDetailsJsonRequest.onsuccess = function (e) {
+                    programQPLDetailsJsonRequest.onsuccess = function () {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
                         if (objectStoreName != "whatIfProgramData") {
                             if (page != "masterDataSync") {
@@ -154,7 +152,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var expiredStock = 0;
                                     var expiredStockWps = 0;
                                     var myArray = [];
-                                    var myArrayWps = [];
                                     for (var b = 0; b < batchDetails.length; b++) {
                                         if (moment(batchDetails[b].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                             var json = {
@@ -981,13 +978,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
                         var programDataOs = programDataTransaction.objectStore(objectStoreName);
                         var putRequest = programDataOs.put(programRequest.result);
-                        putRequest.onerror = function (event) {
+                        putRequest.onerror = function () {
                         }.bind(this);
-                        putRequest.onsuccess = function (event) {
+                        putRequest.onsuccess = function () {
                             var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
                             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                             var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
-                            programQPLDetailsRequest1.onsuccess = function (event) {
+                            programQPLDetailsRequest1.onsuccess = function () {
                                 if (page == "consumption") {
                                     props.updateState("message", i18n.t('static.message.consumptionSaved'));
                                     props.updateState("color", 'green');
@@ -1123,7 +1120,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.updateState("loading", false);
                                     } else {
                                         var programDataJson2 = programRequest.result.programData;
-                                        var planningUnitDataList2 = programDataJson2.planningUnitDataList;
                                         var rangeValue = props.state.rangeValue1;
                                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                                         if (rangeValue.from.month <= 9) {

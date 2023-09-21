@@ -18,12 +18,6 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import SupplierService from "../../api/SupplierService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    startDate: '',
-    stopDate: '',
-    supplier: [],
-    capacity: ''
-}
 const entityname = i18n.t('static.dashboad.planningunitcapacity')
 class PlanningUnitCapacity extends Component {
     constructor(props) {
@@ -158,7 +152,7 @@ class PlanningUnitCapacity extends Component {
         } else {
         }
     }
-    filterSupplier = function (instance, cell, c, r, source) {
+    filterSupplier = function () {
         return this.state.supplierList.filter(c => c.active.toString() == "true");
     }.bind(this);
     buildJExcel() {
@@ -210,7 +204,6 @@ class PlanningUnitCapacity extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -280,7 +273,7 @@ class PlanningUnitCapacity extends Component {
             oneditionend: this.oneditionend,
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                     if (obj.options.allowInsertColumn == true) {
@@ -371,7 +364,7 @@ class PlanningUnitCapacity extends Component {
             loading: false
         })
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -663,10 +656,10 @@ class PlanningUnitCapacity extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
+    onedit = function (instance, cell, x, y) {
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

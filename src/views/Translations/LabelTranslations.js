@@ -96,7 +96,7 @@ export default class DatabaseTranslations extends React.Component {
                             onload: this.loaded,
                             filters: true,
                             license: JEXCEL_PRO_KEY,
-                            contextMenu: function (obj, x, y, e) {
+                            contextMenu: function () {
                                 return false;
                             }.bind(this),
                         };
@@ -211,7 +211,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         );
     };
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -244,7 +244,6 @@ export default class DatabaseTranslations extends React.Component {
         if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
             LabelsService.saveStaticLabels(listToUpdate).then(response => {
                 if (response.status == 200) {
-                    let id = AuthenticationService.displayDashboardBasedOnRole();
                     this.setState({
                         message: i18n.t(response.data.messageCode),
                         color: 'green',
@@ -367,7 +366,7 @@ export default class DatabaseTranslations extends React.Component {
             this.el.setValueFromCoords(2, y, 1, true);
         }
     }.bind(this)
-    editStart = function (instance, cell, x, y, value) {
+    editStart = function (instance, cell, x, y) {
         var elInstance = instance;
         elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)

@@ -10,13 +10,7 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory"))
 let summaryText_2 = "Edit Planning Unit Category"
-let initialValues = {
-    summary: summaryText_1,
-    realmName: "",
-    planningUnitCategoryName: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -307,7 +301,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -375,13 +369,11 @@ export default class EditProductCategoryTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

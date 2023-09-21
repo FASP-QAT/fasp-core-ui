@@ -14,10 +14,7 @@ import { API_URL } from '../../Constants';
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-const initialValuesFour = {
-    regionId: []
-}
-const validationSchemaFour = function (values) {
+const validationSchemaFour = function () {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
@@ -244,19 +241,15 @@ export default class PipelineProgramDataStepFive extends Component {
                         regionId: this.props.items.program.regionArray,
                     }}
                     validate={validateFour(validationSchemaFour)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.endProgramInfoStepFour && this.props.endProgramInfoStepFour();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
-                            handleBlur,
                             handleSubmit,
-                            isSubmitting,
-                            isValid,
                             setTouched,
                             setFieldValue,
                             setFieldTouched

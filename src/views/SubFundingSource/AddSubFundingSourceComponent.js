@@ -13,7 +13,7 @@ const initialValues = {
   subFundingSource: ""
 }
 const entityname = i18n.t('static.subfundingsource.subfundingsource');
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
       .required(i18n.t('static.fundingsource.validfundingsource')),
@@ -173,7 +173,7 @@ class AddSubFundingSourceComponent extends Component {
               <Formik
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
                       if (response.status == 200) {
@@ -222,13 +222,11 @@ class AddSubFundingSourceComponent extends Component {
                 }}
                 render={
                   ({
-                    values,
                     errors,
                     touched,
                     handleChange,
                     handleBlur,
                     handleSubmit,
-                    isSubmitting,
                     isValid,
                     setTouched
                   }) => (

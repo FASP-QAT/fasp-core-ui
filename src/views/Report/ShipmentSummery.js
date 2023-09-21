@@ -60,19 +60,6 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const ref = React.createRef();
-const brandPrimary = getStyle("--primary");
-const brandSuccess = getStyle("--success");
-const brandInfo = getStyle("--info");
-const brandWarning = getStyle("--warning");
-const brandDanger = getStyle("--danger");
-const colors = [
-  "#004876",
-  "#0063a0",
-  "#007ecc",
-  "#0093ee",
-  "#82caf8",
-  "#c8e6f4",
-];
 const options = {
   title: {
     display: true,
@@ -122,7 +109,6 @@ const options = {
     custom: CustomTooltips,
     callbacks: {
       label: function (tooltipItem, data) {
-        let label = data.labels[tooltipItem.index];
         let value =
           data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
         var cell1 = value;
@@ -147,42 +133,6 @@ const options = {
       fontColor: "black",
     },
   },
-};
-const chartData = {
-  labels: [
-    "Jan 2020",
-    "Feb 2020",
-    "Mar 2020",
-    "Apr 2020",
-    "May 2020",
-    "Jun 2020",
-    "Jul 2020",
-    "Aug 2020",
-    "Sep 2020",
-    "Oct 2020",
-    "Nov 2020",
-    "Dec 2020",
-  ],
-  datasets: [
-    {
-      label: "Received",
-      data: [0, 3740000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#042e6a",
-      borderWidth: 0,
-    },
-    {
-      label: "Ordered",
-      data: [0, 0, 0, 0, 5610000, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#6a82a8",
-      borderWidth: 0,
-    },
-    {
-      label: "Planned",
-      data: [0, 0, 0, 0, 0, 7480000, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#dee7f8",
-      borderWidth: 0,
-    },
-  ],
 };
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -596,7 +546,6 @@ class ShipmentSummery extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
-    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
@@ -644,10 +593,8 @@ class ShipmentSummery extends Component {
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
     var h1 = 100;
-    var aspectwidth1 = width - h1;
     let startY = y + 10;
     let pages = Math.ceil(startY / height)
-    let startYtable = startY - ((height - h1) * (pages - 1))
     for (var j = 1; j < pages; j++) {
       doc.addPage()
     }
@@ -803,9 +750,9 @@ class ShipmentSummery extends Component {
         );
         var fSourceOs = fSourceTransaction.objectStore("fundingSource");
         var fSourceRequest = fSourceOs.getAll();
-        fSourceRequest.onerror = function (event) {
+        fSourceRequest.onerror = function () {
         }.bind(this);
-        fSourceRequest.onsuccess = function (event) {
+        fSourceRequest.onsuccess = function () {
           fSourceResult = fSourceRequest.result;
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
@@ -918,9 +865,9 @@ class ShipmentSummery extends Component {
         var fSourceTransaction = db3.transaction(["budget"], "readwrite");
         var fSourceOs = fSourceTransaction.objectStore("budget");
         var fSourceRequest = fSourceOs.getAll();
-        fSourceRequest.onerror = function (event) {
+        fSourceRequest.onerror = function () {
         }.bind(this);
-        fSourceRequest.onsuccess = function (event) {
+        fSourceRequest.onsuccess = function () {
           var budgetValuesFromProps = [];
           var budgetLabelsFromProps = [];
           if (
@@ -1111,7 +1058,6 @@ class ShipmentSummery extends Component {
       document.getElementById("shipmentDetailsListTableDiv"),
       true
     );
-    var json = [];
     var data = shipmentDetailsListArray;
     var options = {
       data: data,
@@ -1217,7 +1163,7 @@ class ShipmentSummery extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
     };
@@ -1231,7 +1177,7 @@ class ShipmentSummery extends Component {
       loading: false,
     });
   }
-  loaded = function (instance, cell, x, y, value) {
+  loaded = function (instance, cell) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
@@ -1366,7 +1312,6 @@ class ShipmentSummery extends Component {
     }
   };
   consolidatedProgramList = () => {
-    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -1377,9 +1322,9 @@ class ShipmentSummery extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
       };
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -1393,7 +1338,6 @@ class ShipmentSummery extends Component {
               myResult[i].programName,
               SECRET_KEY
             );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1410,7 +1354,6 @@ class ShipmentSummery extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -1555,7 +1498,6 @@ class ShipmentSummery extends Component {
     this.fetchData();
   };
   consolidatedVersionList = (programId) => {
-    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -1566,9 +1508,9 @@ class ShipmentSummery extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
       };
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -1585,7 +1527,6 @@ class ShipmentSummery extends Component {
               myResult[i].programName,
               SECRET_KEY
             );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1663,9 +1604,7 @@ class ShipmentSummery extends Component {
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
-            const lan = "en";
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -1681,10 +1620,9 @@ class ShipmentSummery extends Component {
                 "programPlanningUnit"
               );
               var planningunitRequest = planningunitOs.getAll();
-              var planningList = [];
-              planningunitRequest.onerror = function (event) {
+              planningunitRequest.onerror = function () {
               };
-              planningunitRequest.onsuccess = function (e) {
+              planningunitRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 var programId = document
@@ -1900,11 +1838,9 @@ class ShipmentSummery extends Component {
         );
         myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
           this.setState({
             message: i18n.t("static.program.errortext"),
             loading: false,
@@ -1925,13 +1861,13 @@ class ShipmentSummery extends Component {
           var program = `${programId}_v${version}_uId_${userId}`;
           var programDataOs = programDataTransaction.objectStore("programData");
           var programRequest = programDataOs.get(program);
-          programRequest.onerror = function (event) {
+          programRequest.onerror = function () {
             this.setState({
               message: i18n.t("static.program.errortext"),
               loading: false,
             });
           }.bind(this);
-          programRequest.onsuccess = function (e) {
+          programRequest.onsuccess = function () {
             var planningUnitDataList =
               programRequest.result.programData.planningUnitDataList;
             let data = [];
@@ -1990,12 +1926,12 @@ class ShipmentSummery extends Component {
               planningunitTransaction.objectStore("planningUnit");
             var planningunitRequest = planningunitOs.getAll();
             var planningList = [];
-            planningunitRequest.onerror = function (event) {
+            planningunitRequest.onerror = function () {
               this.setState({
                 loading: false,
               });
             };
-            planningunitRequest.onsuccess = function (e) {
+            planningunitRequest.onsuccess = function () {
               var myResult = [];
               myResult = planningunitRequest.result;
               for (var k = 0; k < myResult.length; k++) {
@@ -2013,24 +1949,23 @@ class ShipmentSummery extends Component {
               );
               var paOs = paTransaction.objectStore("procurementAgent");
               var paRequest = paOs.getAll();
-              var procurementAgentList = [];
-              paRequest.onerror = function (event) {
+              paRequest.onerror = function () {
                 this.setState({
                   loading: false,
                 });
               };
-              paRequest.onsuccess = function (e) {
+              paRequest.onsuccess = function () {
                 var paResult = [];
                 paResult = paRequest.result;
                 var bTransaction = db1.transaction(["budget"], "readwrite");
                 var bOs = bTransaction.objectStore("budget");
                 var bRequest = bOs.getAll();
-                bRequest.onerror = function (event) {
+                bRequest.onerror = function () {
                   this.setState({
                     loading: false,
                   });
                 };
-                bRequest.onsuccess = function (e) {
+                bRequest.onsuccess = function () {
                   var bResult = [];
                   bResult = bRequest.result;
                   for (let i = 0; i < planningUnitFilter.length; i++) {
@@ -2192,7 +2127,6 @@ class ShipmentSummery extends Component {
                     from <= to;
                     from++
                   ) {
-                    var monthlydata = [];
                     for (var month = monthstartfrom; month <= 12; month++) {
                       var dtstr =
                         from + "-" + String(month).padStart(2, "0") + "-01";
@@ -2534,7 +2468,7 @@ class ShipmentSummery extends Component {
     const { planningUnits } = this.state;
     let planningUnitList =
       planningUnits.length > 0 &&
-      planningUnits.map((item, i) => {
+      planningUnits.map((item) => {
         return {
           label: getLabelText(item.label, this.state.lang),
           value: item.id,
@@ -2543,16 +2477,8 @@ class ShipmentSummery extends Component {
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
-    var viewById = this.state.viewById;
-    const backgroundColor = [
-      "#002f6c",
-      "#20a8d8",
-      "#118b70",
-      "#EDB944",
-      "#d1e3f5",
-    ];
     const bar = {
-      labels: this.state.shipmentDetailsMonthList.map((item, index) =>
+      labels: this.state.shipmentDetailsMonthList.map((item) =>
         this.dateFormatterLanguage(item.dt)
       ),
       datasets: [
@@ -2566,7 +2492,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.receivedCost
+            (item) => item.receivedCost
           ),
         },
         {
@@ -2579,7 +2505,7 @@ class ShipmentSummery extends Component {
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.arrivedCost
+            (item) => item.arrivedCost
           ),
         },
         {
@@ -2592,7 +2518,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.shippedCost
+            (item) => item.shippedCost
           ),
         },
         {
@@ -2605,7 +2531,7 @@ class ShipmentSummery extends Component {
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.approvedCost
+            (item) => item.approvedCost
           ),
         },
         {
@@ -2618,7 +2544,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.submittedCost
+            (item) => item.submittedCost
           ),
         },
         {
@@ -2631,7 +2557,7 @@ class ShipmentSummery extends Component {
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.plannedCost
+            (item) => item.plannedCost
           ),
         },
         {
@@ -2644,7 +2570,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           data: this.state.shipmentDetailsMonthList.map(
-            (item, index) => item.onholdCost
+            (item) => item.onholdCost
           ),
         },
       ],
@@ -2828,7 +2754,7 @@ class ShipmentSummery extends Component {
                             }}
                             options={
                               fundingSources.length > 0 &&
-                              fundingSources.map((item, i) => {
+                              fundingSources.map((item) => {
                                 return { label: item.code, value: item.id };
                               }, this)
                             }
@@ -2853,7 +2779,7 @@ class ShipmentSummery extends Component {
                               }}
                               options={
                                 filteredBudgetList.length > 0 &&
-                                filteredBudgetList.map((item, i) => {
+                                filteredBudgetList.map((item) => {
                                   return {
                                     label: item.budgetCode,
                                     value: item.budgetId,

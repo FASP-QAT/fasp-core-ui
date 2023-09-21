@@ -94,7 +94,7 @@ class EquivalancyUnit extends Component {
         this.checkValidation1 = this.checkValidation1.bind(this);
         this.onchangepage = this.onchangepage.bind(this)
     }
-    loaded1 = function (instance, cell, x, y, value) {
+    loaded1 = function (instance) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -102,9 +102,8 @@ class EquivalancyUnit extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
-    oneditionend1 = function (instance, cell, x, y, value) {
+    oneditionend1 = function (instance, cell, x, y) {
         var elInstance = this.state.table2Instance;
-        var rowData = elInstance.getRowData(y);
         elInstance.setValueFromCoords(9, y, 1, true);
     }
     onPaste1(instance, data) {
@@ -123,7 +122,6 @@ class EquivalancyUnit extends Component {
     }
     changed1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
-        var rowData = elInstance.getRowData(y);
         if (x == 2) {
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("C").concat(parseInt(y) + 1);
@@ -274,7 +272,6 @@ class EquivalancyUnit extends Component {
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
             jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
         }
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -337,7 +334,7 @@ class EquivalancyUnit extends Component {
                     type: 'hidden'
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -426,7 +423,7 @@ class EquivalancyUnit extends Component {
             onload: this.loaded1,
             license: JEXCEL_PRO_KEY,
             editable: true,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -463,7 +460,7 @@ class EquivalancyUnit extends Component {
             () => {
             })
     }
-    filterHealthArea = function (instance, cell, c, r, source) {
+    filterHealthArea = function () {
         var mylist = this.state.technicalAreaList.filter(c => c.id != '' && c.id != null);
         return mylist.sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -582,7 +579,6 @@ class EquivalancyUnit extends Component {
         if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
             jexcel.destroy(document.getElementById("paputableDiv"), true);
         }
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -700,7 +696,7 @@ class EquivalancyUnit extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -737,7 +733,7 @@ class EquivalancyUnit extends Component {
             countVar: count
         })
     }
-    filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
+    filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r) {
         var mylist = [];
         var value = (this.state.table1Instance.getJson(null, false)[r])[3];
         if (value > 0) {
@@ -749,11 +745,11 @@ class EquivalancyUnit extends Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterEquivalancyUnit = function (instance, cell, c, r, source) {
+    filterEquivalancyUnit = function () {
         let mylist = this.state.equivalancyUnitList.filter(c => c.active.toString() == "true");
         return mylist;
     }.bind(this)
-    filterTechnicalAreaList = function (instance, cell, c, r, source) {
+    filterTechnicalAreaList = function (instance, cell, c, r) {
         var selectedEquivalencyUnitId = (this.state.table1Instance.getJson(null, false)[r])[1];
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
         let mylist = [];
@@ -763,7 +759,7 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
-    filterTracerCategoryList = function (instance, cell, c, r, source) {
+    filterTracerCategoryList = function (instance, cell, c, r) {
         var selectedHealthAreaId = (this.state.table1Instance.getJson(null, false)[r])[2].toString().split(';');
         let mylist = [];
         for (let k = 0; k < selectedHealthAreaId.length; k++) {
@@ -774,14 +770,14 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
-    filterDataset1 = function (instance, cell, c, r, source) {
+    filterDataset1 = function () {
         var mylist = this.state.typeList1;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
     }.bind(this)
-    filterDataset = function (instance, cell, c, r, source) {
+    filterDataset = function (instance, cell, c, r) {
         let mylist = this.state.typeList;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
@@ -1481,7 +1477,7 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = this.state.table1Instance;
         var rowData = elInstance.getRowData(y);
         if (x == 6 && !isNaN(rowData[6]) && rowData[5].toString().indexOf('.') != -1) {
@@ -1491,7 +1487,6 @@ class EquivalancyUnit extends Component {
     }
     addRow1 = function () {
         var elInstance = this.state.table2Instance;
-        var json = elInstance.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -1510,7 +1505,6 @@ class EquivalancyUnit extends Component {
     };
     addRow = function () {
         var elInstance = this.state.table1Instance;
-        var json = elInstance.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -1798,7 +1792,7 @@ class EquivalancyUnit extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance, cell, x, y) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

@@ -26,18 +26,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.program.programMaster');
-let initialValues = {
-    programName: '',
-    realmId: '',
-    realmCountryId: '',
-    organisationId: '',
-    userId: '',
-    healthAreaId: [],
-    programNotes: '',
-    regionId: [],
-    programCode1: ''
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -640,7 +629,7 @@ export default class EditProgram extends Component {
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -700,14 +689,11 @@ export default class EditProgram extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched
@@ -945,18 +931,6 @@ export default class EditProgram extends Component {
                 realmCountryCode: realmCountryCode,
                 isChanged: false
             })
-            initialValues = {
-                programName: getLabelText(this.state.program.label, lang),
-                realmId: this.state.program.realmCountry.realm.realmId,
-                realmCountryId: this.state.program.realmCountry.realmCountryId,
-                organisationId: this.state.program.organisation.id,
-                userId: this.state.program.programManager.userId,
-                healthAreaArray: this.state.program.healthAreaArray,
-                programNotes: this.state.program.programNotes,
-                regionArray: this.state.program.regionArray,
-                uniqueCode: this.state.uniqueCode,
-                healthAreaArray: this.state.program.healthAreaArray
-            }
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
                     if (response.status == 200) {

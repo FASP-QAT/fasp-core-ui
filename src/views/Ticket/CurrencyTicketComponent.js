@@ -12,7 +12,7 @@ const initialValues = {
     conversionRatetoUSD: "",
     notes: ""
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -140,7 +140,7 @@ export default class CurrencyTicketComponent extends Component {
                     <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -206,13 +206,11 @@ export default class CurrencyTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

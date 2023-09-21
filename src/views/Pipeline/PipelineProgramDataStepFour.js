@@ -11,10 +11,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-const initialValuesFour = {
-    organisationId: ''
-}
-const validationSchemaFour = function (values) {
+const validationSchemaFour = function () {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
@@ -139,19 +136,16 @@ export default class PipelineProgramDataStepFour extends Component {
                     enableReinitialize={true}
                     initialValues={{ organisationId: this.props.items.program.organisation.id }}
                     validate={validateFour(validationSchemaFour)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.endProgramInfoStepThree && this.props.endProgramInfoStepThree();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
-                            isValid,
                             setTouched
                         }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='organisationForm'>

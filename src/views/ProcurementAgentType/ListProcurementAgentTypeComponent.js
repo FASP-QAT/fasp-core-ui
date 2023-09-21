@@ -92,7 +92,6 @@ class ListProcurementAgentComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = procurementAgentTypeArray;
         var options = {
             data: data,
@@ -151,7 +150,7 @@ class ListProcurementAgentComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 var items = [];
                 return items;
             }.bind(this)
@@ -174,7 +173,7 @@ class ListProcurementAgentComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -321,69 +320,6 @@ class ListProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.procurementagenttype.procurementtypename'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementAgentTypeCode',
-                text: i18n.t('static.procurementagenttype.procurementagenttypecode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selProcurementAgentType.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

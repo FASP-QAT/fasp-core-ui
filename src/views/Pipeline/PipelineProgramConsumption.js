@@ -106,7 +106,6 @@ export default class PipelineProgramConsumption extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
-            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -205,7 +204,6 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].dataSourceId).concat(i18n.t('static.message.notExist')));
             }
-            var map = new Map(Object.entries(json[y]));
             var col = ("C").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[2]).toString();
             if (value != "" && value > 0) {
@@ -348,7 +346,6 @@ export default class PipelineProgramConsumption extends Component {
                                     }
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
                                     jexcel.destroy(document.getElementById("consumptiontableDiv"), true);
-                                    var json = [];
                                     var data = consumptionDataArr;
                                     var options = {
                                         data: data,
@@ -417,7 +414,7 @@ export default class PipelineProgramConsumption extends Component {
                                             { title: 'Index', type: 'hidden' },
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
-                                        contextMenu: function (obj, x, y, e) {
+                                        contextMenu: function () {
                                             return false;
                                         }.bind(this),
                                         search: true,
@@ -640,10 +637,10 @@ export default class PipelineProgramConsumption extends Component {
             }
         );
     }
-    loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
+    loadedJexcelCommonFunctionTwo = function (instance) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {

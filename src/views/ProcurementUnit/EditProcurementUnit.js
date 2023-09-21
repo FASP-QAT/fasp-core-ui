@@ -23,27 +23,7 @@ import i18n from "../../i18n";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
-let initialValues = {
-    procurementUnitName: '',
-    planningUnitId: '',
-    multiplier: '',
-    unitId: '',
-    supplierId: '',
-    heightUnitId: '',
-    heightQty: "",
-    lengthUnitId: '',
-    lengthQty: 0,
-    widthUnitId: '',
-    widthQty: 0,
-    weightUnitId: '',
-    weightQty: 0,
-    labeling: '',
-    unitsPerContainer: 0,
-    unitsPerCase: 0,
-    unitsPerPalletEuro1: 0,
-    unitsPerPalletEuro2: 0
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         procurementUnitName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -435,7 +415,7 @@ export default class EditProcurementUnit extends Component {
                                     unitsPerContainer: this.state.procurementUnit.unitsPerContainer
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -493,14 +473,11 @@ export default class EditProcurementUnit extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='procurementUnitForm' autocomplete="off">

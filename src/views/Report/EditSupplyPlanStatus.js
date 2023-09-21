@@ -40,7 +40,7 @@ import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js';
 const entityname = i18n.t('static.report.problem');
-const validationSchemaForAddingProblem = function (values) {
+const validationSchemaForAddingProblem = function () {
     return Yup.object().shape({
         problemDescription: Yup.string()
             .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
@@ -67,7 +67,7 @@ const validateForAddingProblem = (getValidationSchema) => {
         }
     }
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         programId: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
@@ -77,7 +77,7 @@ const validationSchema = function (values) {
         needNotesValidation: Yup.boolean(),
         versionNotes: Yup.string()
             .when("needNotesValidation", {
-                is: val => {
+                is: () => {
                     return document.getElementById("needNotesValidation").value === "true";
                 },
                 then: Yup.string().required(i18n.t('static.program.validnotestext')),
@@ -285,7 +285,7 @@ class EditSupplyPlanStatus extends Component {
             return null;
         }
     }
-    addCommas(cell, row) {
+    addCommas(cell) {
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -306,10 +306,10 @@ class EditSupplyPlanStatus extends Component {
             var problemCriticality = transaction.objectStore('problemCriticality');
             var getRequest = problemCriticality.getAll();
             var problemCriticalities = [];
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var filteredGetRequestList = myResult;
@@ -597,10 +597,9 @@ class EditSupplyPlanStatus extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -613,7 +612,7 @@ class EditSupplyPlanStatus extends Component {
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
             var programRequest = programDataOs.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -621,13 +620,12 @@ class EditSupplyPlanStatus extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (e) {
+            programRequest.onsuccess = function () {
                 
                 
                 var programJson = this.state.program;
                 
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 
                 
                 
@@ -712,10 +710,10 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => {
+                    }).catch(() => {
                         
                     });
-                }).catch(error => {
+                }).catch(() => {
                     
                 });
             }.bind(this)
@@ -733,7 +731,7 @@ class EditSupplyPlanStatus extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -746,7 +744,7 @@ class EditSupplyPlanStatus extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -754,14 +752,13 @@ class EditSupplyPlanStatus extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (event) {
+            programRequest.onsuccess = function () {
                 
                 
                 
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 
                 
                 
@@ -848,16 +845,16 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => {
+                    }).catch(() => {
                         
                     });
-                }).catch(error => {
+                }).catch(() => {
                     
                 });
             }.bind(this)
         }.bind(this)
     }
-    suggestedShipmentsDetailsClicked = (month, quantity, isEmergencyOrder) => {
+    suggestedShipmentsDetailsClicked = () => {
     }
     shipmentsDetailsClicked = (supplyPlanType, startDate, endDate) => {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
@@ -865,7 +862,7 @@ class EditSupplyPlanStatus extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -878,7 +875,7 @@ class EditSupplyPlanStatus extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -886,14 +883,13 @@ class EditSupplyPlanStatus extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (event) {
+            programRequest.onsuccess = function () {
                 
                 
                 
                 var programJson = this.state.program;
                 var shipmentListUnFiltered = programJson.shipmentList;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 
                 
                 
@@ -1057,13 +1053,13 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             })
-                                        }).catch(error => { });
-                                    }).catch(error => { });
-                                }).catch(error => { });
-                            }).catch(error => { });
-                        }).catch(error => { });
-                    }).catch(error => { });
-                }).catch(error => { });
+                                        }).catch(() => { });
+                                    }).catch(() => { });
+                                }).catch(() => { });
+                            }).catch(() => { });
+                        }).catch(() => { });
+                    }).catch(() => { });
+                }).catch(() => { });
             }.bind(this)
         }.bind(this)
     }
@@ -1268,14 +1264,11 @@ class EditSupplyPlanStatus extends Component {
             })
         }
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
-        var programId = document.getElementById("programId").value;
         var regionId = -1;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnit = document.getElementById("planningUnitId");
         var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
         var programPlanningUnit = ((this.state.planningUnits).filter(p => p.planningUnit.id == planningUnitId))[0];
-        var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
-        var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
         var regionListFiltered = [];
         if (regionId != -1) {
             regionListFiltered = (this.state.regionList).filter(r => r.id == regionId);
@@ -1311,11 +1304,9 @@ class EditSupplyPlanStatus extends Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -1329,7 +1320,7 @@ class EditSupplyPlanStatus extends Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
             var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
-            realmRequest.onerror = function (event) {
+            realmRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -1337,7 +1328,7 @@ class EditSupplyPlanStatus extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            realmRequest.onsuccess = function (event) {
+            realmRequest.onsuccess = function () {
                 var maxForMonths = 0;
                 var realm = realmRequest.result;
                 var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1381,27 +1372,27 @@ class EditSupplyPlanStatus extends Component {
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                 var shipmentStatusRequest = shipmentStatusOs.getAll();
-                shipmentStatusRequest.onerror = function (event) {
+                shipmentStatusRequest.onerror = function () {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
                         color: "#BA0C2F"
                     })
                 }.bind(this);
-                shipmentStatusRequest.onsuccess = function (event) {
+                shipmentStatusRequest.onsuccess = function () {
                     var shipmentStatusResult = [];
                     shipmentStatusResult = shipmentStatusRequest.result;
                     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                     var papuOs = papuTransaction.objectStore('procurementAgent');
                     var papuRequest = papuOs.getAll();
-                    papuRequest.onerror = function (event) {
+                    papuRequest.onerror = function () {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
                             color: "#BA0C2F"
                         })
                     }.bind(this);
-                    papuRequest.onsuccess = function (event) {
+                    papuRequest.onsuccess = function () {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         
@@ -2240,11 +2231,10 @@ class EditSupplyPlanStatus extends Component {
             display: 'none'
         })
         var db1;
-        var storeOS;
         getDatabase();
         var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (e) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
             })
@@ -2254,12 +2244,12 @@ class EditSupplyPlanStatus extends Component {
             var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
             var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
             var dataSourceRequest = dataSourceOs.getAll();
-            dataSourceRequest.onerror = function (event) {
+            dataSourceRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 })
             }.bind(this);
-            dataSourceRequest.onsuccess = function (event) {
+            dataSourceRequest.onsuccess = function () {
                 var dataSourceResult = [];
                 dataSourceResult = dataSourceRequest.result;
                 for (var k = 0; k < dataSourceResult.length; k++) {
@@ -2496,11 +2486,11 @@ class EditSupplyPlanStatus extends Component {
             var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
             var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
             var problemStatusRequest = problemStatusOs.getAll();
-            problemStatusRequest.onerror = function (event) {
+            problemStatusRequest.onerror = function () {
                 
                 
             };
-            problemStatusRequest.onsuccess = function (e) {
+            problemStatusRequest.onsuccess = function () {
                 var myResult = [];
                 var problemStatusJson = [];
                 myResult = problemStatusRequest.result;
@@ -2522,11 +2512,11 @@ class EditSupplyPlanStatus extends Component {
                 var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
                 var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
                 var problemCategoryRequest = problemCategoryOs.getAll();
-                problemCategoryRequest.onerror = function (event) {
+                problemCategoryRequest.onerror = function () {
                     
                     
                 };
-                problemCategoryRequest.onsuccess = function (e) {
+                problemCategoryRequest.onsuccess = function () {
                     var myResultC = [];
                     myResultC = problemCategoryRequest.result;
                     var procList = []
@@ -2625,7 +2615,7 @@ class EditSupplyPlanStatus extends Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
+                    label: function (tooltipItems) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -2690,7 +2680,7 @@ class EditSupplyPlanStatus extends Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
+                    label: function (tooltipItems) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -2735,12 +2725,12 @@ class EditSupplyPlanStatus extends Component {
         
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
-            && problemStatusList.map((item, i) => {
+            && problemStatusList.map((item) => {
                 return ({ label: item.name, value: item.id })
             }, this);
         const { problemReviewedList } = this.state;
         let problemReviewed = problemReviewedList.length > 0
-            && problemReviewedList.map((item, i) => {
+            && problemReviewedList.map((item) => {
                 return ({ label: item.name, value: item.id })
             }, this);
         let bar = {}
@@ -2751,7 +2741,7 @@ class EditSupplyPlanStatus extends Component {
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                    data: this.state.expiredStockArr.map((item) => (item.qty > 0 ? item.qty : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
@@ -2777,14 +2767,14 @@ class EditSupplyPlanStatus extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    data: this.state.jsonArrForGraph.map((item) => (item.consumption))
                 },
                 {
                     label: i18n.t('static.report.actualConsumption'),
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                    data: this.state.consumptionTotalData.map((item) => (item.consumptionType == 1 ? item.consumptionQty : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
@@ -2804,7 +2794,7 @@ class EditSupplyPlanStatus extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.delivered)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.shipped'),
@@ -2816,7 +2806,7 @@ class EditSupplyPlanStatus extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.shipped)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.submitted'),
@@ -2828,7 +2818,7 @@ class EditSupplyPlanStatus extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.ordered)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.planned'),
@@ -2840,7 +2830,7 @@ class EditSupplyPlanStatus extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.planned)),
                 },
                 {
                     label: i18n.t('static.report.stock'),
@@ -2857,7 +2847,7 @@ class EditSupplyPlanStatus extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                    data: this.state.jsonArrForGraph.map((item) => (item.stock))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -2878,7 +2868,7 @@ class EditSupplyPlanStatus extends Component {
                     pointRadius: 0,
                     yValueFormatString: "$#,##0",
                     lineTension: 0,
-                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.minMos : item.minQty))
+                    data: this.state.jsonArrForGraph.map((item) => (this.state.planBasedOn == 1 ? item.minMos : item.minQty))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.maxStockMos') : i18n.t('static.supplyPlan.maxQty'),
@@ -2899,7 +2889,7 @@ class EditSupplyPlanStatus extends Component {
                     pointRadius: 0,
                     showInLegend: true,
                     yValueFormatString: "$#,##0",
-                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.maxMos : item.maxQty))
+                    data: this.state.jsonArrForGraph.map((item) => (this.state.planBasedOn == 1 ? item.maxMos : item.maxQty))
                 }
             ];
             if (this.state.jsonArrForGraph.length > 0 && this.state.planBasedOn == 1) {
@@ -2919,7 +2909,7 @@ class EditSupplyPlanStatus extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
+                    data: this.state.jsonArrForGraph.map((item) => (item.mos))
                 })
             }
             bar = {
@@ -3608,7 +3598,7 @@ class EditSupplyPlanStatus extends Component {
             }
         }
     }
-    filterProblemStatus = function (instance, cell, c, r, source) {
+    filterProblemStatus = function () {
         var mylist = [];
         
         mylist = this.state.problemStatusListForEdit;
@@ -3636,7 +3626,6 @@ class EditSupplyPlanStatus extends Component {
         this.el = jexcel(document.getElementById("problemTransDiv"), '');
         
         jexcel.destroy(document.getElementById("problemTransDiv"), true);
-        var json = [];
         var data = dataArray;
         var options = {
             data: data,
@@ -3688,7 +3677,7 @@ class EditSupplyPlanStatus extends Component {
             problemTransEl: problemTransEl
         })
     }
-    loaded1 = function (instance, cell, x, y, value) {
+    loaded1 = function (instance) {
         jExcelLoadedFunction(instance, 1);
     }
     buildJExcel() {
@@ -3735,7 +3724,6 @@ class EditSupplyPlanStatus extends Component {
         this.el = jexcel(document.getElementById("problemListDiv"), '');
         
         jexcel.destroy(document.getElementById("problemListDiv"), true);
-        var json = [];
         var data = problemArray;
         var options = {
             data: data,
@@ -3940,7 +3928,7 @@ class EditSupplyPlanStatus extends Component {
                     width: 0
                 },
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 var elInstance = el;
                 if (this.state.editable) {
                     var rowData = elInstance.getRowData(y);
@@ -3970,7 +3958,6 @@ class EditSupplyPlanStatus extends Component {
                 
                 var rowData = elInstance.getRowData(y);
                 var criticalityId = rowData[16];
-                var problemStatusId = rowData[12];
                 if (criticalityId == 3) {
                     
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
@@ -3987,10 +3974,10 @@ class EditSupplyPlanStatus extends Component {
                     
                 }
             }.bind(this),
-            onsearch: function (el) {
+            onsearch: function () {
                 
             },
-            onfilter: function (el) {
+            onfilter: function () {
                 
             },
             
@@ -4022,7 +4009,7 @@ class EditSupplyPlanStatus extends Component {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items1 = [];
                 
                 if (y != null) {
@@ -4044,7 +4031,7 @@ class EditSupplyPlanStatus extends Component {
             problemEl: problemEl
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     updateFieldData = (value) => {
@@ -4208,72 +4195,6 @@ class EditSupplyPlanStatus extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns = [
-            {
-                dataField: 'problemStatus.label',
-                text: i18n.t('static.report.problemStatus'),
-                sort: true,
-                align: 'center',
-                style: { width: '80px' },
-                headerAlign: 'center',
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'notes',
-                text: i18n.t('static.program.notes'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '170px' },
-            },
-            {
-                dataField: 'createdBy.username',
-                text: i18n.t('static.report.lastmodifiedby'),
-                sort: true,
-                align: 'center',
-                style: { width: '80px' },
-                headerAlign: 'center',
-            },
-            {
-                dataField: 'createdDate',
-                text: i18n.t('static.report.lastmodifieddate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: (cell, row) => {
-                    return new moment(cell).format(DATE_FORMAT_CAP);
-                }
-            },
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '15', value: 15
-            }, {
-                text: '25', value: 25
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.data.length
-            }]
-        }
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -4892,7 +4813,7 @@ class EditSupplyPlanStatus extends Component {
                                             suggession: ''
                                         }}
                                         validate={validateForAddingProblem(validationSchemaForAddingProblem)}
-                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        onSubmit={(values) => {
                                             
                                             
                                             var criticalityId = (document.getElementById("modelCriticalityId").value)
@@ -4942,19 +4863,13 @@ class EditSupplyPlanStatus extends Component {
                                         }}
                                         render={
                                             ({
-                                                values,
                                                 errors,
                                                 touched,
                                                 handleChange,
                                                 handleBlur,
                                                 handleSubmit,
-                                                isSubmitting,
-                                                isValid,
                                                 setTouched,
-                                                handleReset,
-                                                setFieldValue,
-                                                setFieldTouched
-                                            }) => (
+                                                handleReset                                            }) => (
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
                                                     <div className="col-md-12">
                                                         <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
@@ -5066,7 +4981,7 @@ class EditSupplyPlanStatus extends Component {
                                 versionNotes: this.state.program.currentVersion.notes
                             }}
                             validate={validate(validationSchema)}
-                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                            onSubmit={(values) => {
                                 document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
@@ -5107,7 +5022,7 @@ class EditSupplyPlanStatus extends Component {
                                 if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
                                     
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                        .then(response => {
+                                        .then(() => {
                                             if (this.state.program.currentVersion.versionStatus.id != 1) {
                                                 
                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
@@ -5184,14 +5099,11 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             render={
                                 ({
-                                    values,
                                     errors,
                                     touched,
                                     handleChange,
                                     handleBlur,
                                     handleSubmit,
-                                    isSubmitting,
-                                    isValid,
                                     setTouched
                                 }) => (
                                     <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>

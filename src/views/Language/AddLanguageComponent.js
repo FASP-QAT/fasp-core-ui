@@ -14,7 +14,7 @@ const initialValues = {
     countryCode: ""
 }
 const entityname = i18n.t('static.language.language');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -139,7 +139,7 @@ class AddLanguageComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -196,13 +196,11 @@ class AddLanguageComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

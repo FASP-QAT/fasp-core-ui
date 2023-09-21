@@ -47,11 +47,9 @@ export default class MapPlanningUnits extends Component {
         this.el.insertRow(
             data, 0, 1
         );
-        var json = this.el.getJson(null, false)
     }
     checkValidation() {
         var reg = /^[0-9\b]+$/;
-        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
@@ -590,7 +588,6 @@ export default class MapPlanningUnits extends Component {
     getRealmId() {
         var list = [];
         var productCategoryList = [];
-        var realmId = this.props.items.program.realm.realmId;
         ProductCategoryServcie.getProductCategoryListByRealmId(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -674,7 +671,6 @@ export default class MapPlanningUnits extends Component {
                                 productDataArr[0] = data;
                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                 jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                var json = [];
                                 var data = productDataArr;
                                 var options = {
                                     data: data,
@@ -788,7 +784,7 @@ export default class MapPlanningUnits extends Component {
                                             type: 'hidden'
                                         },
                                     ],
-                                    updateTable: function (el, cell, x, y, source, value, id) {
+                                    updateTable: function (el, cell, x, y) {
                                         var elInstance = el;
                                         var rowData = elInstance.getRowData(y);
                                         if (rowData[2] == 1) {
@@ -823,7 +819,7 @@ export default class MapPlanningUnits extends Component {
                                     onload: this.loaded,
                                     oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
-                                    contextMenu: function (obj, x, y, e) {
+                                    contextMenu: function (obj, x, y) {
                                         var items = [];
                                         if (y == null) {
                                             if (obj.options.allowInsertColumn == true) {
@@ -1015,7 +1011,7 @@ export default class MapPlanningUnits extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -1034,7 +1030,7 @@ export default class MapPlanningUnits extends Component {
             elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');

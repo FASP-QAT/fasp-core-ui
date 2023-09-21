@@ -345,7 +345,6 @@ export default class PlanningUnitListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = planningUnitArray;
         var options = {
             data: data,
@@ -408,7 +407,7 @@ export default class PlanningUnitListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -448,7 +447,7 @@ export default class PlanningUnitListComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -582,80 +581,6 @@ export default class PlanningUnitListComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns = [{
-            dataField: 'label',
-            text: i18n.t('static.planningunit.planningunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'forecastingUnit.label',
-            text: i18n.t('static.forecastingunit.forecastingunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'unit.label',
-            text: i18n.t('static.unit.unit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'multiplier',
-            text: i18n.t('static.unit.multiplier'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-        }, {
-            dataField: 'active',
-            text: i18n.t('static.common.status'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (
-                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                );
-            }
-        }, {
-            dataField: 'planningUnitId',
-            text: i18n.t('static.common.action'),
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
-                )
-            }
-        }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selSource.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

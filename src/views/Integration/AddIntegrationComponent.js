@@ -10,11 +10,8 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-const initialValues = {
-    label: ""
-}
 const entityname = i18n.t('static.integration.integration');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -303,7 +300,7 @@ export default class AddDimensionComponent extends Component {
                                         fileName: this.state.fileName,
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -366,14 +363,11 @@ export default class AddDimensionComponent extends Component {
                                 }
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         handleReset
                                     }) => (

@@ -15,7 +15,7 @@ const initialValues = {
     currency: "",
     notes: ""
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -215,7 +215,7 @@ export default class CountryTicketComponent extends Component {
                     <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -241,7 +241,7 @@ export default class CountryTicketComponent extends Component {
                                 this.props.toggleSmall(this.state.message);
                             })
                                 .catch(
-                                    error => {
+                                    () => {
                                         this.setState({
                                             message: i18n.t('static.unkownError'), loading: false
                                         },
@@ -253,13 +253,11 @@ export default class CountryTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

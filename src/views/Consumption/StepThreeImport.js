@@ -90,7 +90,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }
     }
     changeColor() {
-        var elInstance1 = this.el;
         var elInstance = this.state.languageEl;
         var json = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
@@ -295,10 +294,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             loading: true
         })
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "red");
             this.props.hideFirstComponent();
@@ -308,15 +306,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
             var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
             var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
-            extrapolationMethodRequest.onerror = function (event) {
+            extrapolationMethodRequest.onerror = function () {
             }.bind(this);
-            extrapolationMethodRequest.onsuccess = function (event) {
+            extrapolationMethodRequest.onsuccess = function () {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetTransaction = transaction.objectStore('datasetData');
                 var datasetRequest = datasetTransaction.get(this.props.items.datasetList[0].id);
-                datasetRequest.onerror = function (event) {
+                datasetRequest.onerror = function () {
                 }.bind(this);
-                datasetRequest.onsuccess = function (event) {
+                datasetRequest.onsuccess = function () {
                     var extrapolationMethodList = extrapolationMethodRequest.result;
                     var myResult = datasetRequest.result;
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -329,15 +327,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
                             var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit.id != listOfPlanningUnits[pu] || (c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id != regionList[r]));
-                            var consumptionExtrapolationData = -1
-                            var consumptionExtrapolationMovingData = -1
-                            var consumptionExtrapolationRegression = -1
-                            var consumptionExtrapolationTESL = -1
-                            var consumptionExtrapolationTESM = -1
-                            var consumptionExtrapolationTESH = -1
-                            var inputDataFilter = this.state.jsonDataSemiAverage;
-                            var inputDataAverageFilter = this.state.movingAvgData;
-                            var inputDataRegressionFilter = this.state.linearRegressionData;
                             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                             var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
                             var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
@@ -508,9 +497,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     this.setState({
                         dataChanged: false
                     })
-                    putRequest.onerror = function (event) {
+                    putRequest.onerror = function () {
                     }.bind(this);
-                    putRequest.onsuccess = function (event) {
+                    putRequest.onsuccess = function () {
                         this.setState({
                             isChanged1: false
                         })
@@ -626,7 +615,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
+                        openRequest.onerror = function () {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 color: 'red'
@@ -639,18 +628,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var transaction = db1.transaction(['datasetData'], 'readwrite');
                             var programTransaction = transaction.objectStore('datasetData');
                             programs.forEach(program => {
-                                var programRequest = programTransaction.put(program);
                             })
-                            transaction.oncomplete = function (event) {
+                            transaction.oncomplete = function () {
                                 db1 = e.target.result;
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.items.datasetList[0].id);
-                                datasetDetailsRequest.onsuccess = function (e) {
+                                datasetDetailsRequest.onsuccess = function () {
                                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                     datasetDetailsRequestJson.changed = 1;
                                     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                    datasetDetailsRequest1.onsuccess = function () {
                                         this.setState({
                                             listOfPlanningUnits: listOfForecastPlanningUnits,
                                             datasetDataUnencrypted: programDataWithoutEncrypt,
@@ -661,7 +649,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this);
-                            transaction.onerror = function (event) {
+                            transaction.onerror = function () {
                                 this.setState({
                                     loading: false,
                                     color: "red",
@@ -679,7 +667,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             ]
         });
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function () {
     }
     componentDidMount() {
     }
@@ -794,7 +782,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
-        var json = [];
         var data = papuDataArr;
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);
@@ -871,7 +858,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'hidden'
                 },
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
@@ -889,12 +876,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: function (obj, x, y, e) {
+            onload: function (obj) {
                 jExcelLoadedFunction(obj);
             },
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this)
         };

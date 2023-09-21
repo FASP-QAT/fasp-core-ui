@@ -73,7 +73,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-const validationSchemaReplan = function (values) {
+const validationSchemaReplan = function () {
     return Yup.object().shape({
         procurementAgentId: Yup.string()
             .required(i18n.t('static.procurementAgent.selectProcurementAgent')),
@@ -240,7 +240,7 @@ export default class SupplyPlanComponent extends React.Component {
             return null;
         }
     }
-    addCommas(cell, row) {
+    addCommas(cell) {
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -564,7 +564,6 @@ export default class SupplyPlanComponent extends React.Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(15);
         var height = doc.internal.pageSize.height;
@@ -636,7 +635,6 @@ export default class SupplyPlanComponent extends React.Component {
             deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
             inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
             var canv = document.getElementById("cool-canvas" + count)
-            var canvasImg1 = canv.toDataURL("image/png", 1.0);
             count++
             let content = {
                 margin: { top: 80, bottom: 70 },
@@ -854,7 +852,7 @@ export default class SupplyPlanComponent extends React.Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
+                    label: function (tooltipItems) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -919,7 +917,7 @@ export default class SupplyPlanComponent extends React.Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
+                    label: function (tooltipItems) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -954,7 +952,7 @@ export default class SupplyPlanComponent extends React.Component {
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                    data: this.state.expiredStockArr.map((item) => (item.qty > 0 ? item.qty : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
@@ -980,14 +978,14 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    data: this.state.jsonArrForGraph.map((item) => (item.consumption))
                 },
                 {
                     label: i18n.t('static.report.actualConsumption'),
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                    data: this.state.consumptionTotalData.map((item) => (item.consumptionType == 1 ? item.consumptionQty : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
@@ -1007,7 +1005,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.delivered)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.shipped'),
@@ -1019,7 +1017,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.shipped)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.submitted'),
@@ -1031,7 +1029,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.ordered)),
                 },
                 {
                     label: i18n.t('static.supplyPlan.planned'),
@@ -1043,7 +1041,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                    data: this.state.jsonArrForGraph.map((item) => (item.planned)),
                 },
                 {
                     label: i18n.t('static.report.stock'),
@@ -1060,7 +1058,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                    data: this.state.jsonArrForGraph.map((item) => (item.stock))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -1081,7 +1079,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointRadius: 0,
                     yValueFormatString: "$#,##0",
                     lineTension: 0,
-                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.minMos : item.minQty))
+                    data: this.state.jsonArrForGraph.map((item) => (this.state.planBasedOn == 1 ? item.minMos : item.minQty))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.maxStockMos') : i18n.t('static.supplyPlan.maxQty'),
@@ -1102,7 +1100,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointRadius: 0,
                     showInLegend: true,
                     yValueFormatString: "$#,##0",
-                    data: this.state.jsonArrForGraph.map((item, index) => (this.state.planBasedOn == 1 ? item.maxMos : item.maxQty))
+                    data: this.state.jsonArrForGraph.map((item) => (this.state.planBasedOn == 1 ? item.maxMos : item.maxQty))
                 }
             ];
             if (this.state.jsonArrForGraph.length > 0 && this.state.planBasedOn == 1) {
@@ -1122,7 +1120,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
+                    data: this.state.jsonArrForGraph.map((item) => (item.mos))
                 })
             }
             bar = {
@@ -1914,24 +1912,18 @@ export default class SupplyPlanComponent extends React.Component {
                                 fundingSourceId: this.state.fundingSourceId
                             }}
                             validate={validate(validationSchemaReplan)}
-                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                            onSubmit={(values) => {
                                 this.planShipment();
                             }}
                             render={
                                 ({
-                                    values,
                                     errors,
                                     touched,
                                     handleChange,
                                     handleBlur,
                                     handleSubmit,
-                                    isSubmitting,
-                                    isValid,
                                     setTouched,
-                                    handleReset,
-                                    setFieldValue,
-                                    setFieldTouched
-                                }) => (
+                                    handleReset                                }) => (
                                     <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                         <ModalBody>
                                             {this.state.showPlanningUnitAndQty == 0 && <>
@@ -2248,7 +2240,7 @@ export default class SupplyPlanComponent extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -2262,7 +2254,7 @@ export default class SupplyPlanComponent extends React.Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -2270,7 +2262,7 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -2335,13 +2327,11 @@ export default class SupplyPlanComponent extends React.Component {
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
             var db1;
-            var storeOS;
             getDatabase();
             var regionList = [];
-            var dataSourceList = [];
             var dataSourceListAll = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -2354,7 +2344,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                 var programDataOs = programDataTransaction.objectStore('programData');
                 var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                programRequest.onerror = function (event) {
+                programRequest.onerror = function () {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
@@ -2362,7 +2352,7 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (e) {
+                programRequest.onsuccess = function () {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -2379,7 +2369,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
                     var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                    planningunitRequest.onerror = function () {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
@@ -2387,19 +2377,19 @@ export default class SupplyPlanComponent extends React.Component {
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function (e) {
+                    planningunitRequest.onsuccess = function () {
                         var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var paTransaction = paTransaction.objectStore('procurementAgent');
                         var paRequest = paTransaction.getAll();
-                        paRequest.onsuccess = function (event) {
+                        paRequest.onsuccess = function () {
                             var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                             var fsTransaction = fsTransaction.objectStore('fundingSource');
                             var fsRequest = fsTransaction.getAll();
-                            fsRequest.onsuccess = function (event) {
+                            fsRequest.onsuccess = function () {
                                 var bTransaction = db1.transaction(['budget'], 'readwrite');
                                 var bTransaction = bTransaction.objectStore('budget');
                                 var bRequest = bTransaction.getAll();
-                                bRequest.onsuccess = function (event) {
+                                bRequest.onsuccess = function () {
                                     var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                                     var paResult = paRequest.result;
                                     var procurementAgentListPlan = [];
@@ -2430,7 +2420,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var puOs = puTransaction.objectStore('planningUnit');
                                     var puRequest = puOs.getAll();
                                     var planningUnitListForConsumption = []
-                                    puRequest.onerror = function (event) {
+                                    puRequest.onerror = function () {
                                         this.setState({
                                             supplyPlanError: i18n.t('static.program.errortext'),
                                             loading: false,
@@ -2438,14 +2428,14 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                         this.hideFirstComponent()
                                     }.bind(this);
-                                    puRequest.onsuccess = function (e) {
+                                    puRequest.onsuccess = function () {
                                         var puResult = [];
                                         puResult = puRequest.result;
                                         planningUnitListForConsumption = puResult;
                                         var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                                         var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                                         var dataSourceRequest = dataSourceOs.getAll();
-                                        dataSourceRequest.onerror = function (event) {
+                                        dataSourceRequest.onerror = function () {
                                             this.setState({
                                                 supplyPlanError: i18n.t('static.program.errortext'),
                                                 loading: false,
@@ -2453,7 +2443,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                             this.hideFirstComponent()
                                         }.bind(this);
-                                        dataSourceRequest.onsuccess = function (event) {
+                                        dataSourceRequest.onsuccess = function () {
                                             var dataSourceResult = [];
                                             dataSourceResult = dataSourceRequest.result;
                                             for (var k = 0; k < dataSourceResult.length; k++) {
@@ -2466,7 +2456,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                             var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                             var rcpuRequest = rcpuOs.getAll();
-                                            rcpuRequest.onsuccess = function (event) {
+                                            rcpuRequest.onsuccess = function () {
                                                 var rcpuResult = [];
                                                 rcpuResult = rcpuRequest.result;
                                                 this.setState({
@@ -2621,11 +2611,9 @@ export default class SupplyPlanComponent extends React.Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -2640,7 +2628,7 @@ export default class SupplyPlanComponent extends React.Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
             var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-            realmRequest.onerror = function (event) {
+            realmRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -2648,7 +2636,7 @@ export default class SupplyPlanComponent extends React.Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            realmRequest.onsuccess = function (event) {
+            realmRequest.onsuccess = function () {
                 var maxForMonths = 0;
                 var realm = realmRequest.result;
                 var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -2683,7 +2671,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                 var shipmentStatusRequest = shipmentStatusOs.getAll();
-                shipmentStatusRequest.onerror = function (event) {
+                shipmentStatusRequest.onerror = function () {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
@@ -2691,13 +2679,13 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                shipmentStatusRequest.onsuccess = function (event) {
+                shipmentStatusRequest.onsuccess = function () {
                     var shipmentStatusResult = [];
                     shipmentStatusResult = shipmentStatusRequest.result;
                     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                     var papuOs = papuTransaction.objectStore('procurementAgent');
                     var papuRequest = papuOs.getAll();
-                    papuRequest.onerror = function (event) {
+                    papuRequest.onerror = function () {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
@@ -2705,7 +2693,7 @@ export default class SupplyPlanComponent extends React.Component {
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    papuRequest.onsuccess = function (event) {
+                    papuRequest.onsuccess = function () {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         var supplyPlanData = [];
@@ -3507,7 +3495,6 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
             var programJson = this.state.programJson;
             var batchInfoList = programJson.batchInfoList;
             var consumptionListUnFiltered = (programJson.consumptionList);
@@ -3570,7 +3557,6 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
             var programJson = this.state.programJson;
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
@@ -3623,7 +3609,6 @@ export default class SupplyPlanComponent extends React.Component {
     }
     suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate) {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
@@ -4132,11 +4117,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({ exportModal: false, loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
-            var storeOS;
             getDatabase();
-            var regionList = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -4149,7 +4132,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                 var programDataOs = programDataTransaction.objectStore('programData');
                 var programRequest = programDataOs.get(document.getElementById("programId").value);
-                programRequest.onerror = function (event) {
+                programRequest.onerror = function () {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
@@ -4157,10 +4140,9 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function (e) {
+                programRequest.onsuccess = function () {
                     var programResult = programRequest.result.programData;
                     var planningUnitData = [];
-                    var selectedPlanningUnitdata = {};
                     var pcnt = 0;
                     var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
                         a = a.label.toLowerCase();
@@ -4216,7 +4198,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
                         var realmRequest = realmOs.get(this.state.generalProgramJson.realmCountry.realm.realmId);
-                        realmRequest.onerror = function (event) {
+                        realmRequest.onerror = function () {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
                                 loading: false,
@@ -4224,7 +4206,7 @@ export default class SupplyPlanComponent extends React.Component {
                             })
                             this.hideFirstComponent()
                         }.bind(this);
-                        realmRequest.onsuccess = function (event) {
+                        realmRequest.onsuccess = function () {
                             var maxForMonths = 0;
                             var realm = realmRequest.result;
                             var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -4262,7 +4244,7 @@ export default class SupplyPlanComponent extends React.Component {
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                             var shipmentStatusRequest = shipmentStatusOs.getAll();
-                            shipmentStatusRequest.onerror = function (event) {
+                            shipmentStatusRequest.onerror = function () {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false,
@@ -4270,13 +4252,13 @@ export default class SupplyPlanComponent extends React.Component {
                                 })
                                 this.hideFirstComponent()
                             }.bind(this);
-                            shipmentStatusRequest.onsuccess = function (event) {
+                            shipmentStatusRequest.onsuccess = function () {
                                 var shipmentStatusResult = [];
                                 shipmentStatusResult = shipmentStatusRequest.result;
                                 var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                 var papuOs = papuTransaction.objectStore('procurementAgent');
                                 var papuRequest = papuOs.getAll();
-                                papuRequest.onerror = function (event) {
+                                papuRequest.onerror = function () {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false,
@@ -4284,7 +4266,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     })
                                     this.hideFirstComponent()
                                 }.bind(this);
-                                papuRequest.onsuccess = function (event) {
+                                papuRequest.onsuccess = function () {
                                     var papuResult = [];
                                     papuResult = papuRequest.result;
                                     var supplyPlanData = [];
@@ -4759,7 +4741,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             yAxisID: 'A',
                                             type: 'line',
                                             stack: 7,
-                                            data: totalExpiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                                            data: totalExpiredStockArr.map((item) => (item.qty > 0 ? item.qty : null)),
                                             fill: false,
                                             borderColor: 'rgb(75, 192, 192)',
                                             tension: 0.1,
@@ -4785,14 +4767,14 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointStyle: 'line',
                                             pointRadius: 0,
                                             showInLegend: true,
-                                            data: jsonArrForGraph.map((item, index) => (item.consumption))
+                                            data: jsonArrForGraph.map((item) => (item.consumption))
                                         },
                                         {
                                             label: i18n.t('static.report.actualConsumption'),
                                             yAxisID: 'A',
                                             type: 'line',
                                             stack: 7,
-                                            data: consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                                            data: consumptionTotalData.map((item) => (item.consumptionType == 1 ? item.consumptionQty : null)),
                                             fill: false,
                                             borderColor: 'rgb(75, 192, 192)',
                                             tension: 0.1,
@@ -4812,7 +4794,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointBorderColor: '#fff',
                                             pointHoverBackgroundColor: '#fff',
                                             pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.delivered)),
+                                            data: jsonArrForGraph.map((item) => (item.delivered)),
                                         },
                                         {
                                             label: i18n.t('static.supplyPlan.shipped'),
@@ -4824,7 +4806,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointBorderColor: '#fff',
                                             pointHoverBackgroundColor: '#fff',
                                             pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.shipped)),
+                                            data: jsonArrForGraph.map((item) => (item.shipped)),
                                         },
                                         {
                                             label: i18n.t('static.supplyPlan.ordered'),
@@ -4836,7 +4818,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointBorderColor: '#fff',
                                             pointHoverBackgroundColor: '#fff',
                                             pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.ordered)),
+                                            data: jsonArrForGraph.map((item) => (item.ordered)),
                                         },
                                         {
                                             label: i18n.t('static.supplyPlan.planned'),
@@ -4848,7 +4830,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointBorderColor: '#fff',
                                             pointHoverBackgroundColor: '#fff',
                                             pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.planned)),
+                                            data: jsonArrForGraph.map((item) => (item.planned)),
                                         },
                                         {
                                             label: i18n.t('static.report.stock'),
@@ -4865,7 +4847,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointStyle: 'line',
                                             pointRadius: 0,
                                             showInLegend: true,
-                                            data: jsonArrForGraph.map((item, index) => (item.stock))
+                                            data: jsonArrForGraph.map((item) => (item.stock))
                                         },
                                         {
                                             label: jsonArrForGraph[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -4886,7 +4868,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointRadius: 0,
                                             yValueFormatString: "$#,##0",
                                             lineTension: 0,
-                                            data: jsonArrForGraph.map((item, index) => (jsonArrForGraph[0].planBasedOn == 1 ? item.minMos : item.minQty))
+                                            data: jsonArrForGraph.map((item) => (jsonArrForGraph[0].planBasedOn == 1 ? item.minMos : item.minQty))
                                         },
                                         {
                                             label: jsonArrForGraph[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.maxStockMos') : i18n.t('static.supplyPlan.maxQty'),
@@ -4907,7 +4889,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointRadius: 0,
                                             showInLegend: true,
                                             yValueFormatString: "$#,##0",
-                                            data: jsonArrForGraph.map((item, index) => (jsonArrForGraph[0].planBasedOn == 1 ? item.maxMos : item.maxQty))
+                                            data: jsonArrForGraph.map((item) => (jsonArrForGraph[0].planBasedOn == 1 ? item.maxMos : item.maxQty))
                                         }
                                     ];
                                     if (jsonArrForGraph.length > 0 && jsonArrForGraph[0].planBasedOn == 1) {
@@ -4927,7 +4909,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointStyle: 'line',
                                             pointRadius: 0,
                                             showInLegend: true,
-                                            data: jsonArrForGraph.map((item, index) => (item.mos))
+                                            data: jsonArrForGraph.map((item) => (item.mos))
                                         })
                                     }
                                     var bar = {
@@ -5009,7 +4991,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         },
                                         tooltips: {
                                             callbacks: {
-                                                label: function (tooltipItems, data) {
+                                                label: function (tooltipItems) {
                                                     return (tooltipItems.yLabel.toLocaleString());
                                                 }
                                             },
@@ -5058,10 +5040,10 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         })
     }
-    handleClickMonthBoxSingle = (e) => {
+    handleClickMonthBoxSingle = () => {
         this.pickAMonthSingle.current.show()
     }
-    handleAMonthChangeSingle = (value, text) => {
+    handleAMonthChangeSingle = () => {
     }
     handleAMonthDissmisSingle = (value) => {
         this.setState({ singleValue: value })
@@ -5099,7 +5081,7 @@ export default class SupplyPlanComponent extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -5111,34 +5093,34 @@ export default class SupplyPlanComponent extends React.Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function (event) {
+            programRequest.onsuccess = function () {
                 var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
                 var dsTransaction1 = dsTransaction.objectStore('dataSource');
                 var dsRequest = dsTransaction1.getAll();
-                dsRequest.onsuccess = function (event) {
+                dsRequest.onsuccess = function () {
                     var ssTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                     var ssTransaction1 = ssTransaction.objectStore('shipmentStatus');
                     var ssRequest = ssTransaction1.getAll();
-                    ssRequest.onsuccess = function (event) {
+                    ssRequest.onsuccess = function () {
                         var cTransaction = db1.transaction(['currency'], 'readwrite');
                         var cTransaction1 = cTransaction.objectStore('currency');
                         var cRequest = cTransaction1.getAll();
-                        cRequest.onsuccess = function (event) {
+                        cRequest.onsuccess = function () {
                             var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                             var papuTransaction1 = papuTransaction.objectStore('procurementAgentPlanningUnit');
                             var papuRequest = papuTransaction1.getAll();
-                            papuRequest.onsuccess = function (event) {
+                            papuRequest.onsuccess = function () {
                                 var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                 var rcpuTransaction1 = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                 var rcpuRequest = rcpuTransaction1.getAll();
-                                rcpuRequest.onsuccess = function (event) {
+                                rcpuRequest.onsuccess = function () {
                                     var showPlanningUnitAndQtyList = []
                                     var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
@@ -5147,7 +5129,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var realmTransaction = db1.transaction(['realm'], 'readwrite');
                                     var realmOs = realmTransaction.objectStore('realm');
                                     var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-                                    realmRequest.onsuccess = function (event) {
+                                    realmRequest.onsuccess = function () {
                                         var planningUnitsIds = this.state.planningUnitIdsPlan;
                                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         var curUser = AuthenticationService.getLoggedInUserId();
@@ -5194,7 +5176,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 }
                                             }
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
-                                            var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
@@ -5243,7 +5224,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
-                                                var spd0 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
@@ -5430,7 +5410,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         var transaction1 = db1.transaction(['programData'], 'readwrite');
                                         var programTransaction1 = transaction1.objectStore('programData');
                                         var putRequest = programTransaction1.put(programRequest.result);
-                                        putRequest.onsuccess = function (event) {
+                                        putRequest.onsuccess = function () {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {

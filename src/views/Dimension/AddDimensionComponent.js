@@ -12,7 +12,7 @@ const initialValues = {
     label: ""
 }
 const entityname = i18n.t('static.dimension.dimension');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -115,7 +115,7 @@ export default class AddDimensionComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -178,13 +178,11 @@ export default class AddDimensionComponent extends Component {
                                 }
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

@@ -100,7 +100,7 @@ class DeleteLocalProgramComponent extends Component {
     getDatabase();
     for (let i = 0; i <= programIds.length; i++) {
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function (event) {
+      openRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
@@ -112,15 +112,14 @@ class DeleteLocalProgramComponent extends Component {
         var transaction = db1.transaction(['programData'], 'readwrite');
         var program = transaction.objectStore('programData');
         var getRequest = program.delete(programIds[i]);
-        var proList = []
-        getRequest.onerror = function (event) {
+        getRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F',
             loading: false
           })
         }.bind(this);
-        getRequest.onsuccess = function (event) {
+        getRequest.onsuccess = function () {
           var myResult = [];
           myResult = getRequest.result;
           this.setState({
@@ -142,7 +141,7 @@ class DeleteLocalProgramComponent extends Component {
     getDatabase();
     for (let i = 0; i <= programIds.length; i++) {
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function (event) {
+      openRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
@@ -154,15 +153,14 @@ class DeleteLocalProgramComponent extends Component {
         var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
         var program = transaction.objectStore('downloadedProgramData');
         var getRequest = program.delete(programIds[i]);
-        var proList = []
-        getRequest.onerror = function (event) {
+        getRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F',
             loading: false
           })
         }.bind(this);
-        getRequest.onsuccess = function (event) {
+        getRequest.onsuccess = function () {
           var myResult = [];
           myResult = getRequest.result;
           this.setState({
@@ -182,7 +180,7 @@ class DeleteLocalProgramComponent extends Component {
     getDatabase();
     for (let i = 0; i <= programIds.length; i++) {
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function (event) {
+      openRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
@@ -194,15 +192,14 @@ class DeleteLocalProgramComponent extends Component {
         var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
         var program = transaction.objectStore('programQPLDetails');
         var getRequest = program.delete(programIds[i]);
-        var proList = []
-        getRequest.onerror = function (event) {
+        getRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F',
             loading: false
           })
         }.bind(this);
-        getRequest.onsuccess = function (event) {
+        getRequest.onsuccess = function () {
           var myResult = [];
           myResult = getRequest.result;
           this.setState({
@@ -221,7 +218,7 @@ class DeleteLocalProgramComponent extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F',
@@ -235,14 +232,14 @@ class DeleteLocalProgramComponent extends Component {
       var getRequest = program.getAll();
       var proList = [];
       var proList1 = []
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -285,7 +282,7 @@ class DeleteLocalProgramComponent extends Component {
   render() {
     const { programs } = this.state;
     let programList = programs.length > 0
-      && programs.map((item, i) => {
+      && programs.map((item) => {
         return (
           { label: item.label, value: item.value }
         )

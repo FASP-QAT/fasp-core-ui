@@ -123,7 +123,6 @@ class ListProcurementAgentComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = procurementAgentArray;
         var options = {
             data: data,
@@ -202,7 +201,7 @@ class ListProcurementAgentComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -249,7 +248,7 @@ class ListProcurementAgentComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -396,118 +395,6 @@ class ListProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.procurementagent.procurementagentname'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementAgentCode',
-                text: i18n.t('static.procurementagent.procurementagentcode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'colorHtmlCode',
-                text: i18n.t('static.procurementagent.procurementAgentColorCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'submittedToApprovedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'approvedToShippedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'localProcurementAgent',
-                text: i18n.t('static.procurementAgent.localProcurementAgent'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-                    );
-                }
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            },
-            {
-                dataField: 'procurementAgentId',
-                text: i18n.t('static.program.mapPlanningUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.buttonFormatter
-            },
-            {
-                dataField: 'procurementAgentId',
-                text: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.buttonFormatterForProcurementUnit
-            }
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selProcurementAgent.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

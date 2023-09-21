@@ -32,72 +32,6 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
-const options = {
-    title: {
-        display: true,
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            labelMaxWidth: 100,
-            stacked: true,
-            gridLines: {
-                display: false
-            },
-        }],
-        yAxes: [{
-            stacked: true,
-        }],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'top',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-const chartData = {
-    labels: ["Feb 2020", "May 2020", "Jun 2020"],
-    datasets: [{
-        label: 'Planned',
-        data: [0, 0, 0, 0],
-        backgroundColor: '#BA0C2F',
-        borderWidth: 0
-    },
-    {
-        label: 'Ordered',
-        data: [0, 17000, 15000],
-        backgroundColor: 'green',
-        borderWidth: 0,
-    },
-    {
-        label: 'Received',
-        data: [20000, 0, 0],
-        backgroundColor: 'blue',
-        borderWidth: 0,
-    },
-    {
-        label: 'Today',
-        data: [0, 0, 0],
-        backgroundColor: '#yellow',
-        borderWidth: 0,
-    }
-    ]
-};
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -249,11 +183,8 @@ class AggregateShipmentByProduct extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
@@ -337,7 +268,6 @@ class AggregateShipmentByProduct extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -348,9 +278,9 @@ class AggregateShipmentByProduct extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -358,7 +288,6 @@ class AggregateShipmentByProduct extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -410,7 +339,6 @@ class AggregateShipmentByProduct extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -421,9 +349,9 @@ class AggregateShipmentByProduct extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -431,7 +359,6 @@ class AggregateShipmentByProduct extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -454,9 +381,7 @@ class AggregateShipmentByProduct extends Component {
             planningUnits: []
         }, () => {
             if (versionId.includes('Local')) {
-                const lan = 'en';
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -464,10 +389,9 @@ class AggregateShipmentByProduct extends Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                    planningunitRequest.onerror = function () {
                     };
-                    planningunitRequest.onsuccess = function (e) {
+                    planningunitRequest.onsuccess = function () {
                         var myResult = [];
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -548,11 +472,9 @@ class AggregateShipmentByProduct extends Component {
         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0) {
             if (versionId.includes('Local')) {
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext')
                     })
@@ -566,12 +488,12 @@ class AggregateShipmentByProduct extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function (event) {
+                    programRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
+                    programRequest.onsuccess = function () {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -597,7 +519,6 @@ class AggregateShipmentByProduct extends Component {
                             var p = plannedShipmentFilteredList.filter(c => c.planningUnit.id == planningUnitIds[i]);
                             var productCost = 0;
                             var quantity = 0;
-                            var freightPer = 0;
                             var freightCost = 0;
                             var totalCost = 0;
                             for (j = 0; j < p.length; j++) {
@@ -741,13 +662,13 @@ class AggregateShipmentByProduct extends Component {
             }, this);
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+            && planningUnits.map((item) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
             }, this);
         let bar = "";
         if (isSiteOnline()) {
             bar = {
-                labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
+                labels: this.state.consumptions.map((item) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
                 datasets: [
                     {
                         type: "line",
@@ -764,7 +685,7 @@ class AggregateShipmentByProduct extends Component {
                         pointStyle: 'line',
                         pointBorderWidth: 5,
                         yValueFormatString: "$#,##0",
-                        data: this.state.consumptions.map((item, index) => (item.forcast))
+                        data: this.state.consumptions.map((item) => (item.forcast))
                     }, {
                         label: i18n.t('static.report.actualConsumption'),
                         backgroundColor: '#86cd99 !important',
@@ -773,14 +694,14 @@ class AggregateShipmentByProduct extends Component {
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.consumptions.map((item, index) => (item.Actual)),
+                        data: this.state.consumptions.map((item) => (item.Actual)),
                     }
                 ],
             }
         }
         if (!isSiteOnline()) {
             bar = {
-                labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
+                labels: this.state.offlineConsumptionList.map((item) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
                 datasets: [
                     {
                         label: i18n.t('static.report.actualConsumption'),
@@ -790,7 +711,7 @@ class AggregateShipmentByProduct extends Component {
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(179,181,198,1)',
-                        data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
+                        data: this.state.offlineConsumptionList.map((item) => (item.Actual)),
                     }, {
                         type: "line",
                         linetension: 0,
@@ -804,7 +725,7 @@ class AggregateShipmentByProduct extends Component {
                         },
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
-                        data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
+                        data: this.state.offlineConsumptionList.map((item) => (item.forcast))
                     }
                 ],
             }
@@ -826,7 +747,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -837,7 +758,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     var decimalFixedValue = cell.toFixed(2);
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -857,7 +778,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     cell += '';
                     var x = cell.split('.');
                     var x1 = x[0];
@@ -876,7 +797,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     var decimalFixedValue = cell.toFixed(2);
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -896,7 +817,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     var decimalFixedValue = cell.toFixed(2);
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -916,7 +837,7 @@ class AggregateShipmentByProduct extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     var decimalFixedValue = cell.toFixed(2);
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -1024,7 +945,7 @@ class AggregateShipmentByProduct extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                            onChange={() => { this.getPlanningUnit(); }}
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {versionList}

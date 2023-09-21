@@ -76,11 +76,6 @@ export default class AddProductCategory extends React.Component {
                 this.setState({ maxId: item.id })
             }
         })
-        const data = getFlatDataFromTree({
-            treeData: this.state.treeData,
-            getNodeKey: ({ node }) => node.id,
-            ignoreCollapsed: false
-        });
     }
     dataChange(event) {
         this.setState({ nodename: event.target.value });
@@ -226,7 +221,7 @@ export default class AddProductCategory extends React.Component {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
+                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={() => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
@@ -238,7 +233,7 @@ export default class AddProductCategory extends React.Component {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                <a style={{ color: '#4dbd74' }} href="javascript:void();" title="Enable Product Category" onClick={(event) => this.enableNode(rowInfo)}><i className="fa fa-check"></i></a>
+                                                                <a style={{ color: '#4dbd74' }} href="javascript:void();" title="Enable Product Category" onClick={() => this.enableNode(rowInfo)}><i className="fa fa-check"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {

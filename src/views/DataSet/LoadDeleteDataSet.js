@@ -258,7 +258,7 @@ class LoadDeleteDataSet extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -273,11 +273,11 @@ class LoadDeleteDataSet extends Component {
             var program = transaction.objectStore('datasetDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 this.setState({
                 })
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -411,7 +411,7 @@ class LoadDeleteDataSet extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -425,7 +425,7 @@ class LoadDeleteDataSet extends Component {
             var program = transaction.objectStore('datasetDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F',
@@ -434,7 +434,7 @@ class LoadDeleteDataSet extends Component {
                     this.hideFirstComponent()
                 })
             }.bind(this);
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -584,18 +584,18 @@ class LoadDeleteDataSet extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
             var deleteRequest = programTransaction.delete(id);
-            deleteRequest.onsuccess = function (event) {
+            deleteRequest.onsuccess = function () {
                 var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                 var programTransaction2 = transaction2.objectStore('datasetDetails');
                 var deleteRequest2 = programTransaction2.delete(id);
-                deleteRequest2.onsuccess = function (event) {
+                deleteRequest2.onsuccess = function () {
                     if (i == length - 1) {
                         this.setState({
                             loading: false,
@@ -663,18 +663,18 @@ class LoadDeleteDataSet extends Component {
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
+                        openRequest.onerror = function () {
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['datasetData'], 'readwrite');
                             var programTransaction = transaction.objectStore('datasetData');
                             var deleteRequest = programTransaction.delete(id);
-                            deleteRequest.onsuccess = function (event) {
+                            deleteRequest.onsuccess = function () {
                                 var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                                 var programTransaction2 = transaction2.objectStore('datasetDetails');
                                 var deleteRequest2 = programTransaction2.delete(id);
-                                deleteRequest2.onsuccess = function (event) {
+                                deleteRequest2.onsuccess = function () {
                                     this.setState({
                                         loading: false,
                                         message: "Dataset delete succesfully.",
@@ -708,16 +708,16 @@ class LoadDeleteDataSet extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             }.bind(this);
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var datasetList = getRequest.result.filter(c => c.userId == userId);
@@ -785,7 +785,6 @@ class LoadDeleteDataSet extends Component {
                             this.hideFirstComponent();
                         })
                 } else {
-                    var programThenCount = 0;
                     var continueToLoad = 0;
                     if (isSiteOnline()) {
                         var checkboxesCheckedProgram = checkboxesChecked.filter(c => c.versionId == -1);
@@ -846,14 +845,14 @@ class LoadDeleteDataSet extends Component {
                                         var id = versionsThatNeedsToBeDeleted[i];
                                         deleteDatasetOs.delete(id);
                                     }
-                                    deleteDatasetTransaction.oncomplete = function (event) {
+                                    deleteDatasetTransaction.oncomplete = function () {
                                         var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                                         var programTransaction2 = transaction2.objectStore('datasetDetails');
                                         for (var i = 0; i < versionsThatNeedsToBeDeleted.length; i++) {
                                             var id = versionsThatNeedsToBeDeleted[i];
                                             programTransaction2.delete(id);
                                         }
-                                        transaction2.oncomplete = function (event) {
+                                        transaction2.oncomplete = function () {
                                             var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                             var programSaveData = transactionForSavingData.objectStore('datasetData');
                                             for (var r = 0; r < json.length; r++) {
@@ -874,9 +873,8 @@ class LoadDeleteDataSet extends Component {
                                                     userId: userId,
                                                     programCode: json[r].programCode,
                                                 };
-                                                var putRequest = programSaveData.put(item);
                                             }
-                                            transactionForSavingData.oncomplete = function (event) {
+                                            transactionForSavingData.oncomplete = function () {
                                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                                 var programIds = []
@@ -891,9 +889,8 @@ class LoadDeleteDataSet extends Component {
                                                         readonly: 0
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 }
-                                                programQPLDetailsTransaction.oncomplete = function (event) {
+                                                programQPLDetailsTransaction.oncomplete = function () {
                                                     this.setState({
                                                         message: 'static.program.downloadsuccess',
                                                         color: 'green',
@@ -909,7 +906,7 @@ class LoadDeleteDataSet extends Component {
                                             }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
-                                }).catch(error => {
+                                }).catch(() => {
                                     this.setState({
                                         loading: false,
                                         message: i18n.t("static.program.errortext"),

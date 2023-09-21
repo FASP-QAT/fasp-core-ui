@@ -28,39 +28,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = ""
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.supplyplanversionandreview')
-    },
-    scales: {
-        yAxes: [
-            {
-                scaleLabel: {
-                    display: true,
-                    labelString: i18n.t('static.report.stock')
-                },
-                ticks: {
-                    beginAtZero: true,
-                    Max: 900
-                }
-            }
-        ]
-    },
-    tooltips: {
-        mode: 'index',
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-        }
-    }
-}
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -179,7 +146,6 @@ class SupplyPlanVersionAndReview extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = matricsArray;
         var options = {
             data: data,
@@ -261,7 +227,7 @@ class SupplyPlanVersionAndReview extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -280,8 +246,6 @@ class SupplyPlanVersionAndReview extends Component {
                     var elInstance = instance;
                     var rowData = elInstance.getRowData(x);
                     let programId = rowData[11];
-                    let versionStatusId = rowData[10];
-                    let versionTypeId = rowData[9];
                     this.props.history.push({
                         pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
                     });
@@ -289,7 +253,7 @@ class SupplyPlanVersionAndReview extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     makeText = m => {
@@ -751,7 +715,6 @@ class SupplyPlanVersionAndReview extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = [];
@@ -821,44 +784,6 @@ class SupplyPlanVersionAndReview extends Component {
                     </option>
                 )
             }, this);
-        const bar = {
-            labels: this.state.matricsList.map((item, index) => (item.date)),
-            datasets: [
-                {
-                    type: "line",
-                    label: "MOS past 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_pass3))
-                },
-                {
-                    type: "line",
-                    label: "MOS P+F",
-                    backgroundColor: 'transparent',
-                    borderColor: '#4dbd74',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_PF))
-                },
-                {
-                    type: "line",
-                    label: "MOS Future 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ed5626',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_Feature3))
-                }
-            ]
-        }
         const columns = [
             {
                 dataField: 'program.label',
@@ -934,32 +859,6 @@ class SupplyPlanVersionAndReview extends Component {
                 align: 'center',
                 headerAlign: 'center',
             }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.matricsList.length
-            }]
-        };
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">

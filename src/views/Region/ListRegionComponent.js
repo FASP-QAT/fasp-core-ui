@@ -100,13 +100,8 @@ class RegionListComponent extends Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = i18n.t('static.regionHead.region');
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
         const headers = [];
         headers.push(i18n.t('static.region.country'));
         headers.push(i18n.t('static.region.region'));
@@ -197,7 +192,6 @@ class RegionListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = regionListArray;
         var options = {
             data: data,
@@ -251,7 +245,7 @@ class RegionListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -405,7 +399,7 @@ class RegionListComponent extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     render() {
@@ -414,13 +408,8 @@ class RegionListComponent extends Component {
             entries: " ",
         });
         const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
         const { realmCountryList } = this.state;
-        let countryList = realmCountryList.length > 0 && realmCountryList.map((item, i) => {
+        let countryList = realmCountryList.length > 0 && realmCountryList.map((item) => {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
         return (

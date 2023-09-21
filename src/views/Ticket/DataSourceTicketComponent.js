@@ -11,15 +11,7 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 const summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
 const summaryText_2 = "Add Data Source"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    programName: "",
-    dataSourceType: "",
-    dataSourceName: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -382,7 +374,7 @@ export default class DataSourceTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -450,13 +442,11 @@ export default class DataSourceTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

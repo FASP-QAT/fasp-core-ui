@@ -10,14 +10,8 @@ import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-let initialValues = {
-    unitId: '',
-    label: '',
-    forecastingUnitId: '',
-    multiplier: ''
-}
 const entityname = i18n.t('static.planningunit.planningunit');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         unitId: Yup.string()
             .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
@@ -296,7 +290,7 @@ export default class AddPlanningUnit extends Component {
                                     multiplier: this.state.planningUnit.multiplier
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -354,14 +348,11 @@ export default class AddPlanningUnit extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         handleReset
                                     }) => (

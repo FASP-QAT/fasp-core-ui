@@ -32,11 +32,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -222,9 +217,7 @@ class Consumption extends Component {
             }
           );
       } else {
-        const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -232,10 +225,9 @@ class Consumption extends Component {
           var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
           var planningunitOs = planningunitTransaction.objectStore('planningUnit');
           var planningunitRequest = planningunitOs.getAll();
-          var planningList = []
-          planningunitRequest.onerror = function (event) {
+          planningunitRequest.onerror = function () {
           };
-          planningunitRequest.onsuccess = function (e) {
+          planningunitRequest.onsuccess = function () {
             var myResult = [];
             myResult = planningunitRequest.result;
             let productFilter = myResult.filter(c => (c.planningUnitId == productId));
@@ -296,10 +288,8 @@ class Consumption extends Component {
       re = this.state.offlineConsumptionList
     }
     let head = [];
-    let head1 = [];
     let row1 = [];
     let row2 = [];
-    let row3 = [];
     if (isSiteOnline()) {
       let consumptionArray = this.state.consumptions;
       head.push('');
@@ -387,7 +377,6 @@ class Consumption extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
-    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     var canvas = document.getElementById("cool-canvas");
@@ -395,7 +384,6 @@ class Consumption extends Component {
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
     var h1 = 100;
-    var aspectwidth1 = (width - h1);
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
@@ -467,11 +455,9 @@ class Consumption extends Component {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             loading: false
@@ -486,13 +472,13 @@ class Consumption extends Component {
           var programDataTransaction = db1.transaction(['programData'], 'readwrite');
           var programDataOs = programDataTransaction.objectStore('programData');
           var programRequest = programDataOs.get(program);
-          programRequest.onerror = function (event) {
+          programRequest.onerror = function () {
             this.setState({
               message: i18n.t('static.program.errortext'),
               loading: false
             })
           }.bind(this);
-          programRequest.onsuccess = function (e) {
+          programRequest.onsuccess = function () {
             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
             var programJson = {}
@@ -582,7 +568,6 @@ class Consumption extends Component {
           message: '',
           loading: true
         })
-        let realmId = AuthenticationService.getRealmId();
         var inputjson = {
           startDate: startDate,
           stopDate: endDate,
@@ -714,7 +699,6 @@ class Consumption extends Component {
     }
   }
   consolidatedProgramList = () => {
-    const lan = 'en';
     const { programs } = this.state
     var proList = programs;
     var db1;
@@ -725,9 +709,9 @@ class Consumption extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
       };
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -735,7 +719,6 @@ class Consumption extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             var f = 0
@@ -749,7 +732,6 @@ class Consumption extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           this.setState({
             programs: proList.sort(function (a, b) {
@@ -787,9 +769,7 @@ class Consumption extends Component {
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
-          const lan = 'en';
           var db1;
-          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -797,10 +777,9 @@ class Consumption extends Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
+            planningunitRequest.onerror = function () {
             };
-            planningunitRequest.onsuccess = function (e) {
+            planningunitRequest.onsuccess = function () {
               var myResult = [];
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
@@ -980,7 +959,6 @@ class Consumption extends Component {
     }
   }
   consolidatedVersionList = (programId) => {
-    const lan = 'en';
     const { versions } = this.state
     var verList = versions;
     var db1;
@@ -991,9 +969,9 @@ class Consumption extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
       };
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1001,7 +979,6 @@ class Consumption extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
@@ -1184,7 +1161,6 @@ class Consumption extends Component {
         custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
-            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';
@@ -1212,7 +1188,7 @@ class Consumption extends Component {
     let bar = "";
     if (isSiteOnline()) {
       bar = {
-        labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        labels: this.state.consumptions.map((item) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1229,7 +1205,7 @@ class Consumption extends Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
+            data: this.state.consumptions.map((item) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#118b70',
@@ -1239,14 +1215,14 @@ class Consumption extends Component {
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
             yValueFormatString: "###,###,###,###",
-            data: this.state.consumptions.map((item, index) => (item.actualConsumption)),
+            data: this.state.consumptions.map((item) => (item.actualConsumption)),
           }
         ],
       }
     }
     if (!isSiteOnline()) {
       bar = {
-        labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        labels: this.state.offlineConsumptionList.map((item) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1263,7 +1239,7 @@ class Consumption extends Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "$#,##0",
-            data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
+            data: this.state.offlineConsumptionList.map((item) => (item.forecastedConsumption))
           }, {
             label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#118b70',
@@ -1272,7 +1248,7 @@ class Consumption extends Component {
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(179,181,198,1)',
-            data: this.state.offlineConsumptionList.map((item, index) => (item.actualConsumption)),
+            data: this.state.offlineConsumptionList.map((item) => (item.actualConsumption)),
           }
         ],
       }

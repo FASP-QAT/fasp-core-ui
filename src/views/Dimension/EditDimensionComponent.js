@@ -7,11 +7,8 @@ import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-let initialValues = {
-    label: ""
-}
 const entityname = i18n.t('static.dimension.dimension');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -177,7 +174,7 @@ export default class UpdateDimensionComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{ label: this.state.dimension.label.label_en }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -235,14 +232,11 @@ export default class UpdateDimensionComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='diamensionForm' autocomplete="off">

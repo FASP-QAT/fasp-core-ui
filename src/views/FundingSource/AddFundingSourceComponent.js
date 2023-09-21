@@ -10,13 +10,8 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-let initialValues = {
-  fundingSourceId: [],
-  subFundingSource: "",
-  fundingSourceCode: "",
-}
 const entityname = i18n.t('static.fundingsource.fundingsource');
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
@@ -323,7 +318,7 @@ class AddFundingSourceComponent extends Component {
                   fundingSourceCode: this.state.fundingSource.fundingSourceCode
                 }}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   this.setState({
                     loading: true
                   })
@@ -381,14 +376,11 @@ class AddFundingSourceComponent extends Component {
                 }}
                 render={
                   ({
-                    values,
                     errors,
                     touched,
                     handleChange,
                     handleBlur,
                     handleSubmit,
-                    isSubmitting,
-                    isValid,
                     setTouched,
                     handleReset
                   }) => (

@@ -12,11 +12,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.organisationType.organisationType');
-let initialValues = {
-    realmId: '',
-    organisationTypeName: ''
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -207,7 +203,7 @@ export default class AddOrganisationTypeComponent extends Component {
                                     realmId: this.state.organisationType.realm.id,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -262,19 +258,13 @@ export default class AddOrganisationTypeComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
-                                        handleReset,
-                                        setFieldValue,
-                                        setFieldTouched
-                                    }) => (
+                                        handleReset                                    }) => (
                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationTypeForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>

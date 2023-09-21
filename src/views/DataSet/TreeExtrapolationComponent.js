@@ -32,11 +32,11 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const validationSchemaExtrapolation = function (values) {
+const validationSchemaExtrapolation = function () {
     return Yup.object().shape({
         noOfMonthsId:
             Yup.string().test('noOfMonthsId', 'Please enter positive number.',
-                function (value) {
+                function () {
                     var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
@@ -46,7 +46,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         confidenceLevelId:
             Yup.string().test('confidenceLevelId', 'Please select confidence level.',
-                function (value) {
+                function () {
                     if ((document.getElementById("smoothingId").value) == "true" && document.getElementById("confidenceLevelId").value == "") {
                         return false;
                     } else {
@@ -55,7 +55,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         confidenceLevelIdLinearRegression:
             Yup.string().test('confidenceLevelIdLinearRegression', 'Please select confidence level.',
-                function (value) {
+                function () {
                     if ((document.getElementById("linearRegressionId").value) == "true" && document.getElementById("confidenceLevelIdLinearRegression").value == "") {
                         return false;
                     } else {
@@ -64,7 +64,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         confidenceLevelIdArima:
             Yup.string().test('confidenceLevelIdArima', 'Please select confidence level.',
-                function (value) {
+                function () {
                     if ((document.getElementById("arimaId").value) == "true" && document.getElementById("confidenceLevelIdArima").value == "") {
                         return false;
                     } else {
@@ -73,7 +73,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         gammaId:
             Yup.string().test('gammaId', 'Please enter correct gamma value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^((?:[0]*)(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
@@ -83,7 +83,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         betaId:
             Yup.string().test('betaId', 'Please enter correct beta value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("betaId").value != "" ? (/^((?:[0]*)(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
@@ -93,7 +93,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         alphaId:
             Yup.string().test('alphaId', 'Please enter correct alpha value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^((?:[0]*)(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
@@ -103,7 +103,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         pId:
             Yup.string().test('pId', 'Please enter correct p value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("pId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
@@ -113,7 +113,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         dId:
             Yup.string().test('dId', 'Please enter correct d value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("dId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
@@ -123,7 +123,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         qId:
             Yup.string().test('qId', 'Please enter correct q value.',
-                function (value) {
+                function () {
                     var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("qId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
@@ -133,7 +133,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         extrapolationMethodId:
             Yup.string().test('extrapolationMethodId', 'Please select extrapolation method.',
-                function (value) {
+                function () {
                     if (document.getElementById("buttonFalg").value == 1 && document.getElementById("extrapolationMethodId").value == "") {
                         return false;
                     } else {
@@ -162,7 +162,7 @@ const getErrorsFromValidationErrorExtrapolation = (validationError) => {
         }
     }, {})
 }
-function addCommasExtrapolation(cell1, row) {
+function addCommasExtrapolation(cell1) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
         var x = cell1.replaceAll(",", "").split('.');
@@ -450,7 +450,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
-        var minMonth = this.state.minMonth;
         var count = 1;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
@@ -522,11 +521,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         var json;
         for (let i = 0; i < filteredExtrapolationMethodList.length; i++) {
             if (filteredExtrapolationMethodList[i].id == 7) {
-                var extrapolationOptionDataList = [];
-                var optionDataJson = {
-                    month: '',
-                    amount: ''
-                };
                 json = {
                     extrapolationMethod: { id: 7 },
                     jsonProperties: {
@@ -971,7 +965,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
-                var interpolatedData = [];
                 var tableJson = this.state.dataExtrapolation.getJson(null, false);
                 var resultCount = 0;
                 for (var i = 0; i < tableJson.length; i++) {
@@ -1114,9 +1107,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.setState({
             extrapolationLoader: true
         }, () => {
-            const lan = 'en';
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -1124,13 +1115,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                 var planningunitTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('extrapolationMethod');
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                planningunitRequest.onerror = function (event) {
+                planningunitRequest.onerror = function () {
                 };
-                planningunitRequest.onsuccess = function (e) {
+                planningunitRequest.onsuccess = function () {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    var proList = []
                     this.setState({
                         extrapolationMethodList: myResult.filter(x => x.active == true),
                         changed: 1
@@ -1522,7 +1511,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             onselection: this.selected,
             oneditionend: this.onedit,
             onchange: this.extrapolationChanged,
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 var elInstance = el;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
@@ -1585,7 +1574,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return [];
             }.bind(this),
         };
@@ -1687,7 +1676,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
-    loadedExtrapolation = function (instance, cell, x, y, value) {
+    loadedExtrapolation = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild.nextSibling;
@@ -1808,7 +1797,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.setState({ isChanged: true })
     }.bind(this);
     setMovingAvgId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var movingAvgId = e.target.checked;
@@ -1848,7 +1836,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setSemiAvgId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var semiAvgId = e.target.checked;
@@ -1885,7 +1872,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setLinearRegressionId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var linearRegressionId = e.target.checked;
@@ -1922,7 +1908,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setSmoothingId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var smoothingId = e.target.checked;
@@ -1960,7 +1945,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setArimaId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var arimaId = e.target.checked;
@@ -1997,7 +1981,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
-    getDatasetData(e) {
+    getDatasetData() {
     }
     toggleShowGuidance() {
         this.setState({
@@ -2181,7 +2165,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
-                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -2226,27 +2209,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             pointHoverBorderColor: 'transparent',
             pointHitRadius: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals > 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
+            data: this.state.jexcelDataArr.map((item) => (item.adjustedActuals > 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
         })
-        let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
-        let startDate = moment(this.props.items.forecastStartDate).format("YYYY-MM-DD");
-        var data = this.state.jexcelDataArr.map((item, index) =>
-        (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0
-            && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
-                || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM')
-                    && (item.amount == "" || item.amount == null)))
-            ? "Inside if data " : "Inside else data"));
-        var data1 = this.state.jexcelDataArr.map((item, index) =>
-        (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0
-            ? "Inside if data " : "Inside else data"));
-        var data2 = this.state.jexcelDataArr.map((item, index) =>
-        (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
-            || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM'))
-            ? "Inside if data " : "Inside else data"));
-        var data3 = this.state.jexcelDataArr.map((item, index) =>
-        (
-            (item.amount == "" || item.amount == null)
-                ? "Inside if data " : "Inside else data"));
         if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
             if (this.state.movingAvgId) {
                 datasets.push(
@@ -2269,7 +2233,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHoverBorderColor: 'transparent',
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                        data: this.state.jexcelDataArr.map((item) => (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.movingAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     })
             }
         }
@@ -2294,7 +2258,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
             }
         }
@@ -2322,7 +2286,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHoverBorderColor: 'transparent',
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                        data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
                             && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                                 || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
                                     || item.amount == null)))
@@ -2355,7 +2319,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHoverBorderColor: 'transparent',
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                        data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
                     })
             }
             if (this.state.linearRegressionId) {
@@ -2381,7 +2345,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         pointHoverBorderColor: 'transparent',
                         pointHitRadius: 5,
                         yValueFormatString: "###,###,###,###",
-                        data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                        data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
                             && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                                 || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
                                     || item.amount == null)))
@@ -2417,7 +2381,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2449,7 +2413,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
             }
             if (this.state.smoothingId) {
@@ -2474,7 +2438,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2510,7 +2474,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2542,7 +2506,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
             }
             if (this.state.arimaId) {
@@ -2567,7 +2531,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2601,7 +2565,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) =>
+                    data: this.state.jexcelDataArr.map((item) =>
                     (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM')
@@ -2629,7 +2593,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
         if (this.state.linearRegressionId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 5)) {
@@ -2655,7 +2619,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2688,7 +2652,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                    data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
         }
         if (this.state.linearRegressionId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 5)) {
@@ -2714,7 +2678,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
+                    data: this.state.jexcelDataArr.map((item) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0
                         && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                             || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                                 && (item.amount == "" || item.amount == null)))
@@ -2748,7 +2712,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
                     && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                         || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                             && (item.amount == "" || item.amount == null)))
@@ -2780,7 +2744,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
         if (this.state.smoothingId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 2)) {
@@ -2805,7 +2769,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
+                data: this.state.jexcelDataArr.map((item) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0
                     && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                         || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == ""
                             || item.amount == null)))
@@ -2839,7 +2803,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
                     && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                         || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                             && (item.amount == "" || item.amount == null)))
@@ -2871,7 +2835,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
+                data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && (item.amount == "" || item.amount == null))) ? this.state.arimaData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
         if (this.state.arimaId && (this.state.nodeDataExtrapolation.extrapolationMethod == null || this.state.nodeDataExtrapolation.extrapolationMethod.id != 4)) {
@@ -2896,7 +2860,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.jexcelDataArr.map((item, index) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
+                data: this.state.jexcelDataArr.map((item) => (this.state.arimaData.filter(x => x.month == item.monthNo).length > 0
                     && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
                         || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM')
                             && (item.amount == "" || item.amount == null)))
@@ -2933,7 +2897,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 qId: this.state.q
                             }}
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
-                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                            onSubmit={(values) => {
                                 if (this.checkValidationExtrapolation()) {
                                     if (this.state.buttonFalg) {
                                         this.checkActualValuesGap(false);
@@ -2945,19 +2909,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                             }}
                             render={
                                 ({
-                                    values,
                                     errors,
                                     touched,
                                     handleChange,
                                     handleBlur,
                                     handleSubmit,
-                                    isSubmitting,
-                                    isValid,
                                     setTouched,
-                                    handleReset,
-                                    setFieldValue,
-                                    setFieldTouched
-                                }) => (
+                                    handleReset                                }) => (
                                     <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                         <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
                                             <div className="row pl-lg-0 pr-lg-0">

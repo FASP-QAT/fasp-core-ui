@@ -28,12 +28,6 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 class SupplierLeadTimes extends Component {
     constructor(props) {
         super(props);
@@ -97,7 +91,6 @@ class SupplierLeadTimes extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = outPutArray;
         var options = {
             data: data,
@@ -188,7 +181,7 @@ class SupplierLeadTimes extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -283,7 +276,6 @@ class SupplierLeadTimes extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -309,8 +301,6 @@ class SupplierLeadTimes extends Component {
             y = y + 10;
         }
         doc.setFontSize(8);
-        const title = i18n.t('static.dashboard.supplierLeadTimes');
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         let startY = y
@@ -508,7 +498,6 @@ class SupplierLeadTimes extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -519,9 +508,9 @@ class SupplierLeadTimes extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -529,7 +518,6 @@ class SupplierLeadTimes extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -543,7 +531,6 @@ class SupplierLeadTimes extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -601,7 +588,6 @@ class SupplierLeadTimes extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -612,9 +598,9 @@ class SupplierLeadTimes extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -622,7 +608,6 @@ class SupplierLeadTimes extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -649,9 +634,7 @@ class SupplierLeadTimes extends Component {
                 procurementAgenttValues: []
             }, () => {
                 if (!isSiteOnline()) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -659,10 +642,9 @@ class SupplierLeadTimes extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
+                        planningunitRequest.onerror = function () {
                         };
-                        planningunitRequest.onsuccess = function (e) {
+                        planningunitRequest.onsuccess = function () {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -822,7 +804,6 @@ class SupplierLeadTimes extends Component {
         }
     }
     consolidatedProcurementAgentList = () => {
-        const lan = 'en';
         const { procurementAgents } = this.state
         var proList = procurementAgents;
         let programId = document.getElementById("programId").value;
@@ -834,13 +815,12 @@ class SupplierLeadTimes extends Component {
             var transaction = db1.transaction(['procurementAgent'], 'readwrite');
             var procuremntAgent = transaction.objectStore('procurementAgent');
             var getRequest = procuremntAgent.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     var f = 0
                     for (var k = 0; k < this.state.procurementAgents.length; k++) {
@@ -877,7 +857,7 @@ class SupplierLeadTimes extends Component {
             }.bind(this);
         }.bind(this);
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     fetchData = () => {
@@ -950,11 +930,9 @@ class SupplierLeadTimes extends Component {
                 procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
                 this.setState({ loading: true })
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         loading: false
@@ -965,24 +943,24 @@ class SupplierLeadTimes extends Component {
                     var programDataTransaction = db1.transaction(['program'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('program');
                     var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
-                    programRequest.onerror = function (event) {
+                    programRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
+                    programRequest.onsuccess = function () {
                         var result = programRequest.result;
                         var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
                         var ppuRequest = ppuOs.getAll();
-                        ppuRequest.onerror = function (event) {
+                        ppuRequest.onerror = function () {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 loading: false
                             })
                         }.bind(this);
-                        ppuRequest.onsuccess = function (e) {
+                        ppuRequest.onsuccess = function () {
                             var result1 = (ppuRequest.result).filter(c => c.program.id == parseInt(programId));
                             if (planningUnitIds.length > 0) {
                                 var planningUnitfilteredList = [];
@@ -997,13 +975,13 @@ class SupplierLeadTimes extends Component {
                             var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                             var papuRequest = papuOs.getAll();
-                            papuRequest.onerror = function (event) {
+                            papuRequest.onerror = function () {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
                                     loading: false
                                 })
                             }.bind(this);
-                            papuRequest.onsuccess = function (e) {
+                            papuRequest.onsuccess = function () {
                                 var result2;
                                 if (procurementAgentIds.length > 0) {
                                     var procurementAgentFilteredList = []
@@ -1018,17 +996,16 @@ class SupplierLeadTimes extends Component {
                                 var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                 var paOs = paTransaction.objectStore('procurementAgent');
                                 var paRequest = paOs.getAll();
-                                paRequest.onerror = function (event) {
+                                paRequest.onerror = function () {
                                     this.setState({
                                         message: i18n.t('static.program.errortext'),
                                         loading: false
                                     })
                                 }.bind(this);
-                                paRequest.onsuccess = function (e) {
+                                paRequest.onsuccess = function () {
                                     var result3 = paRequest.result;
                                     var outPutList = [];
                                     for (var i = 0; i < result1.length; i++) {
-                                        var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
                                         var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
                                         var program = result1[i].program;
                                         for (var k = 0; k < procurementAgentIds.length; k++) {
@@ -1175,22 +1152,14 @@ class SupplierLeadTimes extends Component {
         );
         const { programs } = this.state;
         const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {item.versionId}
-                    </option>
-                )
-            }, this);
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+            && planningUnits.map((item) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { procurementAgents } = this.state
         let procurementAgentList = procurementAgents.length > 0
-            && procurementAgents.map((item, i) => {
+            && procurementAgents.map((item) => {
                 return ({ label: item.code, value: item.id })
             }, this);
         const columns = [
@@ -1209,7 +1178,7 @@ class SupplierLeadTimes extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '200px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1310,32 +1279,6 @@ class SupplierLeadTimes extends Component {
                 style: { width: '80px' },
             },
         ];
-        const tabelOptions = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.outPutList.length
-            }]
-        }
         return (
             <div className="animated" >
                 <AuthenticationServiceComponent history={this.props.history} />

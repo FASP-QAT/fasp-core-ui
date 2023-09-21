@@ -14,14 +14,7 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
-const initialValues = {
-    summary: "",
-    realmId: "",
-    countryId: "",
-    currencyId: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -385,14 +378,6 @@ export default class RealmCountryTicketComponent extends Component {
                     </option>
                 )
             }, this);
-        let countryList = countries.length > 0
-            && countries.map((item, i) => {
-                return (
-                    <option key={i} value={item.countryId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
         let currencyList = currencies.length > 0
             && currencies.map((item, i) => {
                 return (
@@ -415,7 +400,7 @@ export default class RealmCountryTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -483,13 +468,11 @@ export default class RealmCountryTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset,

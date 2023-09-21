@@ -18,7 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const initialValuesFour = {
     regionId: []
 }
-const validationSchemaFour = function (values) {
+const validationSchemaFour = function () {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
@@ -146,18 +146,15 @@ export default class StepFive extends Component {
                 <Formik
                     initialValues={initialValuesFour}
                     validate={validateFour(validationSchemaFour)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.finishedStepFive && this.props.finishedStepFive();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
-                            handleBlur,
                             handleSubmit,
-                            isSubmitting,
                             isValid,
                             setTouched,
                             setFieldValue,

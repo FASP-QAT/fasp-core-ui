@@ -132,7 +132,6 @@ class StockAdjustmentComponent extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -143,9 +142,9 @@ class StockAdjustmentComponent extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -153,7 +152,6 @@ class StockAdjustmentComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -167,7 +165,6 @@ class StockAdjustmentComponent extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -269,7 +266,6 @@ class StockAdjustmentComponent extends Component {
         this.fetchData();
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -280,9 +276,9 @@ class StockAdjustmentComponent extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -290,7 +286,6 @@ class StockAdjustmentComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -346,9 +341,7 @@ class StockAdjustmentComponent extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -356,10 +349,9 @@ class StockAdjustmentComponent extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
+                        planningunitRequest.onerror = function () {
                         };
-                        planningunitRequest.onsuccess = function (e) {
+                        planningunitRequest.onsuccess = function () {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -558,7 +550,6 @@ class StockAdjustmentComponent extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size);
         doc.setFontSize(8);
         const headers = [];
@@ -600,7 +591,6 @@ class StockAdjustmentComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = stockAdjustmentArray;
         var options = {
             data: data,
@@ -655,7 +645,7 @@ class StockAdjustmentComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -666,7 +656,7 @@ class StockAdjustmentComponent extends Component {
             loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     fetchData = () => {
@@ -681,12 +671,10 @@ class StockAdjustmentComponent extends Component {
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 this.setState({ loading: true })
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         loading: false
@@ -701,27 +689,27 @@ class StockAdjustmentComponent extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function (event) {
+                    programRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
+                    programRequest.onsuccess = function () {
                         var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                         var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                         var dataSourceRequest = dataSourceOs.getAll();
-                        dataSourceRequest.onerror = function (event) {
+                        dataSourceRequest.onerror = function () {
                         }.bind(this);
-                        dataSourceRequest.onsuccess = function (event) {
+                        dataSourceRequest.onsuccess = function () {
                             var dataSourceResult = [];
                             dataSourceResult = dataSourceRequest.result;
                             var puTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                             var puOs = puTransaction.objectStore('programPlanningUnit');
                             var puRequest = puOs.getAll();
-                            puRequest.onerror = function (event) {
+                            puRequest.onerror = function () {
                             }.bind(this);
-                            puRequest.onsuccess = function (e) {
+                            puRequest.onsuccess = function () {
                                 var puResult = [];
                                 puResult = puRequest.result;
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
@@ -908,18 +896,10 @@ class StockAdjustmentComponent extends Component {
             }, this);
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+            && planningUnits.map((item) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { realmCountryList } = this.state;
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
         const { rangeValue } = this.state
         const columns = [
             {
@@ -929,7 +909,7 @@ class StockAdjustmentComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             }, {
@@ -947,7 +927,7 @@ class StockAdjustmentComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -958,7 +938,7 @@ class StockAdjustmentComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return new moment(cell).format('MMM YYYY');
                 }
             },
@@ -986,7 +966,7 @@ class StockAdjustmentComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return new moment(cell).format(`${DATE_FORMAT_CAP}`);
                 }
             },
@@ -999,32 +979,6 @@ class StockAdjustmentComponent extends Component {
                 style: { width: '100px' },
             }
         ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selRegion.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

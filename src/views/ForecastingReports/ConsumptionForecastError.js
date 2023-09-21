@@ -103,9 +103,7 @@ class ConsumptionForecastError extends Component {
         }, () => {
             if (programId > 0 && versionId != 0) {
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -113,10 +111,9 @@ class ConsumptionForecastError extends Component {
                         var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
+                        planningunitRequest.onerror = function () {
                         };
-                        planningunitRequest.onsuccess = function (e) {
+                        planningunitRequest.onsuccess = function () {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var filteredEquList = []
@@ -405,7 +402,7 @@ class ConsumptionForecastError extends Component {
         this.state.regionListFiltered.map(item1 => {
             B = [item1.label];
             t1 = [];
-            this.state.monthArrayList.map((item, index) => {
+            this.state.monthArrayList.map((item) => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
                 t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
@@ -586,7 +583,6 @@ class ConsumptionForecastError extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size);
         doc.setFontSize(8);
         var canvas = document.getElementById("cool-canvas");
@@ -594,7 +590,6 @@ class ConsumptionForecastError extends Component {
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 100;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
         const headers = [];
         headers.push('');
@@ -634,7 +629,7 @@ class ConsumptionForecastError extends Component {
             A = [];
             t1 = [];
             A.push(item1.label)
-            this.state.monthArrayList.map((item, index) => {
+            this.state.monthArrayList.map((item) => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
                 t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
@@ -766,9 +761,9 @@ class ConsumptionForecastError extends Component {
                     var getRequest = program.getAll();
                     var datasetList = [];
                     var datasetList1 = [];
-                    getRequest.onerror = function (event) {
+                    getRequest.onerror = function () {
                     };
-                    getRequest.onsuccess = function (event) {
+                    getRequest.onsuccess = function () {
                         var myResult = [];
                         myResult = getRequest.result;
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -776,7 +771,6 @@ class ConsumptionForecastError extends Component {
                         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                         for (var i = 0; i < filteredGetRequestList.length; i++) {
                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson1 = JSON.parse(programData);
@@ -814,7 +808,6 @@ class ConsumptionForecastError extends Component {
                                 monthArrayList.push(dt);
                             }
                             let actualConsumptionList = filteredProgram.actualConsumptionList;
-                            let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
                             if (viewById == 1) {
                                 let treeList = filteredProgram.treeList;
                                 let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
@@ -942,12 +935,6 @@ class ConsumptionForecastError extends Component {
                                     }
                                 }
                                 let regionIdArr = regionIds.map(c => parseInt(c))
-                                let forecast = monthArrayList.map(item => {
-                                    var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && regionIdArr.includes(c.region.regionId));
-                                    var sum = 0;
-                                    cd.map(c => { sum += c.consumptionQty });
-                                    return sum;
-                                });
                                 let actual = monthArrayList.map(item => {
                                     var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && regionIdArr.includes(c.region.regionId));
                                     var sum = 0;
@@ -1145,12 +1132,6 @@ class ConsumptionForecastError extends Component {
                                 let regionListData = tempConsumptionData.map(c => c.consumptionList);
                                 consumptionData = consumptionData.concat(regionListData);
                                 let regionIdArr = regionIds.map(c => parseInt(c))
-                                let forecast = monthArrayList.map(item => {
-                                    var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && regionIdArr.includes(c.region.regionId));
-                                    var sum = 0;
-                                    cd.map(c => { sum += c.consumptionQty });
-                                    return sum;
-                                });
                                 let actual = monthArrayList.map(item => {
                                     var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && regionIdArr.includes(c.region.regionId));
                                     var sum = 0;
@@ -1259,7 +1240,6 @@ class ConsumptionForecastError extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -1270,9 +1250,9 @@ class ConsumptionForecastError extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1281,7 +1261,6 @@ class ConsumptionForecastError extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -1335,7 +1314,6 @@ class ConsumptionForecastError extends Component {
     setVersionId(event) {
         var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
         versionId = parseInt(versionId);
-        var programId = this.state.programId;
         if (versionId != '' || versionId != undefined) {
             this.setState({
                 versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
@@ -1494,7 +1472,6 @@ class ConsumptionForecastError extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -1505,9 +1482,9 @@ class ConsumptionForecastError extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1515,7 +1492,6 @@ class ConsumptionForecastError extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -1702,7 +1678,7 @@ class ConsumptionForecastError extends Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
+                    label: function (tooltipItems) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -1731,7 +1707,6 @@ class ConsumptionForecastError extends Component {
             }
         }
         let bar = {}
-        var consumptionData = this.state.consumptionData;
         var actualConsumption = [];
         var forecastedConsumption = [];
         this.state.monthArrayList.map((item) => {
@@ -1824,7 +1799,7 @@ class ConsumptionForecastError extends Component {
             }, this);
         const { regions } = this.state;
         let regionList = regions.length > 0
-            && regions.map((item, i) => {
+            && regions.map((item) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
             }, this);
         const pickerLang = {
@@ -2130,7 +2105,7 @@ class ConsumptionForecastError extends Component {
                                                                         <tr className="totalForecast">
                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                             <td align="left" className="sticky-col first-col clone" style={{ color: "#4f81bd" }}><b>{item1.label}</b></td>
-                                                                            {this.state.monthArrayList.map((item, index) => {
+                                                                            {this.state.monthArrayList.map((item) => {
                                                                                 t1.splice(0, t1.length)
                                                                                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
                                                                                 t2.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")

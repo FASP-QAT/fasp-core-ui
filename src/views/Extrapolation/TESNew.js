@@ -46,7 +46,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                     calculateError(output, "tesError", props);
                 }
             }
-        }).catch(error => {
+        }).catch(() => {
             if (page == "DataEntry") {
                 var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateTESData(tesData);

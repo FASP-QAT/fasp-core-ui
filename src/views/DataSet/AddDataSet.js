@@ -35,19 +35,7 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 const entityname = i18n.t('static.program.programMaster');
-let initialValues = {
-    realmId: '',
-    realmCountryId: '',
-    healthAreaId: [],
-    organisationId: '',
-    programName: '',
-    programCode: '',
-    programCode1: '',
-    userId: '',
-    programNotes: '',
-    forecastProgramInMonth: ''
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
@@ -252,10 +240,10 @@ export default class AddForecastProgram extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    handleClickMonthBox2 = (e) => {
+    handleClickMonthBox2 = () => {
         this.pickRange.current.show()
     }
-    handleAMonthChange2 = (value, text) => {
+    handleAMonthChange2 = () => {
     }
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
@@ -268,10 +256,10 @@ export default class AddForecastProgram extends Component {
         }, () => {
         })
     }
-    handleClickMonthBox1 = (e) => {
+    handleClickMonthBox1 = () => {
         this.pickRange1.current.show()
     }
-    handleAMonthChange1 = (value, text) => {
+    handleAMonthChange1 = () => {
     }
     getRegionList() {
         ProgramService.getRegionList(document.getElementById('realmCountryId').value)
@@ -826,7 +814,7 @@ export default class AddForecastProgram extends Component {
                                     forecastProgramInMonth: this.state.forecastProgramInMonth
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -888,14 +876,11 @@ export default class AddForecastProgram extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched

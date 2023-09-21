@@ -15,7 +15,7 @@ const initialValues = {
   planningUnitId: ''
 }
 const entityname = i18n.t('static.problem.problem');
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     programId: Yup.string()
       .required(i18n.t('static.budget.programtext')),
@@ -92,7 +92,7 @@ class AddRoleComponent extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -104,13 +104,13 @@ class AddRoleComponent extends Component {
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
       var proList = []
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F'
         })
       }.bind(this);
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -136,13 +136,13 @@ class AddRoleComponent extends Component {
         var transactionP = db1.transaction(['problem'], 'readwrite');
         var problem = transactionP.objectStore('problem');
         var getRequestP = problem.getAll();
-        getRequestP.onerror = function (event) {
+        getRequestP.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F'
           })
         }.bind(this);
-        getRequestP.onsuccess = function (event) {
+        getRequestP.onsuccess = function () {
           var probList = [];
           probList = getRequestP.result;
           var filteredList = probList.filter(c => c.problemType.id != 1)
@@ -153,10 +153,9 @@ class AddRoleComponent extends Component {
   }
   getPlanningUnitList(event) {
     var db1;
-    var storeOS;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -167,27 +166,26 @@ class AddRoleComponent extends Component {
       var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
       var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
       var planningunitRequest = planningunitOs.getAll();
-      var planningList = []
-      planningunitRequest.onerror = function (event) {
+      planningunitRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F'
         })
       }.bind(this);
-      planningunitRequest.onsuccess = function (e) {
+      planningunitRequest.onsuccess = function () {
         var myResult = [];
         myResult = planningunitRequest.result;
         var planningUnitTransactionAll = db1.transaction(['planningUnit'], 'readwrite');
         var planningunitOsAll = planningUnitTransactionAll.objectStore('planningUnit');
         var planningunitRequestAll = planningunitOsAll.getAll();
         var planningUnitListAll = []
-        planningunitRequestAll.onerror = function (event) {
+        planningunitRequestAll.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F'
           })
         }.bind(this);
-        planningunitRequestAll.onsuccess = function (e) {
+        planningunitRequestAll.onsuccess = function () {
           planningUnitListAll = planningunitRequestAll.result;
           var programId = (document.getElementById("programId").value).split("_")[0];
           var proList = []
@@ -210,7 +208,7 @@ class AddRoleComponent extends Component {
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           var regionList = []
-          openRequest.onerror = function (event) {
+          openRequest.onerror = function () {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: '#BA0C2F'
@@ -221,13 +219,13 @@ class AddRoleComponent extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
               this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
               })
             }.bind(this);
-            programRequest.onsuccess = function (event) {
+            programRequest.onsuccess = function () {
               var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
               var programJson = JSON.parse(programData);
@@ -258,8 +256,7 @@ class AddRoleComponent extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    var regionList = []
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -274,7 +271,7 @@ class AddRoleComponent extends Component {
       var programTransaction = transaction.objectStore('programData');
       var programRequest = programTransaction.get(programId);
       var programRequestList = "";
-      programRequest.onerror = function (event) {
+      programRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F'
@@ -283,7 +280,7 @@ class AddRoleComponent extends Component {
             this.hideSecondComponent();
           })
       }.bind(this);
-      programRequest.onsuccess = function (event) {
+      programRequest.onsuccess = function () {
         programRequestList = programRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -297,7 +294,7 @@ class AddRoleComponent extends Component {
         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
         var planningunitRequest = planningunitOs.getAll();
         var planningUnitList = []
-        planningunitRequest.onerror = function (event) {
+        planningunitRequest.onerror = function () {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
           },
@@ -305,7 +302,7 @@ class AddRoleComponent extends Component {
               this.hideSecondComponent();
             })
         }.bind(this);
-        planningunitRequest.onsuccess = function (e) {
+        planningunitRequest.onsuccess = function () {
           var planningUnitResult = [];
           planningUnitResult = planningunitRequest.result;
           planningUnitList = planningUnitResult.filter(c => c.program.id == programId.split("_")[0]);
@@ -313,7 +310,7 @@ class AddRoleComponent extends Component {
           var transactionP = db1.transaction(['problem'], 'readwrite');
           var problem = transactionP.objectStore('problem');
           var getRequestP = problem.getAll();
-          getRequestP.onerror = function (event) {
+          getRequestP.onerror = function () {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: '#BA0C2F'
@@ -322,7 +319,7 @@ class AddRoleComponent extends Component {
                 this.hideSecondComponent();
               })
           }.bind(this);
-          getRequestP.onsuccess = function (event) {
+          getRequestP.onsuccess = function () {
             var probList = [];
             probList = getRequestP.result;
             var programObj = programJson;
@@ -423,7 +420,7 @@ class AddRoleComponent extends Component {
                 programObj.problemReportList = paList;
                 programRequestList.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programObj), SECRET_KEY)).toString();
                 var putRequest = problemOs.put(programRequestList);
-                putRequest.onerror = function (event) {
+                putRequest.onerror = function () {
                   this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
@@ -432,7 +429,7 @@ class AddRoleComponent extends Component {
                       this.hideSecondComponent();
                     })
                 }.bind(this);
-                putRequest.onsuccess = function (event) {
+                putRequest.onsuccess = function () {
                   var programId = document.getElementById("programId").value;
                   this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
                 }.bind(this);
@@ -447,7 +444,6 @@ class AddRoleComponent extends Component {
     }.bind(this);
   }
   render() {
-    const lan = 'en';
     const { programList } = this.state;
     let programs = programList.length > 0
       && programList.map((item, i) => {
@@ -479,22 +475,19 @@ class AddRoleComponent extends Component {
               <Formik
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   this.addProblem && this.addProblem();
                 }}
                 render={
                   ({
-                    values,
                     errors,
                     touched,
                     handleChange,
                     handleBlur,
                     handleSubmit,
-                    isSubmitting,
                     isValid,
                     setTouched,
                     handleReset,
-                    setFieldValue,
                   }) => (
                     <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
                       <CardBody className="pt-2 pb-0">

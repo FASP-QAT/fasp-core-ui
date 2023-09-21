@@ -47,7 +47,6 @@ export default class PipelineProgramFundingSource extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
-            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -60,14 +59,11 @@ export default class PipelineProgramFundingSource extends Component {
         }
     }
     checkValidation() {
-        var reg = /^[0-9\b]+$/;
-        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-            var currentFundingSource = this.el.getRowData(y)[1];
             if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -134,7 +130,6 @@ export default class PipelineProgramFundingSource extends Component {
                                     }
                                     this.el = jexcel(document.getElementById("mapFundingSource"), '');
                                     jexcel.destroy(document.getElementById("mapFundingSource"), true);
-                                    var json = [];
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
@@ -159,7 +154,7 @@ export default class PipelineProgramFundingSource extends Component {
                                         editable: true,
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
-                                        contextMenu: function (obj, x, y, e) {
+                                        contextMenu: function () {
                                             return false;
                                         }.bind(this),
                                         search: true,
@@ -267,7 +262,7 @@ export default class PipelineProgramFundingSource extends Component {
                 }
             );
     }
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    loadedJexcelCommonFunction = function (instance) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
     render() {

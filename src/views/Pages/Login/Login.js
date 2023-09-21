@@ -27,7 +27,7 @@ const initialValues = {
   emailId: "",
   password: ""
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     emailId: Yup.string()
       .email(i18n.t('static.user.invalidemail'))
@@ -86,7 +86,7 @@ class Login extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -97,14 +97,14 @@ class Login extends Component {
       var transaction = db1.transaction(['language'], 'readwrite');
       var program = transaction.objectStore('language');
       var getRequest1 = program.getAll();
-      getRequest1.onerror = function (event) {
+      getRequest1.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
-      getRequest1.onsuccess = function (event) {
+      getRequest1.onsuccess = function () {
         var languageList = [];
         languageList = getRequest1.result;
         this.setState({
@@ -118,7 +118,7 @@ class Login extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -128,17 +128,15 @@ class Login extends Component {
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var transaction = db1.transaction(['language'], 'readwrite');
-      var program = transaction.objectStore('language');
       delete axios.defaults.headers.common["Authorization"];
         MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
           var transaction = db1.transaction(['language'], 'readwrite');
           var program = transaction.objectStore('language');
           var json = (response.data);
           for (var i = 0; i < json.length; i++) {
-            var psuccess = program.put(json[i]);
           }
           this.getAllLanguages();
-        }).catch(error=>{
+        }).catch(()=>{
           this.getAllLanguages();  
         });
     }.bind(this)
@@ -210,7 +208,7 @@ class Login extends Component {
           })
         } else {
         }
-      }).catch(error => {
+      }).catch(() => {
         apiVersionForDisplay = "Offline"
         this.setState({
           apiVersionForDisplay: apiVersionForDisplay
@@ -318,7 +316,7 @@ class Login extends Component {
                       <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                           var emailId = values.emailId;
                           var password = values.password;
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
@@ -420,14 +418,11 @@ class Login extends Component {
                         }}
                         render={
                           ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
-                            isValid,
                             setTouched
                           }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">

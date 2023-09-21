@@ -35,15 +35,8 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import "../Forms/ValidationForms/ValidationForms.css";
-const initialValues = {
-  username: "",
-  realmId: [],
-  emailId: "",
-  orgAndCountry: "",
-  languageId: [],
-};
 const entityname = i18n.t("static.user.user");
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     username: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t("static.validSpace.string"))
@@ -56,7 +49,7 @@ const validationSchema = function (values) {
       .test(
         "roleValid",
         i18n.t("static.common.roleinvalidtext"),
-        function (value) {
+        function () {
           if (document.getElementById("roleValid").value == "false") {
             return true;
           }
@@ -652,8 +645,7 @@ class EditUserComponent extends Component {
       }
     }
   }.bind(this);
-  filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var mylist = [];
+  filterProgramByCountryId = function (instance, cell, c, r) {
     var value = this.state.addUserEL.getJson(null, false)[r][1];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
     var proList = [];
@@ -814,7 +806,6 @@ class EditUserComponent extends Component {
     }
     this.el = jexcel(document.getElementById("paputableDiv"), "");
     jexcel.destroy(document.getElementById("paputableDiv"), true);
-    var json = [];
     var data = papuDataArr;
     var options = {
       data: data,
@@ -866,7 +857,7 @@ class EditUserComponent extends Component {
       onpaste: this.onPaste,
       onload: this.loaded,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function (obj, x, y) {
         var items = [];
         if (y == null) {
           if (obj.options.allowInsertColumn == true) {
@@ -952,7 +943,7 @@ class EditUserComponent extends Component {
       loading1: false,
     });
   }
-  loaded = function (instance, cell, x, y, value) {
+  loaded = function (instance) {
     jExcelLoadedFunction(instance);
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1317,15 +1308,6 @@ class EditUserComponent extends Component {
     });
     const { realms } = this.state;
     const { languages } = this.state;
-    let realmList =
-      realms.length > 0 &&
-      realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        );
-      }, this);
     let languageList =
       languages.length > 0 &&
       languages.map((item, i) => {
@@ -1356,7 +1338,7 @@ class EditUserComponent extends Component {
                   roleId: this.state.user.roleList,
                 }}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   let isValid = this.checkValidation();
                   if (isValid) {
                     let user = this.state.user;
@@ -1504,14 +1486,11 @@ class EditUserComponent extends Component {
                   }
                 }}
                 render={({
-                  values,
                   errors,
                   touched,
                   handleChange,
                   handleBlur,
                   handleSubmit,
-                  isSubmitting,
-                  isValid,
                   setTouched,
                   setFieldValue,
                   setFieldTouched,

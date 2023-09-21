@@ -11,13 +11,8 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-const initialValues = {
-    roleName: "",
-    businessFunctions: [],
-    canCreateRole: []
-}
 const entityname = i18n.t('static.role.role');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         roleName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -355,7 +350,7 @@ class EditRoleComponent extends Component {
                                     canCreateRoles: this.state.role.canCreateRoles
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -414,14 +409,11 @@ class EditRoleComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched

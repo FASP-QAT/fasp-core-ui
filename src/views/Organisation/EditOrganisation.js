@@ -22,7 +22,7 @@ let initialValues = {
     organisationTypeId: '',
 }
 const entityname = i18n.t('static.organisation.organisation');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -462,7 +462,7 @@ export default class EditOrganisationComponent extends Component {
                                     organisationTypeId: this.state.organisation.organisationType.id,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -520,14 +520,11 @@ export default class EditOrganisationComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched

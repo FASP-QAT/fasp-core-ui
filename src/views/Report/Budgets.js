@@ -25,8 +25,6 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const ref = React.createRef();
-const entityname = i18n.t('static.dashboard.budget');
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -76,7 +74,6 @@ const chartoptions =
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-                let label = data.labels[tooltipItem.index];
                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             }
@@ -235,7 +232,6 @@ class Budgets extends Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
-        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -294,7 +290,6 @@ class Budgets extends Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         var canvas = document.getElementById("cool-canvas");
@@ -302,9 +297,8 @@ class Budgets extends Component {
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
-        const headers = columns.map((item, idx) => (item.text));
+        const headers = columns.map((item) => (item.text));
         const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -556,12 +550,12 @@ class Budgets extends Component {
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
-            && programs.map((item, i) => {
+            && programs.map((item) => {
                 return (
                     { label: (item.programCode), value: item.programId }
                 )
             }, this);
-        var budgets = this.state.selBudget.map((item, index) => (item.budget))
+        var budgets = this.state.selBudget.map((item) => (item.budget))
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
         let data1 = []
@@ -686,7 +680,7 @@ class Budgets extends Component {
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
                 formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
+                headerTitle: () => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
@@ -697,7 +691,7 @@ class Budgets extends Component {
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
                 formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
+                headerTitle: () => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
@@ -728,32 +722,6 @@ class Budgets extends Component {
                 style: { align: 'center', width: '100px' },
                 formatter: this.formatDate
             }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.selBudget.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -819,7 +787,7 @@ class Budgets extends Component {
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
                                             options={fundingSources.length > 0
-                                                && fundingSources.map((item, i) => {
+                                                && fundingSources.map((item) => {
                                                     return (
                                                         { label: item.code, value: item.id }
                                                     )
@@ -920,7 +888,7 @@ class Budgets extends Component {
                 parseFormulas: true,
                 editable: false,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y, e) {
+                contextMenu: function () {
                     return false;
                 }.bind(this),
             };
@@ -930,7 +898,7 @@ class Budgets extends Component {
             jexcel.destroy(document.getElementById("budgetTable"), true);
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
 }

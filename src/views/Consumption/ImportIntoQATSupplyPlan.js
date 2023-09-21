@@ -16,7 +16,6 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import StepOneImport from './StepOneImportIntoQATSP';
 import StepThreeImport from './StepThreeImportIntoQATSP';
 import StepTwoImport from './StepTwoImportIntoQATSP';
-const entityname = i18n.t('static.program.programMaster');
 export default class ImportIntoQATSupplyPlan extends Component {
     constructor(props) {
         super(props);

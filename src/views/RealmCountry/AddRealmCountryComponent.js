@@ -16,7 +16,7 @@ const initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: ""
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.realmcountry.validrealm')),
@@ -256,7 +256,7 @@ class AddRealmCountryComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     RealmCountryService.addRealmCountry(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -312,13 +312,11 @@ class AddRealmCountryComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
                                         isValid,
                                         setTouched
                                     }) => (

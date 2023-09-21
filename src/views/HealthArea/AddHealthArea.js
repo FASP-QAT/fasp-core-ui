@@ -16,12 +16,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.healtharea.healtharea');
-let initialValues = {
-  realmId: '',
-  healthAreaName: '',
-  realmCountryId: [],
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
@@ -487,7 +482,7 @@ export default class AddHealthAreaComponent extends Component {
                   realmCountryId: this.state.realmCountryId
                 }}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   if (this.state.healthArea.label.label_en != '') {
                     this.setState({
                       loading: true
@@ -547,14 +542,11 @@ export default class AddHealthAreaComponent extends Component {
                 }}
                 render={
                   ({
-                    values,
                     errors,
                     touched,
                     handleChange,
                     handleBlur,
                     handleSubmit,
-                    isSubmitting,
-                    isValid,
                     setTouched,
                     handleReset,
                     setFieldValue,

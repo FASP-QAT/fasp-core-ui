@@ -18,7 +18,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const initialValuesThree = {
     healthAreaId: []
 }
-const validationSchemaThree = function (values) {
+const validationSchemaThree = function () {
     return Yup.object().shape({
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
@@ -155,18 +155,16 @@ export default class StepThree extends Component {
                 <Formik
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.finishedStepThree && this.props.finishedStepThree();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
                             isValid,
                             setTouched,
                             handleReset,

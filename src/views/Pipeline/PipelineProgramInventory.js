@@ -32,7 +32,7 @@ export default class PipelineProgramInventory extends Component {
     stopLoading() {
         this.setState({ loading: false });
     }
-    dropdownFilter = function (instance, cell, c, r, source) {
+    dropdownFilter = function (instance, cell, c, r) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[c - 7];
@@ -369,7 +369,6 @@ export default class PipelineProgramInventory extends Component {
                                 }
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), '');
                                 jexcel.destroy(document.getElementById("inventorytableDiv"), true);
-                                var json = [];
                                 var data = inventoryDataArr;
                                 var options = {
                                     data: data,
@@ -432,7 +431,7 @@ export default class PipelineProgramInventory extends Component {
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
                                     filters: true,
-                                    contextMenu: function (obj, x, y, e) {
+                                    contextMenu: function () {
                                         return false;
                                     }.bind(this),
                                     search: true,
@@ -651,7 +650,7 @@ export default class PipelineProgramInventory extends Component {
             }
         );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -662,7 +661,7 @@ export default class PipelineProgramInventory extends Component {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         }
     }
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    loadedJexcelCommonFunction = function (instance) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
     render() {

@@ -27,7 +27,6 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 }
                 this.el = jexcel(document.getElementById("planningUnitList"), '');
                 jexcel.destroy(document.getElementById("planningUnitList"), true);
-                var json = [];
                 var data = dataArray;
                 var options = {
                     data: data,
@@ -56,7 +55,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     copyCompatibility: true,
                     onload: this.loaded,
                     filters: true,
-                    contextMenu: function (obj, x, y, e) {
+                    contextMenu: function () {
                         return false;
                     }.bind(this),
                     license: JEXCEL_PRO_KEY,
@@ -103,7 +102,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     render() {

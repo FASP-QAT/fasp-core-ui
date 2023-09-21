@@ -7,13 +7,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.planningunit.planningunit');
-let initialValues = {
-    label: '',
-    forecastingUnitId: '',
-    forecastingUnitList: [],
-    multiplier: ''
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -216,7 +210,7 @@ export default class EditPlanningUnitComponent extends Component {
                                     multiplier: this.state.planningUnit.multiplier
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -274,14 +268,11 @@ export default class EditPlanningUnitComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='planningUnitForm' autocomplete="off">

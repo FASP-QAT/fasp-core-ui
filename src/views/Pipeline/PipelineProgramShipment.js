@@ -1045,7 +1045,7 @@ export default class PipelineProgramShipment extends Component {
             allowDeleteRow: false,
             onchange: this.changed,
             copyCompatibility: true,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
             onload: this.loadedCommonFunctionJExcel,
@@ -1058,7 +1058,7 @@ export default class PipelineProgramShipment extends Component {
             loading: false
         })
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
@@ -1071,7 +1071,7 @@ export default class PipelineProgramShipment extends Component {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
     }
-    loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
+    loadedCommonFunctionJExcel = function (instance) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
     SubmitShipment() {

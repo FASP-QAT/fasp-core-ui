@@ -55,7 +55,7 @@ export default class uploadUserManual extends Component {
                 if (fileExtenstion[fileExtenstion.length - 1] == "pdf") {
                     var formData = new FormData();
                     formData.append("file", file);
-                    UserManualService.uploadUserManual(formData).then(response => {
+                    UserManualService.uploadUserManual(formData).then(() => {
                         this.setState({
                             message: 'static.uploadUserManual.uploadUserManualSuccess',
                             color: 'green',

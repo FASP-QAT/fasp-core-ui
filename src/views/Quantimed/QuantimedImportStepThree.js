@@ -22,7 +22,7 @@ let initialValuesThree = {
     regionId: '',
     regionConversionFactor: ''
 }
-const validationSchemaThree = function (values) {
+const validationSchemaThree = function () {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
@@ -86,10 +86,9 @@ class QuantimedImportStepThree extends Component {
         })
         var programId = this.props.items.program.programId;
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
@@ -101,12 +100,12 @@ class QuantimedImportStepThree extends Component {
             transaction = db1.transaction(['programData'], 'readwrite');
             programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
+            programRequest.onerror = function () {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
-            programRequest.onsuccess = function (event) {
+            programRequest.onsuccess = function () {
                 var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData.generalData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
@@ -168,7 +167,7 @@ class QuantimedImportStepThree extends Component {
                     enableReinitialize={true}
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         var percentage = this.state.region.regionConversionFactor / 100;
                         this.props.items.program.regionConversionFactor = percentage;
                         this.props.finishedStepThree && this.props.finishedStepThree();
@@ -176,14 +175,11 @@ class QuantimedImportStepThree extends Component {
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
-                            isValid,
                             setTouched
                         }) => (
                             <div className="animated fadeIn">

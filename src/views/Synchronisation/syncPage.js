@@ -41,7 +41,7 @@ const entityname = i18n.t('static.dashboard.commitVersion')
 const initialValues = {
   notes: ''
 }
-const validationSchema = function (values, t) {
+const validationSchema = function () {
   return Yup.object().shape({
     notes: Yup.string()
       .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
@@ -244,7 +244,7 @@ export default class syncPage extends Component {
       search: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
       columnSorting: false,
@@ -417,7 +417,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
       onload: this.loadedResolveConflictsInventory
@@ -602,7 +602,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
       onload: this.loadedResolveConflictsShipment
@@ -706,7 +706,7 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
       onload: this.loadedResolveConflictsProblem
@@ -957,10 +957,9 @@ export default class syncPage extends Component {
   generateDataAfterResolveConflictsForQPL() {
     this.setState({ loading: true });
     var db1;
-    var storeOS;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         supplyPlanError: i18n.t('static.program.errortext')
       })
@@ -972,7 +971,6 @@ export default class syncPage extends Component {
       if (actionList == undefined) {
         actionList = []
       }
-      var planningUnitList = [];
       var consumptionData = (this.state.oldProgramDataConsumption).filter(c => c.consumptionId != 0);
       var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
       var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
@@ -1165,12 +1163,10 @@ export default class syncPage extends Component {
       programJson.actionList = actionList;
       programJson.shipmentLinkingList = linkedShipmentListLocal.filter(c => (c.shipmentLinkingId > 0) || (c.shipmentLinkingId == 0 && c.active == true));
       var planningUnitDataListFromState = this.state.planningUnitDataList;
-      var updatedJson = [];
       var consumptionList = programJson.consumptionList;
       var inventoryList = programJson.inventoryList;
       var shipmentList = programJson.shipmentList;
       var batchInfoList = programJson.batchInfoList;
-      var problemReportList = programJson.problemReportList;
       var supplyPlan = programJson.supplyPlan;
       var generalData = programJson;
       delete generalData.consumptionList;
@@ -1201,12 +1197,12 @@ export default class syncPage extends Component {
       var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
       var programOs = programTransaction.objectStore('whatIfProgramData');
       var putRequest = programOs.put(proRequestResult);
-      putRequest.onerror = function (event) {
+      putRequest.onerror = function () {
         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
         this.props.updateState("color", "red");
         this.props.hideFirstComponent();
       }.bind(this);
-      putRequest.onsuccess = function (event) {
+      putRequest.onsuccess = function () {
         this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", false);
       }.bind(this);
     }.bind(this);
@@ -1215,7 +1211,7 @@ export default class syncPage extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         commitVersionError: i18n.t('static.program.errortext'),
         loading: false
@@ -1228,14 +1224,14 @@ export default class syncPage extends Component {
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
       var proList = [];
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
         this.setState({
           commitVersionError: i18n.t('static.program.errortext'),
           loading: false
         })
         this.hideSecondComponent()
       }.bind(this);
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1379,7 +1375,6 @@ export default class syncPage extends Component {
         if (response1.status == 200) {
           var lastModifiedDate = response1.data;
           var db1;
-          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -1387,7 +1382,7 @@ export default class syncPage extends Component {
             var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
             var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
             var lastSyncDateRequest = lastSyncDateTransaction.getAll();
-            lastSyncDateRequest.onsuccess = function (event) {
+            lastSyncDateRequest.onsuccess = function () {
               var lastSyncDate = lastSyncDateRequest.result[0];
               var result = lastSyncDateRequest.result;
               for (var i = 0; i < result.length; i++) {
@@ -1474,7 +1469,6 @@ export default class syncPage extends Component {
                 response.data = decompressJson(response.data);
                 AuthenticationService.setupAxiosInterceptors();
                 var db1;
-                var storeOS;
                 var realmCountryPlanningUnitList = []
                 var dataSourceList = []
                 var planningUnitList = []
@@ -1483,10 +1477,9 @@ export default class syncPage extends Component {
                 var fundingSourceList = []
                 var budgetList = []
                 var currencyList = []
-                var currencyListAll = []
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                   this.setState({
                     commitVersionError: i18n.t('static.program.errortext'),
                     loading: false
@@ -1498,14 +1491,14 @@ export default class syncPage extends Component {
                   var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                   var programDataOs = programDataTransaction.objectStore('programData');
                   var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                  programRequest.onerror = function (event) {
+                  programRequest.onerror = function () {
                     this.setState({
                       commitVersionError: i18n.t('static.program.errortext'),
                       loading: false
                     })
                     this.hideSecondComponent()
                   }.bind(this);
-                  programRequest.onsuccess = function (e) {
+                  programRequest.onsuccess = function () {
                     var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
                     var generalJson = JSON.parse(generalData);
@@ -1541,14 +1534,14 @@ export default class syncPage extends Component {
                       var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                       var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                       var rcpuRequest = rcpuOs.getAll();
-                      rcpuRequest.onerror = function (event) {
+                      rcpuRequest.onerror = function () {
                         this.setState({
                           commitVersionError: i18n.t('static.program.errortext'),
                           loading: false
                         })
                         this.hideSecondComponent()
                       }.bind(this);
-                      rcpuRequest.onsuccess = function (event) {
+                      rcpuRequest.onsuccess = function () {
                         var rcpuResult = [];
                         rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
                         for (var k = 0; k < rcpuResult.length; k++) {
@@ -1562,14 +1555,14 @@ export default class syncPage extends Component {
                         var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                         var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                         var dataSourceRequest = dataSourceOs.getAll();
-                        dataSourceRequest.onerror = function (event) {
+                        dataSourceRequest.onerror = function () {
                           this.setState({
                             commitVersionError: i18n.t('static.program.errortext'),
                             loading: false
                           })
                           this.hideSecondComponent()
                         }.bind(this);
-                        dataSourceRequest.onsuccess = function (event) {
+                        dataSourceRequest.onsuccess = function () {
                           var dataSourceResult = [];
                           dataSourceResult = dataSourceRequest.result;
                           for (var k = 0; k < dataSourceResult.length; k++) {
@@ -1584,13 +1577,13 @@ export default class syncPage extends Component {
                           var puOs = puTransaction.objectStore('planningUnit');
                           var puRequest = puOs.getAll();
                           planningUnitList = []
-                          puRequest.onerror = function (event) {
+                          puRequest.onerror = function () {
                             this.setState({
                               supplyPlanError: i18n.t('static.program.errortext'),
                               loading: false
                             })
                           }.bind(this);
-                          puRequest.onsuccess = function (e) {
+                          puRequest.onsuccess = function () {
                             var puResult = [];
                             puResult = puRequest.result;
                             for (var k = 0; k < puResult.length; k++) {
@@ -1603,14 +1596,14 @@ export default class syncPage extends Component {
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                             var shipmentStatusRequest = shipmentStatusOs.getAll();
-                            shipmentStatusRequest.onerror = function (event) {
+                            shipmentStatusRequest.onerror = function () {
                               this.setState({
                                 commitVersionError: i18n.t('static.program.errortext'),
                                 loading: false
                               })
                               this.hideSecondComponent()
                             }.bind(this);
-                            shipmentStatusRequest.onsuccess = function (event) {
+                            shipmentStatusRequest.onsuccess = function () {
                               var shipmentStatusResult = [];
                               shipmentStatusResult = shipmentStatusRequest.result.filter(c => c.active == true);
                               for (var k = 0; k < shipmentStatusResult.length; k++) {
@@ -1623,14 +1616,14 @@ export default class syncPage extends Component {
                               var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                               var papuOs = papuTransaction.objectStore('procurementAgent');
                               var papuRequest = papuOs.getAll();
-                              papuRequest.onerror = function (event) {
+                              papuRequest.onerror = function () {
                                 this.setState({
                                   commitVersionError: i18n.t('static.program.errortext'),
                                   loading: false
                                 })
                                 this.hideSecondComponent()
                               }.bind(this);
-                              papuRequest.onsuccess = function (event) {
+                              papuRequest.onsuccess = function () {
                                 var papuResult = [];
                                 papuResult = papuRequest.result;
                                 for (var k = 0; k < papuResult.length; k++) {
@@ -1646,14 +1639,14 @@ export default class syncPage extends Component {
                                 var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                                 var fsOs = fsTransaction.objectStore('fundingSource');
                                 var fsRequest = fsOs.getAll();
-                                fsRequest.onerror = function (event) {
+                                fsRequest.onerror = function () {
                                   this.setState({
                                     commitVersionError: i18n.t('static.program.errortext'),
                                     loading: false
                                   })
                                   this.hideSecondComponent()
                                 }.bind(this);
-                                fsRequest.onsuccess = function (event) {
+                                fsRequest.onsuccess = function () {
                                   var fsResult = [];
                                   fsResult = fsRequest.result;
                                   for (var k = 0; k < fsResult.length; k++) {
@@ -1667,14 +1660,14 @@ export default class syncPage extends Component {
                                   var bOs = bTransaction.objectStore('budget');
                                   var bRequest = bOs.getAll();
                                   var budgetListAll = []
-                                  bRequest.onerror = function (event) {
+                                  bRequest.onerror = function () {
                                     this.setState({
                                       commitVersionError: i18n.t('static.program.errortext'),
                                       loading: false
                                     })
                                     this.hideSecondComponent()
                                   }.bind(this);
-                                  bRequest.onsuccess = function (event) {
+                                  bRequest.onsuccess = function () {
                                     var bResult = [];
                                     bResult = bRequest.result;
                                     for (var k = 0; k < bResult.length; k++) {
@@ -1697,14 +1690,14 @@ export default class syncPage extends Component {
                                     var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                     var currencyOs = currencyTransaction.objectStore('currency');
                                     var currencyRequest = currencyOs.getAll();
-                                    currencyRequest.onerror = function (event) {
+                                    currencyRequest.onerror = function () {
                                       this.setState({
                                         commitVersionError: i18n.t('static.program.errortext'),
                                         loading: false
                                       })
                                       this.hideSecondComponent()
                                     }.bind(this);
-                                    currencyRequest.onsuccess = function (event) {
+                                    currencyRequest.onsuccess = function () {
                                       var currencyResult = [];
                                       currencyResult = (currencyRequest.result).filter(c => c.active == true);
                                       for (var k = 0; k < currencyResult.length; k++) {
@@ -1884,7 +1877,7 @@ export default class syncPage extends Component {
                                                 onload: this.loadedFunctionForMerge,
                                                 filters: true,
                                                 license: JEXCEL_PRO_KEY,
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
                                                   if (rowData[18].toString() == 1) {
@@ -2044,7 +2037,7 @@ export default class syncPage extends Component {
                                                 onload: this.loadedFunctionForMergeInventory,
                                                 filters: true,
                                                 license: JEXCEL_PRO_KEY,
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
                                                   if (rowData[19].toString() == 1) {
@@ -2204,7 +2197,7 @@ export default class syncPage extends Component {
                                                 onload: this.loadedFunctionForMergeShipment,
                                                 filters: true,
                                                 license: JEXCEL_PRO_KEY,
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
                                                   if (rowData[36].toString() == 1) {
@@ -2251,7 +2244,6 @@ export default class syncPage extends Component {
                                                 var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
                                                 var arr = [];
                                                 var arr1 = [];
-                                                var arr2 = [];
                                                 var arrDownloaded = [];
                                                 if (listFromAPIFiltered.length > 0) {
                                                 } else {
@@ -2414,7 +2406,7 @@ export default class syncPage extends Component {
                                                 onload: this.loadedFunctionForMergeShipmentLinked,
                                                 filters: true,
                                                 license: JEXCEL_PRO_KEY,
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y);
                                                   if (rowData[21].toString() == 1) {
@@ -3256,7 +3248,7 @@ export default class syncPage extends Component {
     elInstance.orderBy(36, 0);
     elInstance.options.editable = false;
   }
-  getNote(row, lang) {
+  getNote(row) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
     if (transList.length == 0) {
       return ""
@@ -3580,25 +3572,18 @@ export default class syncPage extends Component {
                     <Formik
                       initialValues={initialValues}
                       validate={validate(validationSchema)}
-                      onSubmit={(values, { setSubmitting, setErrors }) => {
+                      onSubmit={(values) => {
                         this.synchronize()
                       }}
                       render={
                         ({
-                          values,
                           errors,
                           touched,
                           handleChange,
                           handleBlur,
                           handleSubmit,
-                          isSubmitting,
-                          isValid,
                           setTouched,
-                          handleReset,
-                          setFieldValue,
-                          setFieldTouched,
-                          setFieldError
-                        }) => (
+                          handleReset                        }) => (
                           <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                             <Col md="12 pl-0 pt-3">
                               <div className="d-md-flex">
@@ -3818,10 +3803,9 @@ export default class syncPage extends Component {
         this.setState({ loading: false });
       } else {
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
           })
@@ -3831,19 +3815,17 @@ export default class syncPage extends Component {
           var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
           var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
           var programRequest = programDataOs.get((this.state.programId).value);
-          programRequest.onerror = function (event) {
+          programRequest.onerror = function () {
             this.setState({
               supplyPlanError: i18n.t('static.program.errortext')
             })
           }.bind(this);
-          programRequest.onsuccess = function (e) {
+          programRequest.onsuccess = function () {
             var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
-            programQPLDetailsGetRequest.onsuccess = function (event) {
+            programQPLDetailsGetRequest.onsuccess = function () {
               var programQPLDetails = programQPLDetailsGetRequest.result;
-              var programIdForNotification = programQPLDetails.programId;
-              var versionIdForNotification = programQPLDetails.version;
               var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
               var generalJson = JSON.parse(generalData);
@@ -3933,7 +3915,6 @@ export default class syncPage extends Component {
                   var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
                   var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
                   programQPLDetails.readonly = 1;
-                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
                   localStorage.setItem("sesProgramId", "");
                   this.setState({
                     progressPer: 50
@@ -4042,7 +4023,7 @@ export default class syncPage extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: 'red'
@@ -4054,21 +4035,21 @@ export default class syncPage extends Component {
           var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
           var program = transaction.objectStore('programQPLDetails');
           var getRequest = program.get((this.state.programId).value);
-          getRequest.onerror = function (event) {
+          getRequest.onerror = function () {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
             })
             this.hideFirstComponent()
           }.bind(this);
-          getRequest.onsuccess = function (event) {
+          getRequest.onsuccess = function () {
             var myResult = [];
             myResult = getRequest.result;
             myResult.readonly = 0;
             var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
             var program1 = transaction1.objectStore('programQPLDetails');
             var getRequest1 = program1.put(myResult);
-            getRequest1.onsuccess = function (e) {
+            getRequest1.onsuccess = function () {
               this.setState({
                 message: i18n.t('static.commitVersion.commitFailed'),
                 color: 'red',
@@ -4080,7 +4061,7 @@ export default class syncPage extends Component {
         }.bind(this)
       }
     }).catch(
-      error => {
+      () => {
         this.redirectToDashbaord(commitRequestId)
       })
   }
@@ -4108,7 +4089,6 @@ export default class syncPage extends Component {
           var inventoryList = json[r].inventoryList;
           var shipmentList = json[r].shipmentList;
           var batchInfoList = json[r].batchInfoList;
-          var problemReportList = json[r].problemReportList;
           var supplyPlan = json[r].supplyPlan;
           var generalData = json[r];
           delete generalData.consumptionList;
@@ -4140,7 +4120,7 @@ export default class syncPage extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: 'red'
@@ -4152,14 +4132,14 @@ export default class syncPage extends Component {
           var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
           var program = transaction.objectStore('programQPLDetails');
           var getRequest = program.getAll();
-          getRequest.onerror = function (event) {
+          getRequest.onerror = function () {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
             })
             this.hideFirstComponent()
           }.bind(this);
-          getRequest.onsuccess = function (event) {
+          getRequest.onsuccess = function () {
             var myResult = [];
             myResult = getRequest.result;
             var userId = AuthenticationService.getLoggedInUserId();
@@ -4171,9 +4151,8 @@ export default class syncPage extends Component {
               if (checkIfProgramExists.length > 0) {
                 programIdToDelete = checkIfProgramExists[0].id;
               }
-              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
             }
-            programDataTransaction1.oncomplete = function (event) {
+            programDataTransaction1.oncomplete = function () {
               var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
               var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
               for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
@@ -4182,9 +4161,8 @@ export default class syncPage extends Component {
                 if (checkIfProgramExists.length > 0) {
                   programIdToDelete = checkIfProgramExists[0].id;
                 }
-                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
               }
-              programDataTransaction3.oncomplete = function (event) {
+              programDataTransaction3.oncomplete = function () {
                 var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                 var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                 for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
@@ -4193,9 +4171,8 @@ export default class syncPage extends Component {
                   if (checkIfProgramExists.length > 0) {
                     programIdToDelete = checkIfProgramExists[0].id;
                   }
-                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                 }
-                programDataTransaction2.oncomplete = function (event) {
+                programDataTransaction2.oncomplete = function () {
                   var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                   var programSaveData = transactionForSavingData.objectStore('programData');
                   for (var r = 0; r < json.length; r++) {
@@ -4216,9 +4193,8 @@ export default class syncPage extends Component {
                       programCode: json[r].programCode,
                     };
                     programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
-                    var putRequest = programSaveData.put(item);
                   }
-                  transactionForSavingData.oncomplete = function (event) {
+                  transactionForSavingData.oncomplete = function () {
                     var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                     for (var r = 0; r < json.length; r++) {
@@ -4236,9 +4212,8 @@ export default class syncPage extends Component {
                         programData: updatedJson[r],
                         userId: userId
                       };
-                      var putRequest = downloadedProgramSaveData.put(item);
                     }
-                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                    transactionForSavingDownloadedProgramData.oncomplete = function () {
                       var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                       var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                       var programIds = []
@@ -4255,9 +4230,8 @@ export default class syncPage extends Component {
                           readonly: 0
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                       }
-                      programQPLDetailsTransaction.oncomplete = function (event) {
+                      programQPLDetailsTransaction.oncomplete = function () {
                         this.setState({
                           progressPer: 100
                         })
@@ -4284,7 +4258,7 @@ export default class syncPage extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         commitVersionError: i18n.t('static.program.errortext'),
         loading: false
@@ -4297,14 +4271,14 @@ export default class syncPage extends Component {
       var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
       var value = (this.state.programId);
       var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-      programRequest.onerror = function (event) {
+      programRequest.onerror = function () {
         this.setState({
           commitVersionError: i18n.t('static.program.errortext'),
           loading: false
         })
         this.hideSecondComponent()
       }.bind(this);
-      programRequest.onsuccess = function (e) {
+      programRequest.onsuccess = function () {
         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
@@ -4492,7 +4466,7 @@ export default class syncPage extends Component {
           onload: this.loadedFunctionForMergeProblemList,
           filters: true,
           license: JEXCEL_PRO_KEY,
-          contextMenu: function (obj, x, y, e) {
+          contextMenu: function (obj, x, y) {
             var items = [];
             var rowData = obj.getRowData(y)
             if (rowData[20].toString() == 1) {

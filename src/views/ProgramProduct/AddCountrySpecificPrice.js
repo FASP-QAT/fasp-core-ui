@@ -57,7 +57,7 @@ class CountrySpecificPrices extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    filterProgram = function (instance, cell, c, r, source) {
+    filterProgram = function () {
         return this.state.procurementAgentArr.filter(c => c.active.toString() == "true");
     }.bind(this);
     componentDidMount() {
@@ -138,7 +138,6 @@ class CountrySpecificPrices extends Component {
                                 }
                                 this.el = jexcel(document.getElementById("paputableDiv"), '');
                                 jexcel.destroy(document.getElementById("paputableDiv"), true);
-                                var json = [];
                                 var data = papuDataArr;
                                 var options = {
                                     data: data,
@@ -207,7 +206,7 @@ class CountrySpecificPrices extends Component {
                                     allowManualInsertRow: false,
                                     license: JEXCEL_PRO_KEY,
                                     onload: this.loaded,
-                                    contextMenu: function (obj, x, y, e) {
+                                    contextMenu: function (obj, x, y) {
                                         var items = [];
                                         if (y == null) {
                                             if (obj.options.allowInsertColumn == true) {
@@ -442,7 +441,7 @@ class CountrySpecificPrices extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -451,7 +450,6 @@ class CountrySpecificPrices extends Component {
         elInstance.setValueFromCoords(7, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.programPlanningUnit.program.label.label_en;
         data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
@@ -562,16 +560,16 @@ class CountrySpecificPrices extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-    blur = function (instance) {
+    blur = function () {
     }
-    focus = function (instance) {
+    focus = function () {
     }
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
@@ -608,7 +606,7 @@ class CountrySpecificPrices extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
+    onedit = function (instance, cell, x, y) {
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
     checkValidation = function () {

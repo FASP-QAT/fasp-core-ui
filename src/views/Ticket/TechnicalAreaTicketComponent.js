@@ -15,15 +15,7 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    countryName: "",
-    technicalAreaName: "",
-    technicalAreaCode: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -487,7 +479,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                             notes: this.state.technicalArea.notes
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -555,14 +547,11 @@ export default class TechnicalAreaTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
-                                isValid,
                                 setTouched,
                                 handleReset,
                                 setFieldValue,

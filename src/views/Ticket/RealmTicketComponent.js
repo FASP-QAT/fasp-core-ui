@@ -7,16 +7,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Add Realm"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    realmCode: "",
-    minMosMinGaurdrail: "",
-    minMosMaxGaurdrail: "",
-    maxMosMaxGaurdrail: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -182,7 +173,7 @@ export default class RealmTicketComponent extends Component {
                             notes: this.state.realm.notes
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -250,14 +241,11 @@ export default class RealmTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
-                                isValid,
                                 setTouched,
                                 handleReset
                             }) => (

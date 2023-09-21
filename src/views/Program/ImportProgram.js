@@ -17,7 +17,6 @@ import {
     Input,
     Label
 } from 'reactstrap';
-import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText.js';
@@ -29,32 +28,6 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     programId: ''
-}
-const validationSchema = function (values) {
-    return Yup.object().shape({
-        programId: Yup.string()
-            .required(i18n.t('static.program.validselectprogramtext'))
-    })
-}
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 const entityname = i18n.t('static.dashboard.importprogram')
 export default class ImportProgram extends Component {
@@ -82,7 +55,7 @@ export default class ImportProgram extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -94,22 +67,20 @@ export default class ImportProgram extends Component {
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F',
                     loading: false
                 })
             }.bind(this);
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -160,9 +131,9 @@ export default class ImportProgram extends Component {
                     var program = transaction.objectStore('programData');
                     var count = 0;
                     var getRequest = program.getAll();
-                    getRequest.onerror = function (event) {
+                    getRequest.onerror = function () {
                     };
-                    getRequest.onsuccess = function (event) {
+                    getRequest.onsuccess = function () {
                         var myResult = [];
                         myResult = getRequest.result;
                         var programDataJson = this.state.programListArray;
@@ -293,42 +264,29 @@ export default class ImportProgram extends Component {
                                                 }
                                                 json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var addProgramDataRequest = program2.put(json);
-                                                addProgramDataRequest.onerror = function (event) {
+                                                addProgramDataRequest.onerror = function () {
                                                 };
-                                                addProgramDataRequest.onsuccess = function (event) {
+                                                addProgramDataRequest.onsuccess = function () {
                                                 };
-                                                transaction2.oncomplete = function (event) {
+                                                transaction2.oncomplete = function () {
                                                     var json1 = JSON.parse(fileData.split("@~-~@")[1]);
                                                     var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                     var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                     json1.userId = userId1;
                                                     json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
-                                                    var item = {
-                                                        id: json.programId + "_v" + json.version + "_uId_" + userId,
-                                                        programId: json.programId,
-                                                        version: json.version,
-                                                        userId: userId,
-                                                        programCode: programJson.programCode,
-                                                        openCount: openCount,
-                                                        addressedCount: addressedCount,
-                                                        programModified: programModified,
-                                                        readonly: readonly
-                                                    }
                                                     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                                    var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
-                                                    programQPLDetailsTransaction.oncomplete = function (event) {
+                                                    programQPLDetailsTransaction.oncomplete = function () {
                                                         var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
                                                         var program3 = transaction3.objectStore('downloadedProgramData');
                                                         var addProgramDataRequest1 = program3.put(json1);
-                                                        transaction3.oncomplete = function (event) {
+                                                        transaction3.oncomplete = function () {
                                                             this.setState({
                                                                 message: i18n.t('static.program.dataimportsuccess'),
                                                                 loading: false
                                                             })
                                                             let id = AuthenticationService.displayDashboardBasedOnRole();
                                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
-                                                            addProgramDataRequest1.onerror = function (event) {
+                                                            addProgramDataRequest1.onerror = function () {
                                                             };
                                                         }.bind(this)
                                                     }.bind(this)
@@ -459,31 +417,18 @@ export default class ImportProgram extends Component {
                                                                 }
                                                                 json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                                 var addProgramDataRequest = program2.put(json);
-                                                                addProgramDataRequest.onerror = function (event) {
+                                                                addProgramDataRequest.onerror = function () {
                                                                 };
                                                                 var json1 = JSON.parse(fileData.split("@~-~@")[1]);
                                                                 var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                                 json1.userId = userId1;
                                                                 json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1;
-                                                                var item = {
-                                                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
-                                                                    programId: json.programId,
-                                                                    version: json.version,
-                                                                    userId: userId,
-                                                                    programCode: programJson.programCode,
-                                                                    openCount: openCount,
-                                                                    addressedCount: addressedCount,
-                                                                    programModified: programModified,
-                                                                    readonly: readonly
-                                                                }
                                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
                                                                 var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
                                                                 var program3 = transaction3.objectStore('downloadedProgramData');
                                                                 var addProgramDataRequest1 = program3.put(json1);
-                                                                addProgramDataRequest1.onerror = function (event) {
+                                                                addProgramDataRequest1.onerror = function () {
                                                                 };
                                                             }
                                                         }
@@ -537,7 +482,7 @@ export default class ImportProgram extends Component {
                         var fileName = []
                         var programListArray = []
                         var size = 0;
-                        Object.keys(zip.files).forEach(function (filename) {
+                        Object.keys(zip.files).forEach(function () {
                             size++;
                         })
                         Object.keys(zip.files).forEach(function (filename) {

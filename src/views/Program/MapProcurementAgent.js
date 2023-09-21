@@ -11,11 +11,8 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-const initialValues = {
-    label: ""
-}
 const entityname = i18n.t('static.report.procurementAgentName');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
     })
 }
@@ -204,7 +201,7 @@ export default class AddDimensionComponent extends Component {
                                         procurementAgentId: this.state.selectedProcurementAgentList
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -265,16 +262,11 @@ export default class AddDimensionComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
-                                        handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
-                                        handleReset,
                                         setFieldTouched,
                                         setFieldValue
                                     }) => (

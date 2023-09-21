@@ -164,7 +164,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
     componentDidMount() {
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 12 && !isNaN(rowData[12]) && rowData[12].toString().indexOf('.') != -1) {
@@ -181,10 +181,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
     }
     showShipmentData() {
-        var planningUnitId = document.getElementById("planningUnitId").value;
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
             actualProgramId: generalProgramJson.programId
@@ -200,7 +198,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var realmCountryPlanningUnitList = []
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
@@ -210,12 +208,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
             var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
             var rcpuRequest = rcpuOs.getAll();
-            rcpuRequest.onerror = function (event) {
+            rcpuRequest.onerror = function () {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
-            rcpuRequest.onsuccess = function (event) {
+            rcpuRequest.onsuccess = function () {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
@@ -242,12 +240,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
                 var shipmentStatusRequest = shipmentStatusOs.getAll();
-                shipmentStatusRequest.onerror = function (event) {
+                shipmentStatusRequest.onerror = function () {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                shipmentStatusRequest.onsuccess = function (event) {
+                shipmentStatusRequest.onsuccess = function () {
                     var shipmentStatusResult = [];
                     shipmentStatusResult = shipmentStatusRequest.result;
                     for (var k = 0; k < shipmentStatusResult.length; k++) {
@@ -262,12 +260,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                     var paOs = paTransaction.objectStore('procurementAgent');
                     var paRequest = paOs.getAll();
-                    paRequest.onerror = function (event) {
+                    paRequest.onerror = function () {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
-                    paRequest.onsuccess = function (event) {
+                    paRequest.onsuccess = function () {
                         var paResult = [];
                         paResult = paRequest.result;
                         var listArrays = [];
@@ -291,12 +289,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                         var papuRequest = papuOs.getAll();
-                        papuRequest.onerror = function (event) {
+                        papuRequest.onerror = function () {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                             this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
-                        papuRequest.onsuccess = function (event) {
+                        papuRequest.onsuccess = function () {
                             var papuResult = [];
                             papuResult = papuRequest.result;
                             this.setState({
@@ -305,12 +303,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                             var fsOs = fsTransaction.objectStore('fundingSource');
                             var fsRequest = fsOs.getAll();
-                            fsRequest.onerror = function (event) {
+                            fsRequest.onerror = function () {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                 this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
-                            fsRequest.onsuccess = function (event) {
+                            fsRequest.onsuccess = function () {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
                                 for (var k = 0; k < fsResult.length; k++) {
@@ -328,12 +326,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var bOs = bTransaction.objectStore('budget');
                                 var bRequest = bOs.getAll();
                                 var budgetListAll = []
-                                bRequest.onerror = function (event) {
+                                bRequest.onerror = function () {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                     this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
-                                bRequest.onsuccess = function (event) {
+                                bRequest.onsuccess = function () {
                                     var bResult = [];
                                     bResult = bRequest.result;
                                     budgetList.push({ id: '', name: i18n.t('static.common.select') });
@@ -367,12 +365,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                                     var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                                     var dataSourceRequest = dataSourceOs.getAll();
-                                    dataSourceRequest.onerror = function (event) {
+                                    dataSourceRequest.onerror = function () {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                         this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
-                                    dataSourceRequest.onsuccess = function (event) {
+                                    dataSourceRequest.onsuccess = function () {
                                         var dataSourceResult = [];
                                         dataSourceResult = dataSourceRequest.result;
                                         for (var k = 0; k < dataSourceResult.length; k++) {
@@ -391,12 +389,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                         var currencyOs = currencyTransaction.objectStore('currency');
                                         var currencyRequest = currencyOs.getAll();
-                                        currencyRequest.onerror = function (event) {
+                                        currencyRequest.onerror = function () {
                                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                             this.props.updateState("color", "#BA0C2F");
                                             this.props.hideFirstComponent();
                                         }.bind(this);
-                                        currencyRequest.onsuccess = function (event) {
+                                        currencyRequest.onsuccess = function () {
                                             var currencyResult = [];
                                             currencyResult = (currencyRequest.result);
                                             for (var k = 0; k < currencyResult.length; k++) {
@@ -755,9 +753,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 }.bind(this),
                                                 onpaste: this.onPaste,
                                                 onload: this.loadedShipments,
-                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                updateTable: function () {
                                                 }.bind(this),
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                     var items = [];
                                                     if (y != null) {
                                                         if (shipmentEditable) {
@@ -798,7 +796,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             }
                                                         }
                                                         var expectedDeliveryDate = moment(rowData[5]).add(1, 'months').format("YYYY-MM-DD");
-                                                        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                         if (rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && obj.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                             items.push({
                                                                 title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
@@ -813,27 +810,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 onclick: function () {
                                                                     var procurementAgent = rowData[7];
                                                                     var db1;
-                                                                    var storeOS;
                                                                     getDatabase();
                                                                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                                                                    openRequest.onerror = function (event) {
+                                                                    openRequest.onerror = function () {
                                                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                                                         this.props.updateState("color", "#BA0C2F");
                                                                         this.props.hideFirstComponent();
                                                                     }.bind(this);
                                                                     openRequest.onsuccess = function (e) {
                                                                         db1 = e.target.result;
-                                                                        var programJson = this.props.items.programJson;
                                                                         var generalProgramJson = this.props.items.generalProgramJson;
                                                                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                         var papuOs = papuTransaction.objectStore('procurementAgent');
                                                                         var papuRequest = papuOs.get(parseInt(procurementAgent));
-                                                                        papuRequest.onerror = function (event) {
+                                                                        papuRequest.onerror = function () {
                                                                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                                                             this.props.updateState("color", "#BA0C2F");
                                                                             this.props.hideFirstComponent();
                                                                         }.bind(this);
-                                                                        papuRequest.onsuccess = function (event) {
+                                                                        papuRequest.onsuccess = function () {
                                                                             var papuResult = [];
                                                                             papuResult = papuRequest.result;
                                                                             this.props.updateState("loading", true);
@@ -850,7 +845,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             var json = [];
                                                                             var shipmentDates = rowData[30];
                                                                             var shipmentStatus = rowData[4];
-                                                                            var emergencyOrder = rowData[15];
                                                                             var erpFlag = rowData[1];
                                                                             var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
                                                                             var expectedPlannedDate = "";
@@ -1025,15 +1019,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 allowExport: false,
                                                                                 onchange: this.shipmentDatesChanged,
                                                                                 editable: tableEditable,
-                                                                                onbeforepaste: function (obj, data, x, y) {
+                                                                                onbeforepaste: function () {
                                                                                     return false;
                                                                                 },
-                                                                                contextMenu: function (obj, x, y, e) {
+                                                                                contextMenu: function () {
                                                                                     return false;
                                                                                 },
                                                                                 license: JEXCEL_PRO_KEY,
                                                                                 onload: this.loadedShipmentDates,
-                                                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                                                updateTable: function (el, cell) {
                                                                                     var elInstance = el;
                                                                                     var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
                                                                                     cell.classList.add('readonly');
@@ -1283,45 +1277,45 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[10] = "";
         obj.insertRow(data);
     }
-    filterCurrency = function (instance, cell, c, r, source) {
+    filterCurrency = function () {
         return this.state.currencyList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterDataSourceList = function (instance, cell, c, r, source) {
+    filterDataSourceList = function () {
         return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterFundingSource = function (instance, cell, c, r, source) {
+    filterFundingSource = function () {
         return this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterProcurementAgent = function (instance, cell, c, r, source) {
+    filterProcurementAgent = function () {
         return this.state.procurementAgentList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
+    filterRealmCountryPlanningUnit = function () {
         return this.state.realmCountryPlanningUnitList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterShipmentStatus = function (instance, cell, c, r, source) {
+    filterShipmentStatus = function () {
         return this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
     }.bind(this)
-    loadedShipments = function (instance, cell, x, y, value) {
+    loadedShipments = function (instance, cell) {
         if (this.props.shipmentPage != "shipmentDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -1400,7 +1394,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("indexOfShipmentContainingBatch", -1);
         }
     }
-    onchangepage(el, pageNo, oldPageNo) {
+    onchangepage(el, pageNo) {
         var shipmentInstance = el;
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM']
@@ -1449,7 +1443,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    loadedQtyCalculator = function (instance, cell, x, y, value) {
+    loadedQtyCalculator = function (instance, cell, x, y) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1461,10 +1455,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
     }
-    loadedQtyCalculator1 = function (instance, cell, x, y, value) {
+    loadedQtyCalculator1 = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
-    budgetDropdownFilter = function (instance, cell, c, r, source) {
+    budgetDropdownFilter = function (instance, cell, c, r) {
         var mylist = [];
         var value = (this.state.shipmentsEl.getJson(null, false)[r])[16];
         if (value != "") {
@@ -1631,9 +1625,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             parseFormulas: true,
             onload: this.loadedBatchInfoShipment,
             license: JEXCEL_PRO_KEY,
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function () {
             }.bind(this),
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -1677,7 +1671,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedArrivedDate = "";
         var expectedDeliveryDate = rowData[5];
         var shipmentMode = rowData[6];
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
@@ -2053,7 +2046,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(17, y, "", true);
             if (valid == true) {
                 var budgetList = this.state.budgetListAll;
-                var receiveDate = rowData[5]
                 var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && [...new Set(b.programs.map(ele => ele.id))].includes(parseInt(this.state.programIdForBudget)) && b.active.toString() == "true");
                 if (mylist.length == 1) {
                     elInstance.setValueFromCoords(17, y, mylist[0].id, true);
@@ -2317,7 +2309,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         return valid;
     }
-    loadedBatchInfoShipment = function (instance, cell, x, y, value) {
+    loadedBatchInfoShipment = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -2325,7 +2317,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
-    batchInfoChangedShipment = function (instance, cell, x, y, value) {
+    batchInfoChangedShipment = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         this.props.updateState("shipmentValidationBatchError", "");
@@ -2395,14 +2387,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var map = new Map(Object.entries(json[y]));
             mapArray.push(map);
             var batchInfoList = this.state.batchInfoListAll;
-            var checkDuplicate = batchInfoList.filter(c =>
-                c.batchNo == map.get("0") &&
-                moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
-            )
-            var index = batchInfoList.findIndex(c =>
-                c.batchNo == map.get("0") &&
-                moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
-            );
             var checkDuplicateInMap = mapArray.filter(c =>
                 c.get("0") == map.get("0") &&
                 moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
@@ -2549,7 +2533,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.hideFifthComponent()
         }
     }
-    loadedShipmentDates = function (instance, cell, x, y, value) {
+    loadedShipmentDates = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -2567,10 +2551,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var procurementAgent = rowData[7];
         var shipmentDatesJson = rowData[30];
         var shipmentStatus = rowData[4];
-        var lastShipmentStatus = rowData[26];
         var addLeadTimes = 0;
         if (shipmentMode != "" && procurementAgent != "" && shipmentStatus != "") {
-            var programJson = this.props.items.programJson;
             var generalProgramJson = this.props.items.generalProgramJson;
             var papuResult = [];
             papuResult = this.state.procurementAgentListAll.filter(c => c.procurementAgentId == parseInt(procurementAgent))[0];
@@ -2579,7 +2561,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var approvedDate = shipmentDatesJson.approvedDate;
             var shippedDate = shipmentDatesJson.shippedDate;
             var arrivedDate = shipmentDatesJson.arrivedDate;
-            var receivedDate = shipmentDatesJson.receivedDate;
             var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
             if (rowData[8].toString() == "true") {
                 addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[3])[0].localProcurementLeadTime;
@@ -2628,7 +2609,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    shipmentDatesChanged = function (instance, cell, x, y, value) {
+    shipmentDatesChanged = function (instance, cell, x, y) {
         this.props.updateState("shipmentDatesError", "");
         this.props.updateState("shipmentDatesChangedFlag", 1);
         var elInstance = this.state.shipmentDatesTableEl;
@@ -2653,27 +2634,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var procurementAgent = rowData[6];
                     var shipmentStatus = rowData[4];
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
+                    openRequest.onerror = function () {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
-                        var programJson = this.props.items.programJson;
                         var generalProgramJson = this.props.items.generalProgramJson;
                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgent');
                         var papuRequest = papuOs.get(parseInt(procurementAgent));
-                        papuRequest.onerror = function (event) {
+                        papuRequest.onerror = function () {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                             this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
-                        papuRequest.onsuccess = function (event) {
+                        papuRequest.onsuccess = function () {
                             var papuResult = [];
                             papuResult = papuRequest.result;
                             var expectedDeliveryDate = rowDataForDates[6];
@@ -3019,7 +2998,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
                             }
                         }
-                        var totalCost = Number(elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + Number(elInstance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                         var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                         if (availableBudgetAmount < 0) {
@@ -3260,10 +3238,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var elInstance = this.state.shipmentsEl;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
@@ -3281,12 +3258,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
                 var programId = (document.getElementById("programId").value);
                 var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+                programRequest.onerror = function () {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                programRequest.onsuccess = function (event) {
+                programRequest.onsuccess = function () {
                     try {
                         var programDataJson = programRequest.result.programData;
                         var planningUnitDataList = programDataJson.planningUnitDataList;
@@ -3700,12 +3677,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                         programRequest.result.programData = programDataJson;
                         var putRequest = programTransaction.put(programRequest.result);
-                        putRequest.onerror = function (event) {
+                        putRequest.onerror = function () {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                             this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
-                        putRequest.onsuccess = function (event) {
+                        putRequest.onsuccess = function () {
                             var programId = (document.getElementById("programId").value)
                             var planningUnitId = (document.getElementById("planningUnitId").value)
                             var objectStore = "";
@@ -3739,7 +3716,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         });
         return (<div></div>)
     }
-    shipmentEditStart = function (instance, cell, x, y, value) {
+    shipmentEditStart = function (instance, cell, x, y) {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
         var elInstance = this.state.shipmentsEl;
         var rowData = elInstance.getRowData(y);
@@ -3877,12 +3854,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 allowExport: false,
                 editable: tableEditable,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y, e) {
+                contextMenu: function () {
                     return false;
                 },
                 onchange: this.shipmentQtyChanged,
                 onload: this.loadedQtyCalculator,
-                updateTable: function (el, cell, x, y, source, value, id) {
+                updateTable: function (el, cell, x, y) {
                     var elInstance = el;
                     var orderBasedOn = elInstance.getRowData(y)[3];
                     if (orderBasedOn == 1 || orderBasedOn == 3 || orderBasedOn == 4) {
@@ -3942,7 +3919,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     editable: true,
                     onload: this.loadedQtyCalculator1,
                     license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
+                    contextMenu: function () {
                         return false;
                     },
                 }

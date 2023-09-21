@@ -112,10 +112,9 @@ export default class ConsumptionDetails extends React.Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = [];
-            var shipStatusList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -132,9 +131,9 @@ export default class ConsumptionDetails extends React.Component {
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
                 var problemStatusRequest = problemStatusOs.getAll();
-                problemStatusRequest.onerror = function (event) {
+                problemStatusRequest.onerror = function () {
                 };
-                problemStatusRequest.onsuccess = function (e) {
+                problemStatusRequest.onsuccess = function () {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
                     var proListProblemStatus = []
@@ -182,9 +181,9 @@ export default class ConsumptionDetails extends React.Component {
                     var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
                     var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
                     var problemCategoryRequest = problemCategoryOs.getAll();
-                    problemCategoryRequest.onerror = function (event) {
+                    problemCategoryRequest.onerror = function () {
                     };
-                    problemCategoryRequest.onsuccess = function (e) {
+                    problemCategoryRequest.onsuccess = function () {
                         var myResultC = [];
                         myResultC = problemCategoryRequest.result;
                         var procList = []
@@ -203,7 +202,6 @@ export default class ConsumptionDetails extends React.Component {
                         this.setState({
                             problemCategoryList: procList
                         })
-                        var needToCalculate = this.props.match.params.calculate;
                         var programIdd = this.props.match.params.programId;
                         if (programIdd != '' && programIdd != undefined) {
                             this.setState({
@@ -268,7 +266,7 @@ export default class ConsumptionDetails extends React.Component {
             return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
         }
     }
-    filterProblemStatus = function (instance, cell, c, r, source) {
+    filterProblemStatus = function () {
         var hasRole = false;
         AuthenticationService.getLoggedInUserRole().map(c => {
             if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
@@ -307,7 +305,7 @@ export default class ConsumptionDetails extends React.Component {
         }
         return valid;
     }
-    rowChanged = function (instance, cell, x, y, value) {
+    rowChanged = function (instance, cell, x, y) {
         this.setState({ showUpdateButton: true });
         var elInstance = this.state.languageEl;
         var rowData = elInstance.getRowData(y);
@@ -342,7 +340,6 @@ export default class ConsumptionDetails extends React.Component {
             var isDataValid = this.checkValidation();
             if (isDataValid == true) {
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -351,16 +348,16 @@ export default class ConsumptionDetails extends React.Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var program = transaction.objectStore('programData');
                     var getRequest = program.get(programId.toString());
-                    getRequest.onerror = function (event) {
+                    getRequest.onerror = function () {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         });
                     };
-                    getRequest.onsuccess = function (event) {
+                    getRequest.onsuccess = function () {
                         var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
-                        programQPLDetailsGetRequest.onsuccess = function (event) {
+                        programQPLDetailsGetRequest.onsuccess = function () {
                             var programObj = getRequest.result;
                             var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -419,17 +416,17 @@ export default class ConsumptionDetails extends React.Component {
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
                             var putRequest = problemOs.put(programObj);
-                            putRequest.onerror = function (event) {
+                            putRequest.onerror = function () {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
                                     color: '#BA0C2F'
                                 })
                             }.bind(this);
-                            putRequest.onsuccess = function (event) {
+                            putRequest.onsuccess = function () {
                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetails);
-                                programQPLDetailsRequest.onsuccess = function (event) {
+                                programQPLDetailsRequest.onsuccess = function () {
                                     this.fetchData();
                                 }.bind(this);
                             }.bind(this);
@@ -513,7 +510,6 @@ export default class ConsumptionDetails extends React.Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = problemArray;
         var qplEditable = this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly;
         var options = {
@@ -647,7 +643,7 @@ export default class ConsumptionDetails extends React.Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -662,7 +658,7 @@ export default class ConsumptionDetails extends React.Component {
                 }
                 return items;
             }.bind(this),
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 var elInstance = el;
                 var lastY = -1;
                 if (y != null && lastY != y) {
@@ -790,13 +786,8 @@ export default class ConsumptionDetails extends React.Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = i18n.t('static.report.qatProblemActionReport');
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
         const headers = [];
         headers.push(i18n.t('static.planningunit.planningunit'));
         headers.push(i18n.t('static.problemActionReport.problemCategory'));
@@ -863,7 +854,7 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
@@ -871,7 +862,6 @@ export default class ConsumptionDetails extends React.Component {
             var colArr = ['U']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
-            var problemStatusId = rowData[12];
             if (criticalityId == 3) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
@@ -956,10 +946,7 @@ export default class ConsumptionDetails extends React.Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                var procurementAgentList = [];
-                var fundingSourceList = [];
-                var budgetList = [];
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                     this.setState({ loading: false });
                 };
                 openRequest.onsuccess = function (e) {
@@ -967,10 +954,10 @@ export default class ConsumptionDetails extends React.Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
-                    programRequest.onerror = function (event) {
+                    programRequest.onerror = function () {
                         this.setState({ loading: false });
                     };
-                    programRequest.onsuccess = function (event) {
+                    programRequest.onsuccess = function () {
                         this.setState({ loading: true },
                             () => {
                             })
@@ -1095,7 +1082,6 @@ export default class ConsumptionDetails extends React.Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
             && programList.map((item, i) => {
@@ -1105,7 +1091,7 @@ export default class ConsumptionDetails extends React.Component {
             }, this);
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
-            && problemStatusList.map((item, i) => {
+            && problemStatusList.map((item) => {
                 return ({ label: item.name, value: item.id })
             }, this);
         const { problemCategoryList } = this.state;
@@ -1140,7 +1126,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -1154,7 +1140,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1166,7 +1152,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '100px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format('MMM-YY');
                         return modifiedDate;
@@ -1180,7 +1166,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '100px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format('MMM-YY');
                         return modifiedDate;
@@ -1216,7 +1202,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '90px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1242,32 +1228,6 @@ export default class ConsumptionDetails extends React.Component {
                 formatter: this.buttonFormatter
             }
         ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.data.length
-            }]
-        }
         const columnsTrans = [
             {
                 dataField: 'problemStatus.label',
@@ -1276,7 +1236,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1295,7 +1255,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return cell == true ? i18n.t('static.program.yes') : i18n.t('static.program.no');
                 }
             },
@@ -1314,7 +1274,7 @@ export default class ConsumptionDetails extends React.Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return new moment(cell).format(DATE_FORMAT_CAP);
                 }
             },
@@ -1383,7 +1343,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
-                                                onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                onChange={() => { this.getProblemListAfterCalculation() }}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs}

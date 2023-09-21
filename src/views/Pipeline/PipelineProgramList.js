@@ -61,7 +61,6 @@ export default class PipelineProgramList extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = pipelineProgramArray;
         var options = {
             data: data,
@@ -102,7 +101,7 @@ export default class PipelineProgramList extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
             license: JEXCEL_PRO_KEY,
@@ -113,14 +112,14 @@ export default class PipelineProgramList extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    selected = function (instance, x1, y1, x2, y2, value) {
+    selected = function (instance, x1, y1, x2, y2) {
         if (y1 == y2) {
             this.props.history.push({
                 pathname: `/pipeline/pieplineProgramSetup/${this.el.getValueFromCoords(0, y1)}`,
             });
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -201,63 +200,6 @@ export default class PipelineProgramList extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns = [
-            {
-                dataField: 'PIPELINE_ID',
-                text: i18n.t('static.pipelineProgram.programId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'USERNAME',
-                text: i18n.t('static.pipelineProgram.user'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                dataField: 'FILE_NAME',
-                text: i18n.t('static.pipelineProgram.fileName'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                dataField: 'CREATED_DATE',
-                text: i18n.t('static.pipelineProgram.importDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.pipelineProgramList.length
-            }]
-        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

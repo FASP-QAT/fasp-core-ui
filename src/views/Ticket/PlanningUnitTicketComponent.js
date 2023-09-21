@@ -14,15 +14,7 @@ import 'react-select/dist/react-select.min.css';
 import '../Forms/ValidationForms/ValidationForms.css';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Add Planning Unit"
-const initialValues = {
-    summary: "",
-    planningUnitDesc: "",
-    forecastingUnitDesc: "",
-    unit: "",
-    multiplier: "",
-    notes: ""
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -292,7 +284,7 @@ export default class PlanningUnitTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                        onSubmit={(values) => {
                             this.setState({
                                 loading: true
                             })
@@ -360,13 +352,11 @@ export default class PlanningUnitTicketComponent extends Component {
                         }}
                         render={
                             ({
-                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
-                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset,

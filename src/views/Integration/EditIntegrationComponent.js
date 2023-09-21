@@ -7,14 +7,7 @@ import IntegrationService from '../../api/IntegrationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.integration.integration');
-let initialValues = {
-    realmId: '',
-    integrationName: '',
-    integrationViewId: '',
-    folderLocation: '',
-    fileName: ''
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         integrationName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -300,7 +293,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     fileName: this.state.integration.fileName,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -359,14 +352,11 @@ export default class UpdateDataSourceComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='integrationForm' autocomplete="off">

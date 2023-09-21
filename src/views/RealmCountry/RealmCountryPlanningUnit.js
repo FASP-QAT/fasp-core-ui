@@ -17,24 +17,6 @@ import RealmCountryService from "../../api/RealmCountryService";
 import UnitService from "../../api/UnitService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    planningUnit: {
-        id: '',
-        label: {
-            label_en: ''
-        }
-    }
-    , label: { label_en: '' },
-    skuCode: '',
-    unit: {
-        unitId: '',
-        label: {
-            label_en: ''
-        }
-    },
-    multiplier: '',
-    active: true
-}
 const entityname = i18n.t('static.dashboad.planningunitcountry')
 class PlanningUnitCountry extends Component {
     constructor(props) {
@@ -194,7 +176,6 @@ class PlanningUnitCountry extends Component {
                                             }
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
                                             jexcel.destroy(document.getElementById("paputableDiv"), true);
-                                            var json = [];
                                             var data = papuDataArr;
                                             var options = {
                                                 data: data,
@@ -249,7 +230,7 @@ class PlanningUnitCountry extends Component {
                                                     }
                                                 ],
                                                 onpaste: this.onPaste,
-                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                updateTable: function (el, cell, x, y) {
                                                     var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
                                                     var realmCountryPlanningUnitId = rowData[8];
@@ -261,9 +242,9 @@ class PlanningUnitCountry extends Component {
                                                         cell.classList.add('readonly');
                                                     }
                                                 },
-                                                onsearch: function (el) {
+                                                onsearch: function () {
                                                 },
-                                                onfilter: function (el) {
+                                                onfilter: function () {
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
@@ -288,7 +269,7 @@ class PlanningUnitCountry extends Component {
                                                     entries: '',
                                                 },
                                                 onload: this.loaded,
-                                                contextMenu: function (obj, x, y, e) {
+                                                contextMenu: function (obj, x, y) {
                                                     var items = [];
                                                     if (y == null) {
                                                         if (obj.options.allowInsertColumn == true) {
@@ -587,7 +568,6 @@ class PlanningUnitCountry extends Component {
             );
     }
     addRow = function () {
-        var json = this.el.getJson();
         var data = [];
         data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
         data[1] = "";
@@ -604,7 +584,6 @@ class PlanningUnitCountry extends Component {
         );
     };
     formSubmit = function () {
-        var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson();
@@ -690,7 +669,6 @@ class PlanningUnitCountry extends Component {
     }
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson();
-        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
@@ -709,7 +687,7 @@ class PlanningUnitCountry extends Component {
             return true;
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -721,9 +699,9 @@ class PlanningUnitCountry extends Component {
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[6].title = i18n.t("static.message.tooltipMultiplier")
     }
-    blur = function (instance) {
+    blur = function () {
     }
-    focus = function (instance) {
+    focus = function () {
     }
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
@@ -796,7 +774,7 @@ class PlanningUnitCountry extends Component {
             this.el.setValueFromCoords(9, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
+    onedit = function (instance, cell, x, y) {
         this.el.setValueFromCoords(9, y, 1, true);
     }.bind(this);
     checkValidation = function () {

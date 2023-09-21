@@ -9,13 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.currency.currencyMaster');
-let initialValues = {
-    currencyCode: '',
-    label: '',
-    conversionRate: '',
-    isSync: true
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         currencyCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
@@ -210,7 +204,7 @@ export default class UpdateCurrencyComponent extends Component {
                                     isSync: this.state.currency.isSync
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -268,14 +262,11 @@ export default class UpdateCurrencyComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='currencyForm' autocomplete="off">

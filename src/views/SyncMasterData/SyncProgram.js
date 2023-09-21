@@ -49,7 +49,7 @@ export default class SyncProgram extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
@@ -61,19 +61,18 @@ export default class SyncProgram extends Component {
             var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
-            var proList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var datasetTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var dataset = datasetTransaction.objectStore('datasetDetails');
                 var datasetGetRequest = dataset.getAll();
-                datasetGetRequest.onsuccess = function (event) {
+                datasetGetRequest.onsuccess = function () {
                     var myResult = [];
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -236,7 +235,7 @@ export default class SyncProgram extends Component {
                 }
             } else {
             }
-        }).catch(error => {
+        }).catch(() => {
         })
     }
     syncPrograms(programList) {
@@ -352,7 +351,7 @@ export default class SyncProgram extends Component {
                 }
             } else {
             }
-        }).catch(error => {
+        }).catch(() => {
         })
     }
     loadLatestVersionDataset(programIds, readonlyProgramToBeDeleted) {
@@ -366,11 +365,10 @@ export default class SyncProgram extends Component {
                 .then(response => {
                     response.data = decompressJson(response.data);
                     var json = response.data;
-                    var updatedJson = json;
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
+                    openRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
@@ -382,29 +380,26 @@ export default class SyncProgram extends Component {
                         var transaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var program = transaction.objectStore('datasetDetails');
                         var getRequest = program.getAll();
-                        getRequest.onerror = function (event) {
+                        getRequest.onerror = function () {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 color: 'red'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
-                        getRequest.onsuccess = function (event) {
+                        getRequest.onsuccess = function () {
                             var myResult = [];
                             myResult = getRequest.result;
-                            var userId = AuthenticationService.getLoggedInUserId();
                             var programDataTransaction1 = db1.transaction(['datasetData'], 'readwrite');
                             var programDataOs1 = programDataTransaction1.objectStore('datasetData');
                             for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                var programRequest1 = programDataOs1.delete(readonlyProgramToBeDeleted[dpd].id);
                             }
-                            programDataTransaction1.oncomplete = function (event) {
+                            programDataTransaction1.oncomplete = function () {
                                 var programDataTransaction3 = db1.transaction(['datasetDetails'], 'readwrite');
                                 var programDataOs3 = programDataTransaction3.objectStore('datasetDetails');
                                 for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                    var programRequest3 = programDataOs3.delete(readonlyProgramToBeDeleted[dpd].id);
                                 }
-                                programDataTransaction3.oncomplete = function (event) {
+                                programDataTransaction3.oncomplete = function () {
                                     var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('datasetData');
                                     for (var r = 0; r < json.length; r++) {
@@ -421,9 +416,8 @@ export default class SyncProgram extends Component {
                                             userId: userId,
                                             programCode: json[r].programCode,
                                         };
-                                        var putRequest = programSaveData.put(item);
                                     }
-                                    transactionForSavingData.oncomplete = function (event) {
+                                    transactionForSavingData.oncomplete = function () {
                                         var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                         var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                         var programIds = []
@@ -438,9 +432,8 @@ export default class SyncProgram extends Component {
                                                 readonly: 0
                                             };
                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                         }
-                                        programQPLDetailsTransaction.oncomplete = function (event) {
+                                        programQPLDetailsTransaction.oncomplete = function () {
                                             var syncedMasters = this.state.syncedMasters;
                                             this.setState({
                                                 syncedMasters: syncedMasters + 1,
@@ -461,7 +454,7 @@ export default class SyncProgram extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
@@ -473,14 +466,14 @@ export default class SyncProgram extends Component {
                 var transaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var program = transaction.objectStore('datasetDetails');
                 var getRequest = program.getAll();
-                getRequest.onerror = function (event) {
+                getRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                getRequest.onsuccess = function (event) {
+                getRequest.onsuccess = function () {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userId = AuthenticationService.getLoggedInUserId();
@@ -492,9 +485,8 @@ export default class SyncProgram extends Component {
                         if (checkIfProgramExists.length > 0) {
                             programIdToDelete = checkIfProgramExists[0].id;
                         }
-                        var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
                     }
-                    programDataTransaction1.oncomplete = function (event) {
+                    programDataTransaction1.oncomplete = function () {
                         var programDataTransaction3 = db1.transaction(['datasetDetails'], 'readwrite');
                         var programDataOs3 = programDataTransaction3.objectStore('datasetDetails');
                         for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
@@ -503,9 +495,8 @@ export default class SyncProgram extends Component {
                             if (checkIfProgramExists.length > 0) {
                                 programIdToDelete = checkIfProgramExists[0].id;
                             }
-                            var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
                         }
-                        programDataTransaction3.oncomplete = function (event) {
+                        programDataTransaction3.oncomplete = function () {
                             var syncedMasters = this.state.syncedMasters;
                             this.setState({
                                 syncedMasters: syncedMasters + 1,
@@ -539,7 +530,6 @@ export default class SyncProgram extends Component {
                         var inventoryList = json[r].inventoryList;
                         var shipmentList = json[r].shipmentList;
                         var batchInfoList = json[r].batchInfoList;
-                        var problemReportList = json[r].problemReportList;
                         var supplyPlan = json[r].supplyPlan;
                         var generalData = json[r];
                         delete generalData.consumptionList;
@@ -571,7 +561,7 @@ export default class SyncProgram extends Component {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
+                    openRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
@@ -583,35 +573,31 @@ export default class SyncProgram extends Component {
                         var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
                         var program = transaction.objectStore('programQPLDetails');
                         var getRequest = program.getAll();
-                        getRequest.onerror = function (event) {
+                        getRequest.onerror = function () {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 color: 'red'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
-                        getRequest.onsuccess = function (event) {
+                        getRequest.onsuccess = function () {
                             var myResult = [];
                             myResult = getRequest.result;
-                            var userId = AuthenticationService.getLoggedInUserId();
                             var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                             var programDataOs1 = programDataTransaction1.objectStore('programData');
                             for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                var programRequest1 = programDataOs1.delete(readonlyProgramToBeDeleted[dpd].id);
                             }
-                            programDataTransaction1.oncomplete = function (event) {
+                            programDataTransaction1.oncomplete = function () {
                                 var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
                                 var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
                                 for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                    var programRequest3 = programDataOs3.delete(readonlyProgramToBeDeleted[dpd].id);
                                 }
-                                programDataTransaction3.oncomplete = function (event) {
+                                programDataTransaction3.oncomplete = function () {
                                     var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                                     var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                                     for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                        var programRequest2 = programDataOs2.delete(readonlyProgramToBeDeleted[dpd].id);
                                     }
-                                    programDataTransaction2.oncomplete = function (event) {
+                                    programDataTransaction2.oncomplete = function () {
                                         var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                         var programSaveData = transactionForSavingData.objectStore('programData');
                                         for (var r = 0; r < json.length; r++) {
@@ -631,9 +617,8 @@ export default class SyncProgram extends Component {
                                                 userId: userId,
                                                 programCode: json[r].programCode,
                                             };
-                                            var putRequest = programSaveData.put(item);
                                         }
-                                        transactionForSavingData.oncomplete = function (event) {
+                                        transactionForSavingData.oncomplete = function () {
                                             var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                                             var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                             for (var r = 0; r < json.length; r++) {
@@ -651,9 +636,8 @@ export default class SyncProgram extends Component {
                                                     programData: updatedJson[r],
                                                     userId: userId
                                                 };
-                                                var putRequest = downloadedProgramSaveData.put(item);
                                             }
-                                            transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                            transactionForSavingDownloadedProgramData.oncomplete = function () {
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                                 var programIds = []
@@ -670,9 +654,8 @@ export default class SyncProgram extends Component {
                                                         readonly: 0
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 }
-                                                programQPLDetailsTransaction.oncomplete = function (event) {
+                                                programQPLDetailsTransaction.oncomplete = function () {
                                                     var syncedMasters = this.state.syncedMasters;
                                                     var pIds = this.state.programIds;
                                                     pIds = pIds.concat(programIds)
@@ -698,7 +681,7 @@ export default class SyncProgram extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
@@ -710,14 +693,14 @@ export default class SyncProgram extends Component {
                 var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
                 var program = transaction.objectStore('programQPLDetails');
                 var getRequest = program.getAll();
-                getRequest.onerror = function (event) {
+                getRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                getRequest.onsuccess = function (event) {
+                getRequest.onsuccess = function () {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userId = AuthenticationService.getLoggedInUserId();
@@ -729,9 +712,8 @@ export default class SyncProgram extends Component {
                         if (checkIfProgramExists.length > 0) {
                             programIdToDelete = checkIfProgramExists[0].id;
                         }
-                        var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
                     }
-                    programDataTransaction1.oncomplete = function (event) {
+                    programDataTransaction1.oncomplete = function () {
                         var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
                         for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
@@ -740,9 +722,8 @@ export default class SyncProgram extends Component {
                             if (checkIfProgramExists.length > 0) {
                                 programIdToDelete = checkIfProgramExists[0].id;
                             }
-                            var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
                         }
-                        programDataTransaction3.oncomplete = function (event) {
+                        programDataTransaction3.oncomplete = function () {
                             var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                             var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                             for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
@@ -751,9 +732,8 @@ export default class SyncProgram extends Component {
                                 if (checkIfProgramExists.length > 0) {
                                     programIdToDelete = checkIfProgramExists[0].id;
                                 }
-                                var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             }
-                            programDataTransaction2.oncomplete = function (event) {
+                            programDataTransaction2.oncomplete = function () {
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
                                     syncedMasters: syncedMasters + 1,

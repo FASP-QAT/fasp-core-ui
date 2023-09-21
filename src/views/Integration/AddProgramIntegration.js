@@ -49,7 +49,7 @@ class ProgramIntegration extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    filterVersionStatus = function (instance, cell, c, r, source) {
+    filterVersionStatus = function (instance, cell, c, r) {
         var rowData = (this.state.dataEL.getJson(null, false)[r]);
         return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
     }.bind(this);
@@ -168,7 +168,6 @@ class ProgramIntegration extends Component {
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
                                                     jexcel.destroy(document.getElementById("paputableDiv"), true);
-                                                    var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
@@ -209,7 +208,7 @@ class ProgramIntegration extends Component {
                                                                 type: 'hidden'
                                                             }
                                                         ],
-                                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                                        updateTable: function (el, cell, x, y) {
                                                             if (y != null) {
                                                                 var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
@@ -223,9 +222,9 @@ class ProgramIntegration extends Component {
                                                                 }
                                                             }
                                                         },
-                                                        onsearch: function (el) {
+                                                        onsearch: function () {
                                                         },
-                                                        onfilter: function (el) {
+                                                        onfilter: function () {
                                                         },
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
@@ -248,7 +247,7 @@ class ProgramIntegration extends Component {
                                                         license: JEXCEL_PRO_KEY,
                                                         editable: true,
                                                         onload: this.loaded,
-                                                        contextMenu: function (obj, x, y, e) {
+                                                        contextMenu: function (obj, x, y) {
                                                             var items = [];
                                                             if (y == null) {
                                                                 if (obj.options.allowInsertColumn == true) {
@@ -581,7 +580,6 @@ class ProgramIntegration extends Component {
             );
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.program.label.label_en;
         data[1] = "";
@@ -690,7 +688,7 @@ class ProgramIntegration extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -698,9 +696,9 @@ class ProgramIntegration extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-    blur = function (instance) {
+    blur = function () {
     }
-    focus = function (instance) {
+    focus = function () {
     }
     changed = function (instance, cell, x, y, value) {
         if(x==1 || x==2 || x==3 || x==4){
@@ -754,7 +752,7 @@ class ProgramIntegration extends Component {
             this.el.setValueFromCoords(6, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
+    onedit = function (instance, cell, x, y) {
         this.el.setValueFromCoords(6, y, 1, true);
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);

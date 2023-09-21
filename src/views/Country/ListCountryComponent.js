@@ -108,7 +108,6 @@ export default class CountryListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = countryArray;
         var options = {
             data: data,
@@ -168,7 +167,7 @@ export default class CountryListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -245,7 +244,7 @@ export default class CountryListComponent extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     selected = function (instance, cell, x, y, value, e) {
@@ -266,11 +265,6 @@ export default class CountryListComponent extends Component {
             entries: " ",
         });
         const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

@@ -15,12 +15,6 @@ import RealmCountryService from "../../api/RealmCountryService";
 import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    region: '',
-    capacityCBM: '',
-    label: '',
-    gln: '',
-}
 const entityname = i18n.t('static.dashboad.regioncountry')
 class RealmCountryRegion extends Component {
     constructor(props) {
@@ -116,7 +110,6 @@ class RealmCountryRegion extends Component {
                         }
                         this.el = jexcel(document.getElementById("paputableDiv"), '');
                         jexcel.destroy(document.getElementById("paputableDiv"), true);
-                        var json = [];
                         var data = papuDataArr;
                         var options = {
                             data: data,
@@ -180,7 +173,7 @@ class RealmCountryRegion extends Component {
                             oneditionend: this.oneditionend,
                             onload: this.loaded,
                             license: JEXCEL_PRO_KEY,
-                            contextMenu: function (obj, x, y, e) {
+                            contextMenu: function (obj, x, y) {
                                 var items = [];
                                 if (y == null) {
                                     if (obj.options.allowInsertColumn == true) {
@@ -367,7 +360,7 @@ class RealmCountryRegion extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -376,7 +369,6 @@ class RealmCountryRegion extends Component {
         this.el.setValueFromCoords(7, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
         data[1] = "";
@@ -492,7 +484,6 @@ class RealmCountryRegion extends Component {
     }
     checkDuplicateRegion = function () {
         var tableJson = this.el.getJson(null, false);
-        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
@@ -511,7 +502,7 @@ class RealmCountryRegion extends Component {
             return true;
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -583,7 +574,7 @@ class RealmCountryRegion extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
+    onedit = function (instance, cell, x, y) {
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
     checkValidation = function () {

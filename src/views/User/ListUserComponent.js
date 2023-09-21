@@ -33,7 +33,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.user.user')
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         username: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -45,7 +45,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validemail')),
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
-                function (value) {
+                function () {
                     if (document.getElementById("roleValid").value == "false") {
                         return true;
                     }
@@ -384,7 +384,6 @@ class ListUserComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = userArray;
         var options = {
             data: data,
@@ -457,7 +456,7 @@ class ListUserComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -496,10 +495,10 @@ class ListUserComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
-    loaded2 = function (instance, cell, x, y, value) {
+    loaded2 = function (instance) {
         jExcelLoadedFunction(instance, 1);
     }
     componentDidMount() {
@@ -688,16 +687,16 @@ class ListUserComponent extends Component {
                 }
             );
     }
-    showRealmLabel(cell, row) {
+    showRealmLabel(cell) {
         return cell.label.label_en;
     }
-    showRoleLabel(cell, row) {
+    showRoleLabel(cell) {
         return cell.label.label_en;
     }
-    showLanguageLabel(cell, row) {
+    showLanguageLabel(cell) {
         return cell.label.label_en;
     }
-    showStatus(cell, row) {
+    showStatus(cell) {
         if (cell) {
             return "Active";
         } else {
@@ -746,7 +745,6 @@ class ListUserComponent extends Component {
     }
     addRow1 = function () {
         var elInstance = this.state.table1Instance;
-        var json = elInstance.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -970,7 +968,6 @@ class ListUserComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         jexcel.destroy(document.getElementById("tableDiv1"), true);
-        var json = [];
         var data = userArray;
         var options = {
             data: data,
@@ -1050,7 +1047,7 @@ class ListUserComponent extends Component {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -1068,7 +1065,6 @@ class ListUserComponent extends Component {
     }
     addRow2 = function () {
         var elInstance = this.state.table2Instance;
-        var json = elInstance.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -1097,7 +1093,6 @@ class ListUserComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv2"), '');
         jexcel.destroy(document.getElementById("tableDiv2"), true);
-        var json = [];
         var data = userArray;
         var options = {
             data: data,
@@ -1149,7 +1144,7 @@ class ListUserComponent extends Component {
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
             editable: true,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -1189,11 +1184,6 @@ class ListUserComponent extends Component {
                 )
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1283,7 +1273,7 @@ class ListUserComponent extends Component {
                                     roleId: this.state.user.roleList
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         message: '',
                                         loading: true
@@ -1350,14 +1340,11 @@ class ListUserComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched

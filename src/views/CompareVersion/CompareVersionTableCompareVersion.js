@@ -98,7 +98,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -133,7 +132,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
         var columns = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        this.state.columns.filter(c => c.type != 'hidden').map((item) => { columns.push(item.title) });
         const headers2 = [
             { content: '', colSpan: 1 },
             { content: '', colSpan: 1 },
@@ -184,8 +183,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
-        var columns = [];
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)];
@@ -299,10 +296,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                 var pu2 = datasetData2.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                 var rg = regionList.filter(c => c.regionId == regionSet[k]);
                 var rg1 = regionList1.filter(c => c.regionId == regionSet[k]);
-                var rg2 = regionList2.filter(c => c.regionId == regionSet[k]);
-                var selectedForecastData = pu.length > 0 ? pu[0].selectedForecastMap : '';
-                var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
-                var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
                 var puFiltered = pu.filter(c => c.region.id == regionSet[k]);
                 var puFiltered1 = pu1.filter(c => c.region.id == regionSet[k]);
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
@@ -345,7 +338,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             editable: false,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 var items = [];
                 return items;
             }.bind(this),
@@ -406,7 +399,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             editable: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
             onload: this.loadedResolveConflicts
@@ -456,7 +449,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.props.updateState("json", elInstance.getJson(null, false));
         this.toggleLarge([], -1);
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
             var elInstance = instance.worksheets[0];

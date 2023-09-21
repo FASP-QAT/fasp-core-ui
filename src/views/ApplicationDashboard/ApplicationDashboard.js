@@ -31,73 +31,9 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const brandPrimary = getStyle('--primary')
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
-const options = {
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.dashboard.programCount')
-      }
-    }],
-    xAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.supplier.realm')
-      }
-    }],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false
-}
-const pie = {
-  labels: [
-    'Realm Name 1',
-    'Realm Name 2',
-    'Realm Name 3',
-  ],
-  datasets: [
-    {
-      data: [60, 40, 100, 20, 10],
-      backgroundColor: [
-        '#4dbd74',
-        '#c8ced3',
-        '#000',
-        '#ffc107',
-        '#f86c6b',
-      ],
-      hoverBackgroundColor: [
-        '#4dbd74',
-        '#c8ced3',
-        '#000',
-        '#ffc107',
-        '#f86c6b',
-      ],
-    }],
-};
-const bar = {
-  labels: [i18n.t('static.realm.realmName'), i18n.t('static.realm.realmName1'), i18n.t('static.realm.realmName2')],
-  datasets: [
-    {
-      label: i18n.t('static.graph.activeProgram'),
-      backgroundColor: '#118B70',
-      borderColor: 'rgba(179,181,198,1)',
-      pointBackgroundColor: 'rgba(179,181,198,1)',
-      pointBorderColor: '#fff',
-      barThickness: 150,
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(179,181,198,1)',
-      data: [65, 59, 89, 81, 56, 55, 40],
-    },
-  ],
-};
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -110,36 +46,6 @@ for (var i = 0; i <= elements; i++) {
   data2.push(random(80, 100));
   data3.push(65);
 }
-const mainChart = {
-  labels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-  datasets: [
-    {
-      label: 'My First dataset',
-      backgroundColor: hexToRgba(brandInfo, 10),
-      borderColor: brandInfo,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 2,
-      data: data1,
-    },
-    {
-      label: 'My Second dataset',
-      backgroundColor: 'transparent',
-      borderColor: brandSuccess,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 2,
-      data: data2,
-    },
-    {
-      label: 'My Third dataset',
-      backgroundColor: 'transparent',
-      borderColor: brandDanger,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 1,
-      borderDash: [8, 5],
-      data: data3,
-    },
-  ],
-};
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
@@ -212,22 +118,22 @@ class ApplicationDashboard extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
             }.bind(this);
             openRequest.onsuccess = function (e) {
               db1 = e.target.result;
               var transaction = db1.transaction(['programData'], 'readwrite');
               var programTransaction = transaction.objectStore('programData');
               var deleteRequest = programTransaction.delete(id);
-              deleteRequest.onsuccess = function (event) {
+              deleteRequest.onsuccess = function () {
                 var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
                 var programTransaction1 = transaction1.objectStore('downloadedProgramData');
                 var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
+                deleteRequest1.onsuccess = function () {
                   var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
                   var programTransaction2 = transaction2.objectStore('programQPLDetails');
                   var deleteRequest2 = programTransaction2.delete(id);
-                  deleteRequest2.onsuccess = function (event) {
+                  deleteRequest2.onsuccess = function () {
                     this.setState({
                       loading: false,
                       message: i18n.t("static.dashboard.programDeletedSuccessfully"),
@@ -272,18 +178,18 @@ class ApplicationDashboard extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            openRequest.onerror = function () {
             }.bind(this);
             openRequest.onsuccess = function (e) {
               db1 = e.target.result;
               var transaction = db1.transaction(['datasetData'], 'readwrite');
               var programTransaction = transaction.objectStore('datasetData');
               var deleteRequest = programTransaction.delete(id);
-              deleteRequest.onsuccess = function (event) {
+              deleteRequest.onsuccess = function () {
                 var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                 var programTransaction2 = transaction2.objectStore('datasetDetails');
                 var deleteRequest2 = programTransaction2.delete(id);
-                deleteRequest2.onsuccess = function (event) {
+                deleteRequest2.onsuccess = function () {
                   this.setState({
                     loading: false,
                     message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
@@ -373,7 +279,7 @@ class ApplicationDashboard extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: '#BA0C2F'
@@ -385,14 +291,14 @@ class ApplicationDashboard extends Component {
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
       var programList = [];
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -421,7 +327,7 @@ class ApplicationDashboard extends Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
+    openRequest.onerror = function () {
       this.setState({
         message: i18n.t('static.program.errortext'),
         color: 'red'
@@ -433,14 +339,14 @@ class ApplicationDashboard extends Component {
       var program = transaction.objectStore('datasetData');
       var getRequest = program.getAll();
       var datasetList = [];
-      getRequest.onerror = function (event) {
+      getRequest.onerror = function () {
         this.setState({
           message: i18n.t('static.program.errortext'),
           color: 'red',
           loading: false
         })
       }.bind(this);
-      getRequest.onsuccess = function (event) {
+      getRequest.onsuccess = function () {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -448,7 +354,6 @@ class ApplicationDashboard extends Component {
         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
         for (var i = 0; i < filteredGetRequestList.length; i++) {
           var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
-          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
           var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson1 = JSON.parse(programData);
@@ -622,129 +527,6 @@ class ApplicationDashboard extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    const columns = [
-      {
-        dataField: 'program.programCode',
-        text: i18n.t('static.program.program'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
-        dataField: 'versionId',
-        text: i18n.t('static.program.versionId'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
-        dataField: 'region.label',
-        text: i18n.t('static.region.region'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'planningUnit.label',
-        text: i18n.t('static.planningunit.planningunit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'dt',
-        text: i18n.t('static.report.month'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format('MMM-YY');
-            return modifiedDate;
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.label',
-        text: i18n.t('static.report.problemDescription'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.actionLabel',
-        text: i18n.t('static.report.suggession'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'problemStatus.label',
-        text: i18n.t('static.report.problemStatus'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.actionUrl',
-        text: i18n.t('static.common.action'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.buttonFormatter
-      }
-    ];
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t('static.common.first'),
-      prePageText: i18n.t('static.common.back'),
-      nextPageText: i18n.t('static.common.next'),
-      lastPageText: i18n.t('static.common.last'),
-      nextPageTitle: i18n.t('static.common.firstPage'),
-      prePageTitle: i18n.t('static.common.prevPage'),
-      firstPageTitle: i18n.t('static.common.nextPage'),
-      lastPageTitle: i18n.t('static.common.lastPage'),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [{
-        text: '10', value: 10
-      }, {
-        text: '30', value: 30
-      }
-        ,
-      {
-        text: '50', value: 50
-      },
-      {
-        text: 'All', value: this.state.problemActionList.length
-      }]
-    }
     const slides = this.state.users.map((item) => {
       return (
         <CarouselItem

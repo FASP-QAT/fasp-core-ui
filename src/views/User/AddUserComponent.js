@@ -44,14 +44,14 @@ let initialValues = {
   roleId: [],
 };
 const entityname = i18n.t("static.user.user");
-const validationSchema = function (values) {
+const validationSchema = function () {
   return Yup.object().shape({
     username: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t("static.validSpace.string"))
       .required(i18n.t("static.user.validusername")),
     showRealm: Yup.boolean(),
     realmId: Yup.string().when("showRealm", {
-      is: (val) => {
+      is: () => {
         return document.getElementById("showRealm").value === "true";
       },
       then: Yup.string().required(i18n.t("static.common.realmtext")),
@@ -61,7 +61,7 @@ const validationSchema = function (values) {
       .test(
         "roleValid",
         i18n.t("static.common.roleinvalidtext"),
-        function (value) {
+        function () {
           if (document.getElementById("roleValid").value == "false") {
             return true;
           }
@@ -690,8 +690,7 @@ class AddUserComponent extends Component {
       }
     }
   }.bind(this);
-  filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var mylist = [];
+  filterProgramByCountryId = function (instance, cell, c, r) {
     var value = this.state.addUserEL.getJson(null, false)[r][1];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
     var proList = [];
@@ -824,7 +823,6 @@ class AddUserComponent extends Component {
       };
       healthAreaList.unshift(paJson);
     }
-    var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
     if (papuDataArr.length == 0) {
@@ -837,7 +835,6 @@ class AddUserComponent extends Component {
       papuDataArr[0] = data;
     }
     jexcel.destroy(document.getElementById("paputableDiv"), true);
-    var json = [];
     var data = papuDataArr;
     var options = {
       data: data,
@@ -889,7 +886,7 @@ class AddUserComponent extends Component {
       onpaste: this.onPaste,
       onload: this.loaded,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function (obj, x, y) {
         var items = [];
         if (y == null) {
           if (obj.options.allowInsertColumn == true) {
@@ -975,7 +972,7 @@ class AddUserComponent extends Component {
       loading1: false,
     });
   }
-  loaded = function (instance, cell, x, y, value) {
+  loaded = function (instance) {
     jExcelLoadedFunction(instance);
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1327,7 +1324,7 @@ class AddUserComponent extends Component {
                 enableReinitialize={true}
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
-                onSubmit={(values, { setSubmitting, setErrors }) => {
+                onSubmit={(values) => {
                   let isValid = this.checkValidation();
                   if (isValid) {
                     let user = this.state.user;
@@ -1473,13 +1470,11 @@ class AddUserComponent extends Component {
                   }
                 }}
                 render={({
-                  values,
                   errors,
                   touched,
                   handleChange,
                   handleBlur,
                   handleSubmit,
-                  isSubmitting,
                   isValid,
                   setTouched,
                   handleReset,

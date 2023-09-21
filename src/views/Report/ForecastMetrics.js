@@ -39,37 +39,6 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const options = {
-  title: {
-    display: true,
-    text: i18n.t('static.dashboard.globalconsumption')
-  },
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.dashboard.consumption')
-      },
-      stacked: true,
-      ticks: {
-        beginAtZero: true
-      }
-    }]
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false
-  ,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-    }
-  }
-}
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -241,7 +210,6 @@ class ForecastMetrics extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
-    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
@@ -563,7 +531,6 @@ class ForecastMetrics extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), '');
     jexcel.destroy(document.getElementById("tableDiv"), true);
-    var json = [];
     var data = consumptionArray;
     var options = {
       data: data,
@@ -594,9 +561,9 @@ class ForecastMetrics extends Component {
         },
       ],
       editable: false,
-      onsearch: function (el) {
+      onsearch: function () {
       },
-      onfilter: function (el) {
+      onfilter: function () {
       },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
@@ -614,7 +581,7 @@ class ForecastMetrics extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
+      contextMenu: function () {
         return false;
       }.bind(this),
     };
@@ -624,7 +591,7 @@ class ForecastMetrics extends Component {
       languageEl: languageEl, loading: false
     })
   }
-  loaded = function (instance, cell, x, y, value) {
+  loaded = function (instance, cell) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
@@ -826,9 +793,9 @@ class ForecastMetrics extends Component {
         var Country = transaction.objectStore('CountryData');
         var getRequest = Country.getAll();
         var proList = []
-        getRequest.onerror = function (event) {
+        getRequest.onerror = function () {
         };
-        getRequest.onsuccess = function (event) {
+        getRequest.onsuccess = function () {
           var myResult = [];
           myResult = getRequest.result;
           var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -878,10 +845,10 @@ class ForecastMetrics extends Component {
             });
             this.setState({
               planningUnits: listArray,
-              planningUnitValues: listArray.map((item, i) => {
+              planningUnitValues: listArray.map((item) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
               }, this),
-              planningUnitLabels: listArray.map((item, i) => {
+              planningUnitLabels: listArray.map((item) => {
                 return (getLabelText(item.label, this.state.lang))
               }, this),
               message: ''
@@ -1062,10 +1029,10 @@ class ForecastMetrics extends Component {
       this.filterData();
     })
   }
-  handleClickMonthBox2 = (e) => {
+  handleClickMonthBox2 = () => {
     this.refs.pickAMonth2.show()
   }
-  handleAMonthChange2 = (value, text) => {
+  handleAMonthChange2 = () => {
   }
   handleAMonthDissmis2 = (value) => {
     this.setState({ singleValue2: value }, () => {
@@ -1092,7 +1059,7 @@ class ForecastMetrics extends Component {
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
+      && planningUnits.map((item) => {
         return (
           { label: getLabelText(item.label, this.state.lang), value: item.id }
         )
@@ -1100,96 +1067,17 @@ class ForecastMetrics extends Component {
     const { programLst } = this.state;
     let programList = [];
     programList = programLst.length > 0
-      && programLst.map((item, i) => {
+      && programLst.map((item) => {
         return (
           { label: item.code, value: item.id }
         )
       }, this);
     const { countrys } = this.state;
-    let countryList = countrys.length > 0 && countrys.map((item, i) => {
+    let countryList = countrys.length > 0 && countrys.map((item) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
-        return (
-          <option key={i} value={item.payload.productCategoryId}>
-            {getLabelText(item.payload.label, this.state.lang)}
-          </option>
-        )
-      }, this);
     const { tracerCategories } = this.state;
-    const columns = [
-      {
-        dataField: 'program.label',
-        text: i18n.t('static.program.program'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '420px' },
-        formatter: this.formatLabel
-      }, {
-        dataField: 'planningUnit.label',
-        text: i18n.t('static.dashboard.planningunit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '420px' },
-        formatter: this.formatLabel
-      }/*, {
-            dataField: 'historicalConsumptionDiff',
-            text: i18n.t('static.report.historicalConsumptionDiff'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-        }, {
-          dataField: 'historicalConsumptionActual',
-          text: i18n.t('static.report.historicalConsumptionActual'),
-          sort: true,
-          align: 'center',
-          headerAlign: 'center',
-      }*/, {
-        dataField: 'forecastError',
-        text: i18n.t('static.report.error'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '250px' },
-        formatter: this.formatValue
-      }, {
-        dataField: 'monthCount',
-        text: i18n.t('static.report.noofmonth'),
-        sort: true,
-        align: 'center',
-        style: { align: 'center', width: '250px' },
-        headerAlign: 'center',
-      }];
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t('static.common.first'),
-      prePageText: i18n.t('static.common.back'),
-      nextPageText: i18n.t('static.common.next'),
-      lastPageText: i18n.t('static.common.last'),
-      nextPageTitle: i18n.t('static.common.firstPage'),
-      prePageTitle: i18n.t('static.common.prevPage'),
-      firstPageTitle: i18n.t('static.common.nextPage'),
-      lastPageTitle: i18n.t('static.common.lastPage'),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [{
-        text: '10', value: 10
-      }, {
-        text: '30', value: 30
-      }
-        ,
-      {
-        text: '50', value: 50
-      },
-      {
-        text: 'All', value: this.state.consumptions.length
-      }]
-    };
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -1315,7 +1203,7 @@ class ForecastMetrics extends Component {
                           disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
-                            tracerCategories.map((item, i) => {
+                            tracerCategories.map((item) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
                             }, this) : []} />
                       </div>
@@ -1344,7 +1232,7 @@ class ForecastMetrics extends Component {
                             name="includeApprovedVersions"
                             id="includeApprovedVersions"
                             bsSize="sm"
-                            onChange={(e) => { this.filterData() }}
+                            onChange={() => { this.filterData() }}
                           >
                             <option value="true">{i18n.t('static.program.yes')}</option>
                             <option value="false">{i18n.t('static.program.no')}</option>

@@ -28,7 +28,7 @@ const initialValues = {
     fundingSourceList: [],
     currencyId: ''
 }
-const validationSchema = function (values, t) {
+const validationSchema = function () {
     return Yup.object().shape({
         budget: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -490,7 +490,7 @@ class AddBudgetComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -578,20 +578,16 @@ class AddBudgetComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset,
                                         setFieldValue,
-                                        setFieldTouched,
-                                        setFieldError
-                                    }) => (
+                                        setFieldTouched                                    }) => (
                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup className="Selectcontrol-bdrNone">

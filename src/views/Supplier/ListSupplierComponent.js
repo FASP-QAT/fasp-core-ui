@@ -53,7 +53,7 @@ class SupplierListComponent extends Component {
             });
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
     selected = function (instance, cell, x, y, value, e) {
@@ -105,7 +105,6 @@ class SupplierListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = supplierArray;
         var options = {
             data: data,
@@ -159,7 +158,7 @@ class SupplierListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function () {
                 return false;
             }.bind(this),
         };
@@ -296,11 +295,6 @@ class SupplierListComponent extends Component {
                 )
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

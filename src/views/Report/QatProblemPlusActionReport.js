@@ -56,10 +56,9 @@ export default class ConsumptionDetails extends React.Component {
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var proList = [];
-            var shipStatusList = []
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -89,7 +88,6 @@ export default class ConsumptionDetails extends React.Component {
     getPlanningUnitList(event) {
         const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -97,10 +95,9 @@ export default class ConsumptionDetails extends React.Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
+            planningunitRequest.onerror = function () {
             };
-            planningunitRequest.onsuccess = function (e) {
+            planningunitRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 var programId = (document.getElementById("programId").value).split("_")[0];
@@ -127,7 +124,6 @@ export default class ConsumptionDetails extends React.Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
             && programList.map((item, i) => {
@@ -149,7 +145,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -161,7 +157,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -173,7 +169,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -192,7 +188,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
                         return modifiedDate;
@@ -212,7 +208,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -224,7 +220,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -236,7 +232,7 @@ export default class ConsumptionDetails extends React.Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     if (cell != null && cell != "") {
                         return getLabelText(cell, this.state.lang);
                     }
@@ -387,7 +383,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
+                                                onClick: (e, row) => {
                                                     this.editProblem(row);
                                                 }
                                             }}

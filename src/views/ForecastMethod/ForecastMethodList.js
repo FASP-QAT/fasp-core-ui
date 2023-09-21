@@ -110,7 +110,6 @@ class forecastMethod extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -160,7 +159,7 @@ class forecastMethod extends Component {
                     type: 'hidden'
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -201,7 +200,7 @@ class forecastMethod extends Component {
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? true : false),
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -435,13 +434,11 @@ class forecastMethod extends Component {
     componentDidMount() {
         this.getForecastMethodTypeList();
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
-        var rowData = elInstance.getRowData(y);
         this.el.setValueFromCoords(7, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -560,7 +557,7 @@ class forecastMethod extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

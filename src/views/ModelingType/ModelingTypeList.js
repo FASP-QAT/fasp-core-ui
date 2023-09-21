@@ -78,7 +78,6 @@ class ScaleUpType extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -120,7 +119,7 @@ class ScaleUpType extends Component {
                     type: 'hidden'
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
+            updateTable: function (el, cell, x, y) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -153,7 +152,7 @@ class ScaleUpType extends Component {
             onload: this.loaded,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? true : false),
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
+            contextMenu: function (obj, x, y) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -261,13 +260,11 @@ class ScaleUpType extends Component {
     componentDidMount() {
         this.getModelingTypeData();
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
-        var rowData = elInstance.getRowData(y);
         this.el.setValueFromCoords(5, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -382,7 +379,7 @@ class ScaleUpType extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

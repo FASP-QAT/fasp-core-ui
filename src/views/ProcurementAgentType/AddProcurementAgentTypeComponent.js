@@ -11,11 +11,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.procurementagenttype')
-let initialValues = {
-    procurementAgentTypeCode: "",
-    procurementAgentTypeName: "",
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -222,7 +218,7 @@ class AddProcurementAgentTypeComponent extends Component {
                                         procurementAgentTypeName: this.state.procurementAgentType.label.label_en,
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -280,14 +276,11 @@ class AddProcurementAgentTypeComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         handleReset
                                     }) => (

@@ -17,7 +17,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const initialValuesFour = {
     organisationId: ''
 }
-const validationSchemaFour = function (values) {
+const validationSchemaFour = function () {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
@@ -152,18 +152,16 @@ export default class StepFour extends Component {
                 <Formik
                     initialValues={initialValuesFour}
                     validate={validateFour(validationSchemaFour)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.finishedStepFour && this.props.finishedStepFour();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
                             isValid,
                             setTouched,
                             handleReset

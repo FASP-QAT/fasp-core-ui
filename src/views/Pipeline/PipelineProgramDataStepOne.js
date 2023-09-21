@@ -17,7 +17,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const initialValues = {
     realmId: 1
 }
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -140,21 +140,15 @@ export default class PipelineProgramDataStepOne extends Component {
                 <Formik
                     initialValues={initialValues}
                     validate={validate(validationSchema)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.finishedStepOne && this.props.finishedStepOne();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
-                            handleChange,
                             handleBlur,
-                            handleSubmit,
-                            isSubmitting,
-                            isValid,
-                            setTouched
-                        }) => (
+                            handleSubmit                        }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>

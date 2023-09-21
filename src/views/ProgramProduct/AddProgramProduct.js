@@ -61,7 +61,7 @@ class AddprogramPlanningUnit extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
-    dropdownFilter = function (instance, cell, c, r, source) {
+    dropdownFilter = function (instance, cell, c, r) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
         var puList = []
@@ -303,7 +303,6 @@ class AddprogramPlanningUnit extends Component {
                                                         }
                                                         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                                         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                                        var json = [];
                                                         var data = productDataArr;
                                                         var options = {
                                                             data: data,
@@ -432,7 +431,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'hidden'
                                                                 }
                                                             ],
-                                                            updateTable: function (el, cell, x, y, source, value, id) {
+                                                            updateTable: function (el, cell, x, y) {
                                                                 var elInstance = el;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 var programPlanningUnitId = rowData[12];
@@ -463,9 +462,9 @@ class AddprogramPlanningUnit extends Component {
                                                                     cell1.classList.add('readonly');
                                                                 }
                                                             },
-                                                            onsearch: function (el) {
+                                                            onsearch: function () {
                                                             },
-                                                            onfilter: function (el) {
+                                                            onfilter: function () {
                                                             },
                                                             pagination: localStorage.getItem("sesRecordCount"),
                                                             filters: true,
@@ -485,7 +484,7 @@ class AddprogramPlanningUnit extends Component {
                                                             oneditionend: this.oneditionend,
                                                             onload: this.loaded,
                                                             license: JEXCEL_PRO_KEY,
-                                                            contextMenu: function (obj, x, y, e) {
+                                                            contextMenu: function (obj, x, y) {
                                                                 var items = [];
                                                                 if (y == null) {
                                                                     if (obj.options.allowInsertColumn == true) {
@@ -799,7 +798,6 @@ class AddprogramPlanningUnit extends Component {
         }
     }
     addRowInJexcel = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = "-1";
         data[1] = "";
@@ -824,7 +822,7 @@ class AddprogramPlanningUnit extends Component {
             data, 0, 1
         );
     }
-    oneditionend = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -1571,7 +1569,7 @@ class AddprogramPlanningUnit extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

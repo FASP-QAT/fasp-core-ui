@@ -149,7 +149,6 @@ export function dataCheck(props, datasetJson) {
     var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
     var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
     var curDate = startDate;
-    var nodeDataModelingList = datasetJson.nodeDataModelingList;
     var childrenWithoutHundred = [];
     var nodeWithPercentageChildren = [];
     for (var i = 0; curDate < stopDate; i++) {
@@ -342,7 +341,6 @@ export function buildJxl(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
     var treeScenarioListFilter = treeScenarioList;
-    var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
         var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == treeScenarioListFilter[tsl].treeId && c.scenarioId == treeScenarioListFilter[tsl].scenarioId);
         if (nodeWithPercentageChildren.length > 0) {
@@ -389,13 +387,12 @@ export function buildJxl(props) {
                 colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columnsArray,
-                onload: function (instance, cell, x, y, value) {
+                onload: function (instance) {
                     jExcelLoadedFunctionOnlyHideRow(instance);
                 },
-                updateTable: function (el, cell, x, y, source, value, id) {
+                updateTable: function (el, cell, x, y, source, value) {
                     if (y != null && x != 0) {
                         if (value != "100.00%") {
-                            var elInstance = el;
                             cell.classList.add('red');
                         }
                     }
@@ -415,7 +412,7 @@ export function buildJxl(props) {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 editable: false,
-                contextMenu: function (obj, x, y, e) {
+                contextMenu: function () {
                     return [];
                 }.bind(this),
             };
@@ -486,7 +483,6 @@ export function exportPDF(props) {
     const unit = "pt";
     const size = "A4"; 
     const orientation = "landscape"; 
-    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
@@ -514,7 +510,7 @@ export function exportPDF(props) {
     doc.setFont('helvetica', 'normal')
     {
         if (props.state.noForecastSelectedList.filter(c => c.regionList.length > 0).length > 0) {
-            props.state.noForecastSelectedList.map((item, i) => {
+            props.state.noForecastSelectedList.map((item) => {
                 item.regionList.map(item1 => {
                     planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, props.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
                     y = y + 3;
@@ -725,7 +721,7 @@ export function exportPDF(props) {
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                     y = y + 10;
                 }
-                item.flatList.length > 0 && item.flatList.map((item1, j) => {
+                item.flatList.length > 0 && item.flatList.map((item1) => {
                     doc.setFont('helvetica', 'normal')
                     doc.setTextColor("black")
                     planningText = doc.splitTextToSize(getLabelText(item1.payload.label, props.state.lang), doc.internal.pageSize.width * 3 / 4);
@@ -766,7 +762,7 @@ export function exportPDF(props) {
     }
     {
         if (props.state.treeScenarioList.length > 0 && props.state.treeScenarioListNotHaving100PerChild.length > 0) {
-            props.state.treeScenarioList.map((item1, count) => {
+            props.state.treeScenarioList.map((item1) => {
                 var height = doc.internal.pageSize.height - 50;
                 var h1 = 50;
                 var startY = y
@@ -872,7 +868,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item5, i) => {
+    props.state.datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item5) => {
         dataArr2.push([
             getLabelText(item5.planningUnit.label, props.state.lang),
             item5.consumptionNotes])
@@ -998,7 +994,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.dataValidation.scenarioNotes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.treeScenarioNotes.map((item5, i) => {
+    props.state.treeScenarioNotes.map((item5) => {
         dataArr2.push([
             getLabelText(item5.tree, props.state.lang),
             getLabelText(item5.scenario, props.state.lang),
@@ -1058,7 +1054,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item6, i) => {
+    props.state.treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item6) => {
         dataArr2.push([
             getLabelText(item6.tree, props.state.lang),
             getLabelText(item6.node, props.state.lang),

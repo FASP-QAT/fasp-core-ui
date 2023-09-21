@@ -82,7 +82,7 @@ export default class DatabaseTranslations extends React.Component {
                     onload: this.loaded,
                     filters: true,
                     license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
+                    contextMenu: function () {
                         return false;
                     }.bind(this),
                 };
@@ -138,7 +138,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         );
     };
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -294,7 +294,7 @@ export default class DatabaseTranslations extends React.Component {
             labelList: labelList
         })
     }.bind(this)
-    editStart = function (instance, cell, x, y, value) {
+    editStart = function (instance, cell, x, y) {
         this.setState({
             rowId: y
         })

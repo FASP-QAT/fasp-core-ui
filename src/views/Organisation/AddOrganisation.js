@@ -16,15 +16,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.organisation.organisation');
-let initialValues = {
-    realmId: '',
-    realmCountryId: [],
-    organisationCode: '',
-    organisationName: '',
-    organisationTypeId: '',
-    organisationTypeList: []
-}
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -550,14 +542,6 @@ export default class AddOrganisationComponent extends Component {
                     </option>
                 )
             }, this);
-        let countryList = selCountries.length > 0
-            && selCountries.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {item.country.label.label_en}
-                    </option>
-                )
-            }, this);
         const { organisationTypeList } = this.state;
         let organisationTypes = organisationTypeList.length > 0
             && organisationTypeList.map((item, i) => {
@@ -582,7 +566,7 @@ export default class AddOrganisationComponent extends Component {
                                     organisationTypeId: this.state.organisation.organisationType.id,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     if (this.state.organisation.organisationCode != '') {
                                         this.setState({
                                             loading: true
@@ -639,14 +623,11 @@ export default class AddOrganisationComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched,
                                         handleReset,
                                         setFieldValue,

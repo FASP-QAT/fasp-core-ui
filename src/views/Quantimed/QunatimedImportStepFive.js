@@ -21,32 +21,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import "../ProductCategory/style.css";
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-const initialValuesThree = {
-}
-const validationSchemaThree = function (values) {
-    return Yup.object().shape({
-    })
-}
-const validateThree = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorThree(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorThree = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class QunatimedImportStepFive extends Component {
     constructor(props) {
         super(props);
@@ -84,7 +58,7 @@ export default class QunatimedImportStepFive extends Component {
     }
     componentDidMount() {
     }
-    loaded_four = function (instance, cell, x, y, value) {
+    loaded_four = function (instance) {
         jExcelLoadedFunctionQuantimed(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -99,7 +73,7 @@ export default class QunatimedImportStepFive extends Component {
     redirectToDashbaord() {
         this.props.redirectToDashboard();
     }
-    changedImport = function (instance, cell, x, y, value) {
+    changedImport = function () {
     }
     monthDiff(dateFrom, dateTo) {
         return dateTo.getMonth() - dateFrom.getMonth() +
@@ -147,10 +121,9 @@ export default class QunatimedImportStepFive extends Component {
                             let moments = dates.map(d => moment(d));
                             var minDate = moment.min(moments).format("YYYY-MM-DD");
                             var db1;
-                            var storeOS;
                             getDatabase();
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                            openRequest.onerror = function (event) {
+                            openRequest.onerror = function () {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                 this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
@@ -163,12 +136,12 @@ export default class QunatimedImportStepFive extends Component {
                                 programTransaction = transaction.objectStore('programData');
                                 var programId = this.props.items.program.programId;
                                 var programRequest = programTransaction.get(programId);
-                                programRequest.onerror = function (event) {
+                                programRequest.onerror = function () {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                     this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
-                                programRequest.onsuccess = function (event) {
+                                programRequest.onsuccess = function () {
                                     var programDataJson = programRequest.result.programData;
                                     var planningUnitDataList = programDataJson.planningUnitDataList;
                                     var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
@@ -177,12 +150,12 @@ export default class QunatimedImportStepFive extends Component {
                                     var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                     var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                     var rcpuRequest = rcpuOs.getAll();
-                                    rcpuRequest.onerror = function (event) {
+                                    rcpuRequest.onerror = function () {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                         this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
-                                    rcpuRequest.onsuccess = function (event) {
+                                    rcpuRequest.onsuccess = function () {
                                         var rcpuResult = [];
                                         rcpuResult = rcpuRequest.result;
                                         var actionList = (generalProgramJson.actionList);
@@ -285,12 +258,12 @@ export default class QunatimedImportStepFive extends Component {
                                         transaction1 = db1.transaction(['programData'], 'readwrite');
                                         programTransaction1 = transaction1.objectStore('programData');
                                         var putRequest = programTransaction1.put(programRequest.result);
-                                        putRequest.onerror = function (event) {
+                                        putRequest.onerror = function () {
                                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                             this.props.updateState("color", "#BA0C2F");
                                             this.props.hideFirstComponent();
                                         }.bind(this);
-                                        putRequest.onsuccess = function (event) {
+                                        putRequest.onsuccess = function () {
                                             var finalQATPlanningList = [];
                                             for (var i = 0; i < finalImportQATData.length; i++) {
                                                 var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
@@ -340,10 +313,9 @@ export default class QunatimedImportStepFive extends Component {
         var dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
         var realmId = AuthenticationService.getRealmId();
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        openRequest.onerror = function () {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
@@ -353,7 +325,7 @@ export default class QunatimedImportStepFive extends Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
-            realmRequest.onsuccess = function (event) {
+            realmRequest.onsuccess = function () {
                 var realm = realmRequest.result;
                 var transaction;
                 var programTransaction;
@@ -361,12 +333,12 @@ export default class QunatimedImportStepFive extends Component {
                 programTransaction = transaction.objectStore('programData');
                 var programId = this.props.items.program.programId;
                 var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+                programRequest.onerror = function () {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                programRequest.onsuccess = function (event) {
+                programRequest.onsuccess = function () {
                     var finalImportQATData = dateFilter;
                     var finalQATPlanningList = [];
                     for (var i = 0; i < finalImportQATData.length; i++) {

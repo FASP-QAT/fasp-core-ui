@@ -16,10 +16,7 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValuesThree = {
-    healthAreaId: ''
-}
-const validationSchemaThree = function (values) {
+const validationSchemaThree = function () {
     return Yup.object().shape({
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
@@ -143,19 +140,16 @@ export default class PipelineProgramDataStepThree extends Component {
                         healthAreaId: this.props.items.program.healthAreaArray
                     }}
                     validate={validateThree(validationSchemaThree)}
-                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                    onSubmit={(values) => {
                         this.props.endProgramInfoStepTwo && this.props.endProgramInfoStepTwo();
                     }}
                     render={
                         ({
-                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
-                            isSubmitting,
-                            isValid,
                             setTouched,
                             setFieldValue
                         }) => (

@@ -7,11 +7,8 @@ import SupplierService from "../../api/SupplierService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
-let initialValues = {
-    supplier: ""
-}
 const entityname = i18n.t('static.supplier.supplier');
-const validationSchema = function (values) {
+const validationSchema = function () {
     return Yup.object().shape({
         supplier: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -189,7 +186,7 @@ class EditSupplierComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{ supplier: this.state.supplier.label.label_en }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -247,14 +244,11 @@ class EditSupplierComponent extends Component {
                                 }}
                                 render={
                                     ({
-                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        isSubmitting,
-                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='supplierForm' autocomplete="off">

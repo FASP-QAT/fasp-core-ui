@@ -116,7 +116,6 @@ class FunderExport extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -127,9 +126,9 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -137,7 +136,6 @@ class FunderExport extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -211,7 +209,6 @@ class FunderExport extends Component {
         }
     }
     consolidatedFundingSourceList = () => {
-        const lan = 'en';
         const { fundingSources } = this.state
         var proList = fundingSources;
         var db1;
@@ -222,13 +219,12 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['fundingSource'], 'readwrite');
             var fundingSource = transaction.objectStore('fundingSource');
             var getRequest = fundingSource.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     var f = 0
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
@@ -279,7 +275,6 @@ class FunderExport extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -290,9 +285,9 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
+            getRequest.onerror = function () {
             };
-            getRequest.onsuccess = function (event) {
+            getRequest.onsuccess = function () {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -300,7 +295,6 @@ class FunderExport extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -323,9 +317,7 @@ class FunderExport extends Component {
             planningUnits: []
         }, () => {
             if (versionId.includes('Local')) {
-                const lan = 'en';
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -333,10 +325,9 @@ class FunderExport extends Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
+                    planningunitRequest.onerror = function () {
                     };
-                    planningunitRequest.onsuccess = function (e) {
+                    planningunitRequest.onsuccess = function () {
                         var myResult = [];
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -526,7 +517,6 @@ class FunderExport extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size);
         doc.setFontSize(8);
         const headers = [];
@@ -560,11 +550,9 @@ class FunderExport extends Component {
         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0 && isPlannedShipmentId > 0) {
             if (versionId.includes('Local')) {
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
+                openRequest.onerror = function () {
                     this.setState({
                         message: i18n.t('static.program.errortext')
                     })
@@ -578,19 +566,19 @@ class FunderExport extends Component {
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function (event) {
+                    programRequest.onerror = function () {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function (e) {
+                    programRequest.onsuccess = function () {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var programTransaction = db1.transaction(['program'], 'readwrite');
                         var programOs = programTransaction.objectStore('program');
                         var program1Request = programOs.getAll();
-                        program1Request.onsuccess = function (event) {
+                        program1Request.onsuccess = function () {
                             var programResult = [];
                             programResult = program1Request.result;
                             let airFreight = 0;
@@ -771,7 +759,7 @@ class FunderExport extends Component {
             }, this);
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+            && planningUnits.map((item) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
             }, this);
         const { rangeValue } = this.state
@@ -782,7 +770,7 @@ class FunderExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -806,7 +794,7 @@ class FunderExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -832,7 +820,7 @@ class FunderExport extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell, row) => {
+                formatter: (cell) => {
                     return cell.toFixed(2);
                 }
             },
@@ -982,7 +970,7 @@ class FunderExport extends Component {
                                                 name="versionId"
                                                 id="versionId"
                                                 bsSize="sm"
-                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                                onChange={() => { this.getPlanningUnit(); }}
                                             >
                                                 <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {versionList}
