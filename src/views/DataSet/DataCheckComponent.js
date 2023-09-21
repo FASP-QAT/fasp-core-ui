@@ -200,7 +200,7 @@ console.log("Export datasetJson",datasetJson.consumptionExtrapolation);
                             }
                         )
                         if (i == 0) {
-                            var index = nodeWithPercentageChildren.findIndex(c => c.id == flatList[fl].id);
+                            var index = nodeWithPercentageChildren.findIndex(c => c.id == flatList[fl].id && c.treeId==PgmTreeList[tl].treeId && c.scenarioId==scenarioList[ndm].id);
                             if (index == -1) {
                                 nodeWithPercentageChildren.push(
                                     {
