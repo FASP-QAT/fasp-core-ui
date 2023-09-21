@@ -61,7 +61,7 @@ console.log("Export datasetJson",datasetJson.consumptionExtrapolation);
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
                         var regionId = datasetRegionList[drl].regionId;
                         if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
-                            if (treeNodeList.findIndex(c => c.nodeDataId == (nodeDataMap[scenarioList[ndm].id])[0].nodeDataId) == -1) {
+                            if (treeNodeList.findIndex(c => c.nodeDataId == (nodeDataMap[scenarioList[ndm].id])[0].nodeDataId && c.treeId==PgmTreeList[tl].treeId && c.scenarioId==scenarioList[ndm].id) == -1) {
                                 if (payload.nodeType.id == 5) {
                                     var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
                                     treePlanningUnitList.push(nodePlanningUnit);
