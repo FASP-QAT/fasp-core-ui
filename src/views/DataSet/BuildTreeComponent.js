@@ -10386,7 +10386,7 @@ export default class BuildTree extends Component {
                             console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             if (!this.state.isSubmitClicked) {
                                 console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-
+                                this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         console.log("inside set timeout on submit")
@@ -10399,7 +10399,8 @@ export default class BuildTree extends Component {
                                         }
                                         this.setState({
                                             cursorItem: 0,
-                                            highlightItem: 0
+                                            highlightItem: 0,
+                                            activeTab1: new Array(1).fill('1')
                                         })
                                     }, 0);
                                 })
