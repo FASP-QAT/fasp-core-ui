@@ -35,7 +35,7 @@
     "static.tooltip.CopyFromTemplate": "Utiliser un modèle pour remplir tous les champs ci-après. Modifiez-les sur l'écran Gestion des programmes > Modèle d'utilisation.",
     "static.procurementAgentPlanningUnit.unitPerPallet": "Unités par palette",
     "static.program.submittoapproveleadtime": "Délai entre la soumission et l`approbation (en mois)",
-    "static.supplyPlan.planMultiplePusByDate": "Planifier plusieurs UP par date",
+    "static.supplyPlan.planMultiplePusByDate": "Planifier les expéditions pour plusieurs PU par date",
     "static.currency.currencysymboltext": "Entrer le symbole de la devise",
     "static.supplyPlan.roundUp": "Arrondir à l`entier supérieur",
     "static.procurementAgentProcurementUnit.vendorPrice": "Prix ​​de l`agent d`approvisionnement (USD)",

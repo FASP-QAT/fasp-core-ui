@@ -976,6 +976,7 @@ class ShipmentSummery extends Component {
   getBudgetList() {
     const { budgets } = this.state;
     var programId = localStorage.getItem("sesProgramIdReport");
+    if(this.state.programId!="" && this.state.programId!=0 && programId!=""){
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       DropdownService.getBudgetDropdownBasedOnProgram(programId)
@@ -1114,6 +1115,31 @@ class ShipmentSummery extends Component {
         }.bind(this);
       }.bind(this);
     }
+  }else{
+    var budgetValuesFromProps = [];
+          var budgetLabelsFromProps = [];
+          if (
+            this.props.match.params.budgetId != "" &&
+            this.props.match.params.budgetId != undefined
+          ) {
+            budgetValuesFromProps.push({
+              label: this.props.match.params.budgetCode,
+              value: parseInt(this.props.match.params.budgetId),
+            });
+            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+          }
+    this.setState(
+      {
+        budgetValues: budgetValuesFromProps,
+        budgetLabels: budgetLabelsFromProps,
+        budgets: [],
+        filteredBudgetList: [],
+      },
+      () => {
+        this.fetchData();
+      }
+    );
+  }
   }
 
   handleFundingSourceChange = (fundingSourceIds) => {
@@ -1794,10 +1820,26 @@ class ShipmentSummery extends Component {
         });
       }
     } else {
+      var budgetValuesFromProps = [];
+          var budgetLabelsFromProps = [];
+          if (
+            this.props.match.params.budgetId != "" &&
+            this.props.match.params.budgetId != undefined
+          ) {
+            budgetValuesFromProps.push({
+              label: this.props.match.params.budgetCode,
+              value: parseInt(this.props.match.params.budgetId),
+            });
+            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+          }
       this.setState({
         versions: [],
         planningUnits: [],
         planningUnitValues: [],
+        budgetValues: budgetValuesFromProps,
+        budgetLabels: budgetLabelsFromProps,
+        budgets: [],
+        filteredBudgetList: [],
       });
     }
     this.fetchData();
