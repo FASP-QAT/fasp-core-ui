@@ -11790,7 +11790,24 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => {
+                                            if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
+                                                var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                                                if (cf == true) {
+                                                    this.setState({
+                                                        openAddNodeModal: false, cursorItem: 0, isChanged: false,
+                                                        highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                                    })
+                                                } else {
+                    
+                                                }
+                                            } else {
+                                                this.setState({
+                                                    openAddNodeModal: false, cursorItem: 0, isChanged: false,
+                                                    highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                                })
+                                            }
+                                        }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
@@ -12308,9 +12325,24 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({
-                                            showMomDataPercent: false
-                                        });
+                                        if (this.state.isChanged == true) {
+                                            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                                            if (cf == true) {
+                                                this.setState({
+                                                    isChanged: false,
+                                                    viewMonthlyData: true,
+                                                    showMomDataPercent: false
+                                                })
+                                            } else {
+                
+                                            }
+                                        } else {
+                                            this.setState({
+                                                isChanged: false,
+                                                viewMonthlyData: true,
+                                                showMomDataPercent: false
+                                            })
+                                        }
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
