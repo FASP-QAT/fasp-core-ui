@@ -1,22 +1,15 @@
 import React, { Component, lazy } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
     Col,
     Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter, Row
 } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, PROGRAM_TYPE_DATASET } from '../../Constants.js'
 import moment from "moment";
@@ -36,12 +29,6 @@ import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
 import DropdownService from '../../api/DropdownService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
-import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
-import FreightCost from '../../assets/img/FreightCost.png';
-import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
-import ProductCost from '../../assets/img/ProductCost.png';
-import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
-import TotalCost from '../../assets/img/TotalCost.png';
 import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/ForecastSummaryEn.html'
 import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
 import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
@@ -1087,7 +1074,7 @@ class ForecastSummary extends Component {
 
         if (versionId != 0 && programId > 0) {
             if (versionId == -1) {
-                // console.log("1------------------------");
+                // console.log("1----------insdie 1--------------",versionId);
                 this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
                 try {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1412,8 +1399,8 @@ class ForecastSummary extends Component {
                                     }
 
                                     totalForecastedQuantity0ri = (totalForecastedQuantity0ri);
-                                    if(!isForecastSelected){
-                                        totalForecastedQuantity0ri=null;
+                                    if (!isForecastSelected) {
+                                        totalForecastedQuantity0ri = null;
                                     }
 
 
@@ -1421,7 +1408,7 @@ class ForecastSummary extends Component {
                                     let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                     let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
                                     let planningUnit = planningUnitList[j].planningUnit;
-                                    let totalForecastedQuantity = totalForecastedQuantity0ri!=null?Number(totalForecastedQuantity0ri).toFixed(2):totalForecastedQuantity0ri;
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri != null ? Number(totalForecastedQuantity0ri).toFixed(2) : totalForecastedQuantity0ri;
                                     let stock1 = Number(planningUnitList[j].stock);
                                     let existingShipments = Number(planningUnitList[j].existingShipments);
                                     let stock2 = (Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - (Number(totalForecastedQuantity0ri));
@@ -1614,7 +1601,7 @@ class ForecastSummary extends Component {
                                                 } else {
                                                     totalForecast = null;
                                                 }
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast) : "";
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast != null ? Number(totalForecast) : "";
                                                 total += Number(filterForecastSelected != undefined ? Number(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
@@ -1759,26 +1746,15 @@ class ForecastSummary extends Component {
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.worksheets[0];
-                                            var json = elInstance.getJson(null, false);
-                                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-                                            for (var y = 0; y < json.length; y++) {
-                                                var rowData = elInstance.getRowData(y);
-                                                // console.log("RowData--------->1", rowData);
-                                                let rowDataSecondLast = rowData[rowData.length - 3];
-                                                // // console.log("RowData--------->2", rowDataSecondLast);
-                                                if (rowDataSecondLast == 1) {
-                                                    for (var r = 0; r < rowData.length; r++) {
-                                                        var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                        cell.classList.add('readonly');
-                                                        cell.classList.add('regionBold');
+                                            var rowElement = elInstance.records;
+                                            for (var r = 0; r < rowElement.length; r++) {
+                                                if (rowElement[r][0].v == 1) {
+                                                    for (var j = 0; j < rowElement[r].length; j++) {
+                                                        var ele = rowElement[r][j].element;
+                                                        ele.classList.add('readonly');
+                                                        ele.classList.add('regionBold');
                                                     }
                                                 }
-                                                // if (rowData[12] == 1) {
-                                                //     for (var r = 0; r < rowData.length; r++) {
-                                                //         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                //         cell.classList.add('readonly');
-                                                //     }
-                                                // }
                                             }
                                         },
                                         license: JEXCEL_PRO_KEY,
@@ -2082,18 +2058,13 @@ class ForecastSummary extends Component {
                                 onload: function (instance, cell, x, y, value) {
                                     jExcelLoadedFunctionOnlyHideRow(instance);
                                     var elInstance = instance.worksheets[0];
-                                    var json = elInstance.getJson(null, false);
-                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-                                    for (var y = 0; y < json.length; y++) {
-                                        var rowData = elInstance.getRowData(y);
-                                        // console.log("RowData--------->1", rowData);
-                                        let rowDataSecondLast = rowData[0];
-                                        // // console.log("RowData--------->2", rowDataSecondLast);
-                                        if (rowDataSecondLast == 1) {
-                                            for (var r = 0; r < rowData.length; r++) {
-                                                var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                cell.classList.add('readonly');
-                                                cell.classList.add('regionBold');
+                                    var rowElement = elInstance.records;
+                                    for (var r = 0; r < rowElement.length; r++) {
+                                        if (rowElement[r][0].v == 1) {
+                                            for (var j = 0; j < rowElement[r].length; j++) {
+                                                var ele = rowElement[r][j].element;
+                                                ele.classList.add('readonly');
+                                                ele.classList.add('regionBold');
                                             }
                                         }
                                     }
@@ -2415,8 +2386,8 @@ class ForecastSummary extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        programData.code=programData.programCode;
-                        programData.id=programData.programId;
+                        programData.code = programData.programCode;
+                        programData.id = programData.programId;
                         // console.log(programNameLabel)
 
                         var f = 0
@@ -3068,17 +3039,17 @@ class ForecastSummary extends Component {
                 // console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
                 if (json[j][(k + 1) * 3] != "") {
                     var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
-                    if(tsList.length>0){
-                    dataList.push({
-                        planningUnit: json[j][1],
-                        scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
-                        treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
-                        consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
-                        totalForecast: json[j][((k + 1) * 3) + 1],
-                        notes: json[j][((k + 1) * 3) + 2],
-                        region: this.state.regRegionList[k]
-                    })
-                }
+                    if (tsList.length > 0) {
+                        dataList.push({
+                            planningUnit: json[j][1],
+                            scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
+                            treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
+                            consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
+                            totalForecast: json[j][((k + 1) * 3) + 1],
+                            notes: json[j][((k + 1) * 3) + 2],
+                            region: this.state.regRegionList[k]
+                        })
+                    }
                 } else {
                     // console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
                     if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
