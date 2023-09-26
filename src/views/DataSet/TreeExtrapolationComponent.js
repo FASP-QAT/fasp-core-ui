@@ -1362,12 +1362,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 });
                             // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
                             if (startValList.length > 0 && endValList.length > 0) {
-                                console.log("In if for start value and end value length greater than 0 TEST123")
-                                var startVal = startValList[startValList.length - 1].amount;
+                                // console.log("startValList",startValList);
+                                var startVal = startValList[startValList.length - 1].adjustedActuals;
+                                // console.log("startValList startVal",startVal);                              
                                 // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startVal---", startVal);
                                 var startMonthVal = startValList[startValList.length - 1].month;
                                 // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startMonthVal---", startMonthVal);
-                                var endVal = endValList[0].amount;
+                                var endVal = endValList[0].adjustedActuals;
+                                // console.log("startValList endVal",endVal);                        
                                 // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
                                 // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
