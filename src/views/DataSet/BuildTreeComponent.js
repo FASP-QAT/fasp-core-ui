@@ -3978,10 +3978,10 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),2)`
-            data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
-            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),2)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
+            data[2] = parseFloat(momList[j].difference).toFixed(4)
+            data[3] = parseFloat(momList[j].manualChange).toFixed()
+            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -3989,7 +3989,7 @@ export default class BuildTree extends Component {
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
-            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`
+            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
