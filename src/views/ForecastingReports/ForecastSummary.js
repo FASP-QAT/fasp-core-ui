@@ -1724,7 +1724,7 @@ class ForecastSummary extends Component {
                                             var elInstance = instance.worksheets[0];
                                             var rowElement = elInstance.records;
                                             for (var r = 0; r < rowElement.length; r++) {
-                                                if (rowElement[r][0].v == 1) {
+                                                if (rowElement[r][6].v == 1) {
                                                     for (var j = 0; j < rowElement[r].length; j++) {
                                                         var ele = rowElement[r][j].element;
                                                         ele.classList.add('readonly');
@@ -2017,6 +2017,8 @@ class ForecastSummary extends Component {
                                     jExcelLoadedFunctionOnlyHideRow(instance);
                                     var elInstance = instance.worksheets[0];
                                     var rowElement = elInstance.records;
+                                    console.log("hello1")
+
                                     for (var r = 0; r < rowElement.length; r++) {
                                         if (rowElement[r][0].v == 1) {
                                             for (var j = 0; j < rowElement[r].length; j++) {
