@@ -122,7 +122,7 @@ export default class ConsumptionDetails extends React.Component {
             dataSourceVar.push(datasourceList[i].name);
         }
 
-        worksheet.dataValidations.add('E2:E100', {
+        worksheet.dataValidations.add('E2:E1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${dataSourceVar.join(",")}"`],
@@ -138,7 +138,7 @@ export default class ConsumptionDetails extends React.Component {
             regionVar.push(regionList[i].name);
         }
 
-        worksheet.dataValidations.add('C2:C100', {
+        worksheet.dataValidations.add('C2:C1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${regionVar.join(",")}"`],
@@ -148,7 +148,7 @@ export default class ConsumptionDetails extends React.Component {
         });
 
         let consumptionTypeDropdown = [i18n.t('static.consumption.actual'), i18n.t('static.consumption.forcast')];
-        worksheet.dataValidations.add('D2:D100', {
+        worksheet.dataValidations.add('D2:D1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${consumptionTypeDropdown.join(",")}"`],
@@ -179,7 +179,7 @@ export default class ConsumptionDetails extends React.Component {
 
         // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('L2:L1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
@@ -202,11 +202,11 @@ export default class ConsumptionDetails extends React.Component {
         //     // error: 'Invalid Value'
         // });
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('B' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
-        worksheet.dataValidations.add('G2:G100', {
+        worksheet.dataValidations.add('G2:G1000', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -216,7 +216,7 @@ export default class ConsumptionDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('J2:J100', {
+        worksheet.dataValidations.add('J2:J1000', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -227,7 +227,7 @@ export default class ConsumptionDetails extends React.Component {
         });
 
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('H' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
