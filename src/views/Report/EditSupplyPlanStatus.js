@@ -4670,7 +4670,7 @@ class EditSupplyPlanStatus extends Component {
                     });
                     if (obj.options.allowDeleteRow == true) {
                         // region id
-                        if (obj.getRowData(y)[12] == 0) {
+                        if (obj.getRowData(y)[0] == 0) {
                             items1.push({
                                 title: i18n.t("static.common.deleterow"),
                                 onclick: function () {
@@ -5843,7 +5843,7 @@ class EditSupplyPlanStatus extends Component {
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var validation = this.checkValidation();
-                                if (validation == true) {
+                                if (validation == false) {
                                 document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
@@ -5853,7 +5853,7 @@ class EditSupplyPlanStatus extends Component {
                                 var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
-
+                                    console.log("Hello", map)
                                     if (map.get("22") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
@@ -5866,6 +5866,33 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                     if (map.get("20") == false && map.get("12") != 4) {
                                         isAllCheckForReviewed = false
+                                    }
+                                    if(map.get("0") == 0){
+                                        reviewedProblemList.push({
+                                            problemReportId: 0,
+                                            realmProblem: {
+                                                realmProblemId: map.get("19") == 1 ? "25" : map.get("19") == 2 ? "26" : "27",
+                                                problemType: {
+                                                    id: "2"
+                                                }
+                                            },
+                                            program: {
+                                                id: this.props.match.params.programId
+                                            },
+                                            versionId: this.props.match.params.versionId,
+                                            problemStatus: {
+                                                id: "1"
+                                            },
+                                            dt: moment(new Date()).format("YYYY-MM-DD"),
+                                            region: {
+                                                id: ""
+                                            },
+                                            planningUnit: {
+                                                id: map.get("5")
+                                            },
+                                            data5: '{"problemDescription":"' + map.get("8") + '", "suggession":"' + map.get("9") + '"}',
+                                            notes: ""
+                                        })
                                     }
                                     // if (map.get("20") == 1) {
                                     //     reviewedProblemList.push({
@@ -6051,7 +6078,7 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {!this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                 {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
