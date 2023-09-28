@@ -387,13 +387,10 @@ class EditSupplyPlanStatus extends Component {
         data[21] = "";
         data[22] = "";
         data[23] = "";
-        console.log("Hello",this.el.getCells())
         this.el.insertRow(
             data, 0, 1
         );
         var cell = this.el.getCell(`F${parseInt(0) + 1}`)
-        cell.classList.remove("readonly");
-        var cell = this.el.getCell(`H${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
         var cell = this.el.getCell(`I${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
@@ -401,6 +398,9 @@ class EditSupplyPlanStatus extends Component {
         cell.classList.remove("readonly");
         var cell = this.el.getCell(`T${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
+        this.setState({
+            problemReportChanged: 1
+        })
 
     };
 
@@ -410,19 +410,7 @@ class EditSupplyPlanStatus extends Component {
         for (var y = 0; y < json.length; y++) {
 
             var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
+            var value = this.el.getValueFromCoords(5, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -434,7 +422,7 @@ class EditSupplyPlanStatus extends Component {
             }
 
             var col = ("I").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
+            var value = this.el.getValueFromCoords(8, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -446,7 +434,7 @@ class EditSupplyPlanStatus extends Component {
             }
 
             var col = ("J").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
+            var value = this.el.getValueFromCoords(9, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -458,7 +446,7 @@ class EditSupplyPlanStatus extends Component {
             }
 
             var col = ("T").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
+            var value = this.el.getValueFromCoords(19, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -487,18 +475,6 @@ class EditSupplyPlanStatus extends Component {
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             if (rowData1[5] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            if (rowData1[7] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -5843,7 +5819,7 @@ class EditSupplyPlanStatus extends Component {
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var validation = this.checkValidation();
-                                if (validation == false) {
+                                if (validation == true) {
                                 document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
@@ -5853,7 +5829,6 @@ class EditSupplyPlanStatus extends Component {
                                 var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
-                                    console.log("Hello", map)
                                     if (map.get("22") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
@@ -6078,8 +6053,8 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {!this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                 &nbsp;
