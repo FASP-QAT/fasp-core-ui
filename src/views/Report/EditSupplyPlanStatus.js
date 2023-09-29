@@ -373,10 +373,10 @@ class EditSupplyPlanStatus extends Component {
         data[7] = "";
         data[8] = "";
         data[9] = "";
-        data[10] = 1;
-        data[11] = "";
-        data[12] = 1;
-        data[13] = "";
+        data[10] = "";
+        data[11] = 1;
+        data[12] = "";
+        data[13] = 1;
         data[14] = "";
         data[15] = "";
         data[16] = "";
@@ -387,16 +387,19 @@ class EditSupplyPlanStatus extends Component {
         data[21] = "";
         data[22] = "";
         data[23] = "";
+        data[24] = "";
         this.el.insertRow(
             data, 0, 1
         );
-        var cell = this.el.getCell(`F${parseInt(0) + 1}`)
+        var cell = this.el.getCell(`B${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
-        var cell = this.el.getCell(`I${parseInt(0) + 1}`)
+        var cell = this.el.getCell(`G${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
         var cell = this.el.getCell(`J${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
-        var cell = this.el.getCell(`T${parseInt(0) + 1}`)
+        var cell = this.el.getCell(`K${parseInt(0) + 1}`)
+        cell.classList.remove("readonly");
+        var cell = this.el.getCell(`U${parseInt(0) + 1}`)
         cell.classList.remove("readonly");
         this.setState({
             problemReportChanged: 1
@@ -409,20 +412,8 @@ class EditSupplyPlanStatus extends Component {
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
-            var col = ("I").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(8, y);
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -445,8 +436,20 @@ class EditSupplyPlanStatus extends Component {
                 this.el.setComments(col, "");
             }
 
-            var col = ("T").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(19, y);
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(10, y);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("U").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(20, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -472,21 +475,9 @@ class EditSupplyPlanStatus extends Component {
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
         // console.log("problemList in changed method ***", problemList);
 
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            if (rowData1[5] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-
-        if (x == 8) {
-            var col = ("I").concat(parseInt(y) + 1);
-            if (rowData1[8] == "") {
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (rowData1[6] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -508,9 +499,21 @@ class EditSupplyPlanStatus extends Component {
             }
         }
 
-        if (x == 19) {
-            var col = ("T").concat(parseInt(y) + 1);
-            if (rowData1[19] == "") {
+        if (x == 10) {
+            var col = ("K").concat(parseInt(y) + 1);
+            if (rowData1[10] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 20) {
+            var col = ("U").concat(parseInt(y) + 1);
+            if (rowData1[20] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -521,18 +524,18 @@ class EditSupplyPlanStatus extends Component {
         }
 
         if(problemList.length > 0){
-        if (x == 10) {
+        if (x == 11) {
             if (problemList[0].problemStatus.id != value) {
                 // console.log("in if 1***");
-                elInstance.setValueFromCoords(20, y, true, true);
+                elInstance.setValueFromCoords(21, y, true, true);
             }
             if (problemList[0].problemStatus.id == value) {
-                elInstance.setValueFromCoords(20, y, false, true);
+                elInstance.setValueFromCoords(21, y, false, true);
                 // console.log("in if 2***");
             }
         }
 
-        if (x == 10 || x == 20 || x == 21) {
+        if (x == 11 || x == 21 || x == 22) {
             var rowData = elInstance.getRowData(y);
             // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
             // console.log("current problem status ***", rowData[10]);
@@ -540,18 +543,18 @@ class EditSupplyPlanStatus extends Component {
             // console.log("current problem status ***", rowData[20]);
             // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
             // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
-            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString()) || (problemList[0].reviewNotes.toString() != rowData[21].toString())) {
+            if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes.toString() != rowData[22].toString())) {
                 // console.log("in if***");
-                elInstance.setValueFromCoords(22, y, 1, true);
+                elInstance.setValueFromCoords(23, y, 1, true);
             } else {
                 // console.log("in else***");
-                elInstance.setValueFromCoords(22, y, 0, true);
+                elInstance.setValueFromCoords(23, y, 0, true);
             }
         }
 
-        if (x == 20) {
+        if (x == 21) {
             if (value.toString() == "false") {
-                elInstance.setValueFromCoords(21, y, "", true);
+                elInstance.setValueFromCoords(22, y, "", true);
             }
         }
         }
@@ -3967,7 +3970,8 @@ class EditSupplyPlanStatus extends Component {
                     </Col>
                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
                         <div className="col-md-12 card-header-action">
-                            <a className="pull-right" style={{ marginTop: '-21px' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>
+                            {/* <a className="pull-right" style={{ marginTop: '-21px' }} href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a> */}
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                         </div>
                     }
                     <br />
@@ -3981,7 +3985,9 @@ class EditSupplyPlanStatus extends Component {
                     <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
-                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                    {/* <div>
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                    </div> */}
                 </TabPane>
 
             </>
@@ -4282,39 +4288,40 @@ class EditSupplyPlanStatus extends Component {
         // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
         problemList = problemList;
-        // console.log("problemList---->", problemList);
+        console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
         for (var j = 0; j < problemList.length; j++) {
             data = [];
             data[0] = problemList[j].problemReportId
-            data[1] = problemList[j].problemActionIndex
-            data[2] = ""
-            data[3] = problemList[j].versionId
-            data[4] = ""
-            data[5] = problemList[j].planningUnit.id
-            data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = problemList[j].problemCategory.id
-            data[8] = getProblemDesc(problemList[j], this.state.lang)
-            data[9] = getSuggestion(problemList[j], this.state.lang)
-            data[10] = problemList[j].problemStatus.id
-            data[11] = this.getNote(problemList[j], this.state.lang)
-            data[12] = problemList[j].problemStatus.id
-            data[13] = problemList[j].planningUnit.id
-            data[14] = problemList[j].realmProblem.problem.problemId
-            data[15] = ""
-            data[16] = problemList[j].realmProblem.criticality.id
+            data[1] = problemList[j].region ? problemList[j].region.id : "";
+            data[2] = problemList[j].problemActionIndex
+            data[3] = ""
+            data[4] = problemList[j].versionId
+            data[5] = ""
+            data[6] = problemList[j].planningUnit.id
+            data[7] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
+            data[8] = problemList[j].problemCategory.id
+            data[9] = getProblemDesc(problemList[j], this.state.lang)
+            data[10] = getSuggestion(problemList[j], this.state.lang)
+            data[11] = problemList[j].problemStatus.id
+            data[12] = this.getNote(problemList[j], this.state.lang)
+            data[13] = problemList[j].problemStatus.id
+            data[14] = problemList[j].planningUnit.id
+            data[15] = problemList[j].realmProblem.problem.problemId
+            data[16] = ""
+            data[17] = problemList[j].realmProblem.criticality.id
 
-            data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
-            data[18] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
+            data[18] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
+            data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
 
-            data[19] = problemList[j].realmProblem.criticality.id
-            data[20] = problemList[j].reviewed
-            data[21] = ''
+            data[20] = problemList[j].realmProblem.criticality.id
+            data[21] = problemList[j].reviewed
+            data[22] = ''
 
-            data[22] = 0
-            data[23] = problemList[j].problemTransList
+            data[23] = 0
+            data[24] = problemList[j].problemTransList
             problemArray[count] = data;
             count++;
 
@@ -4349,6 +4356,13 @@ class EditSupplyPlanStatus extends Component {
                     visible: false,
                     width: 0,
                     readOnly: true, autoCasting: false
+                },
+                {
+                    title: i18n.t("static.common.region"),
+                    type: 'dropdown',
+                    width: 80,
+                    source: this.state.regionList,
+                    readOnly: true
                 },
                 {
                     // title: 'problemActionIndex',
@@ -4551,20 +4565,20 @@ class EditSupplyPlanStatus extends Component {
                 var elInstance = el;
                 if (this.state.editable) {
                     var rowData = elInstance.getRowData(y);
-                    if (rowData[12] == 4) {
-                        var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
+                    if (rowData[13] == 4) {
                         var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
                     if (this.state.editable) {
-                        if (rowData[20].toString() == "true") {
-                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                        if (rowData[21].toString() == "true") {
+                            var cell = elInstance.getCell(("W").concat(parseInt(y) + 1))
                             cell.classList.remove('readonly');
                         } else {
-                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                            var cell = elInstance.getCell(("W").concat(parseInt(y) + 1))
                             cell.classList.add('readonly');
                             // elInstance.setValueFromCoords(x, y, "", true);
                         }
@@ -4577,20 +4591,20 @@ class EditSupplyPlanStatus extends Component {
                 // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
                 // var colArr = ['U']
                 var rowData = elInstance.getRowData(y);
-                var criticalityId = rowData[16];
-                var problemStatusId = rowData[12];
+                var criticalityId = rowData[17];
+                var problemStatusId = rowData[13];
                 if (criticalityId == 3) {
                     // console.log("In if");
-                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     // console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {
                     // console.log("In if 1");
-                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1) {
                     // console.log("In if 2");
-                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
                 }
@@ -5829,24 +5843,24 @@ class EditSupplyPlanStatus extends Component {
                                 var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
-                                    if (map.get("22") == 1) {
+                                    if (map.get("23") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
                                             problemStatus: {
-                                                id: map.get("10")
+                                                id: map.get("11")
                                             },
-                                            reviewed: map.get("20"),
-                                            notes: map.get("21")
+                                            reviewed: map.get("21"),
+                                            notes: map.get("22")
                                         });
                                     }
-                                    if (map.get("20") == false && map.get("12") != 4) {
+                                    if (map.get("21") == false && map.get("13") != 4) {
                                         isAllCheckForReviewed = false
                                     }
                                     if(map.get("0") == 0){
                                         reviewedProblemList.push({
                                             problemReportId: 0,
                                             realmProblem: {
-                                                realmProblemId: map.get("19") == 1 ? "25" : map.get("19") == 2 ? "26" : "27",
+                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
                                                 problemType: {
                                                     id: "2"
                                                 }
@@ -5860,12 +5874,12 @@ class EditSupplyPlanStatus extends Component {
                                             },
                                             dt: moment(new Date()).format("YYYY-MM-DD"),
                                             region: {
-                                                id: ""
+                                                id: map.get("1")
                                             },
                                             planningUnit: {
-                                                id: map.get("5")
+                                                id: map.get("6")
                                             },
-                                            data5: '{"problemDescription":"' + map.get("8") + '", "suggession":"' + map.get("9") + '"}',
+                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
                                             notes: ""
                                         })
                                     }
