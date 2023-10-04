@@ -220,7 +220,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('A2:A100', {
+        worksheet.dataValidations.add('A2:A1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
@@ -241,12 +241,12 @@ export default class ShipmentDetails extends React.Component {
         //     // error: 'Invalid Value'
         // });
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('F' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air'), i18n.t('static.dataentry.road')];
-        worksheet.dataValidations.add('G2:G100', {
+        worksheet.dataValidations.add('G2:G1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentModeDropdown.join(",")}"`],
@@ -257,7 +257,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let isLocalProcurementAgentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('I2:I100', {
+        worksheet.dataValidations.add('I2:I1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${isLocalProcurementAgentDropdown.join(",")}"`],
@@ -268,7 +268,7 @@ export default class ShipmentDetails extends React.Component {
 
         // let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let emergencyShipmentDropdown = ["True", "False"];
-        worksheet.dataValidations.add('O2:O100', {
+        worksheet.dataValidations.add('O2:O1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${emergencyShipmentDropdown.join(",")}"`],
@@ -288,7 +288,7 @@ export default class ShipmentDetails extends React.Component {
             dataSourceVar.push(datasourceList[i].name);
         }
 
-        worksheet.dataValidations.add('W2:W100', {
+        worksheet.dataValidations.add('W2:W1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${dataSourceVar.join(",")}"`],
@@ -309,7 +309,7 @@ export default class ShipmentDetails extends React.Component {
             currencyVar.push(currencyList[i].name);
         }
 
-        worksheet.dataValidations.add('R2:R100', {
+        worksheet.dataValidations.add('R2:R1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${currencyVar.join(",")}"`],
@@ -329,7 +329,7 @@ export default class ShipmentDetails extends React.Component {
             fundingSourceVar.push(fundingSourceList[i].name);
         }
 
-        worksheet.dataValidations.add('P2:P100', {
+        worksheet.dataValidations.add('P2:P1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${fundingSourceVar.join(",")}"`],
@@ -349,7 +349,7 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentVar.push(procurementAgentList[i].name);
         }
 
-        worksheet.dataValidations.add('H2:H100', {
+        worksheet.dataValidations.add('H2:H1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${procurementAgentVar.join(",")}"`],
@@ -369,7 +369,7 @@ export default class ShipmentDetails extends React.Component {
             budgetVar.push(budgetList[i].name);
         }
 
-        worksheet.dataValidations.add('Q2:Q100', {
+        worksheet.dataValidations.add('Q2:Q1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${budgetVar.join(",")}"`],
@@ -399,7 +399,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentStatusVar.push(shipmentStatusList[i].name);
         }
 
-        worksheet.dataValidations.add('E2:E100', {
+        worksheet.dataValidations.add('E2:E1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${shipmentStatusVar.join(",")}"`],
@@ -412,7 +412,7 @@ export default class ShipmentDetails extends React.Component {
 
         //Validations
 
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('L2:L1000', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -422,7 +422,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('S2:S100', {
+        worksheet.dataValidations.add('S2:S1000', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -432,7 +432,7 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('U2:U100', {
+        worksheet.dataValidations.add('U2:U1000', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -444,7 +444,7 @@ export default class ShipmentDetails extends React.Component {
 
         //Locked gray color fill
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('B' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',

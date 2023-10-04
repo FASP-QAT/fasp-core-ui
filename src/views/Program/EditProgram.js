@@ -1049,7 +1049,7 @@ export default class EditProgram extends Component {
 
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
-                                                <FormGroup className="Selectcontrol-bdrNone" className="col-md-6">
+                                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
                                                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -1070,7 +1070,7 @@ export default class EditProgram extends Component {
                                                     <FormFeedback>{errors.regionId}</FormFeedback>
                                                 </FormGroup>
 
-                                                <FormGroup className="col-md-6">
+                                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
                                                     <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
