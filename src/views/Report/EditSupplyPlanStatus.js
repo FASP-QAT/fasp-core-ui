@@ -4201,11 +4201,11 @@ class EditSupplyPlanStatus extends Component {
 
     buildProblemTransJexcel() {
         // console.log("In jexcel+++", this.state.problemTransList);
-        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+        var currentTrans = this.state.problemTransList.length > 0 ? this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
             b = b.createdDate
             return a > b ? -1 : a < b ? 1 : 0;
-        }));
+        })) : [];
 
         let dataArray = [];
         let count = 0;
@@ -4653,14 +4653,16 @@ class EditSupplyPlanStatus extends Component {
                 var items1 = [];
                 // console.log("y====",y);
                 if (y != null) {
-                    items1.push({
-                        title: i18n.t('static.problemContext.viewTrans'),
-                        onclick: function () {
-                            var myObj = obj.getRowData(y);
-                            // console.log("my obj===>", myObj);
-                            this.toggleTransView(myObj[23]);
-                        }.bind(this)
-                    });
+                    if (obj.getRowData(y)[0] != 0) {
+                        items1.push({
+                            title: i18n.t('static.problemContext.viewTrans'),
+                            onclick: function () {
+                                var myObj = obj.getRowData(y);
+                                // console.log("my obj===>", myObj);
+                                this.toggleTransView(myObj[23]);
+                            }.bind(this)
+                        });
+                    }
                     if (obj.options.allowDeleteRow == true) {
                         // region id
                         if (obj.getRowData(y)[0] == 0) {

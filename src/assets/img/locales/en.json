@@ -1560,7 +1560,7 @@
     "static.formula.suggestedText21": "If no, no suggested shipment",
     "static.dataentry.otherUnitMultiplier": "Enter Other unit multiplier",
     "static.programPU.shelfLifeTooltip": "Time from shipment receipt (status = received) to expiry. Used for new batches created via shipments, but actual expiry date for any shipment can be updated by the user.",
-    "static.coreui.oldVersion": "You might have an older version. You should Control+Shift+R now.",
+    "static.coreui.oldVersion": "The QAT software has been updated! Press Control+Shift+R (all 3 keys together) to ensure you are using the latest version of the software.",
     "static.procurementAgent.UnitPerContainer": "Unit Per Container",
     "static.loadDelDataset.keepLatestVersionDeleteOldVersion": "Keep latest version and delete older versions.",
     "static.report.timeWindow": "Time Window",
