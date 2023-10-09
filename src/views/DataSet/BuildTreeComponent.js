@@ -3162,7 +3162,7 @@ export default class BuildTree extends Component {
                     // console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         // console.log("node id for update state 4----", this.state.items);
-                        this.saveTreeData(true, false);
+                        // this.saveTreeData(true, false);
                     })
                 }
             }
@@ -3217,9 +3217,13 @@ export default class BuildTree extends Component {
                 }
 
             }
-            if (parameterName != 'currentItemConfig') {
+            if(parameterName == "nodeDataMomList"){
                 this.saveTreeData(false, false);
             }
+            // if (parameterName != 'currentItemConfig') {
+            //     console.log("Hello Clicked")
+            //     this.saveTreeData(false, false);
+            // }
             // console.log("returmed list---", this.state.nodeDataMomList);
 
         })
