@@ -1559,7 +1559,7 @@
     "static.formula.suggestedText21": "Se não, nenhuma remessa sugerida",
     "static.dataentry.otherUnitMultiplier": "Insira outro multiplicador de unidade",
     "static.programPU.shelfLifeTooltip": "Tempo desde o recebimento da remessa (status = recebido) até o vencimento. Usado para novos lotes criados por meio de remessas, mas a data de validade real de qualquer remessa pode ser atualizada pelo usuário.",
-    "static.coreui.oldVersion": "Você pode ter uma versão mais antiga. Você deve CTRL+Shift+R agora.",
+    "static.coreui.oldVersion": "O software QAT foi atualizado! Pressione Control+Shift+R (todas as 3 teclas juntas) para garantir que você está usando a versão mais recente do software.",
     "static.procurementAgent.UnitPerContainer": "Unidade por contêiner",
     "static.loadDelDataset.keepLatestVersionDeleteOldVersion": "Mantenha a versão mais recente e exclua as versões mais antigas.",
     "static.report.timeWindow": "Horizonte temporal",

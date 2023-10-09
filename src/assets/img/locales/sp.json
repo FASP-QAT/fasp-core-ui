@@ -1559,7 +1559,7 @@
     "static.formula.suggestedText21": "Si no, no hay envío sugerido",
     "static.dataentry.otherUnitMultiplier": "Ingrese el multiplicador de otra unidad",
     "static.programPU.shelfLifeTooltip": "Délai entre la réception de l`envoi (statut = reçu) et l`expiration. Utilisé pour les nouveaux lots créés via des expéditions, mais la date d`expiration réelle de toute expédition peut être mise à jour par l`utilisateur.",
-    "static.coreui.oldVersion": "Es posible que tenga una versión anterior. Deberías CTRL+Shift+R ahora.",
+    "static.coreui.oldVersion": "¡El software QAT ha sido actualizado! Presione Control+Shift+R (las 3 teclas juntas) para asegurarse de que está utilizando la última versión del software.",
     "static.procurementAgent.UnitPerContainer": "No. de unidades por contenedor",
     "static.loadDelDataset.keepLatestVersionDeleteOldVersion": "Mantenga la última versión y elimine las versiones anteriores.",
     "static.report.timeWindow": "Periodo de tiempo",
