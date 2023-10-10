@@ -8,7 +8,7 @@ const loading = () => <div className="animated fadeIn pt-3 text-center"><div cla
 const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout'));
 const Login = React.lazy(() => import('./views/Pages/Login'));
 const UserAgreement = React.lazy(() => import('./views/User/UserAgreement'));
-const Register = React.lazy(() => import('./views/Pages/Register'));
+// const Register = React.lazy(() => import('./views/Pages/Register'));
 const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
 const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
@@ -28,7 +28,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/login" name="Login Page" render={props => <Login {...props} />} />
             <Route exact path="/login/:message" name="Login Page" render={props => <Login {...props} />} />
-            <Route exact path="/register" name="Register Page" render={props => <Register {...props} />} />
+            {/* <Route exact path="/register" name="Register Page" render={props => <Register {...props} />} /> */}
             <Route exact path="/404" name="Page 404" render={props => <Page404 {...props} />} />
             <Route exact path="/500" name="Page 500" render={props => <Page500 {...props} />} />
             <Route exact path="/error" name="Page Error" render={props => <PageError {...props} />} />
