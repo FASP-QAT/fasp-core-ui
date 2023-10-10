@@ -82,6 +82,7 @@ export default class OrganisationListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = organisationsArray;
         var options = {
             data: data,
@@ -143,7 +144,7 @@ export default class OrganisationListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -271,7 +272,7 @@ export default class OrganisationListComponent extends Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     render() {
@@ -280,6 +281,11 @@ export default class OrganisationListComponent extends Component {
             entries: " ",
         });
         const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {

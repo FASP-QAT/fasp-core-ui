@@ -19,15 +19,19 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+let initialValues = {
+    problemStatusInputId: '',
+    notes: ''
+}
 const entityname = i18n.t('static.report.problem');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         problemStatusInputId: Yup.string()
             .required(i18n.t('static.report.selectProblemStatus')),
         needNotesValidation: Yup.boolean(),
         notes: Yup.string()
             .when("needNotesValidation", {
-                is: () => {
+                is: val => {
                     return document.getElementById("needNotesValidation").value === "true";
                 },
                 then: Yup.string().required(i18n.t('static.program.validnotestext')),
@@ -290,11 +294,11 @@ export default class EditLanguageComponent extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(this.state.programId);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
                 var problemStatusRequest = problemStatusOs.getAll();
-                problemStatusRequest.onsuccess = function () {
+                problemStatusRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
                     for (var i = 0; i < myResult.length; i++) {
@@ -325,11 +329,11 @@ export default class EditLanguageComponent extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(this.state.programId);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
                 var problemStatusRequest = problemStatusOs.getAll();
-                problemStatusRequest.onsuccess = function () {
+                problemStatusRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
                     var proList = []
@@ -396,7 +400,7 @@ export default class EditLanguageComponent extends Component {
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -425,9 +429,9 @@ export default class EditLanguageComponent extends Component {
                     var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                     var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
                     var problemStatusRequest = problemStatusOs.getAll();
-                    problemStatusRequest.onerror = function () {
+                    problemStatusRequest.onerror = function (event) {
                     };
-                    problemStatusRequest.onsuccess = function () {
+                    problemStatusRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = problemStatusRequest.result;
                         myResult = myResult.filter(c => c.userManaged == true);
@@ -460,6 +464,7 @@ export default class EditLanguageComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
+        const lan = 'en';
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
             && problemStatusList.map((item, i) => {
@@ -475,7 +480,7 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -494,7 +499,7 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return cell == true ? i18n.t('static.program.yes') : i18n.t('static.program.no');
                 }
             },
@@ -513,7 +518,7 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return new moment(cell).format(DATE_FORMAT_CAP);
                 }
             },
@@ -558,11 +563,12 @@ export default class EditLanguageComponent extends Component {
                                     notes: this.state.notes
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     var db1;
+                                    var storeOS;
                                     getDatabase();
                                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                                    openRequest.onerror = function () {
+                                    openRequest.onerror = function (event) {
                                         this.setState({
                                             message: i18n.t('static.program.errortext'),
                                             color: '#BA0C2F'
@@ -574,7 +580,7 @@ export default class EditLanguageComponent extends Component {
                                         var programTransaction = transaction.objectStore('programData');
                                         var programId = this.state.programId;
                                         var programRequest = programTransaction.get(programId);
-                                        programRequest.onsuccess = function () {
+                                        programRequest.onsuccess = function (event) {
                                             var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                             var programJson = JSON.parse(programData);
@@ -615,13 +621,13 @@ export default class EditLanguageComponent extends Component {
                                             programJson.problemReportList = otherProblemReport;
                                             programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                             var putRequest = programTransaction.put(programRequest.result);
-                                            putRequest.onerror = function () {
+                                            putRequest.onerror = function (event) {
                                                 this.setState({
                                                     message: i18n.t('static.program.errortext'),
                                                     color: '#BA0C2F'
                                                 })
                                             };
-                                            putRequest.onsuccess = function () {
+                                            putRequest.onsuccess = function (event) {
                                                 this.setState({
                                                     changedFlag: 0,
                                                     color: 'green'
@@ -634,11 +640,14 @@ export default class EditLanguageComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='languageForm' autocomplete="off">
@@ -806,7 +815,7 @@ export default class EditLanguageComponent extends Component {
                                                                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                         pagination={paginationFactory(options)}
                                                                         rowEvents={{
-                                                                            onClick: (e, row) => {
+                                                                            onClick: (e, row, rowIndex) => {
                                                                                 this.editProblem(row);
                                                                             }
                                                                         }}

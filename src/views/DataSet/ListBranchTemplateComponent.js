@@ -16,12 +16,15 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dataset.BranchTreeTemplate');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         treeTemplateName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tree.templateNameRequired')),
     })
+}
+const initialValues = {
+    treeTemplateName: "",
 }
 const validate = (getValidationSchema) => {
     return (values) => {
@@ -254,6 +257,7 @@ export default class ListBranchTemplate extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = treeTemplateArray;
         var options = {
             data: data,
@@ -315,7 +319,7 @@ export default class ListBranchTemplate extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -359,7 +363,7 @@ export default class ListBranchTemplate extends Component {
         this.hideFirstComponent();
         this.getBranchTreeTemplateList();
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     selected = function (instance, cell, x, y, value, e) {
@@ -448,7 +452,7 @@ export default class ListBranchTemplate extends Component {
                                         treeTemplateName: this.state.treeTemplateName
                                     }}
                                     validate={validate(validationSchema)}
-                                    onSubmit={(values) => {
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (!this.state.isSubmitClicked) {
                                             this.setState({ loading: true, isSubmitClicked: true }, () => {
                                                 this.copyDeleteTree(this.state.treeTemplateId);
@@ -460,11 +464,14 @@ export default class ListBranchTemplate extends Component {
                                     }}
                                     render={
                                         ({
+                                            values,
                                             errors,
                                             touched,
                                             handleChange,
                                             handleBlur,
                                             handleSubmit,
+                                            isSubmitting,
+                                            isValid,
                                             setTouched,
                                             handleReset
                                         }) => (

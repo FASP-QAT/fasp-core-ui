@@ -1,4 +1,4 @@
-import { sqrt, abs } from 'mathjs';
+import { std, sqrt, mean, abs } from 'mathjs';
 export function calculateError(data, errorName, props) {
     let coef = getCoefficient(data);
     var errorJson = { "rmse": sqrt(coef.e2Bar), "mape": coef.absEPerABar, "mse": coef.e2Bar, "wape": coef.wape, "rSqd": rSquared(data, coef) }

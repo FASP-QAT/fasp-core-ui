@@ -9,7 +9,10 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.region.region');
-const validationSchema = function () {
+let initialValues = {
+    region: ""
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()
             .required(i18n.t('static.region.validregion'))
@@ -170,7 +173,7 @@ class EditRegionComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{ region: getLabelText(this.state.region.label, this.state.lang) }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -222,11 +225,14 @@ class EditRegionComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='regionForm'>

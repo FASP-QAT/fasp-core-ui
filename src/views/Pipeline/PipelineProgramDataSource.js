@@ -32,7 +32,7 @@ export default class PipelineProgramDataSource extends Component {
     stopLoading() {
         this.setState({ loading: false });
     }
-    dropdownFilter = function (instance, cell, c, r) {
+    dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapDataSourceEl.getJson(null, false)[r])[c - 1];
         var puList = (this.state.activeDataSourceList).filter(c => c.dataSourceType.id == value);
@@ -74,6 +74,7 @@ export default class PipelineProgramDataSource extends Component {
             }
         }
         if (x == 3) {
+            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -86,6 +87,8 @@ export default class PipelineProgramDataSource extends Component {
         }
     }
     checkValidation() {
+        var reg = /^[0-9\b]+$/;
+        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
@@ -182,6 +185,7 @@ export default class PipelineProgramDataSource extends Component {
                                             }
                                             this.el = jexcel(document.getElementById("mapDataSource"), '');
                                             jexcel.destroy(document.getElementById("mapDataSource"), true);
+                                            var json = [];
                                             var data = productDataArr;
                                             var options = {
                                                 data: data,
@@ -215,7 +219,7 @@ export default class PipelineProgramDataSource extends Component {
                                                 ],
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
-                                                contextMenu: function () {
+                                                contextMenu: function (obj, x, y, e) {
                                                     return false;
                                                 }.bind(this),
                                                 search: true,
@@ -365,7 +369,7 @@ export default class PipelineProgramDataSource extends Component {
                 }
             );
     }
-    loadedJexcelCommonFunction = function (instance) {
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
     render() {

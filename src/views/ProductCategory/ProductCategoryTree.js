@@ -32,7 +32,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 let initialValues = {
     productCategory: ''
 }
-const validationSchema = function () {
+const validationSchema = function (values, t) {
     return Yup.object().shape({
         productCategory: Yup.string()
             .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
@@ -544,7 +544,7 @@ export default class ProductCategoryTree extends Component {
         });
     };
     render() {
-        const { searchFocusIndex, searchFoundCount } = this.state;
+        const { searchString, searchFocusIndex, searchFoundCount } = this.state;
         const customSearchMethod = ({ node, searchQuery }) =>
             searchQuery &&
             node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
@@ -612,7 +612,7 @@ export default class ProductCategoryTree extends Component {
                                     enableReinitialize={true}
                                     initialValues={initialValues}
                                     validate={validate(validationSchema)}
-                                    onSubmit={(values, { resetForm }) => {
+                                    onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addNewNode();
                                         if (this.state.duplicate == 1) {
                                         } else {
@@ -621,11 +621,15 @@ export default class ProductCategoryTree extends Component {
                                     }}
                                     render={
                                         ({
+                                            values,
                                             errors,
                                             touched,
                                             handleChange,
                                             handleBlur,
                                             handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
                                             handleReset
                                         }) => (
                                             <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm' autocomplete="off">
@@ -686,7 +690,7 @@ export default class ProductCategoryTree extends Component {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={() => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
+                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
@@ -699,7 +703,7 @@ export default class ProductCategoryTree extends Component {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-                                                                <a style={{ color: '#4dbd74' }} href="javascript:void();" title="Enable Product Category" onClick={() => this.enableNode(rowInfo)}><i className="fa fa-check"></i></a>
+                                                                <a style={{ color: '#4dbd74' }} href="javascript:void();" title="Enable Product Category" onClick={(event) => this.enableNode(rowInfo)}><i className="fa fa-check"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {

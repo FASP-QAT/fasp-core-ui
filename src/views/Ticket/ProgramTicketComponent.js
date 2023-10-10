@@ -16,7 +16,29 @@ import classNames from 'classnames';
 import { API_URL, SPACE_REGEX } from '../../Constants';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
-const validationSchema = function () {
+const initialValues = {
+    summary: "",
+    programName: '',
+    programCode: '',
+    realmId: "",
+    realmCountryId: '',
+    regionId: '',
+    organisationId: '',
+    healthAreaId: '',
+    programManager: '',
+    airFreightPerc: '',
+    seaFreightPerc: '',
+    roadFreightPerc: '',
+    plannedToSubmittedLeadTime: '',
+    submittedToApprovedLeadTime: '',
+    approvedToShippedLeadTime: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    shippedToArrivedByRoadLeadTime: '',
+    arrivedToDeliveredLeadTime: '',
+    notes: ""
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -736,6 +758,14 @@ export default class ProgramTicketComponent extends Component {
                     </option>
                 )
             }, this);
+        let realmCountries = realmCountryList.length > 0
+            && realmCountryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.country.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
@@ -791,7 +821,7 @@ export default class ProgramTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values) => {
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
                             })
@@ -859,11 +889,13 @@ export default class ProgramTicketComponent extends Component {
                         }}
                         render={
                             ({
+                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset,

@@ -16,7 +16,7 @@ export default class UserAgreementComponent extends Component {
     }
     accept() {
 
-        UserService.acceptUserAgreement().then(() => {
+        UserService.acceptUserAgreement().then(response => {
             this.props.history.push(`/syncProgram`)
         }).catch(
             error => {

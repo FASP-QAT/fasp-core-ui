@@ -11,7 +11,13 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.country.countryMaster');
-const validationSchema = function () {
+let initialValues = {
+    label: '',
+    countryCode: '',
+    countryCode2: '',
+    currencyId: '',
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -276,7 +282,7 @@ export default class UpdateCountryComponent extends Component {
                                     currencyId: this.state.country.currency.id
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -334,11 +340,14 @@ export default class UpdateCountryComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='countryForm' autocomplete="off">

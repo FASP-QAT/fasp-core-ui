@@ -48,11 +48,12 @@ import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
+const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const validationSchema = function () {
+const validationSchema = function (values, t) {
   return Yup.object().shape({
     consumptionNotes: Yup.string()
       .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.commit.consumptionnotesvalid"))
@@ -82,6 +83,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   constructor(props) {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
+    var stopDate = moment(Date.now()).format("YYYY-MM-DD");
     this.state = {
       datasetList: [],
       datasetId: "",
@@ -175,7 +177,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
-  filterList = function (instance, cell, c, r) {
+  filterList = function (instance, cell, c, r, source) {
     var value = (instance.jexcel.getJson(null, false)[r])[1];
     return this.state.mixedList.filter(c => c.type == value);
   }
@@ -389,7 +391,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           columnDrag: true,
           columns: columns,
           colWidths: [10, 50, 100, 100, 100, 100, 50, 100],
-          updateTable: function () {
+          updateTable: function (el, cell, x, y, source, value, id) {
           },
           onload: this.loaded,
           onchange: function (instance, cell, x, y, value) {
@@ -413,7 +415,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
           editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
-          contextMenu: function () {
+          contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
         };
@@ -588,9 +590,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       loading: true
     })
     var db1;
+    var storeOS;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
       this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
       this.props.updateState("color", "red");
       this.props.hideFirstComponent();
@@ -600,15 +603,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
       var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
       var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
-      extrapolationMethodRequest.onerror = function () {
+      extrapolationMethodRequest.onerror = function (event) {
       }.bind(this);
-      extrapolationMethodRequest.onsuccess = function () {
+      extrapolationMethodRequest.onsuccess = function (event) {
         var transaction = db1.transaction(['datasetData'], 'readwrite');
         var datasetTransaction = transaction.objectStore('datasetData');
         var datasetRequest = datasetTransaction.get(this.state.datasetId);
-        datasetRequest.onerror = function () {
+        datasetRequest.onerror = function (event) {
         }.bind(this);
-        datasetRequest.onsuccess = function () {
+        datasetRequest.onsuccess = function (event) {
           var extrapolationMethodList = extrapolationMethodRequest.result;
           var myResult = datasetRequest.result;
           var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -618,6 +621,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var regionList = this.state.regionList;
           for (var r = 0; r < regionList.length; r++) {
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
+            var consumptionExtrapolationData = -1
+            var consumptionExtrapolationMovingData = -1
+            var consumptionExtrapolationRegression = -1
+            var consumptionExtrapolationTESL = -1
+            var consumptionExtrapolationTESM = -1
+            var consumptionExtrapolationTESH = -1
+            var inputDataFilter = this.state.jsonDataSemiAverage;
+            var inputDataAverageFilter = this.state.movingAvgData;
+            var inputDataRegressionFilter = this.state.linearRegressionData;
             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
             var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
             var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];
@@ -787,9 +799,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           this.setState({
             dataChanged: false
           })
-          putRequest.onerror = function () {
+          putRequest.onerror = function (event) {
           }.bind(this);
-          putRequest.onsuccess = function () {
+          putRequest.onsuccess = function (event) {
             this.setState({
               loading: false,
               dataChanged: false,
@@ -1240,9 +1252,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var validation = this.checkValidationConsumption();
     if (validation) {
       var db1;
+      var storeOS;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function () {
+      openRequest.onerror = function (event) {
         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
         this.props.updateState("color", "red");
         this.props.hideFirstComponent();
@@ -1252,14 +1265,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var transaction = db1.transaction(['datasetData'], 'readwrite');
         var datasetTransaction = transaction.objectStore('datasetData');
         var datasetRequest = datasetTransaction.get(this.state.datasetId);
-        datasetRequest.onerror = function () {
+        datasetRequest.onerror = function (event) {
         }.bind(this);
-        datasetRequest.onsuccess = function () {
+        datasetRequest.onsuccess = function (event) {
           var myResult = datasetRequest.result;
           var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
           var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
           var datasetJson = JSON.parse(datasetData);
           var elInstance = this.state.dataEl;
+          var consumptionList = [];
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
@@ -1271,6 +1285,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
+            var columnData = elInstance.getColumnData([i + 1]);
             var actualConsumptionCount = 2;
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
@@ -1347,18 +1362,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
-          putRequest.onerror = function () {
+          putRequest.onerror = function (event) {
           }.bind(this);
-          putRequest.onsuccess = function () {
+          putRequest.onsuccess = function (event) {
             db1 = e.target.result;
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-            datasetDetailsRequest.onsuccess = function () {
+            datasetDetailsRequest.onsuccess = function (e) {
               var datasetDetailsRequestJson = datasetDetailsRequest.result;
               datasetDetailsRequestJson.changed = 1;
               var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-              datasetDetailsRequest1.onsuccess = function () {
+              datasetDetailsRequest1.onsuccess = function (event) {
               }
             }
             this.setState({
@@ -1402,7 +1417,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     } catch (Expection) {
     }
   }
-  loadedJexcel = function (instance, cell) {
+  loadedJexcel = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var consumptionDataType = this.state.tempConsumptionUnitObject.consumptionDataType;
@@ -1433,7 +1448,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
   }
-  loaded = function (instance, cell) {
+  loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
     var elInstance = instance.worksheets[0];
@@ -1550,7 +1565,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var totalPU = 0;
       var datacsv = [];
       datacsv.push((item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)).replaceAll(' ', '%20'));
-      this.state.monthArray.map((item1) => {
+      this.state.monthArray.map((item1, count) => {
         var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
         total += Number(data[0].qty);
         totalPU += Number(data[0].qtyInPU);
@@ -1565,7 +1580,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var totalRegionPU = 0;
         datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
         {
-          this.state.monthArray.map((item1) => {
+          this.state.monthArray.map((item1, count) => {
             var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
             totalRegion += Number(data[0].qty);
             totalRegionPU += Number(data[0].qtyInPU);
@@ -1757,14 +1772,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
       var datasetOs = datasetTransaction.objectStore('datasetData');
       var getRequest = datasetOs.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       }.bind(this);
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -1861,38 +1876,38 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
       var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
       var datasetOs = datasetTransaction.objectStore('datasetData');
       var dsRequest = datasetOs.get(this.state.datasetId);
-      dsRequest.onerror = function () {
+      dsRequest.onerror = function (event) {
       }.bind(this);
-      dsRequest.onsuccess = function () {
+      dsRequest.onsuccess = function (event) {
         var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
         var tcOs = tcTransaction.objectStore('tracerCategory');
         var tcRequest = tcOs.getAll();
-        tcRequest.onerror = function () {
+        tcRequest.onerror = function (event) {
         }.bind(this);
-        tcRequest.onsuccess = function () {
+        tcRequest.onsuccess = function (event) {
           var myResult = [];
           myResult = tcRequest.result;
           var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
           var fuOs = fuTransaction.objectStore('forecastingUnit');
           var fuRequest = fuOs.getAll();
-          fuRequest.onerror = function () {
+          fuRequest.onerror = function (event) {
           }.bind(this);
-          fuRequest.onsuccess = function () {
+          fuRequest.onsuccess = function (event) {
             var fuResult = [];
             fuResult = fuRequest.result;
             var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
             var puOs = puTransaction.objectStore('planningUnit');
             var puRequest = puOs.getAll();
-            puRequest.onerror = function () {
+            puRequest.onerror = function (event) {
             }.bind(this);
-            puRequest.onsuccess = function () {
+            puRequest.onsuccess = function (event) {
               var puResult = [];
               puResult = puRequest.result;
               var datasetData = dsRequest.result;
@@ -1920,6 +1935,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var curDate = startDate;
               var planningUnitTotalList = [];
               var planningUnitTotalListRegion = [];
+              var totalPlanningUnitData = [];
               for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
                 curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                 var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
@@ -2097,6 +2113,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
@@ -2186,9 +2203,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     addFooters(doc)
     doc.save(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + i18n.t('static.common.dataCheck') + '.pdf');
   }
-  handleAMonthChange2 = () => {
+  handleAMonthChange2 = (value, text) => {
   }
-  handleClickMonthBox2 = () => {
+  handleClickMonthBox2 = (e) => {
     this.pickAMonth2.current.show()
   }
   handleAMonthDissmis2 = (value) => {
@@ -2220,7 +2237,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <tr>
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-            {this.state.monthArray.map((item) => {
+            {this.state.monthArray.map((item, count) => {
               return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
             })}
             <th>{i18n.t('static.supplyPlan.total')}</th>
@@ -2240,7 +2257,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   {
                     this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
                   }</td>
-                {this.state.monthArray.map((item1) => {
+                {this.state.monthArray.map((item1, count) => {
                   var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                   total += Number(data[0].qty);
                   totalPU += Number(data[0].qtyInPU);
@@ -2255,7 +2272,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                   <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                   <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                  {this.state.monthArray.map((item1) => {
+                  {this.state.monthArray.map((item1, count) => {
                     var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                     totalRegion += Number(data[0].qty);
                     totalRegionPU += Number(data[0].qtyInPU);
@@ -2295,6 +2312,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         )
       }, this);
     const { allPlanningUnitList } = this.state;
+    let planningUnits = allPlanningUnitList.length > 0
+      && allPlanningUnitList.map((item, i) => {
+        return (
+          <option key={i} value={item.planningUnitId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
     var chartOptions = {
       title: {
         display: true,
@@ -2334,6 +2359,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';
@@ -2380,7 +2406,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           borderColor: '#CFCDC9',
           showInLegend: true,
         })
-        this.state.regionList.map((item) => {
+        var actualConsumptionCount = 6;
+        this.state.regionList.map((item, count) => {
           if (colourCount > 7) {
             colourCount = 0;
           }
@@ -2402,7 +2429,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     if (this.state.showDetailTable) {
       bar = {
-        labels: this.state.monthArray.map((item) => (moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
+        labels: this.state.monthArray.map((item, index) => (moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
         datasets: datasetListForGraph
       };
     }
@@ -2452,14 +2479,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             enableReinitialize={true}
             initialValues={{ consumptionNotes: this.state.consumptionNotesForValidation }}
             validate={validate(validationSchema)}
-            onSubmit={(values) => { this.saveConsumptionList() }}
+            onSubmit={(values, { setSubmitting, setErrors }) => { this.saveConsumptionList() }}
             render={
               ({
+                values,
                 errors,
+                touched,
                 handleChange,
                 handleBlur,
                 handleSubmit,
-                setTouched              }) => (
+                isSubmitting,
+                isValid,
+                setTouched,
+                handleReset,
+                setFieldValue,
+                setFieldTouched,
+                setFieldError
+              }) => (
                 <Form className="col-md-12" onSubmit={handleSubmit} noValidate name="dataEnteredInTable" autocomplete="off">
                   <CardBody className="pb-lg-0 pt-lg-0">
                     <div>
@@ -2694,14 +2730,25 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </ModalHeader>
           <Formik
             enableReinitialize={true}
-            onSubmit={(values) => {
+            onSubmit={(values, { setSubmitting, setErrors }) => {
               this.submitChangedUnit(this.state.changedConsumptionTypeId);
             }}
             render={
               ({
+                values,
                 errors,
+                touched,
+                handleChange,
+                handleBlur,
                 handleSubmit,
-                setTouched              }) => (
+                isSubmitting,
+                isValid,
+                setTouched,
+                handleReset,
+                setFieldValue,
+                setFieldTouched,
+                setFieldError
+              }) => (
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
                   <ModalBody>
                     <div className="dataEnteredTable">
@@ -2712,7 +2759,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     </Label>
                   </ModalBody>
                   <ModalFooter>
-                    <Button type="submit" size="md" onClick={() => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                    <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                   </ModalFooter>
                 </Form>
@@ -2849,7 +2896,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   resetClicked() {
     this.buildDataJexcel(this.state.selectedConsumptionUnitId, 0)
   }
-  changed = function (instance, cell, x, y) {
+  changed = function (instance, cell, x, y, value) {
     var elInstance = instance;
     var rowData = elInstance.getRowData(y);
     var consumptionDataType = rowData[5];
@@ -2966,7 +3013,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       parseFormulas: true,
       editable: true,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function () {
+      contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
     };

@@ -88,7 +88,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
     componentDidMount() {
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
@@ -102,6 +102,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
+        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
@@ -109,7 +110,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var myVar = "";
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
@@ -119,16 +120,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
-            realmRequest.onsuccess = function () {
+            realmRequest.onsuccess = function (event) {
             var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
             var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
             var rcpuRequest = rcpuOs.getAll();
-            rcpuRequest.onerror = function () {
+            rcpuRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
-            rcpuRequest.onsuccess = function () {
+            rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
@@ -156,12 +157,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                 var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                 var dataSourceRequest = dataSourceOs.getAll();
-                dataSourceRequest.onerror = function () {
+                dataSourceRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                dataSourceRequest.onsuccess = function () {
+                dataSourceRequest.onsuccess = function (event) {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
@@ -333,11 +334,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         onload: this.loadedConsumption,
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
-                        updateTable: function () {
+                        updateTable: function (el, cell, x, y, source, value, id) {
                         }.bind(this),
-                        onsearch: function () {
+                        onsearch: function (el) {
                         },
-                        onfilter: function () {
+                        onfilter: function (el) {
                         },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
@@ -355,6 +356,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             if (y == null) {
                             } else {
                                 if (consumptionEditable && obj.options.allowInsertRow == true) {
+                                    var json = obj.getJson(null, false);
                                     if (consumptionEditable) {
                                         items.push({
                                             title: i18n.t('static.supplyPlan.addNewConsumption'),
@@ -499,9 +501,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             license: JEXCEL_PRO_KEY,
             onpaste: this.onPasteForBatchInfo,
             onload: this.loadedBatchInfoConsumption,
-            updateTable: function () {
+            updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var items = [];
                 if (y == null) {
@@ -594,7 +596,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[5] = rowData[5];
         obj.insertRow(data);
     }
-    loadedConsumption = function (instance, cell, x, y) {
+    loadedConsumption = function (instance, cell, x, y, value) {
         if (this.props.consumptionPage != "consumptionDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -812,7 +814,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r) {
+    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source, conf) {
         var mylist = [];
         var value = (this.state.consumptionEl.getJson(null, false)[r])[2];
         if (value == 1) {
@@ -826,7 +828,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterRealmCountryPlanningUnit = function () {
+    filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
         return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
@@ -839,7 +841,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             this.consumptionChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
-    consumptionChanged = function (instance, cell, x, y) {
+    consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
         var rowData = elInstance.getRowData(y);
         this.props.updateState("consumptionError", "");
@@ -1029,14 +1031,15 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r) {
+    filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
         var mylist = [];
         var json = this.state.consumptionBatchInfoTableEl.getJson(null, false)
+        var value = (json[r])[3];
         var date = (json[r])[5];
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
-    loadedBatchInfoConsumption = function (instance) {
+    loadedBatchInfoConsumption = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1351,9 +1354,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var planningUnitId = document.getElementById("planningUnitId").value;
             var json = elInstance.getJson(null, false);
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
@@ -1371,12 +1375,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 var programId = (document.getElementById("programId").value);
                 var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function () {
+                programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
@@ -1549,12 +1553,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function () {
+                    putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
-                    putRequest.onsuccess = function () {
+                    putRequest.onsuccess = function (event) {
                         var programId = (document.getElementById("programId").value)
                         var planningUnitId = (document.getElementById("planningUnitId").value)
                         var objectStore = "";

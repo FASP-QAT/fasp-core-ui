@@ -29,7 +29,7 @@ const initialValues = {
     productCategoryId: '',
     unitId: ''
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         productName: Yup.string()
             .required(i18n.t('static.product.productnametext')),
@@ -282,7 +282,7 @@ export default class AddProduct extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     ProductService.addProduct(this.state.product)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -318,11 +318,13 @@ export default class AddProduct extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched
                                     }) => (

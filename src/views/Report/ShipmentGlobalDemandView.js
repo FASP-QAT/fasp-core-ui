@@ -35,10 +35,24 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+var numberWithCommas = function (x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+var dataPack1 = [40, 47, 44, 38, 27];
+var dataPack2 = [10, 12, 7, 5, 4];
+var dataPack3 = [17, 11, 22, 18, 12];
+var dates = ["Some l-o-o-o-o-o-o-o-o-o-o-o-n-n-n-n-n-n-g-g-g-g-g-g-g label", "AAA", "BBB", "CCC", "DDDDDDDDD"];
+var bar_ctx = document.getElementById('bar-chart');
+const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
 const options = {
     title: {
         display: true,
@@ -90,6 +104,7 @@ const options = {
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
+                let label = data.labels[tooltipItem.index];
                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                 var cell1 = value
                 cell1 += '';
@@ -390,6 +405,7 @@ class ShipmentGlobalDemandView extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
@@ -446,11 +462,13 @@ class ShipmentGlobalDemandView extends Component {
             align: 'left'
         })
         doc.setTextColor("#fff");
+        const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
         var canvas = document.getElementById("cool-canvas11");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
+        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -632,9 +650,11 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 var db1;
+                var storeOS;
                 getDatabase();
+                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         loading: false
@@ -649,13 +669,13 @@ class ShipmentGlobalDemandView extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (e) {
                         this.setState({ loading: true })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -691,12 +711,12 @@ class ShipmentGlobalDemandView extends Component {
                         var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
                         var procurementAgentRequest = procurementAgentOs.getAll();
                         var procurementAgentList = [];
-                        procurementAgentRequest.onerror = function () {
+                        procurementAgentRequest.onerror = function (event) {
                             this.setState({
                                 loading: false
                             })
                         };
-                        procurementAgentRequest.onsuccess = function () {
+                        procurementAgentRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = procurementAgentRequest.result;
                             for (var k = 0; k < myResult.length; k++) {
@@ -706,6 +726,7 @@ class ShipmentGlobalDemandView extends Component {
                                 }
                                 procurementAgentList[k] = procurementAgentObj
                             }
+                            let data = [];
                             let procurementAgentSplit = [];
                             for (let i = 0; i < planningUnitIds.length; i++) {
                                 let obj = {};
@@ -724,12 +745,14 @@ class ShipmentGlobalDemandView extends Component {
                                             return a;
                                         }, {}));
                                         if (data2.length > 0) {
+                                            let key = data2[0].procurementAgent.code;
                                             let value = data2[0].shipmentQty;
                                             let json = {}
                                             json[data2[0].procurementAgent.code] = data2[0].shipmentQty;
                                             buffer.push(json);
                                             total = total + value;
                                         } else {
+                                            let key = procurementAgentList[j].code;
                                             let value = 0;
                                             let json = {}
                                             json[procurementAgentList[j].code] = value;
@@ -1079,9 +1102,9 @@ class ShipmentGlobalDemandView extends Component {
                 var sStatusTransaction = db2.transaction(['shipmentStatus'], 'readwrite');
                 var sStatusOs = sStatusTransaction.objectStore('shipmentStatus');
                 var sStatusRequest = sStatusOs.getAll();
-                sStatusRequest.onerror = function () {
+                sStatusRequest.onerror = function (event) {
                 }.bind(this);
-                sStatusRequest.onsuccess = function () {
+                sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
                     this.setState({ shipmentStatuses: sStatusResult });
                 }.bind(this)
@@ -1142,6 +1165,7 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedFundingSourceList = () => {
+        const lan = 'en';
         const { fundingSources } = this.state
         var proList = fundingSources;
         var db1;
@@ -1152,12 +1176,13 @@ class ShipmentGlobalDemandView extends Component {
             var transaction = db1.transaction(['fundingSource'], 'readwrite');
             var fundingSource = transaction.objectStore('fundingSource');
             var getRequest = fundingSource.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     var f = 0
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
@@ -1181,7 +1206,7 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
-    formatLabel(cell) {
+    formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
     getPrograms = () => {
@@ -1246,6 +1271,7 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programLst } = this.state
         var proList = programLst;
         var db1;
@@ -1256,9 +1282,9 @@ class ShipmentGlobalDemandView extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1266,6 +1292,7 @@ class ShipmentGlobalDemandView extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         proList.push(programData)
@@ -1314,6 +1341,7 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -1324,9 +1352,9 @@ class ShipmentGlobalDemandView extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1334,6 +1362,7 @@ class ShipmentGlobalDemandView extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -1407,7 +1436,11 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitValues: []
         }, () => {
             if (!isSiteOnline()) {
+                let programId = document.getElementById("programId").value;
+                let versionId = document.getElementById("versionId").value;
+                const lan = 'en';
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -1415,9 +1448,10 @@ class ShipmentGlobalDemandView extends Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    planningunitRequest.onerror = function () {
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
                     };
-                    planningunitRequest.onsuccess = function () {
+                    planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -1586,19 +1620,19 @@ class ShipmentGlobalDemandView extends Component {
         const { programLst } = this.state;
         let programList = [];
         programList = programLst.length > 0
-            && programLst.map((item) => {
+            && programLst.map((item, i) => {
                 return (
                     { label: (item.code), value: item.id }
                 )
             }, this);
         const { countrys } = this.state;
-        let countryList = countrys.length > 0 && countrys.map((item) => {
+        let countryList = countrys.length > 0 && countrys.map((item, i) => {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
         const { planningUnits } = this.state;
         let planningUnitList = [];
         planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return (
                     { label: getLabelText(item.label, this.state.lang), value: item.id }
                 )
@@ -1606,18 +1640,41 @@ class ShipmentGlobalDemandView extends Component {
         const { fundingSources } = this.state;
         let fundingSourceList = [];
         fundingSourceList = fundingSources.length > 0
-            && fundingSources.map((item) => {
+            && fundingSources.map((item, i) => {
                 return (
                     { label: item.fundingSourceCode, value: item.fundingSourceId }
                 )
             }, this);
         const { shipmentStatuses } = this.state;
-        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item) => {
+        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
             return (
                 { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
             )
         }, this);
         const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+        const backgroundColor = [
+            '#4dbd74',
+            '#c8ced3',
+            '#000',
+            '#ffc107',
+            '#f86c6b',
+            '#20a8d8',
+            '#042e6a',
+            '#59cacc',
+            '#118b70',
+            '#EDB944',
+            '#F48521',
+            '#ED5626',
+            '#3fe488'
+        ]
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
@@ -1657,6 +1714,10 @@ class ShipmentGlobalDemandView extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >
@@ -1760,7 +1821,7 @@ class ShipmentGlobalDemandView extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={() => { this.getPlanningUnit(); }}
+                                                            onChange={(e) => { this.getPlanningUnit(); }}
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1823,7 +1884,7 @@ class ShipmentGlobalDemandView extends Component {
                                                         name="includeApprovedVersions"
                                                         id="includeApprovedVersions"
                                                         bsSize="sm"
-                                                        onChange={() => { this.fetchData() }}
+                                                        onChange={(e) => { this.fetchData() }}
                                                     >
                                                         <option value="true">{i18n.t('static.program.yes')}</option>
                                                         <option value="false">{i18n.t('static.program.no')}</option>

@@ -124,7 +124,9 @@ export default class StockStatusMatrix extends React.Component {
         if (programId > 0 && versionId != 0) {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
+            const lan = "en";
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -141,9 +143,9 @@ export default class StockStatusMatrix extends React.Component {
               );
               var planningunitRequest = planningunitOs.getAll();
               var planningList = [];
-              planningunitRequest.onerror = function () {
+              planningunitRequest.onerror = function (event) {
               };
-              planningunitRequest.onsuccess = function () {
+              planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result.filter(
                   (c) => c.active == true
@@ -165,9 +167,9 @@ export default class StockStatusMatrix extends React.Component {
                 var planningunitOs1 =
                   planningunitTransaction1.objectStore("planningUnit");
                 var planningunitRequest1 = planningunitOs1.getAll();
-                planningunitRequest1.onerror = function () {
+                planningunitRequest1.onerror = function (event) {
                 };
-                planningunitRequest1.onsuccess = function () {
+                planningunitRequest1.onsuccess = function (e) {
                   var myResult = [];
                   myResult = planningunitRequest1.result;
                   var flList = [];
@@ -525,7 +527,7 @@ export default class StockStatusMatrix extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
           this.setState({
             message: i18n.t("static.program.errortext"),
             loading: false,
@@ -540,7 +542,7 @@ export default class StockStatusMatrix extends React.Component {
           var planningUnitObjectStore =
             planningUnitTransaction.objectStore("planningUnit");
           var planningunitRequest = planningUnitObjectStore.getAll();
-          planningunitRequest.onerror = function () {
+          planningunitRequest.onerror = function (event) {
             this.setState({
               loading: false,
             });
@@ -549,6 +551,7 @@ export default class StockStatusMatrix extends React.Component {
           planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
             myResult1 = e.target.result;
+            var plunit1 = [];
             planningUnitIds.map((planningUnitId) => {
               plunit = [
                 ...plunit,
@@ -566,12 +569,12 @@ export default class StockStatusMatrix extends React.Component {
           var userId = userBytes.toString(CryptoJS.enc.Utf8);
           var program = `${programId}_v${version}_uId_${userId}`;
           var programRequest = programTransaction.get(program);
-          programRequest.onerror = function () {
+          programRequest.onerror = function (event) {
             this.setState({
               loading: false,
             });
           }.bind(this);
-          programRequest.onsuccess = function () {
+          programRequest.onsuccess = function (event) {
             var planningUnitDataList =
               programRequest.result.programData.planningUnitDataList;
             planningUnitIds.map((planningUnitId) => {
@@ -613,6 +616,12 @@ export default class StockStatusMatrix extends React.Component {
                 for (var month = 1; month <= 12; month++) {
                   var dtstr =
                     from + "-" + String(month).padStart(2, "0") + "-01";
+                  var enddtStr =
+                    from +
+                    "-" +
+                    String(month).padStart(2, "0") +
+                    "-" +
+                    new Date(from, month, 0).getDate();
                   var dt = dtstr;
                   var list = programJson.supplyPlan.filter(
                     (c) =>
@@ -847,7 +856,7 @@ export default class StockStatusMatrix extends React.Component {
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
             var program = `${programId}_v${version}_uId_${userId}`;
             var programRequest = programTransaction.get(program);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
               let productCategories = [];
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
@@ -860,6 +869,7 @@ export default class StockStatusMatrix extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var InventoryList = programJson.inventoryList;
+                var json;
                 InventoryList.map((ele) =>
                   productCategories.push({
                     payload: {
@@ -1036,6 +1046,7 @@ export default class StockStatusMatrix extends React.Component {
     }
   };
   consolidatedProgramList = () => {
+    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -1046,9 +1057,9 @@ export default class StockStatusMatrix extends React.Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -1062,6 +1073,7 @@ export default class StockStatusMatrix extends React.Component {
               myResult[i].programName,
               SECRET_KEY
             );
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1078,6 +1090,7 @@ export default class StockStatusMatrix extends React.Component {
             }
           }
         }
+        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -1218,6 +1231,7 @@ export default class StockStatusMatrix extends React.Component {
     }
   };
   consolidatedVersionList = (programId) => {
+    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -1228,9 +1242,9 @@ export default class StockStatusMatrix extends React.Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -1247,6 +1261,7 @@ export default class StockStatusMatrix extends React.Component {
               myResult[i].programName,
               SECRET_KEY
             );
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1343,7 +1358,9 @@ export default class StockStatusMatrix extends React.Component {
           } else {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes("Local")) {
+              const lan = "en";
               var db1;
+              var storeOS;
               getDatabase();
               var openRequest = indexedDB.open(
                 INDEXED_DB_NAME,
@@ -1359,9 +1376,10 @@ export default class StockStatusMatrix extends React.Component {
                   "programPlanningUnit"
                 );
                 var planningunitRequest = planningunitOs.getAll();
-                planningunitRequest.onerror = function () {
+                var planningList = [];
+                planningunitRequest.onerror = function (event) {
                 };
-                planningunitRequest.onsuccess = function () {
+                planningunitRequest.onsuccess = function (e) {
                   var myResult = [];
                   myResult = planningunitRequest.result;
                   var programId = document
@@ -1384,7 +1402,7 @@ export default class StockStatusMatrix extends React.Component {
                     }
                   }
                   let tracerCategoryValues =
-                    this.state.tracerCategoryValues.map((item) => {
+                    this.state.tracerCategoryValues.map((item, i) => {
                       return { tracerCategoryId: item.value };
                     }, this);
                   let data1 = [];
@@ -1412,7 +1430,7 @@ export default class StockStatusMatrix extends React.Component {
                         ).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                       }),
-                      planningUnitValues: data1.map((item) => {
+                      planningUnitValues: data1.map((item, i) => {
                         return {
                           label: getLabelText(
                             item.planningUnit.label,
@@ -1421,7 +1439,7 @@ export default class StockStatusMatrix extends React.Component {
                           value: item.planningUnit.id,
                         };
                       }, this),
-                      planningUnitLabels: data1.map((item) => {
+                      planningUnitLabels: data1.map((item, i) => {
                         return getLabelText(
                           item.planningUnit.label,
                           this.state.lang
@@ -1464,7 +1482,7 @@ export default class StockStatusMatrix extends React.Component {
                   this.setState(
                     {
                       planningUnits: listArray,
-                      planningUnitValues: response.data.map((item) => {
+                      planningUnitValues: response.data.map((item, i) => {
                         return {
                           label: getLabelText(
                             item.planningUnit.label,
@@ -1473,7 +1491,7 @@ export default class StockStatusMatrix extends React.Component {
                           value: item.planningUnit.id,
                         };
                       }, this),
-                      planningUnitLabels: response.data.map((item) => {
+                      planningUnitLabels: response.data.map((item, i) => {
                         return getLabelText(
                           item.planningUnit.label,
                           this.state.lang
@@ -1703,6 +1721,7 @@ export default class StockStatusMatrix extends React.Component {
       headers[idx] = item.text.replaceAll(" ", "%20").replaceAll("#", "%23");
     });
     var A = [this.addDoubleQuoteToRowContent(headers)];
+    var re = this.state.data;
     this.state.data.map((ele) =>
       A.push(
         this.addDoubleQuoteToRowContent([
@@ -1882,7 +1901,7 @@ export default class StockStatusMatrix extends React.Component {
     }
     return x1 + x2;
   };
-  exportPDF = () => {
+  exportPDF = (columns) => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
       doc.setFont("helvetica", "bold");
@@ -2095,6 +2114,7 @@ export default class StockStatusMatrix extends React.Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
     doc.setFontSize(8);
     let header = [];
@@ -2282,6 +2302,15 @@ export default class StockStatusMatrix extends React.Component {
             : this.formatter(ele.decStock)
           : i18n.t("static.supplyPlanFormula.na"),
     ]);
+    const roundN = (num) => {
+      if (num == null) {
+        return "";
+      } else {
+        return parseFloat(
+          Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)
+        ).toFixed(1);
+      }
+    };
     const cellStyle = (
       planBasedOn,
       min,
@@ -2467,13 +2496,37 @@ export default class StockStatusMatrix extends React.Component {
     const { planningUnits } = this.state;
     let planningUnitList =
       planningUnits.length > 0 &&
-      planningUnits.map((item) => {
+      planningUnits.map((item, i) => {
         return {
           label: getLabelText(item.planningUnit.label, this.state.lang),
           value: item.planningUnit.id,
         };
       }, this);
     const { productCategories } = this.state;
+    let productCategoryList =
+      productCategories.length > 0 &&
+      productCategories.map((item, i) => {
+        return (
+          <option
+            key={i}
+            value={item.payload.productCategoryId}
+            disabled={item.payload.active ? "" : "disabled"}
+          >
+            {Array(item.level).fill("   ").join("") +
+              getLabelText(item.payload.label, this.state.lang)}
+          </option>
+        );
+      }, this);
+    let productCategoryListcheck =
+      productCategories.length > 0 &&
+      productCategories
+        .filter((c) => c.payload.active == true)
+        .map((item, i) => {
+          return {
+            label: getLabelText(item.payload.label, this.state.lang),
+            value: item.payload.productCategoryId,
+          };
+        }, this);
     const pickerLang = {
       months: [
         i18n.t("static.month.jan"),
@@ -2493,6 +2546,11 @@ export default class StockStatusMatrix extends React.Component {
       to: "To",
     };
     const { rangeValue } = this.state;
+    const makeText = (m) => {
+      if (m && m.year && m.month)
+        return pickerLang.months[m.month - 1] + ". " + m.year;
+      return "?";
+    };
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -2667,6 +2725,53 @@ export default class StockStatusMatrix extends React.Component {
         formatter: this.formatter,
       },
     ];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t("static.common.first"),
+      prePageText: i18n.t("static.common.back"),
+      nextPageText: i18n.t("static.common.next"),
+      lastPageText: i18n.t("static.common.last"),
+      nextPageTitle: i18n.t("static.common.firstPage"),
+      prePageTitle: i18n.t("static.common.prevPage"),
+      firstPageTitle: i18n.t("static.common.nextPage"),
+      lastPageTitle: i18n.t("static.common.lastPage"),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [
+        {
+          text: "10",
+          value: 10,
+        },
+        {
+          text: "30",
+          value: 30,
+        },
+        {
+          text: "50",
+          value: 50,
+        },
+        {
+          text: "All",
+          value: this.state.data.length,
+        },
+      ],
+    };
+    const MyExportCSV = (props) => {
+      const handleClick = () => {
+        props.onExport();
+      };
+      return (
+        <div>
+          <img
+            style={{ height: "40px", width: "40px" }}
+            src={csvicon}
+            title="Export CSV"
+            onClick={() => handleClick()}
+          />
+        </div>
+      );
+    };
     return (
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
@@ -2793,7 +2898,7 @@ export default class StockStatusMatrix extends React.Component {
                       disabled={this.state.loading}
                       options={
                         tracerCategories.length > 0
-                          ? tracerCategories.map((item) => {
+                          ? tracerCategories.map((item, i) => {
                             return {
                               label: getLabelText(
                                 item.label,
@@ -2841,7 +2946,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="includePlanningShipments"
                         id="includePlanningShipments"
                         bsSize="sm"
-                        onChange={() => {
+                        onChange={(e) => {
                           this.filterData();
                         }}
                       >
@@ -2866,7 +2971,7 @@ export default class StockStatusMatrix extends React.Component {
                         name="stockStatusId"
                         id="stockStatusId"
                         bsSize="sm"
-                        onChange={() => {
+                        onChange={(e) => {
                           this.filterDataAsperstatus();
                         }}
                       >

@@ -15,6 +15,23 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PRO_KEY } from '../../Const
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import "../ProductCategory/style.css";
+const initialValuesTwo = {
+}
+const validationSchemaTwo = function (values) {
+    return Yup.object().shape({
+    })
+}
+const validateTwo = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorTwo(error)
+        }
+    }
+}
 const getErrorsFromValidationErrorTwo = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -78,6 +95,7 @@ export default class QunatimedImportStepTwo extends Component {
             loading: true
         })
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -85,9 +103,10 @@ export default class QunatimedImportStepTwo extends Component {
             var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('planningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            planningunitRequest.onerror = function () {
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
             };
-            planningunitRequest.onsuccess = function () {
+            planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 this.setState({
@@ -98,7 +117,7 @@ export default class QunatimedImportStepTwo extends Component {
             }.bind(this);
         }.bind(this);
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -130,6 +149,7 @@ export default class QunatimedImportStepTwo extends Component {
                 }
             }
             var col = ("C").concat(parseInt(y) + 1);
+            var col_E = ("E").concat(parseInt(y) + 1);
             var cf = "";
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -209,6 +229,7 @@ export default class QunatimedImportStepTwo extends Component {
     }
     checkDuplicateCountry = function () {
         var tableJson = this.el.getJson(null, false);
+        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[2]]).sort().sort((a, b) => {
@@ -235,6 +256,7 @@ export default class QunatimedImportStepTwo extends Component {
                 loading: true
             })
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -242,9 +264,10 @@ export default class QunatimedImportStepTwo extends Component {
                 var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('planningUnit');
                 var planningunitRequest = planningunitOs.getAll();
-                planningunitRequest.onerror = function () {
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
                 };
-                planningunitRequest.onsuccess = function () {
+                planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
                     var tableJson = this.el.getJson(null, false);
@@ -288,10 +311,15 @@ export default class QunatimedImportStepTwo extends Component {
             loading: true
         })
         var value = this.props.items.program.programId;
+        var programFile = this.props.items.program.filename;
         var db1;
+        var storeOS;
         getDatabase();
+        var regionList = [];
+        var dataSourceList = [];
+        var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -304,7 +332,7 @@ export default class QunatimedImportStepTwo extends Component {
             var procurementAgentPlanningunitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
             var procurementAgentPlanningunitOs = procurementAgentPlanningunitTransaction.objectStore('procurementAgentPlanningUnit');
             var procurementAgentPlanningunitRequest = procurementAgentPlanningunitOs.getAll();
-            procurementAgentPlanningunitRequest.onerror = function () {
+            procurementAgentPlanningunitRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -312,7 +340,7 @@ export default class QunatimedImportStepTwo extends Component {
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            procurementAgentPlanningunitRequest.onsuccess = function () {
+            procurementAgentPlanningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = procurementAgentPlanningunitRequest.result;
                 this.setState({
@@ -322,7 +350,7 @@ export default class QunatimedImportStepTwo extends Component {
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
                 var planningList = []
-                planningunitRequest.onerror = function () {
+                planningunitRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
@@ -330,7 +358,7 @@ export default class QunatimedImportStepTwo extends Component {
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                planningunitRequest.onsuccess = function () {
+                planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
                     var programId = (value != "" && value != undefined ? value : 0).split("_")[0];

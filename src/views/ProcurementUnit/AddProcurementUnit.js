@@ -24,7 +24,27 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
-const validationSchema = function () {
+let initialValues = {
+    procurementUnitName: '',
+    planningUnitId: '',
+    multiplier: '',
+    unitId: '',
+    supplierId: '',
+    heightQty: 0,
+    lengthUnitId: '',
+    lengthQty: 0,
+    widthQty: 0,
+    weightUnitId: '',
+    weightQty: 0,
+    volumeUnitId: '',
+    volumeQty: 0,
+    labeling: '',
+    unitsPerContainer: 0,
+    unitsPerCase: 0,
+    unitsPerPalletEuro1: 0,
+    unitsPerPalletEuro2: 0
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         procurementUnitName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -502,7 +522,7 @@ export default class AddProcurementUnit extends Component {
                                     unitsPerContainer: this.state.procurementUnit.unitsPerContainer
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -560,11 +580,14 @@ export default class AddProcurementUnit extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched,
                                         handleReset
                                     }) => (

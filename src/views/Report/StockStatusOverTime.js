@@ -249,7 +249,7 @@ class StockStatusOverTime extends Component {
     }
     unCheck = () => {
     }
-    unCheck1 = () => {
+    unCheck1 = (e) => {
     }
     show() {
     }
@@ -376,6 +376,7 @@ class StockStatusOverTime extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -386,9 +387,9 @@ class StockStatusOverTime extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -396,6 +397,7 @@ class StockStatusOverTime extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -409,6 +411,7 @@ class StockStatusOverTime extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -550,6 +553,7 @@ class StockStatusOverTime extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -560,9 +564,9 @@ class StockStatusOverTime extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -570,6 +574,7 @@ class StockStatusOverTime extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -622,7 +627,9 @@ class StockStatusOverTime extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
+                    const lan = 'en';
                     var db1;
+                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -630,9 +637,10 @@ class StockStatusOverTime extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        planningunitRequest.onerror = function () {
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
                         };
-                        planningunitRequest.onsuccess = function () {
+                        planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -760,10 +768,12 @@ class StockStatusOverTime extends Component {
         if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != "") {
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
+                let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+                let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         loading: false
                     })
@@ -778,12 +788,12 @@ class StockStatusOverTime extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var data = [];
                     var programRequest = programTransaction.get(program);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         planningUnitIds.map(planningUnitId => {
                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
@@ -806,8 +816,10 @@ class StockStatusOverTime extends Component {
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                             var monthstartfrom = this.state.rangeValue.from.month
                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                var monthlydata = [];
                                 for (var month = monthstartfrom; month <= 12; month++) {
                                     var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
                                     var dt = dtstr
                                     var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
                                     if (list.length > 0) {
@@ -1009,6 +1021,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('"' + (i18n.t('static.report.mosfuture') + ' : ' + document.getElementById("monthsInFutureForAmc").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
+        var re;
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
         this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.roundAMC(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
@@ -1023,6 +1036,7 @@ class StockStatusOverTime extends Component {
         a.click()
     }
     exportPDF = () => {
+        let ypos = 0
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
@@ -1075,13 +1089,16 @@ class StockStatusOverTime extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
+        const title = i18n.t('static.report.stockstatusovertimeReport');
         var canvas = document.getElementById("cool-canvas");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
+        var aspectwidth1 = (width - h1);
         var startY = 190 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnitValues.map(ele => ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10;
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -1117,7 +1134,7 @@ class StockStatusOverTime extends Component {
     render() {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { programs } = this.state;
@@ -1138,6 +1155,14 @@ class StockStatusOverTime extends Component {
                     </option>
                 )
             }, this);
+        const getRandomColor = () => {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
         const backgroundColor = [
             '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
             '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',

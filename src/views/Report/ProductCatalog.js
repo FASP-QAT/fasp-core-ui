@@ -29,6 +29,13 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+const ref = React.createRef();
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
+const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3,000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456,870", "isActive": 'Active' }];
 class ProductCatalog extends Component {
     constructor(props) {
         super(props);
@@ -153,8 +160,13 @@ class ProductCatalog extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
+        const title = i18n.t('static.dashboard.productcatalog');
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
@@ -244,7 +256,9 @@ class ProductCatalog extends Component {
                     }
                 );
             } else {
+                const lan = 'en';
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -253,9 +267,9 @@ class ProductCatalog extends Component {
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
                     var planningList = []
-                    planningunitRequest.onerror = function () {
+                    planningunitRequest.onerror = function (event) {
                     };
-                    planningunitRequest.onsuccess = function () {
+                    planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
                         var proList = []
@@ -267,9 +281,9 @@ class ProductCatalog extends Component {
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
                         var planningunitRequest1 = planningunitOs1.getAll();
-                        planningunitRequest1.onerror = function () {
+                        planningunitRequest1.onerror = function (event) {
                         };
-                        planningunitRequest1.onsuccess = function () {
+                        planningunitRequest1.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest1.result;
                             var flList = []
@@ -392,6 +406,7 @@ class ProductCatalog extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -402,9 +417,9 @@ class ProductCatalog extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -412,6 +427,7 @@ class ProductCatalog extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -425,6 +441,7 @@ class ProductCatalog extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -494,9 +511,10 @@ class ProductCatalog extends Component {
             } else {
                 this.setState({ loading: true })
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         loading: false
@@ -507,17 +525,17 @@ class ProductCatalog extends Component {
                     var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
                     var ppuRequest = ppuOs.getAll();
-                    ppuRequest.onerror = function () {
+                    ppuRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    ppuRequest.onerror = function () {
+                    ppuRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         })
                     }.bind(this);
-                    ppuRequest.onsuccess = function () {
+                    ppuRequest.onsuccess = function (e) {
                         var result3 = ppuRequest.result;
                         result3 = result3.filter(c => c.program.id == programId);
                         var outPutList = [];
@@ -531,6 +549,7 @@ class ProductCatalog extends Component {
                         }
                         const set = new Set(outPutList.map(item => JSON.stringify(item)));
                         const dedup = [...set].map(item => JSON.parse(item));
+                        var lang = this.state.lang;
                         this.setState({
                             loading: false,
                             productCategoriesOffline: dedup.sort(function (a, b) {
@@ -574,6 +593,7 @@ class ProductCatalog extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = outPutArray;
         var options = {
             data: data,
@@ -647,7 +667,7 @@ class ProductCatalog extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -657,7 +677,7 @@ class ProductCatalog extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     fetchData = () => {
@@ -734,9 +754,10 @@ class ProductCatalog extends Component {
             } else {
                 this.setState({ loading: true })
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         loading: false
@@ -747,61 +768,62 @@ class ProductCatalog extends Component {
                     var programDataTransaction = db1.transaction(['program'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('program');
                     var programRequest = programDataOs.get(parseInt(document.getElementById("programId").value));
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext')
                         })
                     }.bind(this);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (e) {
+                        var result = programRequest.result;
                         var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                         var fuOs = fuTransaction.objectStore('forecastingUnit');
                         var fuRequest = fuOs.getAll();
-                        fuRequest.onerror = function () {
+                        fuRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext')
                             })
                         }.bind(this);
-                        fuRequest.onerror = function () {
+                        fuRequest.onerror = function (event) {
                             this.setState({
                                 loading: false
                             })
                         }.bind(this);
-                        fuRequest.onsuccess = function () {
+                        fuRequest.onsuccess = function (e) {
                             var result1 = fuRequest.result;
                             var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
                             var puOs = puTransaction.objectStore('planningUnit');
                             var puRequest = puOs.getAll();
-                            puRequest.onerror = function () {
+                            puRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 })
                             }.bind(this);
-                            puRequest.onerror = function () {
+                            puRequest.onerror = function (event) {
                                 this.setState({
                                     loading: false
                                 })
                             }.bind(this);
-                            puRequest.onsuccess = function () {
+                            puRequest.onsuccess = function (e) {
                                 var result2 = puRequest.result;
                                 var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                                 var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
                                 var ppuRequest = ppuOs.getAll();
-                                ppuRequest.onerror = function () {
+                                ppuRequest.onerror = function (event) {
                                     this.setState({
                                         message: i18n.t('static.program.errortext')
                                     })
                                 }.bind(this);
-                                ppuRequest.onerror = function () {
+                                ppuRequest.onerror = function (event) {
                                     this.setState({
                                         loading: false
                                     })
                                 }.bind(this);
-                                ppuRequest.onsuccess = function () {
+                                ppuRequest.onsuccess = function (e) {
                                     var result3 = ppuRequest.result;
                                     result3 = result3.filter(c => c.program.id == programId);
                                     var outPutList = [];
@@ -898,7 +920,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -908,7 +930,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -918,7 +940,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -928,7 +950,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -938,7 +960,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -962,7 +984,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -972,7 +994,7 @@ class ProductCatalog extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1017,6 +1039,32 @@ class ProductCatalog extends Component {
                 }
             }
         ];
+        const tabelOptions = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.outPutList.length
+            }]
+        }
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >
@@ -1044,7 +1092,7 @@ class ProductCatalog extends Component {
                                                 id="programId"
                                                 bsSize="sm"
                                                 value={this.state.programId}
-                                                onChange={() => { this.fetchData(); this.getProductCategories(); this.getTracerCategoryList(); }}
+                                                onChange={(e) => { this.fetchData(); this.getProductCategories(); this.getTracerCategoryList(); }}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs.length > 0

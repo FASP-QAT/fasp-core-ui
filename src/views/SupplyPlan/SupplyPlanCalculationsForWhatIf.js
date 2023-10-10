@@ -279,6 +279,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var expiredStock = 0;
                     var expiredStockWps = 0;
                     var myArray = [];
+                    var myArrayWps = [];
                     for (var b = 0; b < batchDetails.length; b++) {
                         if (moment(batchDetails[b].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                             var json = {
@@ -1111,16 +1112,16 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;
         var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
         var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
         var putRequest = programDataOs.put(programRequest.result);
-        putRequest.onerror = function () {
+        putRequest.onerror = function (event) {
         }.bind(this);
-        putRequest.onsuccess = function () {
+        putRequest.onsuccess = function (event) {
             calculateSupplyPlan(programIdParam, planningUnitId, "whatIfProgramData", "whatIf", props, [], startDate1)
         }.bind(this)
     }.bind(this)

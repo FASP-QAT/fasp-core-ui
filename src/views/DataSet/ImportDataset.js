@@ -30,6 +30,23 @@ import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     programId: ''
 }
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        programId: Yup.string()
+            .required(i18n.t('static.program.validselectprogramtext'))
+    })
+}
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -65,7 +82,7 @@ export default class ImportDataset extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
@@ -77,14 +94,14 @@ export default class ImportDataset extends Component {
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red',
                     loading: false
                 })
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -92,6 +109,7 @@ export default class ImportDataset extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -142,9 +160,9 @@ export default class ImportDataset extends Component {
                     var program = transaction.objectStore('datasetData');
                     var count = 0;
                     var getRequest = program.getAll();
-                    getRequest.onerror = function () {
+                    getRequest.onerror = function (event) {
                     };
-                    getRequest.onsuccess = function () {
+                    getRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = getRequest.result;
                         var programDataJson = this.state.programListArray;
@@ -169,6 +187,7 @@ export default class ImportDataset extends Component {
                                             if (selectedPrgArr[j].value == filename) {
                                                 db1 = e.target.result;
                                                 var transaction2 = db1.transaction(['datasetData'], 'readwrite');
+                                                var program2 = transaction2.objectStore('datasetData');
                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                 var countryList = json.countryList;
                                                 delete json.countryList;
@@ -278,7 +297,8 @@ export default class ImportDataset extends Component {
                                                 json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                 var programn = transactionn.objectStore('datasetData');
-                                                transactionn.oncomplete = function () {
+                                                var addProgramDataRequest = programn.put(json);
+                                                transactionn.oncomplete = function (event) {
                                                     var item = {
                                                         id: json.programId + "_v" + json.version + "_uId_" + userId,
                                                         programId: json.programId,
@@ -290,7 +310,8 @@ export default class ImportDataset extends Component {
                                                     }
                                                     var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                    programQPLDetailsTransaction.oncomplete = function () {
+                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                                    programQPLDetailsTransaction.oncomplete = function (event) {
                                                         this.setState({
                                                             message: i18n.t('static.program.dataimportsuccess'),
                                                             loading: false
@@ -319,6 +340,7 @@ export default class ImportDataset extends Component {
                                                             if (selectedPrgArr[j].value == filename) {
                                                                 db1 = e.target.result;
                                                                 var transaction2 = db1.transaction(['datasetData'], 'readwrite');
+                                                                var program2 = transaction2.objectStore('datasetData');
                                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                                 var countryList = json.countryList;
                                                                 delete json.countryList;
@@ -428,7 +450,8 @@ export default class ImportDataset extends Component {
                                                                 json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                                 var programn = transactionn.objectStore('datasetData');
-                                                                transactionn.oncomplete = function () {
+                                                                var addProgramDataRequest = programn.put(json);
+                                                                transactionn.oncomplete = function (event) {
                                                                     var item = {
                                                                         id: json.programId + "_v" + json.version + "_uId_" + userId,
                                                                         programId: json.programId,
@@ -440,7 +463,8 @@ export default class ImportDataset extends Component {
                                                                     }
                                                                     var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                                    programQPLDetailsTransaction.oncomplete = function () {
+                                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                                                    programQPLDetailsTransaction.oncomplete = function (event) {
                                                                         this.setState({
                                                                             message: i18n.t('static.program.dataimportsuccess'),
                                                                             loading: false
@@ -495,7 +519,7 @@ export default class ImportDataset extends Component {
                         var fileName = []
                         var programListArray = []
                         var size = 0;
-                        Object.keys(zip.files).forEach(function () {
+                        Object.keys(zip.files).forEach(function (filename) {
                             size++;
                         })
                         Object.keys(zip.files).forEach(function (filename) {

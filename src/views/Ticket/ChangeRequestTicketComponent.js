@@ -9,7 +9,8 @@ const initialValues = {
     summary: "",
     description: ""
 }
-const validationSchema = function () {
+const entityname = i18n.t('static.program.realmcountry');
+const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -126,14 +127,14 @@ export default class ChangeRequestTicketComponent extends Component {
                     <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values) => {
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
                             })
                             JiraTikcetService.addChangeRequest(this.state.changeRequest).then(response => {
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
-                                    JiraTikcetService.addIssueAttachment(this.state.changeRequest, response.data.id).then(() => {
+                                    JiraTikcetService.addIssueAttachment(this.state.changeRequest, response.data.id).then(response => {
                                     });
                                     this.setState({
                                         message: msg, loading: false
@@ -194,11 +195,13 @@ export default class ChangeRequestTicketComponent extends Component {
                         }}
                         render={
                             ({
+                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

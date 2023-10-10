@@ -54,11 +54,11 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const validationSchemaExtrapolation = function () {
+const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
             Yup.string().test('noOfMonthsId', 'Please enter positive number.',
-                function () {
+                function (value) {
                     var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
@@ -68,7 +68,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         confidenceLevelId:
             Yup.string().test('confidenceLevelId', 'Please select confidence level.',
-                function () {
+                function (value) {
                     if ((document.getElementById("smoothingId").value) == "on" && document.getElementById("confidenceLevelId").value == "") {
                         return false;
                     } else {
@@ -77,7 +77,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         confidenceLevelIdLinearRegression:
             Yup.string().test('confidenceLevelIdLinearRegression', 'Please select confidence level.',
-                function () {
+                function (value) {
                     if ((document.getElementById("linearRegressionId").value) == "on" && document.getElementById("confidenceLevelIdLinearRegression").value == "") {
                         return false;
                     } else {
@@ -86,7 +86,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         confidenceLevelIdArima:
             Yup.string().test('confidenceLevelIdArima', 'Please select confidence level.',
-                function () {
+                function (value) {
                     if ((document.getElementById("arimaId").value) == "on" && document.getElementById("confidenceLevelIdArima").value == "") {
                         return false;
                     } else {
@@ -95,7 +95,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         gammaId:
             Yup.string().test('gammaId', 'Please enter correct gamma value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
@@ -105,7 +105,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         betaId:
             Yup.string().test('betaId', 'Please enter correct beta value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("betaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
@@ -115,7 +115,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         alphaId:
             Yup.string().test('alphaId', 'Please enter correct alpha value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
@@ -125,7 +125,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         pId:
             Yup.string().test('pId', 'Please enter correct p value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("pId").value) : false;
                     if ((document.getElementById("arimaId").value) == "on" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
@@ -135,7 +135,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         dId:
             Yup.string().test('dId', 'Please enter correct d value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("dId").value) : false;
                     if ((document.getElementById("arimaId").value) == "on" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
@@ -145,7 +145,7 @@ const validationSchemaExtrapolation = function () {
                 }),
         qId:
             Yup.string().test('qId', 'Please enter correct q value.',
-                function () {
+                function (value) {
                     var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("qId").value) : false;
                     if ((document.getElementById("arimaId").value) == "on" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
@@ -330,7 +330,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
@@ -342,14 +342,14 @@ export default class ExtrapolateDataComponent extends React.Component {
             var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('datasetData');
             var programRequest = programDataOs.getAll();
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (e) {
                 var forecastProgramList = [];
                 var myResult = programRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -612,7 +612,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         type: 'hidden',
                     },
                 ],
-            updateTable: function (el, cell, x, y) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
                     var rowData = elInstance.getRowData(y);
@@ -670,7 +670,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             filters: false,
             license: JEXCEL_PRO_KEY,
             columnSorting: false,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
         };
@@ -875,7 +875,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1008,7 +1008,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "red");
                     this.props.hideFirstComponent();
@@ -1018,13 +1018,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
                     var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
-                    datasetRequest.onerror = function () {
+                    datasetRequest.onerror = function (event) {
                     }.bind(this);
-                    datasetRequest.onsuccess = function () {
+                    datasetRequest.onsuccess = function (event) {
                         var myResult = datasetRequest.result;
                         var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                         var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                         var datasetJson = JSON.parse(datasetData);
+                        var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var consumptionExtrapolationIndexTes = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 2);
                         var consumptionExtrapolationIndexArima = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 4);
                         var consumptionExtrapolationIndexLineatReg = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5);
@@ -1046,18 +1047,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                         this.setState({
                             dataChanged: false
                         })
-                        putRequest.onerror = function () {
+                        putRequest.onerror = function (event) {
                         }.bind(this);
-                        putRequest.onsuccess = function () {
+                        putRequest.onsuccess = function (event) {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
-                            datasetDetailsRequest.onsuccess = function () {
+                            datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
                                 var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                datasetDetailsRequest1.onsuccess = function () {
+                                datasetDetailsRequest1.onsuccess = function (event) {
                                 }
                             }
                             this.setState({
@@ -1082,7 +1083,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "red");
                 this.props.hideFirstComponent();
@@ -1092,15 +1093,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
                 var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
                 var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
-                extrapolationMethodRequest.onerror = function () {
+                extrapolationMethodRequest.onerror = function (event) {
                 }.bind(this);
-                extrapolationMethodRequest.onsuccess = function () {
+                extrapolationMethodRequest.onsuccess = function (event) {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
                     var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
-                    datasetRequest.onerror = function () {
+                    datasetRequest.onerror = function (event) {
                     }.bind(this);
-                    datasetRequest.onsuccess = function () {
+                    datasetRequest.onsuccess = function (event) {
                         var extrapolationMethodList = extrapolationMethodRequest.result;
                         var myResult = datasetRequest.result;
                         var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -1108,9 +1109,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var datasetJson = JSON.parse(datasetData);
                         var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId || (c.planningUnit.id == this.state.planningUnitId && c.region.id != this.state.regionId));
+                        var consumptionExtrapolationData = -1
+                        var consumptionExtrapolationMovingData = -1
+                        var consumptionExtrapolationRegression = -1
+                        var consumptionExtrapolationTESL = -1
+                        var consumptionExtrapolationTESM = -1
+                        var consumptionExtrapolationTESH = -1
+                        var tesData = this.state.tesData;
+                        var arimaData = this.state.arimaData;
+                        var CI = this.state.CI;
                         var rangeValue = this.state.rangeValue1;
                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        var inputDataFilter = this.state.semiAvgData;
+                        var inputDataAverageFilter = this.state.movingAvgData;
+                        var inputDataRegressionFilter = this.state.linearRegressionData;
                         var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                         var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
                         var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
@@ -1271,18 +1284,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                         this.setState({
                             dataChanged: false
                         })
-                        putRequest.onerror = function () {
+                        putRequest.onerror = function (event) {
                         }.bind(this);
-                        putRequest.onsuccess = function () {
+                        putRequest.onsuccess = function (event) {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
-                            datasetDetailsRequest.onsuccess = function () {
+                            datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
                                 var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                datasetDetailsRequest1.onsuccess = function () {
+                                datasetDetailsRequest1.onsuccess = function (event) {
                                 }
                             }
                             this.setState({
@@ -1380,8 +1393,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
+                var consumptionExtrapolationRegressionL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 10)
+                var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 1)
                 var consumptionExtrapolationTESM = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 2)
+                var consumptionExtrapolationTESH = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 3)
                 var consumptionExtrapolationArima = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 4)
+                var consumptionExtrapolationArimaL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 8)
                 if (consumptionExtrapolationMovingData.length > 0) {
                     if (consumptionExtrapolationMovingData[0].jsonProperties.startDate != undefined) {
                         startDate1 = consumptionExtrapolationMovingData[0].jsonProperties.startDate;
@@ -2171,6 +2188,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -2405,6 +2423,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -2814,7 +2833,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 qId: this.state.q
                             }}
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
-                            onSubmit={(values) => {
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var flag = this.state.buttonFalg;
                                 if (flag) {
                                     this.saveForecastConsumptionExtrapolation();
@@ -2824,13 +2843,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                             }}
                             render={
                                 ({
+                                    values,
                                     errors,
                                     touched,
                                     handleChange,
                                     handleBlur,
                                     handleSubmit,
+                                    isSubmitting,
+                                    isValid,
                                     setTouched,
-                                    handleReset                                }) => (
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched,
+                                    setFieldError
+                                }) => (
                                     <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                         <FormGroup className="">
                                             <div className="col-md-12 pl-lg-0">

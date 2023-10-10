@@ -53,7 +53,7 @@ class ListSubFundingSourceComponent extends Component {
             pathname: `/subFundingSource/editSubFundingSource/${subFundingSource.subFundingSourceId}`,
         });
     }
-    addSubFundingSource() {
+    addSubFundingSource(subFundingSource) {
         this.props.history.push({
             pathname: "/subFundingSource/addSubFundingSource"
         });
@@ -280,7 +280,7 @@ class ListSubFundingSourceComponent extends Component {
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
-                                                onClick: (e, row) => {
+                                                onClick: (e, row, rowIndex) => {
                                                     this.editSubFundingSource(row);
                                                 }
                                             }}

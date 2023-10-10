@@ -34,10 +34,16 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
+let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const options = {
   title: {
     display: true,
@@ -88,6 +94,7 @@ const options = {
     custom: CustomTooltips,
     callbacks: {
       label: function (tooltipItem, data) {
+        let label = data.labels[tooltipItem.index];
         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
         var cell1 = value
         cell1 += '';
@@ -268,6 +275,7 @@ class GlobalConsumption extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
@@ -305,11 +313,13 @@ class GlobalConsumption extends Component {
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
       align: 'left'
     })
+    const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
     var h1 = 50;
+    var aspectwidth1 = (width - h1);
     let startY = y + 10
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
@@ -457,6 +467,7 @@ class GlobalConsumption extends Component {
   }
   hideDiv() {
     setTimeout(function () {
+      var theSelect = document.getElementById('planningUnitId').length;
     }, 9000);
   }
   filterData(rangeValue) {
@@ -628,9 +639,9 @@ class GlobalConsumption extends Component {
         var Country = transaction.objectStore('CountryData');
         var getRequest = Country.getAll();
         var proList = []
-        getRequest.onerror = function () {
+        getRequest.onerror = function (event) {
         };
-        getRequest.onsuccess = function () {
+        getRequest.onsuccess = function (event) {
           var myResult = [];
           myResult = getRequest.result;
           var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -909,7 +920,7 @@ class GlobalConsumption extends Component {
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item) => {
+      && planningUnits.map((item, i) => {
         return (
           { label: getLabelText(item.label, this.state.lang), value: item.id }
         )
@@ -917,16 +928,24 @@ class GlobalConsumption extends Component {
     const { programLst } = this.state;
     let programList = [];
     programList = programLst.length > 0
-      && programLst.map((item) => {
+      && programLst.map((item, i) => {
         return (
           { label: item.code, value: item.id }
         )
       }, this);
     const { countrys } = this.state;
-    let countryList = countrys.length > 0 && countrys.map((item) => {
+    let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { realmList } = this.state;
+    let realms = realmList.length > 0
+      && realmList.map((item, i) => {
+        return (
+          <option key={i} value={item.realmId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
     const backgroundColor = [
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
       '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -938,6 +957,7 @@ class GlobalConsumption extends Component {
     ]
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
     let consumptionSummerydata = [];
+    let data = [];
     var mainData = this.state.consumptions;
     mainData = mainData.sort(function (a, b) {
       return new Date(a.consumptionDate) - new Date(b.consumptionDate);
@@ -1083,7 +1103,7 @@ class GlobalConsumption extends Component {
                             name="includeApprovedVersions"
                             id="includeApprovedVersions"
                             bsSize="sm"
-                            onChange={() => { this.filterData(this.state.rangeValue) }}
+                            onChange={(e) => { this.filterData(this.state.rangeValue) }}
                           >
                             <option value="true">{i18n.t('static.program.yes')}</option>
                             <option value="false">{i18n.t('static.program.no')}</option>

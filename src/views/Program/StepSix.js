@@ -37,7 +37,7 @@ const initialValuesSix = {
     programCode: '',
     programCode1: ''
 }
-const validationSchemaSix = function () {
+const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -193,16 +193,19 @@ export default class StepSix extends Component {
                 enableReinitialize={true}
                 initialValues={initialValuesSix}
                 validate={validateSix(validationSchemaSix)}
-                onSubmit={(values) => {
+                onSubmit={(values, { setSubmitting, setErrors }) => {
                     this.props.finishedStepSix && this.props.finishedStepSix();
                 }}
                 render={
                     ({
+                        values,
                         errors,
                         touched,
                         handleChange,
                         handleBlur,
                         handleSubmit,
+                        isSubmitting,
+                        isValid,
                         setTouched
                     }) => (
                         <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">

@@ -15,7 +15,14 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementagent.procurementagent');
-const validationSchema = function () {
+const initialValues = {
+    procurementAgentName: "",
+    submittedToApprovedLeadTime: "",
+    approvedToShippedLeadTime: "",
+    procurementAgentTypeId: [],
+    programId: []
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeId: Yup.string()
             .required(i18n.t('static.procurementagent.procurementagenttypetext')),
@@ -492,7 +499,7 @@ class EditProcurementAgentComponent extends Component {
                                         programId: this.state.procurementAgent.programList
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -556,12 +563,16 @@ class EditProcurementAgentComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched,
+                                        handleReset,
                                         setFieldTouched,
                                         setFieldValue
                                     }) => (

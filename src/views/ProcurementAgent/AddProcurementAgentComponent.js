@@ -16,7 +16,16 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementagent.procurementagent')
-const validationSchema = function () {
+let initialValues = {
+    realmId: [],
+    procurementAgentCode: "",
+    procurementAgentName: "",
+    submittedToApprovedLeadTime: "",
+    approvedToShippedLeadTime: "",
+    procurementAgentTypeId: [],
+    programId: []
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -601,7 +610,7 @@ class AddProcurementAgentComponent extends Component {
                                         programId: this.state.procurementAgent.programList.id
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -665,11 +674,14 @@ class AddProcurementAgentComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched,
                                         handleReset,
                                         setFieldTouched,

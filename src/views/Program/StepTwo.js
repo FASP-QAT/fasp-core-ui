@@ -17,7 +17,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const initialValuesTwo = {
     realmCountryId: ''
 }
-const validationSchemaTwo = function () {
+const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
@@ -152,16 +152,18 @@ export default class Steptwo extends Component {
                 <Formik
                     initialValues={initialValuesTwo}
                     validate={validateTwo(validationSchemaTwo)}
-                    onSubmit={(values) => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepTwo && this.props.finishedStepTwo();
                     }}
                     render={
                         ({
+                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
+                            isSubmitting,
                             isValid,
                             setTouched
                         }) => (

@@ -258,7 +258,7 @@ export default class PipelineProgramSetup extends Component {
                     if (checkValidation == true) {
                         var realmCountryId = document.getElementById("realmCountryId").value;
                         PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId, realmCountryId).
-                            then(() => {
+                            then(response => {
                             });
                         this.setState({
                             pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -287,7 +287,7 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
             }
-            ).catch(() => {
+            ).catch(error => {
                 this.refs.child.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });
@@ -435,7 +435,7 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(() => {
+            }).catch(error => {
                 this.refs.consumptionChild.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });
@@ -473,7 +473,7 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(() => {
+            }).catch(error => {
                 this.refs.inventoryChild.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });

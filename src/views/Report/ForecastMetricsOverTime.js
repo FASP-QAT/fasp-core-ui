@@ -31,6 +31,11 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 const ref = React.createRef();
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -224,6 +229,7 @@ class ForcastMatrixOverTime extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(8);
     var canvas = document.getElementById("cool-canvas");
@@ -231,6 +237,7 @@ class ForcastMatrixOverTime extends Component {
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
     var h1 = 50;
+    var aspectwidth1 = (width - h1);
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
@@ -312,6 +319,7 @@ class ForcastMatrixOverTime extends Component {
     }
   }
   consolidatedProgramList = () => {
+    const lan = 'en';
     const { programs } = this.state
     var proList = programs;
     var db1;
@@ -322,9 +330,9 @@ class ForcastMatrixOverTime extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -332,6 +340,7 @@ class ForcastMatrixOverTime extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             var f = 0
@@ -345,6 +354,7 @@ class ForcastMatrixOverTime extends Component {
             }
           }
         }
+        var lang = this.state.lang;
         if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           this.setState({
             programs: proList.sort(function (a, b) {
@@ -454,6 +464,7 @@ class ForcastMatrixOverTime extends Component {
     }
   }
   consolidatedVersionList = (programId) => {
+    const lan = 'en';
     const { versions } = this.state
     var verList = versions;
     var db1;
@@ -464,9 +475,9 @@ class ForcastMatrixOverTime extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -474,6 +485,7 @@ class ForcastMatrixOverTime extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
@@ -526,7 +538,9 @@ class ForcastMatrixOverTime extends Component {
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
+          const lan = 'en';
           var db1;
+          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -534,9 +548,10 @@ class ForcastMatrixOverTime extends Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            planningunitRequest.onerror = function () {
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
             };
-            planningunitRequest.onsuccess = function () {
+            planningunitRequest.onsuccess = function (e) {
               var myResult = [];
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
@@ -664,7 +679,7 @@ class ForcastMatrixOverTime extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
           this.setState({
             loading: false
           })
@@ -679,12 +694,12 @@ class ForcastMatrixOverTime extends Component {
           var program = `${programId}_v${version}_uId_${userId}`
           var data = [];
           var programRequest = programTransaction.get(program);
-          programRequest.onerror = function () {
+          programRequest.onerror = function (event) {
             this.setState({
               loading: false
             })
           }.bind(this);
-          programRequest.onsuccess = function () {
+          programRequest.onsuccess = function (event) {
             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
             var programJson = {}
@@ -702,9 +717,11 @@ class ForcastMatrixOverTime extends Component {
                 supplyPlan: []
               }
             }
+            var pu = (this.state.planningUnits.filter(c => c.id == planningUnitId))[0]
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+              var monthlydata = [];
               for (var month = monthstartfrom; month <= 12; month++) {
                 var year = from;
                 var actualconsumption = 0;
@@ -853,10 +870,10 @@ class ForcastMatrixOverTime extends Component {
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
-  handleClickMonthBox2 = () => {
+  handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show()
   }
-  handleAMonthChange2 = () => {
+  handleAMonthChange2 = (value, text) => {
   }
   handleAMonthDissmis2 = (value) => {
     this.setState({ singleValue2: value }, () => {
@@ -902,6 +919,14 @@ class ForcastMatrixOverTime extends Component {
         )
       }, this);
     const { programs } = this.state;
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
     const { versions } = this.state;
     let versionList = versions.length > 0
       && versions.map((item, i) => {
@@ -982,6 +1007,7 @@ class ForcastMatrixOverTime extends Component {
         mode: 'index',
         callbacks: {
           label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';
@@ -1010,7 +1036,7 @@ class ForcastMatrixOverTime extends Component {
       },
     }
     const bar = {
-      labels: this.state.matricsList.map((item) => (this.dateFormatterLanguage(item.month))),
+      labels: this.state.matricsList.map((item, index) => (this.dateFormatterLanguage(item.month))),
       datasets: [
         {
           type: "line",
@@ -1022,7 +1048,7 @@ class ForcastMatrixOverTime extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#####%",
-          data: this.state.matricsList.map((item) => (this.round(item.forecastError)))
+          data: this.state.matricsList.map((item, index) => (this.round(item.forecastError)))
         }
       ],
     }
@@ -1032,6 +1058,10 @@ class ForcastMatrixOverTime extends Component {
     }
     const { rangeValue } = this.state
     const { singleValue2 } = this.state
+    const makeText = m => {
+      if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+      return '?'
+    }
     return (
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} />

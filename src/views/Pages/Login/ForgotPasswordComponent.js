@@ -12,7 +12,7 @@ import UserService from '../../../api/UserService.js';
 const initialValues = {
     emailId: ""
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
@@ -101,7 +101,7 @@ class ForgotPasswordComponent extends Component {
                                     <Formik
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
-                                        onSubmit={(values) => {
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
                                                 UserService.forgotPassword(values.emailId)
                                                     .then(response => {
@@ -152,11 +152,13 @@ class ForgotPasswordComponent extends Component {
                                         }}
                                         render={
                                             ({
+                                                values,
                                                 errors,
                                                 touched,
                                                 handleChange,
                                                 handleBlur,
                                                 handleSubmit,
+                                                isSubmitting,
                                                 isValid,
                                                 setTouched
                                             }) => (

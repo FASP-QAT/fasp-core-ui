@@ -30,11 +30,11 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.common.listtree');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         datasetIdModal: Yup.string()
             .test('datasetIdModal', 'Please select program',
-                function () {
+                function (value) {
                     if (document.getElementById("treeFlag").value == "false" && document.getElementById("datasetIdModal").value == "") {
                         return false;
                     } else {
@@ -46,7 +46,7 @@ const validationSchema = function () {
             .required(i18n.t('static.validation.selectTreeName')),
         forecastMethodId: Yup.string()
             .test('forecastMethodId', i18n.t('static.validation.selectForecastMethod'),
-                function () {
+                function (value) {
                     if (document.getElementById("treeFlag").value == "false" && document.getElementById("forecastMethodId").value == "") {
                         return false;
                     } else {
@@ -56,7 +56,7 @@ const validationSchema = function () {
         treeFlag: Yup.boolean(),
         regionId: Yup.string()
             .when("treeFlag", {
-                is: () => {
+                is: val => {
                     return document.getElementById("treeFlag").value === "false";
                 },
                 then: Yup.string()
@@ -65,6 +65,9 @@ const validationSchema = function () {
                 otherwise: Yup.string().notRequired()
             }),
     })
+}
+const initialValues = {
+    treeName: "",
 }
 const validate = (getValidationSchema) => {
     return (values) => {
@@ -173,7 +176,7 @@ export default class ListTreeComponent extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
@@ -196,16 +199,17 @@ export default class ListTreeComponent extends Component {
                 programName: (CryptoJS.AES.encrypt(JSON.stringify((tempProgram.label)), SECRET_KEY)).toString(),
                 userId: userId
             }
-            transaction.oncomplete = function () {
+            var programRequest = programTransaction.put(json);
+            transaction.oncomplete = function (event) {
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                 var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                datasetDetailsRequest.onsuccess = function () {
+                datasetDetailsRequest.onsuccess = function (e) {
                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                     datasetDetailsRequestJson.changed = 1;
                     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function () {
+                    datasetDetailsRequest1.onsuccess = function (event) {
                     }
                 }
                 this.setState({
@@ -225,7 +229,7 @@ export default class ListTreeComponent extends Component {
                     }
                 });
             }.bind(this);
-            transaction.onerror = function () {
+            transaction.onerror = function (event) {
                 this.setState({
                     loading: false,
                     color: "red",
@@ -465,7 +469,7 @@ export default class ListTreeComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -732,7 +736,7 @@ export default class ListTreeComponent extends Component {
             isChanged1: true,
         });
     }
-    loadedMissingPU = function (instance, cell) {
+    loadedMissingPU = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -948,6 +952,7 @@ export default class ListTreeComponent extends Component {
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             var planningUnitList = [];
+            var programs = [];
             var missingPUList = this.state.missingPUList;
             var updatedMissingPUList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -1015,9 +1020,9 @@ export default class ListTreeComponent extends Component {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var program = transaction.objectStore('datasetData');
                 var getRequest = program.getAll();
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 };
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1045,17 +1050,17 @@ export default class ListTreeComponent extends Component {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
                     programTransaction.put(program);
-                    transaction.oncomplete = function () {
+                    transaction.oncomplete = function (event) {
                         db1 = e.target.result;
                         var id = (this.state.datasetIdModal + "_uId_" + userId).replace("~", "_");
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                        datasetDetailsRequest.onsuccess = function () {
+                        datasetDetailsRequest.onsuccess = function (e) {
                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
                             datasetDetailsRequestJson.changed = 1;
                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                            datasetDetailsRequest1.onsuccess = function () {
+                            datasetDetailsRequest1.onsuccess = function (event) {
                                 this.setState({
                                     color: "green",
                                     missingPUList: updatedMissingPUList,
@@ -1069,7 +1074,7 @@ export default class ListTreeComponent extends Component {
                             }.bind(this)
                         }.bind(this)
                     }.bind(this);
-                    transaction.onerror = function () {
+                    transaction.onerror = function (event) {
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
@@ -1077,6 +1082,8 @@ export default class ListTreeComponent extends Component {
     }
     updateMissingPUs() {
         var validation = this.checkValidation();
+        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+        var curUser = AuthenticationService.getLoggedInUserId();
         let indexVar = 0;
         if (validation == true) {
             var db1;
@@ -1087,9 +1094,9 @@ export default class ListTreeComponent extends Component {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var program = transaction.objectStore('datasetData');
                 var getRequest = program.getAll();
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 };
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1139,17 +1146,17 @@ export default class ListTreeComponent extends Component {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
                     programTransaction.put(program);
-                    transaction.oncomplete = function () {
+                    transaction.oncomplete = function (event) {
                         db1 = e.target.result;
                         var id = (this.state.datasetIdModal + "_uId_" + userId).replace("~", "_");
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                        datasetDetailsRequest.onsuccess = function () {
+                        datasetDetailsRequest.onsuccess = function (e) {
                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
                             datasetDetailsRequestJson.changed = 1;
                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                            datasetDetailsRequest1.onsuccess = function () {
+                            datasetDetailsRequest1.onsuccess = function (event) {
                                 this.setState({
                                     color: "green",
                                     missingPUList: updatedMissingPUList,
@@ -1163,7 +1170,7 @@ export default class ListTreeComponent extends Component {
                             }.bind(this)
                         }.bind(this)
                     }.bind(this);
-                    transaction.onerror = function () {
+                    transaction.onerror = function (event) {
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
@@ -1172,6 +1179,7 @@ export default class ListTreeComponent extends Component {
     getPlanningUnitWithPricesByIds() {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
+                var listArray = response.data;
                 this.setState({
                     planningUnitObjList: response.data
                 });
@@ -1213,7 +1221,9 @@ export default class ListTreeComponent extends Component {
             );
     }
     procurementAgentList() {
+        const lan = 'en';
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -1221,7 +1231,8 @@ export default class ListTreeComponent extends Component {
             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
             var procurementAgentRequest = procurementAgentOs.getAll();
-            procurementAgentRequest.onerror = function () {
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
                 this.setState({
                     message: 'unknown error occured', loading: false
                 },
@@ -1229,7 +1240,7 @@ export default class ListTreeComponent extends Component {
                         this.hideSecondComponent();
                     })
             };
-            procurementAgentRequest.onsuccess = function () {
+            procurementAgentRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = procurementAgentRequest.result;
                 var listArray = myResult;
@@ -1402,7 +1413,9 @@ export default class ListTreeComponent extends Component {
         });
     }
     getForecastMethodList() {
+        const lan = 'en';
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -1410,9 +1423,10 @@ export default class ListTreeComponent extends Component {
             var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
             var planningunitRequest = planningunitOs.getAll();
-            planningunitRequest.onerror = function () {
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
             };
-            planningunitRequest.onsuccess = function () {
+            planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 this.setState({
@@ -1453,6 +1467,7 @@ export default class ListTreeComponent extends Component {
         var treeTemplateId = '';
         if (operationId == 1) {
             const index = treeList.findIndex(c => c.treeId == treeId);
+            const result = treeList.splice(index, 1);
         } else if (operationId == 2) {
             let treeName = this.state.treeName;
             for (let i = 0; i < treeList.length; i++) {
@@ -1717,9 +1732,9 @@ export default class ListTreeComponent extends Component {
             var transaction = db1.transaction(['treeTemplate'], 'readwrite');
             var program = transaction.objectStore('treeTemplate');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var treeTemplateList = myResult.filter(x => x.active == true && (x.flatList.filter(c => c.parent == null)[0].payload.nodeType.id == 2 || x.flatList.filter(c => c.parent == null)[0].payload.nodeType.id == 1));
@@ -1778,7 +1793,7 @@ export default class ListTreeComponent extends Component {
                         })
                     }
                 }).catch(
-                    () => {
+                    error => {
                         this.consolidatedProgramList();
                     }
                 );
@@ -1789,6 +1804,7 @@ export default class ListTreeComponent extends Component {
     }
     consolidatedProgramList = () => {
         this.setState({ loading: true })
+        const lan = 'en';
         const { datasetList } = this.state
         var proList = datasetList;
         var db1;
@@ -1799,14 +1815,14 @@ export default class ListTreeComponent extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 var pcTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                 var pcProgram = pcTransaction.objectStore('forecastingUnit');
                 var pcGetRequest = pcProgram.getAll();
-                pcGetRequest.onsuccess = function () {
+                pcGetRequest.onsuccess = function (event) {
                     myResult = getRequest.result;
                     var pcList = pcGetRequest.result;
                     this.setState({
@@ -1818,6 +1834,7 @@ export default class ListTreeComponent extends Component {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId) {
                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                             var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                             programData.code = programData.programCode;
@@ -1834,6 +1851,7 @@ export default class ListTreeComponent extends Component {
                             downloadedProgramData.push(programData);
                         }
                     }
+                    var lang = this.state.lang;
                     if (proList.length == 1) {
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
@@ -1999,6 +2017,7 @@ export default class ListTreeComponent extends Component {
     }
     consolidatedVersionList = (programId) => {
         this.setState({ loading: true })
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -2009,9 +2028,9 @@ export default class ListTreeComponent extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -2019,6 +2038,7 @@ export default class ListTreeComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -2223,6 +2243,10 @@ export default class ListTreeComponent extends Component {
                     }
                 }
             }
+            const sortArray = (sourceArray) => {
+                const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
+                return sourceArray.sort(sortByName);
+            };
             if (treeArray.length > 0) {
                 treeArray.sort(function (a, b) {
                     return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
@@ -2230,6 +2254,7 @@ export default class ListTreeComponent extends Component {
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
+            var json = [];
             var data = treeArray;
             var options = {
                 data: data,
@@ -2308,7 +2333,7 @@ export default class ListTreeComponent extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y) {
+                contextMenu: function (obj, x, y, e) {
                     var items = [];
                     if (y != null) {
                         if (obj.options.allowInsertRow == true && this.state.versionId.toString().includes("(Local)")) {
@@ -2463,7 +2488,7 @@ export default class ListTreeComponent extends Component {
             });
         }
     };
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
     selected = function (instance, cell, x, y, value, e) {
@@ -2488,7 +2513,7 @@ export default class ListTreeComponent extends Component {
                                         var db1;
                                         getDatabase();
                                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                                        openRequest.onerror = function () {
+                                        openRequest.onerror = function (event) {
                                             this.setState({
                                                 message: i18n.t('static.program.errortext'),
                                                 color: 'red'
@@ -2500,7 +2525,7 @@ export default class ListTreeComponent extends Component {
                                             var programDataTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
                                             var programDataOs1 = programDataTransaction1.objectStore('datasetDataServer');
                                             var ddatasetDataServerRequest = programDataOs1.clear();
-                                            ddatasetDataServerRequest.onsuccess = function () {
+                                            ddatasetDataServerRequest.onsuccess = function (event) {
                                                 this.downloadClicked(treeId);
                                             }.bind(this)
                                         }.bind(this)
@@ -2566,14 +2591,15 @@ export default class ListTreeComponent extends Component {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function () {
+                    openRequest.onerror = function (event) {
                         this.setState({ loading: false })
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
                         var transaction = db1.transaction(['datasetDataServer'], 'readwrite');
                         var program = transaction.objectStore('datasetDataServer');
-                        transaction.oncomplete = function () {
+                        var putRequest = program.put(item);
+                        transaction.oncomplete = function (event) {
                             this.setState({
                                 message: 'static.program.downloadsuccess',
                                 color: 'green',
@@ -2582,7 +2608,7 @@ export default class ListTreeComponent extends Component {
                                 this.props.history.push({ pathname: `/masterDataSyncForTree`, state: { "programIds": programIds, "treeId": treeId } })
                             })
                         }.bind(this);
-                        transaction.onerror = function () {
+                        transaction.onerror = function (event) {
                             this.setState({
                                 loading: false,
                                 color: "red",
@@ -2591,7 +2617,7 @@ export default class ListTreeComponent extends Component {
                         }.bind(this);
                     }.bind(this)
                 }
-            }).catch(() => {
+            }).catch(error => {
                 this.setState({
                     loading: false,
                     message: i18n.t("static.program.errortext"),
@@ -2807,7 +2833,7 @@ export default class ListTreeComponent extends Component {
                                     }}
                                     enableReinitialize={true}
                                     validate={validate(validationSchema)}
-                                    onSubmit={(values) => {
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (!this.state.isSubmitClicked) {
                                             this.setState({ loading: true, isSubmitClicked: true }, () => {
                                                 this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.downloadAcrossProgram == 1 ? 4 : this.state.treeFlag ? 2 : 3);
@@ -2821,11 +2847,14 @@ export default class ListTreeComponent extends Component {
                                     }}
                                     render={
                                         ({
+                                            values,
                                             errors,
                                             touched,
                                             handleChange,
                                             handleBlur,
                                             handleSubmit,
+                                            isSubmitting,
+                                            isValid,
                                             setTouched,
                                             handleReset,
                                             setFieldValue,

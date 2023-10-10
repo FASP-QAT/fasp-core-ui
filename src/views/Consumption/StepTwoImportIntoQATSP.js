@@ -19,6 +19,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 export default class StepTwoImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -157,7 +161,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -229,6 +233,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
+        var json = [];
         var papuList11 = this.state.selSource2;
         var data;
         if (papuList11 != "") {
@@ -265,7 +270,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     source: this.state.supplyPlanRegionListJExcel,
                 }
             ],
-            updateTable: function (el, cell, x, y) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
                     var rowData = elInstance.getRowData(y);
@@ -299,7 +304,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };

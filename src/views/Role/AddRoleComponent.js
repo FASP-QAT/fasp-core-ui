@@ -17,7 +17,7 @@ const initialValues = {
     canCreateRoles: []
 }
 const entityname = i18n.t('static.role.role');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -291,7 +291,7 @@ class AddRoleComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -351,11 +351,13 @@ class AddRoleComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset,

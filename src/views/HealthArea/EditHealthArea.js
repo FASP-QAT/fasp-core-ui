@@ -20,7 +20,7 @@ let initialValues = {
     realmCountryId: [],
 }
 const entityname = i18n.t('static.healtharea.healtharea');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -371,7 +371,7 @@ export default class EditHealthAreaComponent extends Component {
                                     realmCountryId: this.state.healthArea.realmCountryArray
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -429,11 +429,14 @@ export default class EditHealthAreaComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched,
                                         setFieldValue,
                                         setFieldTouched

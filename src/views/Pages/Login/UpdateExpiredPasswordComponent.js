@@ -130,7 +130,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                             emailId: this.state.emailId
                                         }}
                                         validate={validate(validationSchema)}
-                                        onSubmit={(values) => {
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
@@ -193,11 +193,13 @@ class UpdateExpiredPasswordComponent extends Component {
                                         }}
                                         render={
                                             ({
+                                                values,
                                                 errors,
                                                 touched,
                                                 handleChange,
                                                 handleBlur,
                                                 handleSubmit,
+                                                isSubmitting,
                                                 isValid,
                                                 setTouched
                                             }) => (

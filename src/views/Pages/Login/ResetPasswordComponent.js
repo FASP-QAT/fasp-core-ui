@@ -155,7 +155,7 @@ class ResetPasswordComponent extends Component {
                                             username: this.state.username
                                         }}
                                         validate={validate(validationSchema)}
-                                        onSubmit={(values) => {
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
                                                 if (!this.state.buttonClicked) {
                                                     UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
@@ -219,11 +219,13 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         render={
                                             ({
+                                                values,
                                                 errors,
                                                 touched,
                                                 handleChange,
                                                 handleBlur,
                                                 handleSubmit,
+                                                isSubmitting,
                                                 isValid,
                                                 setTouched
                                             }) => (

@@ -6,7 +6,7 @@ export function calculateModelingData(dataset, props, page) {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;

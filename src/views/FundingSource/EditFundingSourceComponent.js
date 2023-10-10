@@ -8,8 +8,12 @@ import FundingSourceService from "../../api/FundingSourceService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+let initialValues = {
+    fundingSource: "",
+    fundingSourceCode: "",
+}
 const entityname = i18n.t('static.fundingsource.fundingsource');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -200,7 +204,7 @@ class EditFundingSourceComponent extends Component {
                                     fundingSourceCode: this.state.fundingSource.fundingSourceCode
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -258,11 +262,14 @@ class EditFundingSourceComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm' autocomplete="off">

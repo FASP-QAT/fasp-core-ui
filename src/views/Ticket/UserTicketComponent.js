@@ -14,7 +14,17 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
-const validationSchema = function () {
+const initialValues = {
+    summary: "",
+    realm: "",
+    name: "",
+    emailId: "",
+    orgAndCountry: "",
+    role: "",
+    language: "",
+    notes: ""
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -29,7 +39,7 @@ const validationSchema = function () {
             .required(i18n.t('static.user.validemail')),
         role: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
-                function () {
+                function (value) {
                     if (document.getElementById("roleValid").value == "false") {
                         return true;
                     } else {
@@ -440,7 +450,7 @@ export default class UserTicketComponent extends Component {
                             notes: ""
                         }}
                         validate={validate(validationSchema)}
-                        onSubmit={(values) => {
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
                             })
@@ -508,11 +518,13 @@ export default class UserTicketComponent extends Component {
                         }}
                         render={
                             ({
+                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset,

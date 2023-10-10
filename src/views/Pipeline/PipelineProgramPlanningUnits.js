@@ -33,7 +33,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     stopLoading() {
         this.setState({ loading: false });
     }
-    dropdownFilter = function (instance, cell, c, r) {
+    dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
         var puList = []
@@ -294,6 +294,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
     checkValidation() {
         var reg = /^[0-9\b]+$/;
+        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
@@ -601,6 +602,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             }
                                             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+                                            var json = [];
                                             var data = productDataArr;
                                             var options = {
                                                 data: data,
@@ -672,7 +674,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 editable: false,
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
-                                                contextMenu: function () {
+                                                contextMenu: function (obj, x, y, e) {
                                                     return false;
                                                 }.bind(this),
                                                 search: true,
@@ -821,7 +823,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
@@ -842,7 +844,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
         }
     }
-    loadedJexcelCommonFunction = function (instance) {
+    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
     render() {

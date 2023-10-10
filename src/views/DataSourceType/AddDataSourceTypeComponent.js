@@ -15,7 +15,7 @@ let initialValues = {
     label: ''
 }
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -202,7 +202,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -261,11 +261,13 @@ export default class AddDataSourceTypeComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

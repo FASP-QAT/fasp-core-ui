@@ -7,8 +7,11 @@ import SubFundingSourceService from "../../api/SubFundingSourceService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+let initialValues = {
+    subFundingSource: ""
+}
 const entityname = i18n.t('static.subfundingsource.subfundingsource');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
             .required(i18n.t('static.fundingsource.validsubfundingsource'))
@@ -167,7 +170,7 @@ class EditSubFundingSourceComponent extends Component {
                                     subFundingSource: this.state.subFundingSource.label.label_en
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -216,11 +219,14 @@ class EditSubFundingSourceComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>

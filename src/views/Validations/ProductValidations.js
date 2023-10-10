@@ -89,16 +89,16 @@ class ProductValidation extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
                 var getRequest = datasetOs.get(datasetId);
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 }.bind(this);
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -134,7 +134,7 @@ class ProductValidation extends Component {
                     })
                 }
             }).catch(
-                () => {
+                error => {
                     this.setState({
                         datasetData: {},
                         localProgramId: "",
@@ -275,7 +275,7 @@ class ProductValidation extends Component {
             })
         }
     }
-    addCommasWith8Decimals(cell1) {
+    addCommasWith8Decimals(cell1, row) {
         if (cell1 != null && cell1 != "") {
             cell1 += '';
             var x = cell1.replaceAll(",", "").split('.');
@@ -290,7 +290,7 @@ class ProductValidation extends Component {
             return "";
         }
     }
-    addCommas(cell1) {
+    addCommas(cell1, row) {
         if (cell1 != null && cell1 != "") {
             cell1 += '';
             var x = cell1.replaceAll(",", "").split('.');
@@ -337,6 +337,7 @@ class ProductValidation extends Component {
                 var nodeDataMap = items[f].payload.nodeDataMap[this.state.scenarioId][0];
                 nodeDataList.push({ nodeDataMap: nodeDataMap, flatItem: items[f] });
             }
+            var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
             var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
             var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
@@ -592,7 +593,7 @@ class ProductValidation extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 editable: false,
-                contextMenu: function () {
+                contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
             };
@@ -612,7 +613,7 @@ class ProductValidation extends Component {
             })
         }
     }
-    loaded = function (instance, cell) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.worksheets[0].getJson(null, false);
         var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -708,7 +709,7 @@ class ProductValidation extends Component {
                 })
             }
         }).catch(
-            () => {
+            error => {
                 this.getOfflineDatasetList();
             }
         );
@@ -720,44 +721,44 @@ class ProductValidation extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
             var datasetOs = datasetTransaction.objectStore('datasetData');
             var getRequest = datasetOs.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var unitTransaction = db1.transaction(['unit'], 'readwrite');
                 var unitOs = unitTransaction.objectStore('unit');
                 var unitRequest = unitOs.getAll();
-                unitRequest.onerror = function () {
+                unitRequest.onerror = function (event) {
                 }.bind(this);
-                unitRequest.onsuccess = function () {
+                unitRequest.onsuccess = function (event) {
                     var upTransaction = db1.transaction(['usagePeriod'], 'readwrite');
                     var upOs = upTransaction.objectStore('usagePeriod');
                     var upRequest = upOs.getAll();
-                    upRequest.onerror = function () {
+                    upRequest.onerror = function (event) {
                     }.bind(this);
-                    upRequest.onsuccess = function () {
+                    upRequest.onsuccess = function (event) {
                         var utTransaction = db1.transaction(['usageType'], 'readwrite');
                         var utOs = utTransaction.objectStore('usageType');
                         var utRequest = utOs.getAll();
-                        utRequest.onerror = function () {
+                        utRequest.onerror = function (event) {
                         }.bind(this);
-                        utRequest.onsuccess = function () {
+                        utRequest.onsuccess = function (event) {
                             var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                             var currencyOs = currencyTransaction.objectStore('currency');
                             var currencyRequest = currencyOs.getAll();
-                            currencyRequest.onerror = function () {
+                            currencyRequest.onerror = function (event) {
                             }.bind(this);
-                            currencyRequest.onsuccess = function () {
+                            currencyRequest.onsuccess = function (event) {
                                 var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                                 var fuOs = fuTransaction.objectStore('forecastingUnit');
                                 var fuRequest = fuOs.getAll();
-                                fuRequest.onerror = function () {
+                                fuRequest.onerror = function (event) {
                                 }.bind(this);
                                 fuRequest.onsuccess = function (event) {
                                     var fuList = fuRequest.result;
@@ -902,6 +903,7 @@ class ProductValidation extends Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -977,6 +979,7 @@ class ProductValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
         var columns = [];
         columns.push(i18n.t('static.common.level'));
         columns.push(i18n.t('static.supplyPlan.type'));

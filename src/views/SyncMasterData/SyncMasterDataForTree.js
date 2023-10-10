@@ -90,6 +90,7 @@ export default class SyncMasterDataForTree extends Component {
         )
     }
     fetchData(hasPrograms, programId) {
+        var realmId = AuthenticationService.getRealmId();
         if (this.state.syncedMasters === this.state.totalMasters) {
             document.getElementById("retryButtonDiv").style.display = "none";
             let id = AuthenticationService.displayDashboardBasedOnRole();
@@ -108,10 +109,13 @@ export default class SyncMasterDataForTree extends Component {
         this.setState({ loading: false })
         if (isSiteOnline()) {
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
+                var realmId = AuthenticationService.getRealmId();
                 db1 = e.target.result;
+                var tm = this.state.totalMasters;
                 var pIds = [];
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -119,7 +123,7 @@ export default class SyncMasterDataForTree extends Component {
                 var datasetDataServerTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
                 var ddatasetDataServerOs = datasetDataServerTransaction1.objectStore('datasetDataServer');
                 var ddatasetDataServerRequest = ddatasetDataServerOs.getAll();
-                ddatasetDataServerRequest.onsuccess = function () {
+                ddatasetDataServerRequest.onsuccess = function (e) {
                     var datasetDataServerList = ddatasetDataServerRequest.result;
                     var datasetDataServerListFiltered = [];
                     if (this.props.location.state != undefined && this.props.location.state.programIds != undefined) {
@@ -141,7 +145,7 @@ export default class SyncMasterDataForTree extends Component {
                                     for (var i = 0; i < json.length; i++) {
                                         countryObjectStore.put(json[i]);
                                     }
-                                    countryTransaction.oncomplete = function () {
+                                    countryTransaction.oncomplete = function (event) {
                                         this.setState({
                                             syncedMasters: this.state.syncedMasters + 1,
                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -152,7 +156,7 @@ export default class SyncMasterDataForTree extends Component {
                                             for (var i = 0; i < json.length; i++) {
                                                 forecastingUnitObjectStore.put(json[i]);
                                             }
-                                            forecastingUnitTransaction.oncomplete = function () {
+                                            forecastingUnitTransaction.oncomplete = function (event) {
                                                 this.setState({
                                                     syncedMasters: this.state.syncedMasters + 1,
                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -163,7 +167,7 @@ export default class SyncMasterDataForTree extends Component {
                                                     for (var i = 0; i < json.length; i++) {
                                                         planningUnitObjectStore.put(json[i]);
                                                     }
-                                                    planningUnitTransaction.oncomplete = function () {
+                                                    planningUnitTransaction.oncomplete = function (event) {
                                                         this.setState({
                                                             syncedMasters: this.state.syncedMasters + 1,
                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -174,7 +178,7 @@ export default class SyncMasterDataForTree extends Component {
                                                             for (var i = 0; i < json.length; i++) {
                                                                 procurementUnitObjectStore.put(json[i]);
                                                             }
-                                                            procurementUnitTransaction.oncomplete = function () {
+                                                            procurementUnitTransaction.oncomplete = function (event) {
                                                                 this.setState({
                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -185,7 +189,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                     for (var i = 0; i < json.length; i++) {
                                                                         realmCountryObjectStore.put(json[i]);
                                                                     }
-                                                                    realmCountryTransaction.oncomplete = function () {
+                                                                    realmCountryTransaction.oncomplete = function (event) {
                                                                         this.setState({
                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -196,7 +200,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                             for (var i = 0; i < json.length; i++) {
                                                                                 realmCountryPlanningUnitObjectStore.put(json[i]);
                                                                             }
-                                                                            realmCountryPlanningUnitTransaction.oncomplete = function () {
+                                                                            realmCountryPlanningUnitTransaction.oncomplete = function (event) {
                                                                                 this.setState({
                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -207,7 +211,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                         procurementAgentPlanningUnitObjectStore.put(json[i]);
                                                                                     }
-                                                                                    procurementAgentPlanningUnitTransaction.oncomplete = function () {
+                                                                                    procurementAgentPlanningUnitTransaction.oncomplete = function (event) {
                                                                                         this.setState({
                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -218,7 +222,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                 procurementAgentProcurementUnitObjectStore.put(json[i]);
                                                                                             }
-                                                                                            procurementAgentProcurementUnitTransaction.oncomplete = function () {
+                                                                                            procurementAgentProcurementUnitTransaction.oncomplete = function (event) {
                                                                                                 this.setState({
                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -229,7 +233,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                         programObjectStore.put(json[i]);
                                                                                                     }
-                                                                                                    programTransaction.oncomplete = function () {
+                                                                                                    programTransaction.oncomplete = function (event) {
                                                                                                         this.setState({
                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -240,7 +244,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                 programPlanningUnitObjectStore.put(json[i]);
                                                                                                             }
-                                                                                                            programPlanningUnitTransaction.oncomplete = function () {
+                                                                                                            programPlanningUnitTransaction.oncomplete = function (event) {
                                                                                                                 this.setState({
                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -251,7 +255,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                         regionObjectStore.put(json[i]);
                                                                                                                     }
-                                                                                                                    regionTransaction.oncomplete = function () {
+                                                                                                                    regionTransaction.oncomplete = function (event) {
                                                                                                                         this.setState({
                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -262,7 +266,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                 equivalencyUnitObjectStore.put(json[i]);
                                                                                                                             }
-                                                                                                                            equivalencyUnitTransaction.oncomplete = function () {
+                                                                                                                            equivalencyUnitTransaction.oncomplete = function (event) {
                                                                                                                                 this.setState({
                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -273,7 +277,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                         budgetObjectStore.put(json[i]);
                                                                                                                                     }
-                                                                                                                                    budgetTransaction.oncomplete = function () {
+                                                                                                                                    budgetTransaction.oncomplete = function (event) {
                                                                                                                                         this.setState({
                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -284,7 +288,7 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                 usageTemplateObjectStore.put(json[i]);
                                                                                                                                             }
-                                                                                                                                            usageTemplateTransaction.oncomplete = function () {
+                                                                                                                                            usageTemplateTransaction.oncomplete = function (event) {
                                                                                                                                                 this.setState({
                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -320,7 +324,7 @@ export default class SyncMasterDataForTree extends Component {
                                     }.bind(this);
                                 }
                             }).catch(
-                                () => {
+                                error => {
                                     if (document.getElementById('div1') != null) {
                                         document.getElementById('div1').style.display = 'none';
                                     }

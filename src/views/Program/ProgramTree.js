@@ -239,7 +239,7 @@ class Program extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -254,11 +254,11 @@ class Program extends Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                 })
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -453,7 +453,7 @@ class Program extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
@@ -467,7 +467,7 @@ class Program extends Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red',
@@ -476,7 +476,7 @@ class Program extends Component {
                     this.hideFirstComponent()
                 })
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -512,22 +512,22 @@ class Program extends Component {
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function () {
+                        openRequest.onerror = function (event) {
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['programData'], 'readwrite');
                             var programTransaction = transaction.objectStore('programData');
                             var deleteRequest = programTransaction.delete(id);
-                            deleteRequest.onsuccess = function () {
+                            deleteRequest.onsuccess = function (event) {
                                 var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
                                 var programTransaction1 = transaction1.objectStore('downloadedProgramData');
                                 var deleteRequest1 = programTransaction1.delete(id);
-                                deleteRequest1.onsuccess = function () {
+                                deleteRequest1.onsuccess = function (event) {
                                     var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
                                     var programTransaction2 = transaction2.objectStore('programQPLDetails');
                                     var deleteRequest2 = programTransaction2.delete(id);
-                                    deleteRequest2.onsuccess = function () {
+                                    deleteRequest2.onsuccess = function (event) {
                                         this.setState({
                                             loading: false,
                                             message: "Program delete succesfully.",
@@ -692,25 +692,26 @@ class Program extends Component {
     }
     deleteProgramById(id, i, length) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var deleteRequest = programTransaction.delete(id);
-            deleteRequest.onsuccess = function () {
+            deleteRequest.onsuccess = function (event) {
                 var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
                 var programTransaction1 = transaction1.objectStore('downloadedProgramData');
                 var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function () {
+                deleteRequest1.onsuccess = function (event) {
                     var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
                     var programTransaction2 = transaction2.objectStore('programQPLDetails');
                     var deleteRequest2 = programTransaction2.delete(id);
-                    deleteRequest2.onsuccess = function () {
+                    deleteRequest2.onsuccess = function (event) {
                         if (i == length - 1) {
                             this.setState({
                                 loading: false,
@@ -829,6 +830,7 @@ class Program extends Component {
                 })
         }
         else {
+            var programThenCount = 0;
             if (isSiteOnline()) {
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
@@ -841,6 +843,7 @@ class Program extends Component {
                             var inventoryList = json[r].inventoryList;
                             var shipmentList = json[r].shipmentList;
                             var batchInfoList = json[r].batchInfoList;
+                            var problemReportList = json[r].problemReportList;
                             var supplyPlan = json[r].supplyPlan;
                             var generalData = json[r];
                             delete generalData.consumptionList;
@@ -884,10 +887,11 @@ class Program extends Component {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
                             var program = transaction.objectStore('programQPLDetails');
+                            var count = 0;
                             var getRequest = program.getAll();
-                            getRequest.onerror = function () {
+                            getRequest.onerror = function (event) {
                             };
-                            getRequest.onsuccess = function () {
+                            getRequest.onsuccess = function (event) {
                                 var myResult = [];
                                 myResult = getRequest.result;
                                 var programAndVersionListLocal = [];
@@ -933,8 +937,9 @@ class Program extends Component {
                                                             userId: userId,
                                                             programCode: json[r].programCode,
                                                         };
+                                                        var putRequest = programSaveData.put(item);
                                                     }
-                                                    transactionForSavingData.oncomplete = function () {
+                                                    transactionForSavingData.oncomplete = function (event) {
                                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                                                         var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                                         for (var r = 0; r < json.length; r++) {
@@ -952,8 +957,9 @@ class Program extends Component {
                                                                 programData: updatedJson[r],
                                                                 userId: userId
                                                             };
+                                                            var putRequest = downloadedProgramSaveData.put(item);
                                                         }
-                                                        transactionForSavingDownloadedProgramData.oncomplete = function () {
+                                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                                             var programIds = []
@@ -970,8 +976,9 @@ class Program extends Component {
                                                                     readonly: 0
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                             }
-                                                            programQPLDetailsTransaction.oncomplete = function () {
+                                                            programQPLDetailsTransaction.oncomplete = function (event) {
                                                                 this.setState({
                                                                     message: 'static.program.downloadsuccess',
                                                                     color: 'green',
@@ -1024,8 +1031,9 @@ class Program extends Component {
                                             userId: userId,
                                             programCode: json[r].programCode,
                                         };
+                                        var putRequest = programSaveData.put(item);
                                     }
-                                    transactionForSavingData.oncomplete = function () {
+                                    transactionForSavingData.oncomplete = function (event) {
                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                                         var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                         for (var r = 0; r < json.length; r++) {
@@ -1043,8 +1051,9 @@ class Program extends Component {
                                                 programData: updatedJson[r],
                                                 userId: userId
                                             };
+                                            var putRequest = downloadedProgramSaveData.put(item);
                                         }
-                                        transactionForSavingDownloadedProgramData.oncomplete = function () {
+                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                             var programIds = []
@@ -1061,8 +1070,9 @@ class Program extends Component {
                                                     readonly: 0
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             }
-                                            programQPLDetailsTransaction.oncomplete = function () {
+                                            programQPLDetailsTransaction.oncomplete = function (event) {
                                                 this.setState({
                                                     message: 'static.program.downloadsuccess',
                                                     color: 'green',

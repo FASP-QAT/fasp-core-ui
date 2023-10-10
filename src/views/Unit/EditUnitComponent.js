@@ -8,8 +8,11 @@ import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+let initialValues = {
+    unit: ""
+}
 const entityname = i18n.t('static.unit.unit');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         unitName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -197,7 +200,7 @@ export default class EditUnitComponent extends Component {
                                     unitCode: this.state.unit.unitCode
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -255,11 +258,14 @@ export default class EditUnitComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='unitForm' autocomplete="off">

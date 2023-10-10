@@ -45,7 +45,7 @@ const entityname = i18n.t('static.button.commit');
 const initialValues = {
     notes: ''
 }
-const validationSchema = function () {
+const validationSchema = function (values, t) {
     return Yup.object().shape({
         notes: Yup.string()
             .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.commit.consumptionnotesvalid"))
@@ -228,7 +228,7 @@ export default class CommitTreeComponent extends React.Component {
             search: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
             columnSorting: false,
@@ -432,7 +432,7 @@ export default class CommitTreeComponent extends React.Component {
             search: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
             columnSorting: false,
@@ -589,7 +589,7 @@ export default class CommitTreeComponent extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -600,13 +600,13 @@ export default class CommitTreeComponent extends React.Component {
             var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('datasetData');
             var programRequest = programDataOs.getAll();
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
                 })
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (e) {
                 var programList = [];
                 var myResult = programRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -815,7 +815,7 @@ export default class CommitTreeComponent extends React.Component {
                                 onload: this.loadedFunctionForVersionSettings,
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
-                                contextMenu: function (obj, x, y) {
+                                contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
                                     if (rowData[9].toString() == 1) {
@@ -1012,7 +1012,7 @@ export default class CommitTreeComponent extends React.Component {
                                 onload: this.loadedFunctionForPlanningUnits,
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
-                                contextMenu: function (obj, x, y) {
+                                contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
                                     if (rowData[14].toString() == 1) {
@@ -1153,7 +1153,7 @@ export default class CommitTreeComponent extends React.Component {
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
-                                onclick: function (instance, cell, x, y) {
+                                onclick: function (instance, cell, x, y, event) {
                                     if (x == 5) {
                                         instance.options.editable = true;
                                         instance.setValueFromCoords(12, y, instance.getValueFromCoords(5, y, true).toString() == "true" ? false : true, true)
@@ -1164,7 +1164,7 @@ export default class CommitTreeComponent extends React.Component {
                                 onload: this.loadedFunctionForConsumption,
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
-                                contextMenu: function (obj, x, y) {
+                                contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
                                     if (rowData[6].toString() == 1) {
@@ -1335,7 +1335,7 @@ export default class CommitTreeComponent extends React.Component {
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
                                 onload: this.loadedFunctionForTree,
-                                onclick: function (instance, cell, x, y) {
+                                onclick: function (instance, cell, x, y, value) {
                                     if (x == 3) {
                                         instance.options.editable = true;
                                         instance.setValueFromCoords(10, y, instance.getValueFromCoords(3, y, true).toString() == "true" ? false : true, true)
@@ -1345,7 +1345,7 @@ export default class CommitTreeComponent extends React.Component {
                                 }.bind(this),
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
-                                contextMenu: function (obj, x, y) {
+                                contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
                                     if (rowData[6].toString() == 1) {
@@ -1485,6 +1485,7 @@ export default class CommitTreeComponent extends React.Component {
                                     var pu2 = datasetData2.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                                     var rg = regionList.filter(c => c.regionId == regionSet[k]);
                                     var rg1 = regionList1.filter(c => c.regionId == regionSet[k]);
+                                    var rg2 = regionList2.filter(c => c.regionId == regionSet[k]);
                                     var selectedForecastData = pu.length > 0 ? pu[0].selectedForecastMap : '';
                                     var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
                                     var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
@@ -1627,7 +1628,7 @@ export default class CommitTreeComponent extends React.Component {
                                 position: 'top',
                                 filters: true,
                                 license: JEXCEL_PRO_KEY,
-                                contextMenu: function (obj, x, y) {
+                                contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
                                     if (rowData[11].toString() == 1) {
@@ -1776,23 +1777,26 @@ export default class CommitTreeComponent extends React.Component {
     }
     mergeData() {
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
             var programRequest = programTransaction.get(this.state.programId);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
+                var dataset = programRequest.result;
                 var programDataJson = programRequest.result.programData;
                 var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                 var datasetJsonOriginal = JSON.parse(datasetData);
                 if (this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0) {
+                    var programDataLocal = this.state.programDataLocal;
                     var programDataJson = this.state.programDataLocal;
                     var programDataServer = this.state.programDataServer;
                     var versionSettingsJson = this.state.versionSettingsInstance.getJson(null, false);
@@ -2444,7 +2448,7 @@ export default class CommitTreeComponent extends React.Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
@@ -2456,14 +2460,14 @@ export default class CommitTreeComponent extends React.Component {
                     var transaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var program = transaction.objectStore('datasetDetails');
                     var getRequest = program.get((this.state.programId));
-                    getRequest.onerror = function () {
+                    getRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    getRequest.onsuccess = function () {
+                    getRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = getRequest.result;
                         myResult.readonly = 0;
@@ -2471,7 +2475,7 @@ export default class CommitTreeComponent extends React.Component {
                         var program1 = transaction1.objectStore('datasetDetails');
                         var getRequest1 = program1.put(myResult);
                         var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
-                        getRequest1.onsuccess = function () {
+                        getRequest1.onsuccess = function (e) {
                             this.setState({
                                 message: message,
                                 color: 'red',
@@ -2483,12 +2487,13 @@ export default class CommitTreeComponent extends React.Component {
                 }.bind(this)
             }
         }).catch(
-            () => {
+            error => {
                 this.redirectToDashbaord(commitRequestId)
             })
     }
     getLatestProgram(notificationDetails) {
         this.setState({ loading: true });
+        var updatedJson = [];
         var checkboxesChecked = [];
         var programIdsToSyncArray = [];
         var notificationArray = [];
@@ -2507,7 +2512,7 @@ export default class CommitTreeComponent extends React.Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
@@ -2517,10 +2522,12 @@ export default class CommitTreeComponent extends React.Component {
                     db1 = e.target.result;
                     var datasetDataTransaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetDataOs = datasetDataTransaction.objectStore('datasetData');
-                    datasetDataTransaction.oncomplete = function () {
+                    var datasetRequest = datasetDataOs.delete(this.state.programId);
+                    datasetDataTransaction.oncomplete = function (event) {
                         var datasetDataTransaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDataOs2 = datasetDataTransaction2.objectStore('datasetDetails');
-                        datasetDataTransaction2.oncomplete = function () {
+                        var datasetRequest2 = datasetDataOs2.delete(this.state.programId);
+                        datasetDataTransaction2.oncomplete = function (event) {
                             var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                             var programSaveData = transactionForSavingData.objectStore('datasetData');
                             for (var r = 0; r < json.length; r++) {
@@ -2537,10 +2544,12 @@ export default class CommitTreeComponent extends React.Component {
                                     programCode: json[r].programCode
                                 };
                                 programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                                var putRequest = programSaveData.put(item);
                             }
-                            transactionForSavingData.oncomplete = function () {
+                            transactionForSavingData.oncomplete = function (event) {
                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                var programIds = []
                                 for (var r = 0; r < json.length; r++) {
                                     var programQPLDetailsJson = {
                                         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
@@ -2550,8 +2559,9 @@ export default class CommitTreeComponent extends React.Component {
                                         programCode: json[r].programCode,
                                         changed: 0
                                     };
+                                    var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                 }
-                                programQPLDetailsTransaction.oncomplete = function () {
+                                programQPLDetailsTransaction.oncomplete = function (event) {
                                     this.setState({
                                         progressPer: 100,
                                         loading: false
@@ -2599,7 +2609,7 @@ export default class CommitTreeComponent extends React.Component {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function () {
+                    openRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
@@ -2609,19 +2619,20 @@ export default class CommitTreeComponent extends React.Component {
                         var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
                         var programDataOs = programDataTransaction.objectStore('datasetData');
                         var programRequest = programDataOs.get((this.state.programId));
-                        programRequest.onerror = function () {
+                        programRequest.onerror = function (event) {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
                         }.bind(this);
-                        programRequest.onsuccess = function () {
+                        programRequest.onsuccess = function (e) {
                             var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
                             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
                             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
-                            programQPLDetailsGetRequest.onsuccess = function () {
+                            programQPLDetailsGetRequest.onsuccess = function (event) {
                                 var programQPLDetails = programQPLDetailsGetRequest.result;
                                 var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"", null);
+                                var datasetJson = JSON.parse(datasetData);
                                 var programJson = this.state.finalProgramJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
@@ -2692,6 +2703,7 @@ export default class CommitTreeComponent extends React.Component {
                                         var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
                                         var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');
                                         programQPLDetails.readonly = 1;
+                                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
                                         localStorage.setItem("sesProgramId", "");
                                         this.setState({
                                             progressPer: 50
@@ -3173,18 +3185,25 @@ export default class CommitTreeComponent extends React.Component {
                                     <Formik
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
-                                        onSubmit={(values) => {
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
                                             this.toggleShowValidation()
                                         }}
                                         render={
                                             ({
+                                                values,
                                                 errors,
                                                 touched,
                                                 handleChange,
                                                 handleBlur,
                                                 handleSubmit,
+                                                isSubmitting,
+                                                isValid,
                                                 setTouched,
-                                                handleReset                                            }) => (
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched,
+                                                setFieldError
+                                            }) => (
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                                                     <div className="row">
                                                         <FormGroup className="col-md-4">

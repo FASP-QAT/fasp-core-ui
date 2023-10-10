@@ -9,7 +9,10 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.procurementagenttype');
-const validationSchema = function () {
+const initialValues = {
+    procurementAgentTypeName: "",
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
@@ -200,7 +203,7 @@ class EditProcurementAgentTypeComponent extends Component {
                                         procurementAgentTypeName: this.state.procurementAgentType.label.label_en,
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -258,11 +261,14 @@ class EditProcurementAgentTypeComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='procurementAgentTypeForm' autocomplete="off">

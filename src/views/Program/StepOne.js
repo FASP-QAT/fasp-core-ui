@@ -14,7 +14,10 @@ import { API_URL } from '../../Constants';
 import HealthAreaService from "../../api/HealthAreaService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const validationSchema = function () {
+const initialValues = {
+    realmId: ''
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -146,16 +149,19 @@ export default class StepOne extends Component {
                         realmId: this.props.items.program.realm.realmId
                     }}
                     validate={validate(validationSchema)}
-                    onSubmit={() => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepOne && this.props.finishedStepOne();
                     }}
                     render={
                         ({
+                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
+                            isSubmitting,
+                            isValid,
                             setTouched
                         }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>

@@ -6,14 +6,15 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function () {
+    openRequest.onerror = function (event) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;
         var usagePeriodTransaction = db1.transaction(['usagePeriod'], 'readwrite');
         var usagePeriodOs = usagePeriodTransaction.objectStore('usagePeriod');
         var usagePeriodRequest = usagePeriodOs.getAll();
-        usagePeriodRequest.onsuccess = function () {
+        var usagePeriodList = []
+        usagePeriodRequest.onsuccess = function (e) {
             var usagePeriodList = usagePeriodRequest.result;
             var datasetJson = {};
             if (!isTemplate) {
@@ -166,6 +167,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         }
                                         var difference = 0;
                                         var differenceWMC = 0;
+                                        var transferNodeValue = 0;
                                         var endValue = Number(startValue);
                                         var endValueWMC = Number(startValue);
                                         var transfer = 0;
@@ -442,6 +444,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                             if (parentNodeNodeData.fuNode.usageType.id == 2
                                             ) {
+                                                var daysPerMonth = 365 / 12;
                                                 var grandParent = parentFiltered.parent;
                                                 var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
                                                 var patients = 0;
@@ -474,6 +477,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
                                                 var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                                 var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
+                                                var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
                                                 var monthNo = i;
                                                 var cycle = Math.floor(monthNo / monthsPerVisit);
                                                 var deltaPatients = 0;
@@ -497,6 +501,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                         deltaPatients = val1 - val2;
                                                     }
                                                 }
+                                                var noOfPatientsNew = 0;
                                                 var noOfPatients = 0;
                                                 if (cycle == 0) {
                                                     noOfPatients = (patients / monthsPerVisit) + deltaPatients;

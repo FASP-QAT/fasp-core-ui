@@ -73,7 +73,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
@@ -135,7 +135,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
     showInventoryData() {
         var realmId = AuthenticationService.getRealmId();
+        var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
         var inventoryList = this.props.items.inventoryListForSelectedPlanningUnits;
+        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
@@ -143,7 +145,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var myVar = "";
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
             this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
@@ -153,16 +155,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
-            realmRequest.onsuccess = function () {
+            realmRequest.onsuccess = function (event) {
                 var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                 var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                 var rcpuRequest = rcpuOs.getAll();
-                rcpuRequest.onerror = function () {
+                rcpuRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                rcpuRequest.onsuccess = function () {
+                rcpuRequest.onsuccess = function (event) {
                     var rcpuResult = [];
                     rcpuResult = rcpuRequest.result;
                     for (var k = 0; k < rcpuResult.length; k++) {
@@ -182,12 +184,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                     var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
                     var dataSourceRequest = dataSourceOs.getAll();
-                    dataSourceRequest.onerror = function () {
+                    dataSourceRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
-                    dataSourceRequest.onsuccess = function () {
+                    dataSourceRequest.onsuccess = function (event) {
                         var dataSourceResult = [];
                         dataSourceResult = dataSourceRequest.result;
                         for (var k = 0; k < dataSourceResult.length; k++) {
@@ -403,11 +405,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             editable: inventoryEditable,
                             onformulachain: this.formulaChanged,
                             onchange: this.inventoryChanged,
-                            updateTable: function () {
+                            updateTable: function (el, cell, x, y, source, value, id) {
                             }.bind(this),
-                            onsearch: function () {
+                            onsearch: function (el) {
                             },
-                            onfilter: function () {
+                            onfilter: function (el) {
                             },
                             contextMenu: function (obj, x, y, e) {
                                 var items = [];
@@ -423,6 +425,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         });
                                     }
                                     if (obj.options.allowInsertRow == true) {
+                                        var json = obj.getJson(null, false);
                                         if (inventoryEditable) {
                                             items.push({
                                                 title: this.props.items.inventoryType == 1 ? i18n.t('static.supplyPlan.addNewInventory') : i18n.t('static.supplyPlan.addNewAdjustments'),
@@ -597,13 +600,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             editable: inventoryBatchEditable,
             onload: this.loadedBatchInfoInventory,
             license: JEXCEL_PRO_KEY,
-            updateTable: function () {
+            updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var items = [];
                 if (y == null) {
                 } else {
+                    var adjustmentType = this.props.items.inventoryType;
                     if (inventoryEditable) {
                         items.push({
                             title: i18n.t('static.supplyPlan.addNewBatchInfo'),
@@ -626,6 +630,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         } else {
                                             inventoryQty = (this.state.inventoryEl).getValue(`G${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim();
                                         }
+                                        var rd = obj.getRowData(0);
                                         var data = [];
                                         var adjustmentType = this.props.items.inventoryType;
                                         var data = [];
@@ -719,14 +724,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[7] = rowData[7];
         obj.insertRow(data);
     }
-    filterDataSource = function () {
+    filterDataSource = function (instance, cell, c, r, source) {
         return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    filterRealmCountryPlanningUnit = function (instance, cell, c, r) {
+    filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
         var planningUnitId = (this.state.inventoryEl.getJson(null, false)[r])[0];
         return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true" && c.planningUnitId == planningUnitId).sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -734,7 +739,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    loadedInventory = function (instance, cell) {
+    loadedInventory = function (instance, cell, x, y, value) {
         if (this.props.inventoryPage != "inventoryDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -1054,13 +1059,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r) {
+    filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
+        var value = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[5];
         var date = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[8]
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
-    loadedBatchInfoInventory = function (instance) {
+    loadedBatchInfoInventory = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1217,6 +1223,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
                 totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
             }
+            var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
             var allConfirm = true;
             if (allConfirm == true) {
                 if (map.get("2") == 1) {
@@ -1428,9 +1435,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var selectedPlanningUnits = this.props.items.planningUnit;
             var json = elInstance.getJson(null, false);
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
@@ -1448,12 +1456,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
                 var programId = (document.getElementById("programId").value);
                 var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function () {
+                programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
@@ -1582,12 +1590,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function () {
+                    putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
-                    putRequest.onsuccess = function () {
+                    putRequest.onsuccess = function (event) {
                         var programId = (document.getElementById("programId").value)
                         var puListForRebuild = [...new Set(this.props.items.planningUnit.map(ele => (ele.value)))]
                         var objectStore = "";

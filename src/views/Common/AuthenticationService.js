@@ -5,6 +5,7 @@ import moment from 'moment';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import i18n from '../../i18n';
+let myDt;
 class AuthenticationService {
     isUserLoggedIn(emailId) {
         var decryptedPassword = "";
@@ -44,7 +45,9 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roleList = "";
             for (let i = 0; i <= decryptedUser.roleList.length; i++) {
+                let role = decryptedUser.roleList[i];
             }
             return decryptedUser.roleList;
         }
@@ -136,6 +139,8 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         var decoded = jwt_decode(decryptedToken);
+        let tokenExpiryTime = new Date(decoded.exp * 1000);
+        var curDate = new Date();
         if (new Date(decoded.exp * 1000) > new Date()) {
             return true;
         } else {
@@ -249,26 +254,26 @@ class AuthenticationService {
                 var user = transaction.objectStore('user');
                 var result;
                 result = user.delete(decodedObj.userId);
-                result.onsuccess = function () {
+                result.onsuccess = function (event) {
                     result = user.add(userObj);
-                    result.onerror = function () {
+                    result.onerror = function (event) {
                     };
-                    result.onsuccess = function () {
+                    result.onsuccess = function (event) {
                     };
                 };
-                result.onerror = function () {
+                result.onerror = function (event) {
                 };
                 var transaction1 = db.transaction(['curuser'], 'readwrite');
                 var curuser = transaction1.objectStore('curuser');
                 result = curuser.clear();
-                result.onsuccess = function () {
+                result.onsuccess = function (event) {
                     result = curuser.add(userId);
-                    result.onerror = function () {
+                    result.onerror = function (event) {
                     };
-                    result.onsuccess = function () {
+                    result.onsuccess = function (event) {
                     };
                 };
-                result.onerror = function () {
+                result.onerror = function (event) {
                 };
             }.bind(this);
         }
@@ -312,17 +317,17 @@ class AuthenticationService {
                 var transaction1 = db.transaction(['curuser'], 'readwrite');
                 var curuser = transaction1.objectStore('curuser');
                 result = curuser.getAll();
-                result.onsuccess = function () {
+                result.onsuccess = function (event) {
                     var user = db.transaction(['user'], 'readwrite').objectStore('user');
                     result = user.get(result.result[0].userId);
-                    result.onerror = function () {
+                    result.onerror = function (event) {
                     };
-                    result.onsuccess = function () {
+                    result.onsuccess = function (event) {
                         userObj = result.result;
                         return userObj;
                     };
                 };
-                result.onerror = function () {
+                result.onerror = function (event) {
                 };
             }.bind(this);
         }

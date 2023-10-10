@@ -9,7 +9,22 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.realm.realm');
-const validationSchema = function () {
+let initialValues = {
+    realmCode: '',
+    label: '',
+    minMosMinGaurdrail: '',
+    minMosMaxGaurdrail: '',
+    maxMosMaxGaurdrail: '',
+    minQplTolerance: '',
+    minQplToleranceCutOff: '',
+    maxQplTolerance: '',
+    actualConsumptionMonthsInPast: '',
+    forecastConsumptionMonthsInPast: '',
+    inventoryMonthsInPast: '',
+    minCountForMode: '',
+    minPercForMode: ''
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
             .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
@@ -239,7 +254,7 @@ export default class UpdateDataSourceComponent extends Component {
             }
         }
     }
-    componentDidMount() {
+    componentDidMount(str) {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -329,7 +344,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     minPercForMode: this.state.realm.minPercForMode
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -388,11 +403,14 @@ export default class UpdateDataSourceComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='realmForm' autocomplete="off">

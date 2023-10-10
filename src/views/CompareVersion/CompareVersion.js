@@ -241,7 +241,7 @@ class CompareVersion extends Component {
                 })
             }
         }).catch(
-            () => {
+            error => {
                 this.getOfflineDatasetList();
             }
         );
@@ -253,14 +253,14 @@ class CompareVersion extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
             var datasetOs = datasetTransaction.objectStore('datasetData');
             var getRequest = datasetOs.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
                 var myResult = getRequest.result;
@@ -331,16 +331,16 @@ class CompareVersion extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
                 var getRequest = datasetOs.get(datasetId);
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 }.bind(this);
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -468,7 +468,7 @@ class CompareVersion extends Component {
                     })
                 }
             }).catch(
-                () => {
+                error => {
                     this.setState({
                         datasetData: {},
                         firstDataSet: 0,
@@ -497,16 +497,16 @@ class CompareVersion extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
                 var getRequest = datasetOs.get(datasetId);
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 }.bind(this);
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -631,7 +631,7 @@ class CompareVersion extends Component {
                     })
                 }
             }).catch(
-                () => {
+                error => {
                     this.setState({
                         datasetData1: {},
                         secondDataSet: 0,

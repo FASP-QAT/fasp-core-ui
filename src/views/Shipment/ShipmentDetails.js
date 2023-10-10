@@ -58,7 +58,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-const validationSchemaReplan = function () {
+const validationSchemaReplan = function (values) {
     return Yup.object().shape({
         procurementAgentId: Yup.string()
             .required(i18n.t('static.procurementAgent.selectProcurementAgent')),
@@ -151,7 +151,7 @@ export default class ShipmentDetails extends React.Component {
         this.setBudgetId = this.setBudgetId.bind(this);
         this.planShipment = this.planShipment.bind(this)
     }
-    addCommas(cell) {
+    addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -191,7 +191,7 @@ export default class ShipmentDetails extends React.Component {
             { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },
             { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
         ];
-        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -380,58 +380,58 @@ export default class ShipmentDetails extends React.Component {
             }
         }
         worksheet.protect();
-        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('W').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('W').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('X').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('X').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         workbook.xlsx.writeBuffer().then((data) => {
@@ -535,7 +535,7 @@ export default class ShipmentDetails extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -548,14 +548,14 @@ export default class ShipmentDetails extends React.Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -630,9 +630,10 @@ export default class ShipmentDetails extends React.Component {
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
@@ -644,26 +645,27 @@ export default class ShipmentDetails extends React.Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    planningunitRequest.onerror = function () {
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function () {
+                    planningunitRequest.onsuccess = function (e) {
                         var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var paTransaction = paTransaction.objectStore('procurementAgent');
                         var paRequest = paTransaction.getAll();
-                        paRequest.onsuccess = function () {
+                        paRequest.onsuccess = function (event) {
                             var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                             var fsTransaction = fsTransaction.objectStore('fundingSource');
                             var fsRequest = fsTransaction.getAll();
-                            fsRequest.onsuccess = function () {
+                            fsRequest.onsuccess = function (event) {
                                 var bTransaction = db1.transaction(['budget'], 'readwrite');
                                 var bTransaction = bTransaction.objectStore('budget');
                                 var bRequest = bTransaction.getAll();
-                                bRequest.onsuccess = function () {
+                                bRequest.onsuccess = function (event) {
                                     var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                                     var paResult = paRequest.result;
                                     var procurementAgentListPlan = [];
@@ -814,7 +816,7 @@ export default class ShipmentDetails extends React.Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
@@ -826,14 +828,14 @@ export default class ShipmentDetails extends React.Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         var puData = [];
                         var shipmentListForSelectedPlanningUnits = [];
@@ -1216,18 +1218,24 @@ export default class ShipmentDetails extends React.Component {
                             fundingSourceId: this.state.fundingSourceId
                         }}
                         validate={validate(validationSchemaReplan)}
-                        onSubmit={(values) => {
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.planShipment();
                         }}
                         render={
                             ({
+                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                isSubmitting,
+                                isValid,
                                 setTouched,
-                                handleReset                            }) => (
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
+                            }) => (
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                     <ModalBody>
                                         {this.state.showPlanningUnitAndQty == 0 && <>
@@ -1354,10 +1362,10 @@ export default class ShipmentDetails extends React.Component {
             </div>
         );
     }
-    handleClickMonthBoxSingle = () => {
+    handleClickMonthBoxSingle = (e) => {
         this.pickAMonthSingle.current.show()
     }
-    handleAMonthChangeSingle = () => {
+    handleAMonthChangeSingle = (value, text) => {
     }
     handleAMonthDissmisSingle = (value) => {
         this.setState({ singleValue: value })
@@ -1393,7 +1401,7 @@ export default class ShipmentDetails extends React.Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -1405,34 +1413,34 @@ export default class ShipmentDetails extends React.Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
                 var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
                 var dsTransaction1 = dsTransaction.objectStore('dataSource');
                 var dsRequest = dsTransaction1.getAll();
-                dsRequest.onsuccess = function () {
+                dsRequest.onsuccess = function (event) {
                     var ssTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                     var ssTransaction1 = ssTransaction.objectStore('shipmentStatus');
                     var ssRequest = ssTransaction1.getAll();
-                    ssRequest.onsuccess = function () {
+                    ssRequest.onsuccess = function (event) {
                         var cTransaction = db1.transaction(['currency'], 'readwrite');
                         var cTransaction1 = cTransaction.objectStore('currency');
                         var cRequest = cTransaction1.getAll();
-                        cRequest.onsuccess = function () {
+                        cRequest.onsuccess = function (event) {
                             var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                             var papuTransaction1 = papuTransaction.objectStore('procurementAgentPlanningUnit');
                             var papuRequest = papuTransaction1.getAll();
-                            papuRequest.onsuccess = function () {
+                            papuRequest.onsuccess = function (event) {
                                 var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                 var rcpuTransaction1 = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                 var rcpuRequest = rcpuTransaction1.getAll();
-                                rcpuRequest.onsuccess = function () {
+                                rcpuRequest.onsuccess = function (event) {
                                     var showPlanningUnitAndQtyList = []
                                     var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1441,7 +1449,7 @@ export default class ShipmentDetails extends React.Component {
                                     var realmTransaction = db1.transaction(['realm'], 'readwrite');
                                     var realmOs = realmTransaction.objectStore('realm');
                                     var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-                                    realmRequest.onsuccess = function () {
+                                    realmRequest.onsuccess = function (event) {
                                         var planningUnitsIds = this.state.planningUnitIdsPlan;
                                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         var curUser = AuthenticationService.getLoggedInUserId();
@@ -1488,6 +1496,7 @@ export default class ShipmentDetails extends React.Component {
                                                 }
                                             }
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
@@ -1722,7 +1731,7 @@ export default class ShipmentDetails extends React.Component {
                                         var transaction1 = db1.transaction(['programData'], 'readwrite');
                                         var programTransaction1 = transaction1.objectStore('programData');
                                         var putRequest = programTransaction1.put(programRequest.result);
-                                        putRequest.onsuccess = function () {
+                                        putRequest.onsuccess = function (event) {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {

@@ -89,7 +89,7 @@ export default class AddInventory extends Component {
             { header: i18n.t('static.common.note'), key: 'string', width: 25 },
             { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
         ];
-        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -191,34 +191,34 @@ export default class AddInventory extends Component {
             }
         }
         worksheet.protect();
-        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell) {
+            worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         } else {
-            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell) {
+            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         }
-        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell) {
+        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         workbook.xlsx.writeBuffer().then((data) => {
@@ -304,7 +304,7 @@ export default class AddInventory extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -317,14 +317,14 @@ export default class AddInventory extends Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -398,10 +398,11 @@ export default class AddInventory extends Component {
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
                 var db1;
+                var storeOS;
                 var regionList = [];
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
@@ -413,14 +414,14 @@ export default class AddInventory extends Component {
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (e) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -435,14 +436,15 @@ export default class AddInventory extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        planningunitRequest.onerror = function () {
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 color: '#BA0C2F'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
-                        planningunitRequest.onsuccess = function () {
+                        planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                             myResult = planningunitRequest.result.filter(c => c.program.id == programId);
@@ -566,7 +568,7 @@ export default class AddInventory extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
@@ -578,14 +580,14 @@ export default class AddInventory extends Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         var puData = [];
                         var inventoryListForSelectedPlanningUnits = [];

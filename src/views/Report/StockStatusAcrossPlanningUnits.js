@@ -72,7 +72,9 @@ class StockStatusAcrossPlanningUnits extends Component {
         if (programId > 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
+                const lan = 'en';
                 var db1;
+                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -81,9 +83,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
                     var planningList = []
-                    planningunitRequest.onerror = function () {
+                    planningunitRequest.onerror = function (event) {
                     };
-                    planningunitRequest.onsuccess = function () {
+                    planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result.filter(c => c.active == true);
                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -97,9 +99,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
                         var planningunitRequest1 = planningunitOs1.getAll();
-                        planningunitRequest1.onerror = function () {
+                        planningunitRequest1.onerror = function (event) {
                         };
-                        planningunitRequest1.onsuccess = function () {
+                        planningunitRequest1.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest1.result;
                             var flList = []
@@ -212,6 +214,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -277,9 +280,13 @@ class StockStatusAcrossPlanningUnits extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const headers = columns.map((item) => (item.text));
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        const headers = columns.map((item, idx) => (item.text));
         const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatterAMC(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -361,6 +368,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -371,9 +379,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -381,6 +389,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -394,6 +403,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -494,6 +504,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -504,9 +515,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -514,6 +525,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -563,12 +575,12 @@ class StockStatusAcrossPlanningUnits extends Component {
             return null;
         }
     }
-    formatLabel = (cell) => {
+    formatLabel = (cell, row) => {
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
         }
     }
-    formatterDate = (cell) => {
+    formatterDate = (cell, row) => {
         if (cell != null && cell != "") {
             return moment(cell).format('MMM-yy');
         }
@@ -602,10 +614,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             return { align: 'center', color: '#BA0C2F' }
         }
     }
-    handleClickMonthBox2 = () => {
+    handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = () => {
+    handleAMonthChange2 = (value, text) => {
     }
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
@@ -716,6 +728,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = dataArray;
         var options = {
             data: data,
@@ -768,7 +781,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
             ],
             editable: false,
-            updateTable: function () {
+            updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
@@ -786,7 +799,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -796,11 +809,13 @@ class StockStatusAcrossPlanningUnits extends Component {
             languageEl: languageEl, loading: false, jexcelData: data
         })
     }
-    loaded = function (instance, cell) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var colArrB = ['C', 'D', 'E'];
+        var colArrC = ['C', 'D'];
+        var colArrE = ['E'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var mos = rowData[1] == 1 ? parseFloat(rowData[4]) : rowData[3];
@@ -898,7 +913,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         loading: false
                     })
@@ -913,12 +928,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var data = [];
                     var programRequest = programTransaction.get(program);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (event) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -926,13 +941,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
                         var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
-                        realmRequest.onerror = function () {
+                        realmRequest.onerror = function (event) {
                             this.setState({
                                 loading: false,
                             })
                             this.hideFirstComponent()
                         }.bind(this);
-                        realmRequest.onsuccess = function () {
+                        realmRequest.onsuccess = function (event) {
                             var maxForMonths = 0;
                             var realm = realmRequest.result;
                             this.state.planningUnitList.map(planningUnit => {
@@ -1160,7 +1175,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     }
                 }
                 ,
-                style: function callback(cell, row) {
+                style: function callback(cell, row, rowIndex, colIndex) {
                     if (cell < row.minMos) {
                         return { backgroundColor: '#f48282', align: 'center', width: '100px' };
                     } else if (cell > row.maxMos) {
@@ -1177,7 +1192,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatterDouble,
-                style: function callback(cell, row) {
+                style: function callback(cell, row, rowIndex, colIndex) {
                     if (cell < row.minMos) {
                         return { backgroundColor: '#f48282', align: 'center', width: '100px' };
                     } else if (cell > row.maxMos) {
@@ -1244,6 +1259,32 @@ class StockStatusAcrossPlanningUnits extends Component {
                 formatter: this.formatterDate
             }
         ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.data.length
+            }]
+        }
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1331,7 +1372,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="includePlanningShipments"
                                                             id="includePlanningShipments"
                                                             bsSize="sm"
-                                                            onChange={() => { this.fetchData() }}
+                                                            onChange={(e) => { this.fetchData() }}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>
@@ -1352,7 +1393,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         disabled={this.state.loading}
                                                         options=
                                                         {tracerCategories.length > 0 ?
-                                                            tracerCategories.map((item) => {
+                                                            tracerCategories.map((item, i) => {
                                                                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
                                                             }, this) : []} />
                                                 </div>
@@ -1366,7 +1407,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="stockStatusId"
                                                             id="stockStatusId"
                                                             bsSize="sm"
-                                                            onChange={() => { this.filterDataAsperstatus() }}
+                                                            onChange={(e) => { this.filterDataAsperstatus() }}
                                                         >
                                                             <option value="-1">{i18n.t('static.common.all')}</option>
                                                             {legendcolor.length > 0

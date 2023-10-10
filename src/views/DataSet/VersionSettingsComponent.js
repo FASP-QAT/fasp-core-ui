@@ -26,6 +26,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { consumptionExtrapolationNotesClicked, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
+const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -488,7 +489,7 @@ class VersionSettingsComponent extends Component {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function () {
+                    openRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
@@ -500,18 +501,19 @@ class VersionSettingsComponent extends Component {
                         var transaction = db1.transaction(['datasetData'], 'readwrite');
                         var programTransaction = transaction.objectStore('datasetData');
                         programs.forEach(program => {
+                            var programRequest = programTransaction.put(program);
                         })
-                        transaction.oncomplete = function () {
+                        transaction.oncomplete = function (event) {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                             programs.forEach(program => {
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
-                                datasetDetailsRequest.onsuccess = function () {
+                                datasetDetailsRequest.onsuccess = function (e) {
                                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                     datasetDetailsRequestJson.changed = 1;
                                     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                    datasetDetailsRequest1.onsuccess = function () {
+                                    datasetDetailsRequest1.onsuccess = function (event) {
                                     }
                                 }
                             })
@@ -524,7 +526,7 @@ class VersionSettingsComponent extends Component {
                                 this.hideSecondComponent();
                             });
                         }.bind(this);
-                        transaction.onerror = function () {
+                        transaction.onerror = function (event) {
                             this.setState({
                                 loading: false,
                                 color: "red",
@@ -562,9 +564,9 @@ class VersionSettingsComponent extends Component {
             var transaction = db1.transaction(['versionType'], 'readwrite');
             var program = transaction.objectStore('versionType');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 myResult = myResult.sort((a, b) => {
@@ -589,9 +591,9 @@ class VersionSettingsComponent extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 var proList = [];
                 myResult = getRequest.result;
@@ -648,7 +650,7 @@ class VersionSettingsComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         elInstance.setValueFromCoords(12, y, 1, true);
     }
@@ -721,7 +723,7 @@ class VersionSettingsComponent extends Component {
                     })
             }
         }).catch(
-            () => {
+            error => {
                 this.setState({
                     dataList: [],
                     loading: false
@@ -853,6 +855,7 @@ class VersionSettingsComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = versionSettingsArray;
         var options = {
             data: data,
@@ -982,7 +985,7 @@ class VersionSettingsComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
                     var rowData = obj.getRowData(y);
@@ -1002,6 +1005,7 @@ class VersionSettingsComponent extends Component {
                             }.bind(this)
                         });
                     } else {
+                        var programId = this.state.programId;
                         items.push({
                             title: i18n.t('static.commitTree.showValidation'),
                             onclick: function () {
@@ -1053,7 +1057,7 @@ class VersionSettingsComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1081,6 +1085,7 @@ class VersionSettingsComponent extends Component {
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
         for (var y = 0; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
             if (rowData[10] == 1) {
@@ -1120,7 +1125,7 @@ class VersionSettingsComponent extends Component {
             }
         }
     }
-    oncreateeditor = function (el, cell, x) {
+    oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
             var config = el.options.columns[x].maxlength;
             cell.children[0].setAttribute('maxlength', config);
@@ -1157,7 +1162,7 @@ class VersionSettingsComponent extends Component {
                     })
                 }
             }).catch(
-                () => {
+                error => {
                     this.getVersionTypeList();
                     this.getDatasetList();
                 }
@@ -1212,7 +1217,7 @@ class VersionSettingsComponent extends Component {
         });
         const { uniquePrograms } = this.state;
         let programMultiList = uniquePrograms.length > 0
-            && uniquePrograms.map((item) => {
+            && uniquePrograms.map((item, i) => {
                 return ({ label: item.programCode, value: item.programId })
             }, this);
         programMultiList = Array.from(programMultiList);
@@ -1230,6 +1235,7 @@ class VersionSettingsComponent extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
+        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
@@ -1408,7 +1414,7 @@ class VersionSettingsComponent extends Component {
                                                 name="versionTypeId"
                                                 id="versionTypeId"
                                                 bsSize="sm"
-                                                onChange={() => { this.getOnLineDatasetsVersion() }}
+                                                onChange={(e) => { this.getOnLineDatasetsVersion() }}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {versionTypes}

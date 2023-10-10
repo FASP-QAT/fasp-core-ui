@@ -204,6 +204,7 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedProgramList = () => {
+    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -214,9 +215,9 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -230,6 +231,7 @@ class ProcurementAgentExport extends Component {
               myResult[i].programName,
               SECRET_KEY
             );
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -246,6 +248,7 @@ class ProcurementAgentExport extends Component {
             }
           }
         }
+        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -370,6 +373,7 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedProcurementAgentList = () => {
+    const lan = "en";
     const { procurementAgents } = this.state;
     var proList = procurementAgents;
     let programId = document.getElementById("programId").value;
@@ -381,9 +385,9 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["procurementAgent"], "readwrite");
       var procuremntAgent = transaction.objectStore("procurementAgent");
       var getRequest = procuremntAgent.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         for (var i = 0; i < myResult.length; i++) {
@@ -541,6 +545,7 @@ class ProcurementAgentExport extends Component {
     this.fetchData();
   };
   consolidatedVersionList = (programId) => {
+    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -551,9 +556,9 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
@@ -570,6 +575,7 @@ class ProcurementAgentExport extends Component {
               myResult[i].programName,
               SECRET_KEY
             );
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -647,7 +653,9 @@ class ProcurementAgentExport extends Component {
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
+            const lan = "en";
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -663,9 +671,10 @@ class ProcurementAgentExport extends Component {
                 "programPlanningUnit"
               );
               var planningunitRequest = planningunitOs.getAll();
-              planningunitRequest.onerror = function () {
+              var planningList = [];
+              planningunitRequest.onerror = function (event) {
               };
-              planningunitRequest.onsuccess = function () {
+              planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 var programId = document
@@ -1173,6 +1182,7 @@ class ProcurementAgentExport extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
     doc.setFontSize(8);
     var viewby = document.getElementById("viewById").value;
@@ -1330,6 +1340,7 @@ class ProcurementAgentExport extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
     jexcel.destroy(document.getElementById("tableDiv"), true);
+    var json = [];
     var data = shipmentCostArray;
     let obj1 = {};
     let obj2 = {};
@@ -1418,7 +1429,7 @@ class ProcurementAgentExport extends Component {
       position: "top",
       filters: true,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function () {
+      contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
     };
@@ -1429,7 +1440,7 @@ class ProcurementAgentExport extends Component {
       loading: false,
     });
   }
-  loaded = function (instance) {
+  loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
   };
   fetchData = () => {
@@ -1484,7 +1495,7 @@ class ProcurementAgentExport extends Component {
           this.setState({ loading: true });
           var regionList = [];
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onerror = function () {
+          openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t("static.program.errortext"),
               loading: false,
@@ -1506,13 +1517,13 @@ class ProcurementAgentExport extends Component {
             var programDataOs =
               programDataTransaction.objectStore("programData");
             var programRequest = programDataOs.get(program);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
               this.setState({
                 message: i18n.t("static.program.errortext"),
                 loading: false,
               });
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (e) {
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -1533,12 +1544,12 @@ class ProcurementAgentExport extends Component {
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-              program1Request.onerror = function () {
+              program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
                 });
               }.bind(this);
-              program1Request.onsuccess = function () {
+              program1Request.onsuccess = function (event) {
                 var programResult = [];
                 programResult = program1Request.result;
                 let airFreight = 0;
@@ -1681,6 +1692,7 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
+                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -1878,7 +1890,7 @@ class ProcurementAgentExport extends Component {
           var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onerror = function () {
+          openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t("static.program.errortext"),
               loading: false,
@@ -1900,13 +1912,13 @@ class ProcurementAgentExport extends Component {
             var programDataOs =
               programDataTransaction.objectStore("programData");
             var programRequest = programDataOs.get(program);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
               this.setState({
                 message: i18n.t("static.program.errortext"),
                 loading: false,
               });
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (e) {
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -1927,12 +1939,12 @@ class ProcurementAgentExport extends Component {
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-              program1Request.onerror = function () {
+              program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
                 });
               }.bind(this);
-              program1Request.onsuccess = function () {
+              program1Request.onsuccess = function (event) {
                 var programResult = [];
                 programResult = program1Request.result;
                 let airFreight = 0;
@@ -2056,6 +2068,7 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
+                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -2253,7 +2266,7 @@ class ProcurementAgentExport extends Component {
           var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onerror = function () {
+          openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t("static.program.errortext"),
               loading: false,
@@ -2275,13 +2288,13 @@ class ProcurementAgentExport extends Component {
             var programDataOs =
               programDataTransaction.objectStore("programData");
             var programRequest = programDataOs.get(program);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
               this.setState({
                 message: i18n.t("static.program.errortext"),
                 loading: false,
               });
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (e) {
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -2302,12 +2315,12 @@ class ProcurementAgentExport extends Component {
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-              program1Request.onerror = function () {
+              program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
                 });
               }.bind(this);
-              program1Request.onsuccess = function () {
+              program1Request.onsuccess = function (event) {
                 var programResult = [];
                 programResult = program1Request.result;
                 let airFreight = 0;
@@ -2399,6 +2412,7 @@ class ProcurementAgentExport extends Component {
                   );
                   var qty = 0;
                   var productCost = 0;
+                  var freightPerc = 0;
                   var freightCost = 0;
                   var totalCost = 0;
                   for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
@@ -2737,6 +2751,7 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedFundingSourceList = () => {
+    const lan = "en";
     const { fundingSources } = this.state;
     var proList = fundingSources;
     var db1;
@@ -2747,15 +2762,16 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["fundingSource"], "readwrite");
       var fundingSource = transaction.objectStore("fundingSource");
       var getRequest = fundingSource.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(
           localStorage.getItem("curUser"),
           SECRET_KEY
         );
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           var f = 0;
           for (var k = 0; k < this.state.fundingSources.length; k++) {
@@ -2771,6 +2787,7 @@ class ProcurementAgentExport extends Component {
             proList.push(programData);
           }
         }
+        var lang = this.state.lang;
         this.setState({
           fundingSources: proList.sort(function (a, b) {
             a = a.fundingSourceCode.toLowerCase();
@@ -2825,7 +2842,7 @@ class ProcurementAgentExport extends Component {
     const { planningUnits } = this.state;
     let planningUnitList =
       planningUnits.length > 0 &&
-      planningUnits.map((item) => {
+      planningUnits.map((item, i) => {
         return {
           label: getLabelText(item.label, this.state.lang),
           value: item.id,
@@ -2842,7 +2859,7 @@ class ProcurementAgentExport extends Component {
         sort: true,
         align: "center",
         headerAlign: "center",
-        formatter: (cell) => {
+        formatter: (cell, row) => {
           return getLabelText(cell, this.state.lang);
         },
         style: { width: "70px" },
@@ -2862,7 +2879,7 @@ class ProcurementAgentExport extends Component {
         sort: true,
         align: "center",
         headerAlign: "center",
-        formatter: (cell) => {
+        formatter: (cell, row) => {
           return getLabelText(cell, this.state.lang);
         },
         style: { width: "100px" },
@@ -2900,7 +2917,7 @@ class ProcurementAgentExport extends Component {
         sort: true,
         align: "center",
         headerAlign: "center",
-        formatter: (cell) => {
+        formatter: (cell, row) => {
           return getLabelText(cell, this.state.lang);
         },
         style: { width: "400px" },
@@ -2929,7 +2946,7 @@ class ProcurementAgentExport extends Component {
         sort: true,
         align: "center",
         headerAlign: "center",
-        formatter: (cell) => {
+        formatter: (cell, row) => {
           return cell.toFixed(2);
         },
         style: { width: "100px" },
@@ -2953,6 +2970,38 @@ class ProcurementAgentExport extends Component {
         style: { width: "100px" },
       },
     ];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t("static.common.first"),
+      prePageText: i18n.t("static.common.back"),
+      nextPageText: i18n.t("static.common.next"),
+      lastPageText: i18n.t("static.common.last"),
+      nextPageTitle: i18n.t("static.common.firstPage"),
+      prePageTitle: i18n.t("static.common.prevPage"),
+      firstPageTitle: i18n.t("static.common.nextPage"),
+      lastPageTitle: i18n.t("static.common.lastPage"),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [
+        {
+          text: "10",
+          value: 10,
+        },
+        {
+          text: "30",
+          value: 30,
+        },
+        {
+          text: "50",
+          value: 50,
+        },
+        {
+          text: "All",
+          value: this.state.selRegion.length,
+        },
+      ],
+    };
     const checkOnline = localStorage.getItem("sessionType");
     return (
       <div className="animated">
@@ -3207,7 +3256,7 @@ class ProcurementAgentExport extends Component {
                       }}
                       options={
                         procurementAgents.length > 0 &&
-                        procurementAgents.map((item) => {
+                        procurementAgents.map((item, i) => {
                           return {
                             label: item.procurementAgentCode,
                             value: item.procurementAgentId,
@@ -3238,7 +3287,7 @@ class ProcurementAgentExport extends Component {
                       }}
                       options={
                         fundingSources.length > 0 &&
-                        fundingSources.map((item) => {
+                        fundingSources.map((item, i) => {
                           return {
                             label: item.fundingSourceCode,
                             value: item.fundingSourceId,

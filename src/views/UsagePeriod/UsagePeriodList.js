@@ -81,6 +81,7 @@ class UsagePeriod extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
+        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -126,7 +127,7 @@ class UsagePeriod extends Component {
                     type: 'hidden'
                 },
             ],
-            updateTable: function (el, cell, x, y) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
@@ -160,7 +161,7 @@ class UsagePeriod extends Component {
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? true : false),
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -268,7 +269,7 @@ class UsagePeriod extends Component {
             window.onbeforeunload = undefined
         }
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
@@ -277,6 +278,7 @@ class UsagePeriod extends Component {
         this.el.setValueFromCoords(6, y, 1, true);
     }
     addRow = function () {
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -397,7 +399,7 @@ class UsagePeriod extends Component {
         } else {
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

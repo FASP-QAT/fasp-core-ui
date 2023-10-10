@@ -106,10 +106,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (value != 0) {
             localStorage.setItem("sesProgramId", value);
             var db1;
+            var storeOS;
             var supplyPlanRegionList = [];
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
@@ -121,14 +122,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                 var programDataOs = programDataTransaction.objectStore('programData');
                 var programRequest = programDataOs.get(value != "" && value != undefined ? value : 0);
-                programRequest.onerror = function () {
+                programRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (e) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -143,18 +144,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    planningunitRequest.onerror = function () {
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    planningunitRequest.onsuccess = function () {
+                    planningunitRequest.onsuccess = function (e) {
                         var planningunitUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitUnitOs = planningunitUnitTransaction.objectStore('planningUnit');
                         var planningunitUnitRequest = planningunitUnitOs.getAll();
-                        planningunitUnitRequest.onsuccess = function () {
+                        planningunitUnitRequest.onsuccess = function (e) {
                             var planningUnitListFromtable = planningunitUnitRequest.result;
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
@@ -340,7 +342,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -390,7 +392,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 })
             }
         }).catch(
-            () => {
+            error => {
             }
         );
     }
@@ -404,9 +406,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var programs = [];
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -441,7 +443,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: '#BA0C2F'
@@ -453,14 +455,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var programDataTransaction1 = db1.transaction(['program'], 'readwrite');
                 var programDataOs1 = programDataTransaction1.objectStore('program');
                 var programRequest1 = programDataOs1.get(programId != "" && programId != undefined ? Number(programId) : 0);
-                programRequest1.onerror = function () {
+                programRequest1.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest1.onsuccess = function () {
+                programRequest1.onsuccess = function (e) {
                     var myResult = [];
                     myResult = programRequest1.result;
                     this.setState({
@@ -633,6 +635,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].planningUnit.id)[0];
                 let totalForecast = 0;
                 let check = (Object.keys(papuList[j].selectedForecastMap).length == 0)
+                let check1 = (Object.keys(papuList[j].selectedForecastMap).map(c => totalForecast += papuList[j].selectedForecastMap[c].totalForecast))
                 let isForecastBlank = (!check && totalForecast == 0)
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
@@ -654,6 +657,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
+        var json = [];
         var papuList11 = this.state.selSource1;
         var data;
         if (papuList11 != "") {
@@ -709,7 +713,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     type: 'hidden',
                 }
             ],
-            updateTable: function (el, cell, x, y) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
@@ -774,7 +778,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -787,7 +791,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.props.updateStepOneData("loading", false);
         document.getElementById("stepOneBtn").disabled = false;
     }
-    filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r) {
+    filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[5];
         var mylist = this.state.planningUnitListJexcel;
