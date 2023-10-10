@@ -1,14 +1,9 @@
 import { std, sqrt, mean, abs } from 'mathjs';
 export function calculateError(data, errorName, props) {
-    // console.log("errorName---", errorName + " Data@@@@@@@@@@##############", data)
-    // console.log("Error name@@@@@@@@@@##############", errorName);
     let coef = getCoefficient(data);
     var errorJson = { "rmse": sqrt(coef.e2Bar), "mape": coef.absEPerABar, "mse": coef.e2Bar, "wape": coef.wape, "rSqd": rSquared(data, coef) }
-
-    // console.log("Error json@@@@@@@@@@##############", errorJson);
     props.updateState(errorName, errorJson);
 }
-
 function getCoefficient(data) {
     let cnt = 0
     let xBar = 0
@@ -20,7 +15,6 @@ function getCoefficient(data) {
     let absEPerABar = 0
     let e2Bar = 0
     let ePerABar = 0
-
     for (let x = 0; x < data.length; x++) {
         if (data[x].actual) {
             xBar += data[x].actual
@@ -45,18 +39,14 @@ function getCoefficient(data) {
     absEPerABar = absEPerABar / cnt
     e2Bar = e2Bar / cnt
     ePerABar = ePerABar / cnt
-
     let m = (xyBar - xBar * yBar) / (xxBar - (xBar * xBar))
     let c = yBar - m * xBar
     return { "m": m, "c": c, "yBar": yBar, "eBar": eBar, "absEBar": absEBar, "absEPerABar": absEPerABar, "e2Bar": e2Bar, "ePerABar": ePerABar, "wape": wape }
 }
-
 function yPrediction(x, m, c) {
     return c + m * x
 }
-
 function rSquared(data, coef) {
-
     let regressionSquaredError = 0
     let totalSquaredError = 0
     for (let x = 0; x < data.length; x++) {

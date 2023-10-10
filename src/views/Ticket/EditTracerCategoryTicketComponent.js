@@ -1,17 +1,12 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
+import JiraTikcetService from '../../api/JiraTikcetService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-
+import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.tracercategory.tracercategory"))
 let summaryText_2 = "Edit Tracer Category"
 const initialValues = {
@@ -19,7 +14,6 @@ const initialValues = {
     tracerCategoryName: "",
     notes: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -27,12 +21,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.summarytext')),
         tracerCategoryName: Yup.string()
             .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.tracercategory.tracercategory')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.tracercategory.tracercategory'))))),
-
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -44,7 +36,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -54,9 +45,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class EditTracerCategoryTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -75,7 +64,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { tracerCategory } = this.state
         if (event.target.name == "summary") {
@@ -92,7 +80,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 tracerCategoryId: event.target.value
             })
         }
-
         if (event.target.name == "notes") {
             tracerCategory.notes = event.target.value;
         }
@@ -100,7 +87,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
             tracerCategory
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -123,16 +109,13 @@ export default class EditTracerCategoryTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                // console.log("response.data----", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -142,13 +125,11 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -180,21 +161,17 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 }
             );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { tracerCategory } = this.state;
-        // tracerCategory.summary = '';        
         tracerCategory.tracerCategoryName = '';
         tracerCategory.notes = '';
         this.setState({
@@ -203,9 +180,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { tracerCategories } = this.state;
         let tracerCategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
@@ -215,7 +190,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -232,7 +206,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                             this.state.tracerCategory.summary = summaryText_2;
                             this.state.tracerCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.tracerCategory).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -256,13 +229,11 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -335,7 +306,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="textarea" name="notes" id="notes"
@@ -346,7 +316,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.tracerCategory.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
@@ -355,10 +324,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
                                 </Form>
                             )} />
                 </div>
@@ -370,9 +335,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                         </div>
                     </div>
                 </div>
-
             </div>
         );
     }
-
 }

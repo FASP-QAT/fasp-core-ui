@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
-
 class ReportService {
     getForecastMatricsOverTime(json) {
         return axios.post(`${API_URL}/api/report/forecastMetricsMonthly`, json, {
@@ -14,7 +13,6 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/forecastMetricsComparision`, json, {}
         );
     }
-
     getFunderExportData(programIds) {
         return axios.post(`${API_URL}/api/budget/programIds`, programIds, {}
         );
@@ -26,7 +24,6 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/annualShipmentCost`, json, {}
         );
     }
-
     getStockOverTime(json) {
         return axios.post(`${API_URL}/api/report/stockStatusOverTime`, json, {}
         );
@@ -35,12 +32,10 @@ class ReportService {
         return axios.get(`${API_URL}/api/programVersion/programId/${programId}/versionId/-1/realmCountryId/${realmCountryId}/healthAreaId/-1/organisationId/-1/versionTypeId/${versionTypeId}/versionStatusId/${versionStatusId}/dates/${startDate}/${stopDate}`, {}
         );
     }
-
     costOfInventory(json) {
         return axios.post(`${API_URL}/api/report/costOfInventory`, json, {}
         );
     }
-
     getStockStatusData(json) {
         return axios.post(`${API_URL}/api/report/stockStatusVertical`, json, {}
         );
@@ -77,7 +72,6 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/programProductCatalog`, json, {}
         );
     }
-
     ShipmentGlobalView(json) {
         return axios.post(`${API_URL}/api/report/shipmentGlobalDemand`, json, {}
         );
@@ -113,17 +107,15 @@ class ReportService {
     forecastOutput(inputjson) {
         return axios.post(`${API_URL}/api/report/monthlyForecast`, inputjson, {});
     }
-
     forecastSummary(inputjson) {
         return axios.post(`${API_URL}/api/report/forecastSummary`, inputjson, {});
     }
-
     forecastError(inputjson) {
         return axios.post(`${API_URL}/api/report/forecastError`, inputjson, {});
     }
-    getUpdateProgramInfoDetailsBasedRealmCountryId(programTypeId, realmCountryId,statusId) {
+    getUpdateProgramInfoDetailsBasedRealmCountryId(programTypeId, realmCountryId, statusId) {
         return axios.get(`${API_URL}/api/report/updateProgramInfo/programTypeId/${programTypeId}/realmCountryId/${realmCountryId}/active/${statusId}`, {}
-        );   
-    } 
+        );
+    }
 }
 export default new ReportService();

@@ -1,17 +1,15 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ForecastingUnitService from '../../api/ForecastingUnitService';
-import i18n from '../../i18n';
-import UnitService from '../../api/UnitService.js';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL, SPACE_REGEX } from '../../Constants.js';
-
+import { API_URL } from '../../Constants.js';
+import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import UnitService from '../../api/UnitService.js';
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     unitId: '',
     label: '',
@@ -19,25 +17,21 @@ let initialValues = {
     multiplier: ''
 }
 const entityname = i18n.t('static.planningunit.planningunit');
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         unitId: Yup.string()
             .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
         label: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.planningUnit.plannignUnitName')),
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningUnit.enterAssociatedForecastingUnit')),
         multiplier: Yup.string()
             .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
-            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningUnit.multiplier'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -49,7 +43,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -59,16 +52,12 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
 export default class AddPlanningUnit extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             units: [],
             forecastingUnits: [],
-
             message: '',
             planningUnit:
             {
@@ -93,36 +82,28 @@ export default class AddPlanningUnit extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changePlanningUnit = this.changePlanningUnit.bind(this);
     }
-
     changePlanningUnit() {
-        // alert("HI forecastingUnitId");
         let forecastingUnitId = document.getElementById("forecastingUnitId").value;
-
         if (forecastingUnitId != '') {
-            // alert("if";
             let forecastingUnitText = document.getElementById("forecastingUnitId")
             var selectedText = forecastingUnitText.options[forecastingUnitText.selectedIndex].text;
             let { planningUnit } = this.state;
             planningUnit.label.label_en = selectedText;
             this.setState({ planningUnit }, () => { })
         } else {
-            // alert("else")
             var selectedText = '';
             let { planningUnit } = this.state;
             planningUnit.label.label_en = selectedText;
             this.setState({ planningUnit }, () => { })
         }
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     dataChange(event) {
         let { planningUnit } = this.state
-        // console.log(event.target.value);
         if (event.target.name === "label") {
             planningUnit.label.label_en = event.target.value
         }
@@ -135,15 +116,12 @@ export default class AddPlanningUnit extends Component {
         if (event.target.name === "multiplier") {
             planningUnit.multiplier = event.target.value;
         }
-
         this.setState(
             {
                 planningUnit
             }
         )
-
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             'label': true,
@@ -168,28 +146,24 @@ export default class AddPlanningUnit extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         units: listArray, loading: false
                     })
-                    // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
-                        // console.log("RESP----->", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -199,13 +173,11 @@ export default class AddPlanningUnit extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -245,18 +217,15 @@ export default class AddPlanningUnit extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -287,12 +256,7 @@ export default class AddPlanningUnit extends Component {
                     }
                 }
             );
-
-
-
     }
-
-
     Capitalize(str) {
         let { planningUnit } = this.state
         planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -316,10 +280,6 @@ export default class AddPlanningUnit extends Component {
                     </option>
                 )
             }, this);
-
-
-
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -327,11 +287,7 @@ export default class AddPlanningUnit extends Component {
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
-                                // initialValues={initialValues}
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.planningUnit.label.label_en,
@@ -344,7 +300,6 @@ export default class AddPlanningUnit extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log(JSON.stringify(this.state.planningUnit))
                                     PlanningUnitService.addPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -361,13 +316,11 @@ export default class AddPlanningUnit extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -398,10 +351,7 @@ export default class AddPlanningUnit extends Component {
                                                 }
                                             }
                                         );
-
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -482,38 +432,29 @@ export default class AddPlanningUnit extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUniteg')}</Label>
                                                 </FormGroup>
-
-
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <CardFooter>
                                                 <FormGroup>
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
-
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
@@ -521,38 +462,29 @@ export default class AddPlanningUnit extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    {/* <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6> */}
                 </div>
             </div>
         );
     }
-
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         let { planningUnit } = this.state
-
         planningUnit.label.label_en = ''
         planningUnit.forecastingUnit.forecastingUnitId = ''
         planningUnit.unit.id = ''
         planningUnit.multiplier = ''
-
         this.setState(
             {
                 planningUnit
             }
         )
     }
-
 }

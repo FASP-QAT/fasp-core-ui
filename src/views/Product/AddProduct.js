@@ -1,20 +1,27 @@
+import { Formik } from 'formik';
 import React, { Component } from 'react';
 import {
-    Row, Col, Card, CardHeader,
-    CardFooter, Button, CardBody,
-    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormFeedback
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input, InputGroupAddon, InputGroupText,
+    Label,
+    Row
 } from 'reactstrap';
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
+import ProductService from '../../api/ProductService';
 import RealmServcie from '../../api/RealmService';
 import UnitService from '../../api/UnitService';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText'
-import ProductService from '../../api/ProductService';
-import i18n from "../../i18n"
-import { API_URL } from '../../Constants';
-
+import i18n from "../../i18n";
+import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     productName: '',
     genericName: '',
@@ -36,7 +43,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.product.productunittext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -48,7 +54,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -58,10 +63,8 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 const entityname = i18n.t('static.product.product')
 export default class AddProduct extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -81,7 +84,6 @@ export default class AddProduct extends Component {
                 forecastingUnit: {
                     unitId: ''
                 }
-
             },
             lan: localStorage.getItem('lang'),
             realmList: [],
@@ -94,11 +96,9 @@ export default class AddProduct extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmServcie.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         realmList: response.data
                     })
@@ -110,7 +110,6 @@ export default class AddProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -129,11 +128,9 @@ export default class AddProduct extends Component {
                     }
                 }
             );
-
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         unitList: response.data
                     })
@@ -145,7 +142,6 @@ export default class AddProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message 
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -165,13 +161,10 @@ export default class AddProduct extends Component {
                 }
             );
     }
-
     getDependentLists(event) {
-        // AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.setState({
                         productCategoryList: response.data
                     })
@@ -183,7 +176,6 @@ export default class AddProduct extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: error.message 
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         });
                     } else {
@@ -202,7 +194,6 @@ export default class AddProduct extends Component {
                     }
                 }
             );
-
     }
     dataChange(event) {
         let { product } = this.state;
@@ -227,11 +218,9 @@ export default class AddProduct extends Component {
         this.setState({
             product
         },
-            () => { 
-                // console.log(product) 
+            () => {
             });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             productName: true,
@@ -294,12 +283,9 @@ export default class AddProduct extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // AuthenticationService.setupAxiosInterceptors();
-                                    // console.log("==============",this.state.product);
                                     ProductService.addProduct(this.state.product)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                // console.log(response);
                                                 this.props.history.push(`/product/listProduct/` + i18n.t(response.data.message, { entityname }))
                                             } else {
                                                 this.setState({
@@ -311,7 +297,6 @@ export default class AddProduct extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: error.message
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     });
                                                 } else {
@@ -325,7 +310,6 @@ export default class AddProduct extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            // console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -361,7 +345,6 @@ export default class AddProduct extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.productName}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
@@ -378,7 +361,6 @@ export default class AddProduct extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.genericName}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
@@ -401,8 +383,6 @@ export default class AddProduct extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </InputGroupAddon>
-
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
@@ -421,14 +401,10 @@ export default class AddProduct extends Component {
                                                             value={this.state.productCategoryId}
                                                         >
                                                             <option value="">{i18n.t('static.common.pleaseSelect')}</option>
-                                                            {/* <option value="1">Product Category One</option>
-                                                            <option value="2">Product Category Two</option>
-                                                            <option value="3">Product Category Three</option> */}
                                                             {productCategories}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.product.unit')}</Label>
@@ -451,14 +427,10 @@ export default class AddProduct extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </InputGroupAddon>
-
                                                 </FormGroup>
-
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-
-                                                    {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
@@ -479,5 +451,4 @@ export default class AddProduct extends Component {
     cancelClicked() {
         this.props.history.push(`/product/listProduct/` + "Action Canceled")
     }
-
 }

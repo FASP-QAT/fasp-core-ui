@@ -1,14 +1,10 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
+import { API_URL, DECIMAL_NO_REGEX, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
-
+import i18n from '../../i18n';
 const initialValues = {
     summary: "Add Currency",
     currencyName: "",
@@ -16,7 +12,6 @@ const initialValues = {
     conversionRatetoUSD: "",
     notes: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,17 +20,11 @@ const validationSchema = function (values) {
         currencyName: Yup.string()
             .required(i18n.t('static.currency.currencytext'))
             .matches(SPACE_REGEX, i18n.t('static.message.rolenamevalidtext')),
-        // currencyCode: Yup.string()
-        //     .required(i18n.t('static.currency.currencycodetext'))
-        //     .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly')),
         conversionRatetoUSD: Yup.string()
             .required(i18n.t('static.currency.currencyconversiontext'))
             .matches(DECIMAL_NO_REGEX, i18n.t('static.currency.conversionrateNumberDecimalPlaces')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -47,7 +36,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -57,9 +45,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class CurrencyTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -77,7 +63,6 @@ export default class CurrencyTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { currency } = this.state
         if (event.target.name == "summary") {
@@ -99,7 +84,6 @@ export default class CurrencyTicketComponent extends Component {
             currency
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -124,25 +108,19 @@ export default class CurrencyTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { currency } = this.state;
-        // currency.summary = '';
         currency.currencyName = '';
         currency.currencyCode = '';
         currency.conversionRatetoUSD = '';
@@ -152,9 +130,7 @@ export default class CurrencyTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -169,7 +145,6 @@ export default class CurrencyTicketComponent extends Component {
                                 loading: true
                             })
                             JiraTikcetService.addEmailRequestIssue(values).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -193,13 +168,11 @@ export default class CurrencyTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -273,12 +246,9 @@ export default class CurrencyTicketComponent extends Component {
                                             <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
                                             <Input type="text" name="currencyCode" id="currencyCode"
                                                 bsSize="sm"
-                                                // valid={!errors.currencyCode && this.state.currency.currencyCode != ''}
-                                                // invalid={touched.currencyCode && !!errors.currencyCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.currency.currencyCode}
-                                            // required 
                                             />
                                             <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                         </FormGroup>
@@ -304,7 +274,6 @@ export default class CurrencyTicketComponent extends Component {
                                                 onBlur={handleBlur}
                                                 maxLength={600}
                                                 value={this.state.currency.notes}
-                                            // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
@@ -327,5 +296,4 @@ export default class CurrencyTicketComponent extends Component {
             </div>
         );
     }
-
 }

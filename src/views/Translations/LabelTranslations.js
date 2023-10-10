@@ -1,23 +1,25 @@
-import React from "react";
 import jexcel from 'jspreadsheet';
+import React from "react";
+import {
+    Button,
+    Card, CardBody,
+    CardFooter,
+    Col,
+    FormGroup,
+    Row
+} from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import "../ProductCategory/style.css"
-import {
-    Card, CardBody, CardHeader, FormGroup,
-    CardFooter, Button, Col, Row
-} from 'reactstrap';
-import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import LabelsService from '../../api/LabelService.js';
 import LanguageService from '../../api/LanguageService';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
-
+import "../ProductCategory/style.css";
 const entityname = i18n.t('static.label.labelTranslations');
 export default class DatabaseTranslations extends React.Component {
-
     constructor(props) {
         super(props);
         this.options = props.options;
@@ -39,9 +41,7 @@ export default class DatabaseTranslations extends React.Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageListActive().then(languageResponse => {
             if (languageResponse.status == 200) {
                 LabelsService.getStaticLabelsList().then(response => {
@@ -52,14 +52,12 @@ export default class DatabaseTranslations extends React.Component {
                             labelList: json,
                             languageList: languageList
                         })
-                        // console.log("json+++", json);
-                        // console.log("LanguageList+++", languageList);
                         var data = [];
                         var label = [];
                         for (var i = 0; i < json.length; i++) {
                             data = [];
-                            data[0] = json[i].staticLabelId;// A
-                            data[1] = json[i].labelCode;// A
+                            data[0] = json[i].staticLabelId;
+                            data[1] = json[i].labelCode;
                             data[2] = 0;
                             var k = 3;
                             for (var j = 0; j < languageList.length; j++) {
@@ -80,22 +78,14 @@ export default class DatabaseTranslations extends React.Component {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
                         jexcel.destroy(document.getElementById("labelTranslationTable"), true);
-
                         var options = {
                             data: label,
                             colWidths: [80, 80, 80, 80, 80],
                             columns: colHeadersArray,
-                            // text: {
-                            //     // showingPage: 'Showing {0} to {1} of {1}',
-                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                            //     show: '',
-                            //     entries: '',
-                            // },
                             editable: true,
                             pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
-                            // tableOverflow: true,
                             wordWrap: true,
                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                             allowInsertColumn: false,
@@ -103,19 +93,14 @@ export default class DatabaseTranslations extends React.Component {
                             onchange: this.changed,
                             oneditionstart: this.editStart,
                             allowDeleteRow: false,
-                            // tableOverflow: false,
                             onload: this.loaded,
                             filters: true,
                             license: JEXCEL_PRO_KEY,
                             contextMenu: function (obj, x, y, e) {
                                 return false;
                             }.bind(this),
-                            // tableHeight: '500px',
                         };
-                        // console.log("optionsss===1", options)
                         this.el = jexcel(document.getElementById("labelTranslationTable"), options);
-                        // console.log("optionsss===2", options)
-
                         this.setState({
                             loading: false
                         })
@@ -131,17 +116,14 @@ export default class DatabaseTranslations extends React.Component {
                     }
                 }).catch(
                     error => {
-                        // console.log("Error+++", error)
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
                                 color: '#BA0C2F'
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -187,17 +169,14 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
-                // console.log("Error1+++", error)
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false,
                         color: '#BA0C2F'
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -232,17 +211,12 @@ export default class DatabaseTranslations extends React.Component {
             }
         );
     };
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-
-        // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
-
     saveData = function () {
         this.setState({
             loading: true
@@ -253,7 +227,6 @@ export default class DatabaseTranslations extends React.Component {
         var listToUpdate = [];
         for (var j = 0; j < tableJson.length; j++) {
             if ((tableJson[j])[2] == 1) {
-                // console.log("changed------------------");
                 var staticLabelJsonIndex = labelList.findIndex(c => c.staticLabelId == (tableJson[j])[0]);
                 var staticLabelLanguagesList = [];
                 var k = 3;
@@ -269,11 +242,9 @@ export default class DatabaseTranslations extends React.Component {
             }
         }
         if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
-            // AuthenticationService.setupAxiosInterceptors();
             LabelsService.saveStaticLabels(listToUpdate).then(response => {
                 if (response.status == 200) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
-                    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
                     this.setState({
                         message: i18n.t(response.data.messageCode),
                         color: 'green',
@@ -296,14 +267,12 @@ export default class DatabaseTranslations extends React.Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -341,35 +310,25 @@ export default class DatabaseTranslations extends React.Component {
             alert(`${i18n.t('static.label.validData')}`);
         }
     };
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
-                <h5 style={{ color: this.state.color }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                                <h5 style={{ color: this.state.color }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col xs="12" sm="12">
                         <Card>
-                            {/* <CardHeader>
-
-                                <strong>{i18n.t('static.label.labelTranslations')}</strong>
-                            </CardHeader> */}
-                            <CardBody className="table-responsive pt-md-1 pb-md-1">
-                                {/* <div id="loader" className="center"></div> */}
-                                <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                                        <CardBody className="table-responsive pt-md-1 pb-md-1">
+                                                                <div id="labelTranslationTable" style={{ display: this.state.loading ? "none" : "block" }}></div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
                                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                             <div class="spinner-border blue ml-4" role="status">
-
                                             </div>
                                         </div>
                                     </div>
@@ -385,18 +344,14 @@ export default class DatabaseTranslations extends React.Component {
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         )
     }
-
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     changed = function (instance, cell, x, y, value) {
-        // console.log("changed function called----------------");
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -408,12 +363,10 @@ export default class DatabaseTranslations extends React.Component {
                 this.el.setComments(col, "");
             }
         }
-
         if (x != 2) {
             this.el.setValueFromCoords(2, y, 1, true);
         }
     }.bind(this)
-
     editStart = function (instance, cell, x, y, value) {
         var elInstance = instance;
         elInstance.setValueFromCoords(2, y, 1, true);

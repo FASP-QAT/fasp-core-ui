@@ -2,12 +2,10 @@ import React, { Component } from "react";
 import {
     Button
 } from 'reactstrap';
-
 export default class StatusUpdateButtonFeature extends Component {
-
     render() {
         if (this.props.isRowNew == true) {
-            return(
+            return (
                 <></>
             )
         } else {
@@ -16,5 +14,4 @@ export default class StatusUpdateButtonFeature extends Component {
             );
         }
     }
-
 }

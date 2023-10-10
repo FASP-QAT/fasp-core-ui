@@ -1,36 +1,31 @@
+import CryptoJS from 'crypto-js';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import jexcel from 'jspreadsheet';
+import moment from "moment";
 import React, { Component } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Form,
+    FormGroup, Input, InputGroup, Label
 } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import i18n from '../../i18n'
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT, ROUNDING_NUMBER } from '../../Constants.js'
-import moment from "moment";
-import pdfIcon from '../../assets/img/pdf.png';
-import csvicon from '../../assets/img/csv.png'
-import "jspdf-autotable";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import getLabelText from '../../CommonComponent/getLabelText'
-import CryptoJS from 'crypto-js'
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
-import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import ProgramService from '../../api/ProgramService';
-import DatasetService from '../../api/DatasetService';
-import jsPDF from "jspdf";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, ROUNDING_NUMBER, SECRET_KEY, TITLE_FONT } from '../../Constants.js';
+import DatasetService from '../../api/DatasetService';
+import ProgramService from '../../api/ProgramService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 class ProductValidation extends Component {
     constructor(props) {
         super(props);
@@ -57,7 +52,6 @@ class ProductValidation extends Component {
         this.getTreeList = this.getTreeList.bind(this);
         this.getDatasetData = this.getDatasetData.bind(this);
     }
-
     setVersionId(e) {
         this.setState({ loading: true })
         var versionId = e.target.value;
@@ -82,20 +76,16 @@ class ProductValidation extends Component {
             })
         }
     }
-
     getDatasetData() {
-        // console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        // console.log("In get dataset data+++", versionId);
         if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
             var datasetId = this.state.datasetId + "_v" + actualVersionId + "_uId_" + userId;
-            // console.log("DatasetId+++", datasetId);
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -111,7 +101,6 @@ class ProductValidation extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    // console.log("MyResult+++", myResult);
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
@@ -128,7 +117,6 @@ class ProductValidation extends Component {
             var json = [{ programId: this.state.datasetId, versionId: versionId }]
             DatasetService.getAllDatasetData(json).then(response => {
                 if (response.status == 200) {
-                    // console.log("resp--------------------", response.data);
                     response.data = decompressJson(response.data);
                     var responseData = response.data[0];
                     this.setState({
@@ -170,11 +158,9 @@ class ProductValidation extends Component {
             })
         }
     }
-
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
-        // console.log("datasetJson+++", datasetJson);
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var treeId = "";
         var event = {
@@ -193,13 +179,9 @@ class ProductValidation extends Component {
             treeList: treeList,
             loading: false
         }, () => {
-            // if (treeId != "") {
             this.setTreeId(event);
-            // }
         })
-
     }
-
     setTreeId(e) {
         var treeId = e.target.value;
         localStorage.setItem("sesTreeId", treeId);
@@ -219,13 +201,11 @@ class ProductValidation extends Component {
             })
         }
     }
-
     getScenarioList() {
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
             this.setState({ loading: true })
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
-            // var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
             var scenarioList = treeListFiltered.scenarioList;
             var scenarioId = "";
             var event = {
@@ -242,13 +222,10 @@ class ProductValidation extends Component {
             }
             this.setState({
                 scenarioList: treeListFiltered.scenarioList.filter(c => c.active.toString() == "true"),
-                // levelList: levelList,
                 treeListFiltered: treeListFiltered,
                 loading: false
             }, () => {
-                // if (scenarioId != "") {
                 this.setScenarioId(event);
-                // }
             })
         } else {
             this.setState({
@@ -257,7 +234,6 @@ class ProductValidation extends Component {
             })
         }
     }
-
     setScenarioId(e) {
         var scenarioId = e.target.value;
         localStorage.setItem("sesScenarioId", scenarioId);
@@ -267,9 +243,7 @@ class ProductValidation extends Component {
             this.getData()
         })
     }
-
     setDatasetId(e) {
-
         var datasetId = e.target.value;
         localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
@@ -285,7 +259,6 @@ class ProductValidation extends Component {
             }, () => {
                 this.getVersionList();
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             })
         } else {
@@ -302,7 +275,6 @@ class ProductValidation extends Component {
             })
         }
     }
-
     addCommasWith8Decimals(cell1, row) {
         if (cell1 != null && cell1 != "") {
             cell1 += '';
@@ -314,14 +286,11 @@ class ProductValidation extends Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-            // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         } else {
             return "";
         }
     }
-
     addCommas(cell1, row) {
-
         if (cell1 != null && cell1 != "") {
             cell1 += '';
             var x = cell1.replaceAll(",", "").split('.');
@@ -332,22 +301,15 @@ class ProductValidation extends Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-            // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         } else {
             return "";
         }
     }
-
     round(value) {
-        // console.log("Round input value---", value);
         var result = (value - Math.floor(value)).toFixed(4);
-        // console.log("Round result---", result);
-        // console.log("Round condition---", `${ROUNDING_NUMBER}`);
         if (result > `${ROUNDING_NUMBER}`) {
-            // console.log("Round ceiling---", Math.ceil(value));
             return Math.ceil(value);
         } else {
-            // console.log("Round floor---", Math.floor(value));
             if (Math.floor(value) == 0) {
                 return Math.ceil(value);
             } else {
@@ -355,14 +317,12 @@ class ProductValidation extends Component {
             }
         }
     }
-
     getData() {
         if (this.state.scenarioId > 0) {
             this.setState({
                 loading: true
             })
             var datasetData = this.state.datasetData;
-            // console.log("DatasetData+++", datasetData);
             var treeList = datasetData.treeList;
             var selectedTree = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var flatList = selectedTree.tree.flatList;
@@ -375,62 +335,46 @@ class ProductValidation extends Component {
             var nodeDataList = []
             for (var f = 0; f < items.length; f++) {
                 var nodeDataMap = items[f].payload.nodeDataMap[this.state.scenarioId][0];
-                // console.log("NodeDataMap+++", nodeDataMap)
                 nodeDataList.push({ nodeDataMap: nodeDataMap, flatItem: items[f] });
             }
             var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
-            // console.log("MaxLevel+++", maxLevel);
             var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
             var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
-            // console.log("PlanningUnitList+++", planningUnitList);
-            // console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
             var finalData = [];
             for (var i = 0; i < planningUnitList.length; i++) {
                 var parentLabelList = [];
                 if (planningUnitList[i].flatItem.payload.nodeType.id == 5) {
                     var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    // console.log("Node@@@+++", node);
                     var levelForNode = node.flatItem.level
                     for (var j = 0; j < (levelForNode); j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
                         if (parentNode != undefined) {
-                            // console.log("ParentNode@@@+++", parentNode)
-                            // console.log("Node parent@@@+++", node.flatItem.parent)
                             parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                             node = parentNode;
                         }
                     }
-                    // console.log("Parent Label list+++", parentLabelList)
                     var name = "";
-                    // console.log("Length+++", parentLabelList.length)
                     for (var p = parentLabelList.length; p > 0; p--) {
-                        // console.log("In for+++")
                         if (p != 1) {
                             name = name.concat(parentLabelList[p - 1]) + " > "
                         } else {
                             name = name.concat(parentLabelList[p - 1])
                         }
                     }
-                    // console.log("Name+++", name);
                     finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem, parent: fuNode.flatItem.parent })
                 } else {
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    // console.log("Node@@@+++", node)
                     var levelForNode = node.flatItem.level
                     parentLabelList.push(getLabelText(node.flatItem.payload.label, this.state.lang));
                     for (var j = 0; j < levelForNode; j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
-                        // console.log("ParentNode@@@+++", parentNode)
-                        // console.log("Node parent@@@+++", node.flatItem.parent)
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
                     }
                     var name = "";
-                    // console.log("Length+++", parentLabelList.length)
                     for (var p = parentLabelList.length; p > 0; p--) {
-                        // console.log("In for+++")
                         if (p != 1) {
                             name = name.concat(parentLabelList[p - 1]) + " > "
                         } else {
@@ -440,7 +384,6 @@ class ProductValidation extends Component {
                     finalData.push({ name: name, nodeDataMap: "", flatItem: "", parentNodeNodeDataMap: planningUnitList[i].nodeDataMap, parentNodeFlatItem: planningUnitList[i].flatItem, parent: planningUnitList[i].flatItem.parent })
                 }
             }
-            // console.log("FinalData+++", finalData);
             var dataArray = [];
             var data = [];
             var parentId = 0;
@@ -454,19 +397,14 @@ class ProductValidation extends Component {
                 var selectedText;
                 var selectedText1;
                 var selectedText2;
-                // console.log("finalData[i].parentNodeNodeDataMap+++", finalData[i])
                 noOfPersons = finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons;
                 noOfForecastingUnitsPerPerson = finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson;
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                 var unitList = this.state.unitList;
-                // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 try {
                     selectedText = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
                 } catch (err) {
-
                 }
-                // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                // console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
                 try {
                     if (this.state.versionId.toString().includes("Local")) {
                         selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
@@ -474,12 +412,9 @@ class ProductValidation extends Component {
                         selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
                     }
                 } catch (error) {
-                    // console.log("error--->", error)
                     selectedText1 = "";
                 }
-                // console.log("selectedText1", selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
-                    // console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod != null && c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                     if (upListFiltered.length > 0) {
                         selectedText2 = getLabelText(upListFiltered[0].label, this.state.lang);
@@ -487,7 +422,6 @@ class ProductValidation extends Component {
                 }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage.toString() != "true") {
-                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod)
                         var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null && finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId != '' ? this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en : '';
                         usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + " " + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + " " + usageFrequency + " " + i18n.t('static.tree.timesPer') + " " + selectedText2 + " " + i18n.t('static.tree.for') + " " + (finalData[i].parentNodeNodeDataMap.fuNode.repeatCount != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatCount : '') + " " + selectedText3;
                     } else {
@@ -498,8 +432,6 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    // console.log("finalData[i]@@@", finalData[i]);
-                    // console.log("PlanningUnitList@@@", this.state.datasetData.planningUnitList);
                     var planningUnitObj = this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
                     var planningUnit = ""
                     if (planningUnitObj.length > 0) {
@@ -508,28 +440,21 @@ class ProductValidation extends Component {
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
-
                     usageTypeId = finalData[i].parentNodeNodeDataMap.fuNode.usageType.id;
                     usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod != null ? finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId : "";
                     usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                     var noOfMonthsInUsagePeriod = 0;
                     if (usagePeriodId != null && usagePeriodId != "") {
-                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod);
                         var usagePeriodObj = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                         var convertToMonth = usagePeriodObj[0].convertToMonth;
-                        // console.log("convertToMonth---", convertToMonth);
                         if (usageTypeId == 2) {
                             var div = (convertToMonth * usageFrequency);
-                            // console.log("duv---", div);
                             if (div != 0) {
                                 noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                             }
                         } else {
-                            // var noOfFUPatient = this.state.noOfFUPatient;
                             var noOfFUPatient;
                             noOfFUPatient = (finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons);
-                            // noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                             noOfMonthsInUsagePeriod = finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true" ? convertToMonth * usageFrequency * noOfFUPatient : noOfFUPatient;
                         }
                     }
@@ -542,12 +467,7 @@ class ProductValidation extends Component {
                         }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
-                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
-                        // console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
-                        // console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
                         var puPerInterval = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
-                        // console.log("puPerInterval###", parseFloat(puPerInterval).toFixed(8));
-
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommasWith8Decimals((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
@@ -561,26 +481,8 @@ class ProductValidation extends Component {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2) {
                         qty = Number(qty) / Number(finalData[i].nodeDataMap.puNode.refillMonths)
                     }
-
-                    // if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
-                    //     cost = (sharePu * price) / currency.conversionRateToUsd;
-                    //     qty = sharePu;
-                    // } else {
-                    //     if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
-                    //         console.log("puPerInterval+++", puPerInterval)
-                    //         console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                    //         console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
                     cost = (Number(qty) * price) / currency.conversionRateToUsd;
-                    //         qty = (puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths));
-                    //     } else {
-                    //         cost = ((finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
-                    //         qty = (finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
-                    //     }
-                    // }
-                    // totalCost += cost;
                 }
-                // console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
-
                 if (i > 0 && finalData[i].parent != finalData[i - 1].parent) {
                     data = [];
                     data[0] = "";
@@ -610,10 +512,6 @@ class ProductValidation extends Component {
                 data[9] = 0;
                 totalCost += Number(data[8])
                 dataArray.push(data);
-                // console.log("i Test", i)
-                // console.log("i final data Test", finalData[i])
-                // console.log("i-1 Test", finalData[i - 1])
-
             }
             if (finalData.length > 0) {
                 data = [];
@@ -630,9 +528,7 @@ class ProductValidation extends Component {
                 totalCost = 0;
                 dataArray.push(data);
             }
-            // console.log("DataArray+++", dataArray)
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
             var options = {
                 data: dataArray,
@@ -681,18 +577,11 @@ class ProductValidation extends Component {
                         type: 'hidden'
                     },
                 ],
-                // text: {
-                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     show: '',
-                //     entries: '',
-                // },
                 onload: this.loaded,
                 pagination: false,
                 search: false,
                 columnSorting: false,
                 defaultColWidth: 120,
-                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -710,7 +599,6 @@ class ProductValidation extends Component {
             };
             var dataEl = jexcel(document.getElementById("tableDiv"), options);
             this.el = dataEl;
-
             this.setState({
                 dataEl: dataEl,
                 dataList: finalData,
@@ -718,7 +606,6 @@ class ProductValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
             this.setState({
                 loading: false,
@@ -726,36 +613,24 @@ class ProductValidation extends Component {
             })
         }
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.worksheets[0].getJson(null, false);
-        // console.log("Json@@@@@ Test", json)
         var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         for (var j = 0; j < json.length; j++) {
             if (json[j][9] == 1) {
-                // console.log("In j 9 Test")
                 for (var i = 0; i < colArr.length; i++) {
-                    // console.log("colArr[i] + (j + 1) Test", colArr[i] + (j + 1))
                     var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
                     cell.classList.add('productValidationSubTotalClass');
-                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
-                    // instance.worksheets[0].setStyle(colArr[i] + (j + 1), "background-color", "transparent")
-                    // instance.worksheets[0].setStyle(colArr[i] + (j + 1), "background-color", "#ccc")
-                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "color", "#000")
-                    // instance.worksheets[0].setStyle(colArr[i] + (j + 1), "font-weight", "bold")
                 }
             }
         }
     }
-
     getVersionList() {
         this.setState({
             loading: true
         })
         var datasetList = this.state.datasetList;
-        // console.log("datsetlist+++", datasetList);
-        // console.log("this.state.datasetId+++", this.state.datasetId)
         if (this.state.datasetId > 0) {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
@@ -780,7 +655,6 @@ class ProductValidation extends Component {
                     value: ""
                 }
             };
-            // console.log("Version List Test@123",versionList)
             if (versionList.length == 1) {
                 versionId = versionList[0].versionId;
                 event.target.value = versionList[0].versionId;
@@ -792,9 +666,7 @@ class ProductValidation extends Component {
                 versionList: versionList,
                 loading: false
             }, () => {
-                // if (versionId != "") {
                 this.setVersionId(event)
-                // }
             })
         } else {
             this.setState({
@@ -808,12 +680,10 @@ class ProductValidation extends Component {
             })
         }
     }
-
     componentDidMount() {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
-                // console.log("resp--------------------", response.data);
                 var responseData = response.data;
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
@@ -844,7 +714,6 @@ class ProductValidation extends Component {
             }
         );
     }
-
     getOfflineDatasetList() {
         this.setState({
             loading: true
@@ -868,29 +737,24 @@ class ProductValidation extends Component {
                 unitRequest.onerror = function (event) {
                 }.bind(this);
                 unitRequest.onsuccess = function (event) {
-
                     var upTransaction = db1.transaction(['usagePeriod'], 'readwrite');
                     var upOs = upTransaction.objectStore('usagePeriod');
                     var upRequest = upOs.getAll();
                     upRequest.onerror = function (event) {
                     }.bind(this);
                     upRequest.onsuccess = function (event) {
-
                         var utTransaction = db1.transaction(['usageType'], 'readwrite');
                         var utOs = utTransaction.objectStore('usageType');
                         var utRequest = utOs.getAll();
                         utRequest.onerror = function (event) {
                         }.bind(this);
                         utRequest.onsuccess = function (event) {
-
-
                             var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                             var currencyOs = currencyTransaction.objectStore('currency');
                             var currencyRequest = currencyOs.getAll();
                             currencyRequest.onerror = function (event) {
                             }.bind(this);
                             currencyRequest.onsuccess = function (event) {
-
                                 var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                                 var fuOs = fuTransaction.objectStore('forecastingUnit');
                                 var fuRequest = fuOs.getAll();
@@ -903,14 +767,12 @@ class ProductValidation extends Component {
                                     var utList = utRequest.result;
                                     var myResult = [];
                                     myResult = getRequest.result;
-
                                     var currencyResult = [];
                                     currencyResult = currencyRequest.result;
                                     var currencyList = [];
                                     currencyResult.map(item => {
                                         currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
                                     })
-                                    // console.log("MyResult+++", myResult);
                                     var datasetList = this.state.datasetList;
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -922,7 +784,6 @@ class ProductValidation extends Component {
                                             if (index == -1) {
                                                 var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                                                 var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                                                // console.log("programNamelabel+++", programNameLabel);
                                                 var programNameJson = JSON.parse(programNameLabel);
                                                 var json = {
                                                     id: myResult[mr].programId,
@@ -933,7 +794,6 @@ class ProductValidation extends Component {
                                                 datasetList.push(json)
                                             } else {
                                                 var existingVersionList = datasetList[index].versionList;
-                                                // console.log("existingVersionList+++", datasetList[index].versionList)
                                                 existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
                                                 datasetList[index].versionList = existingVersionList
                                             }
@@ -946,7 +806,6 @@ class ProductValidation extends Component {
                                         }
                                     };
                                     if (datasetList.length == 1) {
-                                        // console.log("in if%%%", datasetList.length)
                                         datasetId = datasetList[0].id;
                                         event.target.value = datasetList[0].id;
                                     } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
@@ -966,9 +825,7 @@ class ProductValidation extends Component {
                                         fuList: fuList,
                                         loading: false
                                     }, () => {
-                                        // if (datasetId != "") {
                                         this.setDatasetId(event);
-                                        // }
                                     })
                                 }.bind(this)
                             }.bind(this)
@@ -978,13 +835,10 @@ class ProductValidation extends Component {
             }.bind(this)
         }.bind(this)
     }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-
     formatter = value => {
-
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -996,17 +850,13 @@ class ProductValidation extends Component {
         }
         return x1 + x2;
     }
-
     exportPDF() {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -1014,28 +864,15 @@ class ProductValidation extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
-
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-
                 doc.setFontSize(8)
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
@@ -1055,110 +892,56 @@ class ProductValidation extends Component {
                     align: 'right'
                 })
                 doc.setFontSize(TITLE_FONT)
-                /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
-                });*/
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.productValidation'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
-                    // doc.setFont('helvetica', 'normal')
-                    // doc.setFontSize(8)
-                    // doc.text(i18n.t('static.dashboard.programheader') + ': ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                    //     align: 'left'
-                    // })
-
                 }
-
             }
         }
-
-
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4"; 
+        const orientation = "landscape"; 
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
         doc.setTextColor("#002f6c");
-
-
         var y = 100;
-        // var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        // for (var i = 0; i < planningText.length; i++) {
-        //     if (y > doc.internal.pageSize.height - 100) {
-        //         doc.addPage();
-        //         y = 80;
-
-        //     }
-        //     doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-        //     y = y + 10;
-        //     console.log(y)
-        // }
         var planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 100;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 5;
-            // console.log(y)
         }
-
         planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
         y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 100;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 5;
-            // console.log(y)
         }
         y = y + 5;
         doc.text(i18n.t('static.country.currency') + ': ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
         y = y + 5;
-
-
-
-
-
-        //   const title = i18n.t('static.dashboard.globalconsumption');
-        //   var canvas = document.getElementById("cool-canvas");
-        //   //creates image
-
-        //   var canvasImg = canvas.toDataURL("image/png", 1.0);
-        //   var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        //   var aspectwidth1 = (width - h1);
         let startY = y + 10
-        //   console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
-        //   doc.setTextColor("#fff");
-        //   if (startYtable > (height - 400)) {
-        //     doc.addPage()
-        //     startYtable = 80
-        //   }
-        //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
         var columns = [];
         columns.push(i18n.t('static.common.level'));
         columns.push(i18n.t('static.supplyPlan.type'));
@@ -1171,48 +954,28 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.productValidation.cost') + "/" + i18n.t("static.common.person"));
         const headers = [columns]
         const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8] != "" ? this.formatter(Number(ele[8]).toFixed(2)) : ""]);
-        // doc.addPage()
         let content = {
             margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: headers,
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
-            // didParseCell: function (data) {
-            //     if (data.column.index === this.state.dataEl.getJson(null,false).length-1 && data.row.section != "head") {
-            //         data.cell.styles.fontStyle = 'bold';
-            //     }
-            // }.bind(this)
         };
-
-
-        //doc.text(title, marginLeft, 40);
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
         doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.productValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
-        //creates PDF from img
-        /*  var doc = new jsPDF('landscape');
-          doc.setFontSize(20);
-          doc.text(15, 15, "Cool Chart");
-          doc.save('canvas.pdf');*/
     }
-
     exportCSV() {
         var csvRow = [];
-
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (getLabelText(this.state.datasetData.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-
-        // csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.country.currency') + ': ' + document.getElementById("currencyId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -1229,10 +992,8 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.productValidation.cost') + "/" + i18n.t("static.common.person"));
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
-
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
-
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1244,7 +1005,6 @@ class ProductValidation extends Component {
         document.body.appendChild(a)
         a.click()
     }
-
     setCurrencyId(e) {
         var currencyId = e.target.value;
         this.setState({
@@ -1255,26 +1015,21 @@ class ProductValidation extends Component {
             }
         })
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {/* {item.name} */}
-                        {item.code}
+                                                {item.code}
                     </option>
                 )
             }, this);
-
         const { versionList } = this.state;
-        // console.log("versionList111", versionList)
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
@@ -1283,7 +1038,6 @@ class ProductValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { treeList } = this.state;
         let trees = treeList.length > 0
             && treeList.map((item, i) => {
@@ -1293,7 +1047,6 @@ class ProductValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { scenarioList } = this.state;
         let scenarios = scenarioList.length > 0
             && scenarioList.map((item, i) => {
@@ -1303,7 +1056,6 @@ class ProductValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { currencyList } = this.state;
         let currencies = currencyList.length > 0
             && currencyList.map((item, i) => {
@@ -1313,26 +1065,21 @@ class ProductValidation extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                        {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                            {/* {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && */}
-                            <a className="pr-lg-0 pt-lg-3">
+                                                <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                                        <a className="pr-lg-0 pt-lg-3">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined && this.state.localProgramId != "" ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.modelingValidation')}</a></span>
                             </a>
-                            {/* } */}
-                        </div>
+                                                    </div>
                         <div className="Card-header-reporticon pb-0">
                             <a className="pr-lg-0 pt-lg-2 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
@@ -1340,12 +1087,8 @@ class ProductValidation extends Component {
                             <a className="pr-lg-2 pt-lg-2 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
-
-
                         </div>
-
-                        {/* } */}
-                    </div>
+                                            </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <Form >
@@ -1360,15 +1103,12 @@ class ProductValidation extends Component {
                                                         name="datasetId"
                                                         id="datasetId"
                                                         bsSize="sm"
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setDatasetId(e); }}
                                                         value={this.state.datasetId}
-
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {datasets}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1381,15 +1121,12 @@ class ProductValidation extends Component {
                                                         name="versionId"
                                                         id="versionId"
                                                         bsSize="sm"
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setVersionId(e); }}
                                                         value={this.state.versionId}
-
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {versions}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1402,15 +1139,12 @@ class ProductValidation extends Component {
                                                         name="treeId"
                                                         id="treeId"
                                                         bsSize="sm"
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setTreeId(e); }}
                                                         value={this.state.treeId}
-
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {trees}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1423,15 +1157,12 @@ class ProductValidation extends Component {
                                                         name="scenarioId"
                                                         id="scenarioId"
                                                         bsSize="sm"
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setScenarioId(e); }}
                                                         value={this.state.scenarioId}
-
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {scenarios}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1444,15 +1175,11 @@ class ProductValidation extends Component {
                                                         name="currencyId"
                                                         id="currencyId"
                                                         bsSize="sm"
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setCurrencyId(e); }}
                                                         value={this.state.currencyId}
-
                                                     >
-                                                        {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                                        {currencies}
+                                                                                                                {currencies}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1460,39 +1187,27 @@ class ProductValidation extends Component {
                                 </div>
                             </Form>
                             <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                {/* {this.state.show && */}
-                                <div className="row">
+                                                                <div className="row">
                                     <div className="col-md-12 pl-0 pr-0">
-
-                                        {/* // <div className="table-scroll">
-                                                    // <div className="table-wrap table-responsive"> */}
-                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: !this.state.loading ? "block" : "none" }}>
+                                                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: !this.state.loading ? "block" : "none" }}>
                                         </div>
-                                        {/* // </div>
-                                                // </div> */}
-
                                     </div>
                                 </div>
-                                {/* } */}
-                            </Col>
+                                                            </Col>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                         <div class="spinner-border blue ml-4" role="status">
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {/* </div> */}
-                    </CardBody>
+                                            </CardBody>
                 </Card>
             </div >
         );
     }
 }
-
 export default ProductValidation;

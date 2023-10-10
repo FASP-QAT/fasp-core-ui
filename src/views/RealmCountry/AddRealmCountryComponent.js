@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-
-import RealmService from "../../api/RealmService";
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import '../Forms/ValidationForms/ValidationForms.css';
+import { API_URL } from '../../Constants';
 import CountryService from "../../api/CountryService";
 import RealmCountryService from "../../api/RealmCountryService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.program.realmcountry');
 const initialValues = {
     realmId: [],
@@ -18,7 +16,6 @@ const initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -31,7 +28,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realmcountry.validsubmittoapprove'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -43,7 +39,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -63,7 +58,6 @@ class AddRealmCountryComponent extends Component {
                 realm: {
                 },
                 label: {
-
                 }
             },
             message: ''
@@ -78,7 +72,6 @@ class AddRealmCountryComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -86,8 +79,6 @@ class AddRealmCountryComponent extends Component {
             return "";
         }
     }
-
-
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
@@ -102,14 +93,11 @@ class AddRealmCountryComponent extends Component {
         if (event.target.name == "submittedToApprovedLeadTime") {
             procurementAgent.submittedToApprovedLeadTime = event.target.value;
         }
-
-
         this.setState({
             procurementAgent
         },
             () => { });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
@@ -134,9 +122,7 @@ class AddRealmCountryComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -156,13 +142,11 @@ class AddRealmCountryComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -206,21 +190,17 @@ class AddRealmCountryComponent extends Component {
                         () => {
                             this.hideSecondComponent();
                         })
-
                 }
-
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -252,7 +232,6 @@ class AddRealmCountryComponent extends Component {
                 }
             );
     }
-
     render() {
         const { realms } = this.state;
         const { countries } = this.state;
@@ -264,15 +243,6 @@ class AddRealmCountryComponent extends Component {
                     </option>
                 )
             }, this);
-
-        // let countryList = countries.length > 0
-        //     && countries.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.countryuId}>
-        //                 {item.label.label_en}
-        //             </option>
-        //         )
-        //     }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -280,7 +250,6 @@ class AddRealmCountryComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-
                             <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.procurementAgent.AddProcurementAgent')}</strong>{' '}
                             </CardHeader>
@@ -305,13 +274,11 @@ class AddRealmCountryComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -444,9 +411,7 @@ class AddRealmCountryComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
@@ -457,5 +422,4 @@ class AddRealmCountryComponent extends Component {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.program.actioncancelled'))
     }
 }
-
 export default AddRealmCountryComponent;

@@ -1,16 +1,13 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants';
-
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.realm.realm');
 let initialValues = {
     realmCode: '',
@@ -27,7 +24,6 @@ let initialValues = {
     minCountForMode: '',
     minPercForMode: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
@@ -41,21 +37,18 @@ const validationSchema = function (values) {
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.minMosMinGaurdrail'))
             .min(0, i18n.t('static.program.validvaluetext')),
         minMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.minMosMaxGaurdrail'))
             .min(0, i18n.t('static.program.validvaluetext')),
         maxMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail'))
             .min(0, i18n.t('static.program.validvaluetext')),
         minQplTolerance: Yup.number()
@@ -105,15 +98,8 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .required(i18n.t('static.validated.minPercForMode'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        /*   monthInPastForAmc: Yup.number()
-               .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-           monthInFutureForAmc: Yup.number()
-               .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-           orderFrequency: Yup.number()
-               .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -125,7 +111,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -135,14 +120,11 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class UpdateDataSourceComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             loading: true,
-            // realm: this.props.location.state.realm,
             realm: {
                 realmCode: '',
                 label: {
@@ -151,9 +133,6 @@ export default class UpdateDataSourceComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                /*  monthInPastForAmc: '',
-                  monthInFutureForAmc: '',
-                  orderFrequency: '',*/
                 defaultRealm: '',
                 minMosMinGaurdrail: '',
                 minMosMaxGaurdrail: '',
@@ -189,7 +168,6 @@ export default class UpdateDataSourceComponent extends Component {
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name === "label") {
@@ -231,15 +209,6 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "minPercForMode") {
             realm.minPercForMode = event.target.value
         }
-        /* if (event.target.name === "monthInPastForAmc") {
-             realm.monthInPastForAmc = event.target.value
-         }
-         if (event.target.name === "monthInFutureForAmc") {
-             realm.monthInFutureForAmc = event.target.value
-         }
-         if (event.target.name === "orderFrequency") {
-             realm.orderFrequency = event.target.value
-         }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -251,9 +220,7 @@ export default class UpdateDataSourceComponent extends Component {
                 realm
             }
         )
-
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             realmCode: true,
@@ -287,18 +254,14 @@ export default class UpdateDataSourceComponent extends Component {
             }
         }
     }
-
     componentDidMount(str) {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
-                // console.log("=====>", response.data);
                 this.setState({
                     realm: response.data, loading: false
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -306,20 +269,16 @@ export default class UpdateDataSourceComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -351,7 +310,6 @@ export default class UpdateDataSourceComponent extends Component {
                 }
             );
     }
-
     Capitalize(str) {
         let { realm } = this.state
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -359,9 +317,7 @@ export default class UpdateDataSourceComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -369,9 +325,6 @@ export default class UpdateDataSourceComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -390,14 +343,11 @@ export default class UpdateDataSourceComponent extends Component {
                                     minCountForMode: this.state.realm.minCountForMode,
                                     minPercForMode: this.state.realm.minPercForMode
                                 }}
-
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
-                                    // console.log("====>+++", this.state.realm);
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -415,13 +365,11 @@ export default class UpdateDataSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -453,8 +401,6 @@ export default class UpdateDataSourceComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -469,7 +415,6 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='realmForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -477,7 +422,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="label"
                                                         bsSize="sm"
                                                         valid={!errors.label}
-                                                        // invalid={touched.label && !!errors.label || this.state.realm.label.label_en == ''}
                                                         invalid={(touched.label && !!errors.label) || !!errors.label}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -492,7 +436,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="realmCode"
                                                         bsSize="sm"
                                                         valid={!errors.realmCode}
-                                                        // invalid={touched.realmCode && !!errors.realmCode || this.state.realm.realmCode == ''}
                                                         invalid={(touched.realmCode && !!errors.realmCode) || !!errors.realmCode}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
@@ -508,7 +451,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="minMosMinGaurdrail"
                                                         bsSize="sm"
                                                         valid={!errors.minMosMinGaurdrail && (this.state.realm.minMosMinGaurdrail >= 0)}
-                                                        // invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || (this.state.realm.minMosMinGaurdrail).toString() == '')}
                                                         invalid={(touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail) || (this.state.realm.minMosMinGaurdrail < 0 || !!errors.minMosMinGaurdrail)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
@@ -524,7 +466,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="minMosMaxGaurdrail"
                                                         bsSize="sm"
                                                         valid={!errors.minMosMaxGaurdrail && (this.state.realm.minMosMaxGaurdrail >= 0)}
-                                                        // invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || (this.state.realm.minMosMaxGaurdrail).toString() == '')}
                                                         invalid={(touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail) || (this.state.realm.minMosMaxGaurdrail < 0 || !!errors.minMosMaxGaurdrail)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
@@ -540,7 +481,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="maxMosMaxGaurdrail"
                                                         bsSize="sm"
                                                         valid={!errors.maxMosMaxGaurdrail && (this.state.realm.maxMosMaxGaurdrail >= 0)}
-                                                        // invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || (this.state.realm.maxMosMaxGaurdrail).toString() == '')}
                                                         invalid={(touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail) || (this.state.realm.maxMosMaxGaurdrail < 0 || !!errors.maxMosMaxGaurdrail)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
@@ -596,7 +536,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionActualConsumption')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="actualConsumptionMonthsInPast"
                                                         id="actualConsumptionMonthsInPast"
                                                         bsSize="sm"
@@ -611,7 +550,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionForecastConsumption')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="forecastConsumptionMonthsInPast"
                                                         id="forecastConsumptionMonthsInPast"
                                                         bsSize="sm"
@@ -626,7 +564,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionInventory')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="inventoryMonthsInPast"
                                                         id="inventoryMonthsInPast"
                                                         bsSize="sm"
@@ -668,48 +605,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.minPercForMode}</FormFeedback>
                                                 </FormGroup>
-                                                {/*    <FormGroup>
-                                                        <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
-                                                        <Input type="number"
-                                                            name="monthInPastForAmc"
-                                                            id="monthInPastForAmc"
-                                                            bsSize="sm"
-                                                            valid={!errors.monthInPastForAmc}
-                                                            invalid={touched.monthInPastForAmc && !!errors.monthInPastForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.monthInPastForAmc}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.monthInPastForAmc}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="monthInFutureForAmc">{i18n.t('static.realm.monthInFutureForAmc')}</Label>
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="monthInFutureForAmc"
-                                                            id="monthInFutureForAmc"
-                                                            valid={!errors.monthInFutureForAmc}
-                                                            invalid={touched.monthInFutureForAmc && !!errors.monthInFutureForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.monthInFutureForAmc}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.monthInFutureForAmc}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="orderFrequency">{i18n.t('static.realm.orderFrequency')}</Label>
-                                                        <Input type="number"
-                                                            name="orderFrequency"
-                                                            id="orderFrequency"
-                                                            bsSize="sm"
-                                                            valid={!errors.orderFrequency}
-                                                            invalid={touched.orderFrequency && !!errors.orderFrequency}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.orderFrequency}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
-                                                </FormGroup>*/}
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                     <FormGroup check inline>
@@ -785,14 +680,11 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <CardFooter>
                                                 <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
@@ -802,35 +694,27 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             this.setState({
                 realm: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -862,5 +746,4 @@ export default class UpdateDataSourceComponent extends Component {
             }
         );
     }
-
 }

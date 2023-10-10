@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants';
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants';
-
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
@@ -23,7 +21,6 @@ const validationSchema = function (values) {
       .required(i18n.t('static.fundingsource.validsubfundingsource'))
   })
 }
-
 const validate = (getValidationSchema) => {
   return (values) => {
     const validationSchema = getValidationSchema(values)
@@ -35,7 +32,6 @@ const validate = (getValidationSchema) => {
     }
   }
 }
-
 const getErrorsFromValidationError = (validationError) => {
   const FIRST_ERROR = 0
   return validationError.inner.reduce((errors, error) => {
@@ -54,7 +50,6 @@ class AddSubFundingSourceComponent extends Component {
         fundingSource: {
         },
         label: {
-
         }
       },
       message: ''
@@ -64,7 +59,6 @@ class AddSubFundingSourceComponent extends Component {
     this.Capitalize = this.Capitalize.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
   }
-
   Capitalize(str) {
     if (str != null && str != "") {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -72,8 +66,6 @@ class AddSubFundingSourceComponent extends Component {
       return "";
     }
   }
-
-
   dataChange(event) {
     let { subFundingSource } = this.state;
     if (event.target.name == "fundingSourceId") {
@@ -87,7 +79,6 @@ class AddSubFundingSourceComponent extends Component {
     },
       () => { });
   };
-
   touchAll(setTouched, errors) {
     setTouched({
       fundingSourceId: true,
@@ -110,7 +101,6 @@ class AddSubFundingSourceComponent extends Component {
       }
     }
   }
-
   componentDidMount() {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
@@ -124,13 +114,11 @@ class AddSubFundingSourceComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
             switch (error.response ? error.response.status : "") {
-
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
                 break;
@@ -161,9 +149,7 @@ class AddSubFundingSourceComponent extends Component {
           }
         }
       );
-
   }
-
   render() {
     const { fundingSources } = this.state;
     let fundingSourceList = fundingSources.length > 0
@@ -198,13 +184,11 @@ class AddSubFundingSourceComponent extends Component {
                       error => {
                         if (error.message === "Network Error") {
                           this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                           });
                         } else {
                           switch (error.response ? error.response.status : "") {
-
                             case 401:
                               this.props.history.push(`/login/static.message.sessionExpired`)
                               break;
@@ -235,7 +219,6 @@ class AddSubFundingSourceComponent extends Component {
                         }
                       }
                     );
-
                 }}
                 render={
                   ({
@@ -291,7 +274,6 @@ class AddSubFundingSourceComponent extends Component {
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                           <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                           <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
                           &nbsp;
                         </FormGroup>
                       </CardFooter>
@@ -308,15 +290,12 @@ class AddSubFundingSourceComponent extends Component {
   }
   resetClicked() {
     let { subFundingSource } = this.state;
-
     subFundingSource.fundingSource.fundingSourceId = ''
     subFundingSource.label.label_en = ''
-
     this.setState({
       subFundingSource
     },
       () => { });
   }
 }
-
 export default AddSubFundingSourceComponent;

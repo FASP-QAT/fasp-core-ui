@@ -1,25 +1,22 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
-import Select from 'react-select';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
-import 'react-select/dist/react-select.min.css';
-import i18n from '../../i18n';
-import getLabelText from '../../CommonComponent/getLabelText';
-import BudgetService from "../../api/BudgetService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import moment from 'moment';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import FundingSourceService from '../../api/FundingSourceService';
-import ProgramService from '../../api/ProgramService';
+import { Formik } from 'formik';
+import moment from 'moment';
+import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, PROGRAM_TYPE_SUPPLY_PLAN, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
+import BudgetService from "../../api/BudgetService";
 import DropdownService from '../../api/DropdownService';
-
-
+import FundingSourceService from '../../api/FundingSourceService';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
@@ -28,22 +25,15 @@ let initialValues = {
     fundingSourceId: '',
     programId: []
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
-            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            // .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
-        // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         budgetCode: Yup.string()
-            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .max(30, i18n.t('static.common.max30digittext'))
             .required(i18n.t('static.budget.budgetDisplayNameText')),
@@ -51,7 +41,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.fundingtext')),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -63,7 +52,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -73,7 +61,6 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
@@ -85,7 +72,6 @@ class EditBudgetComponent extends Component {
             rangeValue: "",
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            // budget: this.props.location.state.budget,
             budget: {
                 label: {
                     label_en: '',
@@ -119,21 +105,18 @@ class EditBudgetComponent extends Component {
                         label_pr: '',
                         label_fr: ''
                     }
-
                 },
                 startDate: '',
                 stopDate: '',
                 budgetAmt: '',
                 notes: '',
                 budgetCode: '',
-                programs:[]
-
+                programs: []
             },
             message: '',
             lang: localStorage.getItem('lang'),
             programs: [],
         }
-
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
@@ -152,7 +135,6 @@ class EditBudgetComponent extends Component {
         this.pickRange = React.createRef();
         this.programChange = this.programChange.bind(this);
     }
-
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -167,39 +149,30 @@ class EditBudgetComponent extends Component {
             this.setState({ programId: programId });
             var programId = programId;
         }
-
         let { budget } = this.state;
-        // this.setState({ roleId });
         var programIdArray = [];
         for (var i = 0; i < programId.length; i++) {
             programIdArray[i] = {
                 id: programId[i].value
             }
         }
-
         budget.programs = programIdArray;
-
         this.setState({
             budget,
         },
             () => { });
     }
-
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
-
     handleRangeChange(value, text, listIndex) {
-        //
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
-
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-
     CommaFormatted(cell) {
         cell += '';
         cell = cell.replace(/,/g, '');
@@ -212,15 +185,10 @@ class EditBudgetComponent extends Component {
         }
         return x1 + x2;
     }
-
-
     addMonths(date, months) {
-        // console.log("add months date 1---" + date);
         date.setMonth(date.getMonth() + months);
-        // console.log("add months date 2---" + date);
         return date;
     }
-
     changeMessage(message) {
         this.setState({ message: message })
     }
@@ -229,45 +197,40 @@ class EditBudgetComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     dataChangeDate(date) {
         let { budget } = this.state
         budget.startDate = date;
         budget.stopDate = '';
         this.setState({ budget: budget });
     }
-
     dataChangeEndDate(date) {
         let { budget } = this.state;
         budget.stopDate = date;
         this.setState({ budget: budget });
     }
-
     componentDidMount() {
         this.setState({ loading: true })
-        let realmId=AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
-                    var responseData=response.data.filter(c=>c.active);
+                    var responseData = response.data.filter(c => c.active);
                     for (var i = 0; i < responseData.length; i++) {
                         programList[i + 1] = { value: responseData[i].id, label: getLabelText(responseData[i].label, this.state.lang) }
                     }
                     var listArray = programList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase();
+                        var itemLabelB = b.label.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     listArray.unshift({ value: "-1", label: i18n.t("static.common.all") })
-
                     this.setState({
                         programs: listArray, loading: false
                     })
                 }
                 else {
-
                     this.setState({
                         message: response.data.messageCode, loading: false
                     },
@@ -275,18 +238,15 @@ class EditBudgetComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -320,35 +280,22 @@ class EditBudgetComponent extends Component {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.status == 200) {
-                    // console.log("(response.data.startDate)--", new Date(response.data.startDate));
-                    // console.log("Response data Test",response.data)
-                    // if (response.data.startDate != null && response.data.startDate != "") {
-                    //     response.data.startDate = new Date(response.data.startDate);
-                    // }
-                    // if (response.data.stopDate != null && response.data.stopDate != "") {
-                    //     response.data.stopDate = new Date(response.data.stopDate);
-                    // }
-                    // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
-                    // response.data.budgetAmt = getBudgetAmount;
                     var proramListArray = [];
                     var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
                     var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                     let budgetObj = response.data;
                     budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                    // console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-                    // console.log("Budget Obj Test",budgetObj)
                     for (var i = 0; i < budgetObj.programs.length; i++) {
                         if (budgetObj.programs[i].id != 0) {
                             proramListArray[i] = { value: budgetObj.programs[i].id, label: getLabelText(budgetObj.programs[i].label, this.state.lang) }
                         }
                     }
                     this.setState({
-                        budget: budgetObj, loading: false,programId: proramListArray,
+                        budget: budgetObj, loading: false, programId: proramListArray,
                         rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                     });
                 }
                 else {
-
                     this.setState({
                         message: response.data.messageCode, loading: false
                     },
@@ -356,24 +303,15 @@ class EditBudgetComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-                // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
-                // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
-                // new Date('2019-06-11')
-
-
-
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -404,17 +342,15 @@ class EditBudgetComponent extends Component {
                     }
                 }
             );
-
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    // fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
                     fundingSources: listArray
                     , loading: false
                 })
@@ -422,13 +358,11 @@ class EditBudgetComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -459,7 +393,6 @@ class EditBudgetComponent extends Component {
                     }
                 }
             );
-
     }
     Capitalize(str) {
         let { budget } = this.state
@@ -481,20 +414,11 @@ class EditBudgetComponent extends Component {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
-            // var chnageValue = this.CommaFormatted(event.target.value);
-            // budget.budgetAmt = chnageValue;
-
             budget.budgetAmt = event.target.value;
         }
         if (event.target.name === "fundingSourceId") {
             budget.fundingSource.fundingSourceId = event.target.value;
         }
-        // if (event.target.name === "startDate") {
-        //     budget.startDate = event.target.value;
-        //     budget.stopDate = ''
-        // } if (event.target.name === "stopDate") {
-        //     budget.stopDate = event.target.value;
-        // }
         if (event.target.name === "budgetCode") {
             budget.budgetCode = event.target.value.toUpperCase();
         }
@@ -506,11 +430,9 @@ class EditBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { 
-                // console.log(this.state) 
+            () => {
             });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             budgetName: true,
@@ -535,14 +457,12 @@ class EditBudgetComponent extends Component {
             }
         }
     }
-
     render() {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
@@ -562,9 +482,6 @@ class EditBudgetComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -582,35 +499,18 @@ class EditBudgetComponent extends Component {
                                         loading: true
                                     })
                                     let { budget } = this.state;
-
-                                    // var amount = this.state.budget.budgetAmt.replace(/,/g, '');
-                                    // budget.budgetAmt = amount;
                                     budget.budgetAmt = this.state.budget.budgetAmt;
                                     let rangeValue = this.state.rangeValue;
                                     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                                     budget.startDate = startDate;
-
-                                    // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     budget.stopDate = stopDate;
                                     for (var i = 0; i < budget.programs.length; i++) {
                                         if (budget.programs[i].id == 0) {
                                             budget.programs = []
                                         }
                                     }
-                                    // var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
-                                    // budget.startDate = startDate;
-
-                                    // var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
-                                    // budget.stopDate = stopDate;
-                                    // var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
-                                    // budget.startDate = new Date(startDateString);
-
-                                    // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
-                                    // budget.stopDate = new Date(stopDateString);
-                                    // console.log("check----->1", budget.budgetAmt);
                                     budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
-                                    // console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
@@ -627,14 +527,11 @@ class EditBudgetComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
-                                                    // console.log("ERROR------->", error.response);
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -651,7 +548,6 @@ class EditBudgetComponent extends Component {
                                                             break;
                                                         case 409:
                                                             this.setState({
-                                                                // message: error.response.data.messageCode,
                                                                 message: i18n.t('static.budget.duplicateDisplayName'),
                                                                 loading: false
                                                             });
@@ -674,7 +570,6 @@ class EditBudgetComponent extends Component {
                                         );
                                 }}
                                 render={
-
                                     ({
                                         values,
                                         errors,
@@ -691,8 +586,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-
-                                            <FormGroup className="Selectcontrol-bdrNone">
+                                                <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -710,7 +604,6 @@ class EditBudgetComponent extends Component {
                                                         id="programId"
                                                         multi
                                                         required
-                                                        // min={1}
                                                         options={this.state.programs}
                                                         value={this.state.programId}
                                                     />
@@ -718,7 +611,6 @@ class EditBudgetComponent extends Component {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         type="select"
                                                         name="fundingSourceId"
@@ -735,7 +627,6 @@ class EditBudgetComponent extends Component {
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {fundingSourceList}
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -750,7 +641,6 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.budget.label.label_en}
-
                                                     />
                                                     <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                 </FormGroup>
@@ -769,11 +659,8 @@ class EditBudgetComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
                                                     <Input
                                                         type="text"
                                                         name="currencyId"
@@ -783,10 +670,8 @@ class EditBudgetComponent extends Component {
                                                         disabled
                                                     >
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -798,31 +683,17 @@ class EditBudgetComponent extends Component {
                                                         disabled />
                                                     <FormFeedback className="red">{errors.budget}</FormFeedback>
                                                 </FormGroup>
-
-
-
-
-
                                                 <FormGroup>
                                                     <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="budgetAmt"
                                                         id="budgetAmt"
                                                         bsSize="sm"
-                                                        // valid={!errors.budgetAmt}
-                                                        // invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
-
                                                         valid={!errors.budgetAmt}
                                                         invalid={(touched.budgetAmt && !!errors.budgetAmt) || !!errors.budgetAmt}
-
-                                                        // valid={!errors.budgetAmt}
-                                                        // invalid={(touched.budgetAmt && !!errors.budgetAmt || !!errors.budgetAmt)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="text"
-                                                        // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                         value={this.state.budget.budgetAmt}
                                                     />
                                                     <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
@@ -835,7 +706,6 @@ class EditBudgetComponent extends Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
-                                                            //theme="light"
                                                             onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
@@ -844,9 +714,7 @@ class EditBudgetComponent extends Component {
                                                     </div>
                                                 </FormGroup>}
                                                 <FormGroup>
-
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
-
                                                     <FormGroup check inline>
                                                         <Input
                                                             className="form-check-input"
@@ -888,7 +756,6 @@ class EditBudgetComponent extends Component {
                                                         id="notes"
                                                         bsSize="sm"
                                                         onChange={(e) => { this.dataChange(e) }}
-                                                        // maxLength={600}
                                                         type="textarea"
                                                     />
                                                     <FormFeedback className="red"></FormFeedback>
@@ -898,16 +765,13 @@ class EditBudgetComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <CardFooter>
                                                 <FormGroup>
-
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
@@ -915,31 +779,19 @@ class EditBudgetComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
                         </Card>
                     </Col>
                 </Row>
-
-                {/* <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div> */}
             </div>
-
         );
     }
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                // console.log("Response data Test",response.data)
-
-                // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
-                // response.data.budgetAmt = getBudgetAmount;
                 var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
                 var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                 this.setState({
@@ -950,13 +802,11 @@ class EditBudgetComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -989,5 +839,4 @@ class EditBudgetComponent extends Component {
             );
     }
 }
-
 export default EditBudgetComponent;

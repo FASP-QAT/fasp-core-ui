@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import FundingSourceService from "../../api/FundingSourceService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, API_URL } from '../../Constants.js';
-
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
+import FundingSourceService from "../../api/FundingSourceService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     fundingSource: "",
     fundingSourceCode: "",
@@ -21,13 +19,10 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
-            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -39,7 +34,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -49,12 +43,10 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // fundingSource: this.props.location.state.fundingSource,
             fundingSource: {
                 realm: {
                     label: {
@@ -90,18 +82,14 @@ class EditFundingSourceComponent extends Component {
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
-                // console.log("RESP----", response.data);
                 this.setState({
                     fundingSource: response.data, loading: false
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -109,18 +97,15 @@ class EditFundingSourceComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -157,7 +142,6 @@ class EditFundingSourceComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     dataChange(event) {
         let { fundingSource } = this.state;
         if (event.target.name == "fundingSource") {
@@ -177,7 +161,6 @@ class EditFundingSourceComponent extends Component {
         },
             () => { });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             fundingSource: true,
@@ -206,7 +189,6 @@ class EditFundingSourceComponent extends Component {
             fundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
-
     render() {
         return (
             <div className="animated fadeIn">
@@ -215,9 +197,6 @@ class EditFundingSourceComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -229,14 +208,11 @@ class EditFundingSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
-                                    // console.log("FUNDING_SOURCE----", this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
-
                                                 this.setState({
                                                     message: response.data.messageCode, loading: false
                                                 },
@@ -248,13 +224,11 @@ class EditFundingSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -319,7 +293,6 @@ class EditFundingSourceComponent extends Component {
                                                         id="fundingSource"
                                                         bsSize="sm"
                                                         valid={!errors.fundingSource}
-                                                        // invalid={touched.fundingSource && !!errors.fundingSource || this.state.fundingSource.label.label_en == ''}
                                                         invalid={(touched.fundingSource && !!errors.fundingSource) || !!errors.fundingSource}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -335,7 +308,6 @@ class EditFundingSourceComponent extends Component {
                                                         id="fundingSourceCode"
                                                         bsSize="sm"
                                                         valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                        // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode || this.state.fundingSource.fundingSourceCode == ''}
                                                         invalid={(touched.fundingSourceCode && !!errors.fundingSourceCode) || !!errors.fundingSourceCode}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
@@ -345,7 +317,6 @@ class EditFundingSourceComponent extends Component {
                                                     />
                                                     <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
                                                     <FormGroup check inline className="ml-5">
@@ -381,7 +352,6 @@ class EditFundingSourceComponent extends Component {
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                     <FormGroup check inline className="ml-5">
@@ -422,9 +392,7 @@ class EditFundingSourceComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -438,42 +406,30 @@ class EditFundingSourceComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
-                {/* <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div> */}
             </div>
         );
     }
     cancelClicked() {
         this.props.history.push(`/fundingSource/listFundingSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             this.setState({
                 fundingSource: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -506,5 +462,4 @@ class EditFundingSourceComponent extends Component {
         );
     }
 }
-
 export default EditFundingSourceComponent;
