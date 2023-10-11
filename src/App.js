@@ -5,7 +5,7 @@ import { withTranslation } from "react-i18next";
 import './App.scss';
 import i18n from './i18n';
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
-const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout'));
+const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout/DefaultLayout.js'));
 const Login = React.lazy(() => import('./views/Pages/Login'));
 const UserAgreement = React.lazy(() => import('./views/User/UserAgreement'));
 // const Register = React.lazy(() => import('./views/Pages/Register'));
