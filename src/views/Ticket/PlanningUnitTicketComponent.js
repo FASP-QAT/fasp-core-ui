@@ -11,7 +11,6 @@ import i18n from '../../i18n';
 import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import '../Forms/ValidationForms/ValidationForms.css';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Add Planning Unit"
 const initialValues = {

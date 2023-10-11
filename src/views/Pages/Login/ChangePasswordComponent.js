@@ -9,7 +9,6 @@ import { API_URL, SECRET_KEY } from '../../../Constants.js';
 import UserService from '../../../api/UserService';
 import i18n from '../../../i18n';
 import AuthenticationService from '../../Common/AuthenticationService.js';
-import '../../Forms/ValidationForms/ValidationForms.css';
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()

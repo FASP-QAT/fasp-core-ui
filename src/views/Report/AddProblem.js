@@ -9,7 +9,6 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
-import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
   programId: '',
   planningUnitId: ''

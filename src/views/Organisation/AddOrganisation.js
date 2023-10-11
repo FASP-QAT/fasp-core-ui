@@ -14,7 +14,6 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.organisation.organisation');
 let initialValues = {
     realmId: '',

@@ -6,18 +6,18 @@ import './App.scss';
 import i18n from './i18n';
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout/DefaultLayout.js'));
-const Login = React.lazy(() => import('./views/Pages/Login'));
+const Login = React.lazy(() => import('./views/Pages/Login/Login.js'));
 const UserAgreement = React.lazy(() => import('./views/User/UserAgreement'));
 // const Register = React.lazy(() => import('./views/Pages/Register'));
-const Page404 = React.lazy(() => import('./views/Pages/Page404'));
+const Page404 = React.lazy(() => import('./views/Pages/Page404/Page404.js'));
 const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
 const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
 const MasterDataSyncForTree = React.lazy(() => import('./views/SyncMasterData/SyncMasterDataForTree'));
 const SyncProgram = React.lazy(() => import('./views/SyncMasterData/SyncProgram'));
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
-const Page500 = React.lazy(() => import('./views/Pages/Page500'));
-const PageError = React.lazy(() => import('./views/Pages/PageError'));
+const Page500 = React.lazy(() => import('./views/Pages/Page500/Page500.js'));
+const PageError = React.lazy(() => import('./views/Pages/PageError/PageError.js'));
 class App extends Component {
   componentDidMount() {
   }

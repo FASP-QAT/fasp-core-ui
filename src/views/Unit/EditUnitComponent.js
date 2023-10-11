@@ -7,7 +7,6 @@ import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     unit: ""
 }

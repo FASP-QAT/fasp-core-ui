@@ -7,7 +7,6 @@ import {
 import Select from 'react-select';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
 import { lang } from "moment";

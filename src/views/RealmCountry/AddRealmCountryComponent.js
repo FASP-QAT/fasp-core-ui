@@ -2,7 +2,6 @@ import { Formik } from 'formik';
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
 import { API_URL } from '../../Constants';
 import CountryService from "../../api/CountryService";
 import RealmCountryService from "../../api/RealmCountryService";

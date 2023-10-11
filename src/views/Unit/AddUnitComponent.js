@@ -9,7 +9,6 @@ import DimensionService from '../../api/DimensionService';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     unitName: "",
     unitCode: "",

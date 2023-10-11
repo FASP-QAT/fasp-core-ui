@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 import i18n from '../../../i18n';
-import '../../Forms/ValidationForms/ValidationForms.css';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';

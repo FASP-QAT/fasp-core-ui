@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     Card, CardBody, CardHeader,
     CardFooter, Button, Col, Progress, FormGroup} from 'reactstrap';
-import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import moment from 'moment';
 import MasterSyncService from '../../api/MasterSyncService.js';

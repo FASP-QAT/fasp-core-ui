@@ -8,7 +8,6 @@ import RealmCountryService from "../../api/RealmCountryService.js";
 import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.region.region');
 const initialValues = {
   realmCountryId: [],

@@ -21,7 +21,6 @@ import ProcurementUnitService from "../../api/ProcurementUnitService";
 import UnitService from '../../api/UnitService';
 import i18n from "../../i18n";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 let initialValues = {
     procurementUnitName: '',

@@ -32,7 +32,6 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { BATCH_PREFIX, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from '../../Constants.js';
 import i18n from '../../i18n';
-import '../../views/Forms/ValidationForms/ValidationForms.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlanForDataEntry";

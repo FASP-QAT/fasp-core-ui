@@ -46,7 +46,6 @@ import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const ref = React.createRef();
 const pickerLang = {

@@ -19,7 +19,6 @@ import { jExcelLoadedFunctionQuantimed } from '../../CommonComponent/JExcelCommo
 import { DATE_FORMAT_CAP_WITHOUT_DATE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
-import "../ProductCategory/style.css";
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 const initialValuesThree = {
 }

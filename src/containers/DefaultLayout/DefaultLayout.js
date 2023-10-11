@@ -39,7 +39,7 @@ const EditOrganisationType = React.lazy(() => import('../../views/OrganisationTy
 const AddSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/EditSubFundingSourceComponent'));
-const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard'));
+const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('../../views/FundingSource/ListFundingSourceComponent'));
@@ -61,7 +61,6 @@ const ListRegion = React.lazy(() => import('../../views/Region/ListRegionCompone
 const EditRegion = React.lazy(() => import('../../views/Region/EditRegionComponent'));
 const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
-const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
 const MapProcurementAgent = React.lazy(() => import('../../views/Program/MapProcurementAgent'));
 const ManualJsonTrigger = React.lazy(() => import('../../views/Integration/ManualJsonTrigger'));
@@ -80,16 +79,11 @@ const AddBudgetComponent = React.lazy(() => import('../../views/Budget/AddBudget
 const ListBudgetComponent = React.lazy(() => import('../../views/Budget/ListBudgetComponent'));
 const EditBudgetComponent = React.lazy(() => import('../../views/Budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('../../views/ProgramProduct/AddProgramProduct'));
-const AddProductCategory = React.lazy(() => import('../../views/ProductCategory/AddProductCategory'));
 const AddProgram = React.lazy(() => import('../../views/Program/AddProgram'));
 const Programs = React.lazy(() => import('../../views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('../../views/Program/EditProgram'));
 const SubFundingSourceList = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
-const AddProduct = React.lazy(() => import('../../views/Product/AddProduct'));
-const ListProdct = React.lazy(() => import('../../views/Product/ProductList'));
-const EditProdct = React.lazy(() => import('../../views/Product/EditProduct'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
-const DeleteLocalPrograms = React.lazy(() => import('../../views/Program/DeleteLocalProgramComponent'));
 const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
 const ConsumptionDetails = React.lazy(() => import('../../views/Consumption/ConsumptionDetails'));
@@ -132,8 +126,6 @@ const AddProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/
 const EditProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/EditProcurementUnit'))
 const AddProcurementAgentPlanningUnit = React.lazy(() => import('../../views/ProcurementAgentPlanningUnit/AddProcurementAgentPlanningUnit'));
 const AddProcurementAgentProcurementUnit = React.lazy(() => import('../../views/ProcurementAgentProcurementUnit/AddProcurementAgentProcurementUnit'));
-const PlanningUnitCapacity = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacity'));
-const PlanningUnitCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountryPlanningUnit'));
 const PlanningUnitCountryList = React.lazy(() => import('../../views/RealmCountry/RealmCountryPlanningUnitList'));
 const PlanningUnitCapacityList = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('../../views/RealmCountry/RealmCountryRegion'));
@@ -180,7 +172,6 @@ const IntegrationList = React.lazy(() => import('../../views/Integration/Integra
 const EditIntegration = React.lazy(() => import('../../views/Integration/EditIntegrationComponent'));
 const UsagePeriodList = React.lazy(() => import('../../views/UsagePeriod/UsagePeriodList'));
 const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
-const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/ModelingTypeList'));
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 const ExtrapolateData = React.lazy(() => import('../../views/Extrapolation/ExtrapolateDataComponent.js'));
@@ -204,7 +195,6 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
 const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSetting/PlanningUnitSetting'));
 const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
-const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
 const routes = [
@@ -250,7 +240,6 @@ const routes = [
   { path: '/productCategory/productCategoryTree/:color/:message', name: 'static.dashboard.productcategory', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'static.home' },
   { path: '/programTree', name: 'static.dashboard.program', component: ProgramTree },
-  { path: '/program/deleteLocalProgram', name: 'static.program.deleteLocalProgram', component: DeleteLocalPrograms },
   { path: '/diamension/AddDiamension', name: 'static.breadcrum.add', entityname: 'static.dashboard.dimensionheader', component: AddDimension },
   { path: '/dimension/listDimension', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.dimension', component: DimensionList },
   { path: '/dimension/listDimension/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.dimension', component: DimensionList },
@@ -260,15 +249,10 @@ const routes = [
   { path: '/realm/listRealm', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
   { path: '/realm/updateRealm/:realmId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.realmheader', component: EditRealm },
   { path: '/realm/listRealm/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
-  { path: '/product/editProduct/:productId', name: 'static.breadcrum.edit', entityname: 'static.product.product', component: EditProdct },
-  { path: '/product/listProduct', exact: true, name: 'static.breadcrum.list', entityname: 'static.product.product', component: ListProdct },
-  { path: '/product/listProduct/:message', name: 'static.breadcrum.list', entityname: 'static.product.product', component: ListProdct },
-  { path: '/product/addProduct', name: 'static.breadcrum.add', entityname: 'static.product.product', component: AddProduct },
   { path: '/program/addProgram', name: 'static.breadcrum.add', entityname: 'static.programHead.program', component: AddProgram },
   { path: '/program/listProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/listProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/editProgram/:programId', name: 'static.programHead.program', entityname: 'static.programHead.program', component: EditProgram },
-  { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/programProduct/addProgramProduct/:programId/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -327,7 +311,6 @@ const routes = [
   { path: '/realmCountry/listRealmCountry/:color/:message', name: 'static.dashboard.realmcountry', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'static.dashboard.realmcountry', component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
-  { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
   { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
@@ -393,7 +376,6 @@ const routes = [
   { path: '/planningUnit/addPlanningUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.planningunitheader', component: AddPlanningUnit },
   { path: '/planningUnit/listPlanningUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
-  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: 'static.dashboad.planningunitcapacityheader', component: PlanningUnitCapacity },
   { path: '/procurementUnit/addProcurementUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementUnitheader', component: AddProcurementUnit },
   { path: '/procurementUnit/listProcurementUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.procurementUnit.procurementUnit', component: ListProcurementUnit },
   { path: '/procurementUnit/listProcurementUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.procurementUnit.procurementUnit', component: ListProcurementUnit },
@@ -402,8 +384,6 @@ const routes = [
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.dashboard.planningunitheader', component: EditPlanningUnit },
   { path: '/realmCountry/listRealmCountryPlanningUnit', exact: true, name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
   { path: '/realmCountry/listRealmCountryPlanningUnit/:color/:message', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountryList },
-  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: 'static.dashboad.planningunitcapacity', component: PlanningUnitCapacity },
-  { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: 'static.dashboad.planningunitcountry', component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: 'static.planningUnitVolumeHead.planningUnitVolume', component: PlanningUnitCapacityList },
   { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: 'static.dashboad.regioncountry', component: RealmCountryRegion },
   { path: '/report/productCatalog', name: 'static.dashboard.productcatalog', component: ProductCatalog },
@@ -448,8 +428,6 @@ const routes = [
   { path: '/forecastMethod/listForecastMethod', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastMethod.forecastMethod', component: ForecastMethodList },
   { path: '/usagePeriod/listUsagePeriod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usagePeriod.usagePeriod', component: UsagePeriodList },
   { path: '/usagePeriod/listUsagePeriod', exact: true, name: 'static.breadcrum.list', entityname: 'static.usagePeriod.usagePeriod', component: UsagePeriodList },
-  { path: '/modelingType/listModelingType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
-  { path: '/modelingType/listModelingType', exact: true, name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
   { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
   { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
@@ -469,7 +447,6 @@ const routes = [
   { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
-  { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
   { path: '/forecastReport/forecastOutput', exact: true, name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
   { path: '/forecastReport/forecastOutput/:programId/:versionId', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
   { path: '/forecastReport/forecastSummary', exact: true, name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },

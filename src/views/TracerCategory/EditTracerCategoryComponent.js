@@ -6,7 +6,6 @@ import TracerCategoryService from "../../api/TracerCategoryService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';

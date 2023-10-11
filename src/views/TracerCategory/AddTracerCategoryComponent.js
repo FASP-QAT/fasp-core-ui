@@ -2,7 +2,6 @@ import { Formik } from 'formik';
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
 import RealmService from "../../api/RealmService";
 import TracerCategoryService from "../../api/TracerCategoryService";
 import i18n from '../../i18n';

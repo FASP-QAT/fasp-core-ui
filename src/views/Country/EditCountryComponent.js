@@ -9,7 +9,6 @@ import CurrencyService from '../../api/CurrencyService.js';
 import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.country.countryMaster');
 let initialValues = {
     label: '',

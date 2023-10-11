@@ -22,7 +22,6 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
 import AuthenticationService from '../../Common/AuthenticationService.js';
-import '../../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
   emailId: "",
   password: ""

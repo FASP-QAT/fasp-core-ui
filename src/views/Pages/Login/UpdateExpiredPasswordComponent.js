@@ -2,7 +2,6 @@ import { Formik } from 'formik';
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import '../../Forms/ValidationForms/ValidationForms.css';
 import CryptoJS from 'crypto-js';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';

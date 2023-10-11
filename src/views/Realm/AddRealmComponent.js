@@ -7,7 +7,6 @@ import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONT
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.realm.realm');
 const initialValues = {
     realmCode: '',
