@@ -5863,6 +5863,7 @@ export default class BuildTree extends Component {
                     }, () => {
                         console.log("x row data===>", ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1));
                         var startValue = this.getMomValueForDateRange(rowData[1]);
+                        var targetYears = ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1) < 3 ? 3 : ((moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) + 1);
                         // console.log("***MOM final start value---", startValue)
                         this.setState({
                             currentRowIndex: x,
