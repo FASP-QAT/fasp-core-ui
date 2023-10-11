@@ -2593,7 +2593,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         // doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
         doc.addImage(canvasImg, 'png', 10, 280, 825, 220, 'CANVAS');
         doc.addPage();
-        doc.text("! = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 8, 100, {
+        doc.text("No Actual Data = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 20, 100, {
             align: 'left',
         })
 
@@ -3410,7 +3410,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         <thead>
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="sticky-col first-col clone"></th>
+                                                                <th className="forecastErrorFistColumnWidth sticky-col first-col clone"></th>
                                                                 {this.state.monthArray.map((item, count) => {
                                                                     return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                                                                 })}
