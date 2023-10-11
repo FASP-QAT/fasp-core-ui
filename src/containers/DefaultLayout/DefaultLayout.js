@@ -20,7 +20,6 @@ import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png'
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import ErrorBoundary from '../../views/Pages/PageError/ErrorBoundary';
-const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const AddInventory = React.lazy(() => import('../../views/Inventory/AddInventory'));
@@ -153,7 +152,6 @@ const pipelineProgramSetup = React.lazy(() => import('../../views/Pipeline/Pipel
 const StockStatusOverTime = React.lazy(() => import('../../views/Report/StockStatusOverTime'));
 const SupplyPlanFormulas = React.lazy(() => import('../../views/SupplyPlan/SupplyPlanFormulas'));
 const ForecastMetrics = React.lazy(() => import('../../views/Report/ForecastMetrics'));
-const QatProblemPlusActionReport = React.lazy(() => import('../../views/Report/QatProblemPlusActionReport'));
 const ProblemList = React.lazy(() => import('../../views/Report/ProblemList'));
 const FunderExport = React.lazy(() => import('../../views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('../../views/Report/ProcurementAgentExport'));
@@ -417,7 +415,6 @@ const routes = [
   { path: '/report/consumptionForecastErrorSupplyPlan', name: 'static.report.forecasterrorovertime', component: ConsumptionForecastErrorSupplyPlan },
   { path: '/report/stockStatusOverTime', name: 'static.dashboard.stockstatusovertime', component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: 'static.dashboard.forecastmetrics', component: ForecastMetrics },
-  { path: '/report/qatProblemPlusActionReport', name: 'static.report.qatProblemActionReport', component: QatProblemPlusActionReport },
   { path: '/report/problemList', name: 'static.dashboard.qatProblemList', component: ProblemList },
   { path: '/report/funderExport', name: 'static.dashboard.funderExport', component: FunderExport },
   { path: '/report/procurementAgentExport', name: 'static.report.shipmentCostReport', component: ProcurementAgentExport },
