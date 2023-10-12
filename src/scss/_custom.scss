@@ -888,7 +888,7 @@ label.arrow_label:after {
   position: absolute;
   top: 33px;
   right: 20px;
-  color: 697069;
+  color: #697069;
 }
 
 .consumption-box-icon {
@@ -10587,4 +10587,18 @@ border-top: 1px solid #c8ced3 !important;
 }
 .chart-graph-report-forecastOutput{
   min-height: 1000px!important;
+}
+// .fa-sort-down:before, .fa-sort-desc:before {
+//   content: "\f0dd";
+// }
+.ModelingIcon{
+  font-size: 16px;
+  font-weight: bold;
+}
+.svgdropdown .rmsc .gray{
+  color: var(--rmsc-gray);
+  width: 22px;
+  height: 30px;
+  transform: scale(0.73);
+  margin: 6px -11px 0px 2px;
 }
