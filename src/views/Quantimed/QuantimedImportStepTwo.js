@@ -14,7 +14,6 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PRO_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import "../ProductCategory/style.css";
 const initialValuesTwo = {
 }
 const validationSchemaTwo = function (values) {

@@ -6,7 +6,6 @@ import { API_URL } from '../../Constants.js';
 import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     label: ""
 }

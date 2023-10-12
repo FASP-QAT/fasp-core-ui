@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Container, Button, FormFeedback, InputGroupAddon, InputGroupText, InputGroup, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import '../../Forms/ValidationForms/ValidationForms.css'
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import UserService from '../../../api/UserService'

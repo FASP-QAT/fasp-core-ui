@@ -7,7 +7,6 @@ import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.procurementagenttype');
 const initialValues = {
     procurementAgentTypeName: "",

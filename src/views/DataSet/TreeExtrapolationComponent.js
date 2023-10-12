@@ -21,7 +21,6 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 import i18n from '../../i18n';
-import '../../views/Forms/ValidationForms/ValidationForms.css';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { calculateArima } from '../Extrapolation/Arima';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';

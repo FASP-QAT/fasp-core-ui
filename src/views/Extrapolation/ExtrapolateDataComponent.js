@@ -41,7 +41,6 @@ import { JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
-import '../../views/Forms/ValidationForms/ValidationForms.css';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateArima } from '../Extrapolation/Arima';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';

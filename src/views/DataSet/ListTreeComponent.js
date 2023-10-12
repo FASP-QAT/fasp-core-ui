@@ -28,7 +28,6 @@ import i18n from '../../i18n';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.common.listtree');
 const validationSchema = function (values) {
     return Yup.object().shape({

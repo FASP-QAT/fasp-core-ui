@@ -19,7 +19,6 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants
 import MasterSyncService from '../../api/MasterSyncService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import '../Forms/ValidationForms/ValidationForms.css';
 import { decompressJson, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 export default class SyncMasterDataForTree extends Component {
     constructor(props) {

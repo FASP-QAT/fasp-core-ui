@@ -7,7 +7,6 @@ import { API_URL, SPECIAL_CHARECTER_WITHOUT_NUM } from '../../Constants.js';
 import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     label: "",
     languageCode: "",

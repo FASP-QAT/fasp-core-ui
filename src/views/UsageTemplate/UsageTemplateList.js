@@ -15,7 +15,6 @@ import {
     ModalHeader
 } from 'reactstrap';
 import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
 import { Prompt } from 'react-router';

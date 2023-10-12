@@ -17,7 +17,6 @@ import LabelsService from '../../api/LabelService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import "../ProductCategory/style.css";
 const entityname = i18n.t('static.label.databaseTranslations');
 export default class DatabaseTranslations extends React.Component {
     constructor(props) {

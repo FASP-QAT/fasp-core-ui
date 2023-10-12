@@ -7,7 +7,6 @@ import { API_URL } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.realm.realm');
 let initialValues = {
     realmCode: '',

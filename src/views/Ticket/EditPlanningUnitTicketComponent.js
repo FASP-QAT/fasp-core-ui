@@ -10,7 +10,6 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import i18n from '../../i18n';
-import '../Forms/ValidationForms/ValidationForms.css';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Edit Planning Unit"
 const initialValues = {

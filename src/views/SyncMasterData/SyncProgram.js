@@ -14,7 +14,6 @@ import DatasetService from '../../api/DatasetService';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import '../Forms/ValidationForms/ValidationForms.css';
 export default class SyncProgram extends Component {
     constructor(props) {
         super(props);

@@ -10,7 +10,6 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     label: ""
 }

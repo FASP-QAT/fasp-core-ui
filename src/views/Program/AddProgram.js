@@ -22,7 +22,6 @@ import HealthAreaService from "../../api/HealthAreaService";
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
     programName: '',
