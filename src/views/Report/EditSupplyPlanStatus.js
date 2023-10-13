@@ -4360,6 +4360,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t("static.common.region"),
                     type: 'dropdown',
+                    visible: false,
                     width: 80,
                     source: this.state.regionList,
                     readOnly: true
