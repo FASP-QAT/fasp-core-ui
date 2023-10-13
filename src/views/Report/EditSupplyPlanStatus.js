@@ -13,7 +13,7 @@ import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
@@ -365,52 +365,7 @@ class EditSupplyPlanStatus extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
-        for (var y = 0; y < json.length; y++) {
-            var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-            var col = ("J").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(9, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-            var col = ("K").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(10, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-            var col = ("U").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(20, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        valid = checkValidation(this.el);
         return valid;
     }
     rowChanged = function (instance, cell, x, y, value) {
@@ -421,72 +376,29 @@ class EditSupplyPlanStatus extends Component {
         let problemList = this.state.problemList;
         var rowData1 = elInstance.getRowData(y);
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            if (rowData1[6] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 9) {
-            var col = ("J").concat(parseInt(y) + 1);
-            if (rowData1[9] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 10) {
-            var col = ("K").concat(parseInt(y) + 1);
-            if (rowData1[10] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 20) {
-            var col = ("U").concat(parseInt(y) + 1);
-            if (rowData1[20] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        changed(instance, cell, x, y, value)
         if(problemList.length > 0){
-        if (x == 11) {
-            if (problemList[0].problemStatus.id != value) {
-                elInstance.setValueFromCoords(21, y, true, true);
+            if (x == 11) {
+                if (problemList[0].problemStatus.id != value) {
+                    elInstance.setValueFromCoords(21, y, true, true);
+                }
+                if (problemList[0].problemStatus.id == value) {
+                    elInstance.setValueFromCoords(21, y, false, true);
+                }
             }
-            if (problemList[0].problemStatus.id == value) {
-                elInstance.setValueFromCoords(21, y, false, true);
+            if (x == 11 || x == 21 || x == 22) {
+                var rowData = elInstance.getRowData(y);
+                if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes.toString() != rowData[22].toString())) {
+                    elInstance.setValueFromCoords(23, y, 1, true);
+                } else {
+                    elInstance.setValueFromCoords(23, y, 0, true);
+                }
             }
-        }
-        if (x == 11 || x == 21 || x == 22) {
-            var rowData = elInstance.getRowData(y);
-            if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes.toString() != rowData[22].toString())) {
-                elInstance.setValueFromCoords(23, y, 1, true);
-            } else {
-                elInstance.setValueFromCoords(23, y, 0, true);
+            if (x == 21) {
+                if (value.toString() == "false") {
+                    elInstance.setValueFromCoords(22, y, "", true);
+                }
             }
-        }
-        if (x == 21) {
-            if (value.toString() == "false") {
-                elInstance.setValueFromCoords(22, y, "", true);
-            }
-        }
         }
     }
     hideFirstComponent() {
@@ -3466,7 +3378,8 @@ class EditSupplyPlanStatus extends Component {
                     type: 'dropdown',
                     source: this.state.planningUnitDropdownList,
                     readOnly: true,
-                    width: 80
+                    width: 80,
+                    required: true
                 },
                 {
                     title: 'A',
@@ -3486,13 +3399,15 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.report.problemDescription'),
                     type: 'text',
                     readOnly: true,
-                    width: 120
+                    width: 120,
+                    required: true
                 },
                 {
                     title: i18n.t('static.report.suggession'),
                     type: 'text',
                     readOnly: true,
-                    width: 120
+                    width: 120,
+                    required: true
                 },
                 {
                     title: i18n.t('static.report.problemStatus'),
@@ -3500,7 +3415,8 @@ class EditSupplyPlanStatus extends Component {
                     source: this.state.problemStatusListForEdit,
                     width: 80,
                     filter: this.filterProblemStatus,
-                    readOnly: !this.state.editable
+                    readOnly: !this.state.editable,
+                    required: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -3560,7 +3476,8 @@ class EditSupplyPlanStatus extends Component {
                     type: 'dropdown',
                     readOnly: true,
                     width: 80,
-                    source: this.state.criticalitiesList
+                    source: this.state.criticalitiesList,
+                    required: true
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),

@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
+import { checkValidation, changed, jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN } from "../../Constants";
 import DropdownService from '../../api/DropdownService';
@@ -312,19 +312,22 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.productCategory.productCategory'),
                                                                     type: 'dropdown',
-                                                                    source: productCategoryListNew
+                                                                    source: productCategoryListNew,
+                                                                    required: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.dashboard.product'),
                                                                     type: 'autocomplete',
                                                                     source: list,
-                                                                    filter: this.dropdownFilter
+                                                                    filter: this.dropdownFilter,
+                                                                    required: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.programPU.planBasedOn'),
                                                                     type: 'dropdown',
                                                                     source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
-                                                                    tooltip: i18n.t("static.programPU.planByTooltip")
+                                                                    tooltip: i18n.t("static.programPU.planByTooltip"),
+                                                                    required: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.reorderFrequency'),
@@ -332,7 +335,13 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
+                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
+                                                                    required: true,
+                                                                    number: true,
+                                                                    regex:{
+                                                                        ex: JEXCEL_INTEGER_REGEX,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.minMonthOfStock'),
@@ -356,7 +365,13 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
+                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip"),
+                                                                    required: true,
+                                                                    number: true,
+                                                                    regex: {
+                                                                        ex: JEXCEL_INTEGER_REGEX,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthpastamc'),
@@ -364,7 +379,13 @@ class AddprogramPlanningUnit extends Component {
                                                                     textEditor: true,
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip")
+                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip"),
+                                                                    required: true,
+                                                                    number: true,
+                                                                    regex: {
+                                                                        ex: JEXCEL_INTEGER_REGEX,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -374,7 +395,12 @@ class AddprogramPlanningUnit extends Component {
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
                                                                     tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                                                    width: 120
+                                                                    width: 120,
+                                                                    required: true,
+                                                                    regex: {
+                                                                        ex: JEXCEL_DECIMAL_LEAD_TIME,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -391,7 +417,13 @@ class AddprogramPlanningUnit extends Component {
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
                                                                     tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
-                                                                    width: 120
+                                                                    width: 120,
+                                                                    required: true,
+                                                                    number: true,
+                                                                    regex: {
+                                                                        ex: JEXCEL_INTEGER_REGEX,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -400,7 +432,12 @@ class AddprogramPlanningUnit extends Component {
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
                                                                     tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
-                                                                    width: 120
+                                                                    width: 120,
+                                                                    required: true,
+                                                                    regex: {
+                                                                        ex: JEXCEL_DECIMAL_CATELOG_PRICE,
+                                                                        text: i18n.t('static.message.invalidnumber')
+                                                                    }
                                                                 },
                                                                 {
                                                                     title: 'Id',
@@ -862,73 +899,26 @@ class AddprogramPlanningUnit extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
+        valid = checkValidation(this.el)
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(14, y);
             if (parseInt(value) == 1) {
-                var col = ("A").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(0, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getRowData(parseInt(y))[1];
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    for (var i = (json.length - 1); i >= 0; i--) {
-                        var map = new Map(Object.entries(json[i]));
-                        var planningUnitValue = map.get("1");
-                        if (planningUnitValue == value && y != i && i > y) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                            i = -1;
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
-                }
-                var col = ("C").concat(parseInt(y) + 1);
-                value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("D").concat(parseInt(y) + 1);
-                value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
                         valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
                     }
                 }
+                
+                
                 var col = ("E").concat(parseInt(y) + 1);
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX
@@ -986,101 +976,6 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setComments(col, "");
                     }
                 }
-                var col = ("G").concat(parseInt(y) + 1);
-                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-                var col = ("H").concat(parseInt(y) + 1);
-                value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-                var col = ("I").concat(parseInt(y) + 1);
-                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_LEAD_TIME
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-                var col = ("K").concat(parseInt(y) + 1);
-                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-                var col = ("L").concat(parseInt(y) + 1);
-                value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_CATELOG_PRICE
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
             }
         }
         return valid;
@@ -1088,53 +983,31 @@ class AddprogramPlanningUnit extends Component {
     changed = function (instance, cell, x, y, value) {
         var valid = true;
         var rowData = this.el.getRowData(y);
+        changed(instance, cell, x, y, value)
+        this.el.setValueFromCoords(14, y, 1, true);
         if (x == 0) {
-            var col = ("A").concat(parseInt(y) + 1);
-            if (rowData[0] == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = true;
-            }
             this.el.setValueFromCoords(1, y, "", true);
         }
-        if (x == 1) {
+        else if (x == 1) {
             var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                var jsonLength = parseInt(json.length) - 1;
-                for (var i = jsonLength; i >= 0; i--) {
-                    var map = new Map(Object.entries(json[i]));
-                    var planningUnitValue = map.get("1");
-                    if (planningUnitValue == value && y != i) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                        this.el.setValueFromCoords(14, y, 1, true);
-                        valid = false;
-                        i = -1;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                        this.el.setValueFromCoords(14, y, 1, true);
-                        valid = true;
-                    }
+
+            var jsonLength = parseInt(json.length) - 1;
+            for (var i = jsonLength; i >= 0; i--) {
+                var map = new Map(Object.entries(json[i]));
+                var planningUnitValue = map.get("1");
+                if (planningUnitValue == value && y != i) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                    this.el.setValueFromCoords(14, y, 1, true);
+                    valid = false;
+                    i = -1;
                 }
             }
+            
         }
-        if (x == 2) {
+        else if (x == 2) {
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1147,7 +1020,6 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 this.el.setValueFromCoords(14, y, 1, true);
-                valid = true;
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX
                 var col = ("E").concat(parseInt(y) + 1);
@@ -1168,7 +1040,6 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
                         this.el.setValueFromCoords(14, y, 1, true);
-                        valid = true;
                     }
                 }
                 value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -1191,7 +1062,6 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
                         this.el.setValueFromCoords(14, y, 1, true);
-                        valid = true;
                     }
                 }
                 value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -1212,7 +1082,6 @@ class AddprogramPlanningUnit extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
                         this.el.setValueFromCoords(14, y, 1, true);
-                        valid = true;
                     }
                 }
             }
@@ -1226,32 +1095,7 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(4, y, rowData[16], true);
             }
         }
-        if (x == 3) {
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        if (x == 4) {
+        else if (x == 4) {
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
@@ -1272,14 +1116,13 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
                 }
             }
             if (value !== "") {
                 this.el.setValueFromCoords(16, y, value, true);
             }
         }
-        if (x == 5) {
+        else if (x == 5) {
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
@@ -1300,14 +1143,13 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
                 }
             }
             if (value !== "") {
                 this.el.setValueFromCoords(17, y, value, true);
             }
         }
-        if (x == 9) {
+        else if (x == 9) {
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("J").concat(parseInt(y) + 1);
@@ -1328,138 +1170,13 @@ class AddprogramPlanningUnit extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
                 }
             }
             if (value !== "") {
                 this.el.setValueFromCoords(18, y, value, true);
             }
         }
-        if (x == 6) {
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        if (x == 7) {
-            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("H").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        if (x == 8) {
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
-            var col = ("I").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        if (x == 10) {
-            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("K").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
-        if (x == 11) {
-            value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            var col = ("L").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                this.el.setValueFromCoords(14, y, 1, true);
-                valid = false;
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    this.el.setValueFromCoords(14, y, 1, true);
-                    valid = true;
-                }
-            }
-        }
+        
         if (x != 14) {
             this.el.setValueFromCoords(14, y, 1, true);
         }
