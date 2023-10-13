@@ -52,6 +52,7 @@ export default class HealthAreaListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = healthAreasArray;
         var options = {
             data: data,
@@ -109,7 +110,7 @@ export default class HealthAreaListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -284,6 +285,11 @@ export default class HealthAreaListComponent extends Component {
                 )
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -337,7 +343,7 @@ export default class HealthAreaListComponent extends Component {
             </div>
         );
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     editHealthArea(healthArea) {

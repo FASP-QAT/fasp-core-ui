@@ -184,6 +184,7 @@ export default class ExpiredInventory extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -194,9 +195,9 @@ export default class ExpiredInventory extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -204,6 +205,7 @@ export default class ExpiredInventory extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -217,6 +219,7 @@ export default class ExpiredInventory extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -320,6 +323,7 @@ export default class ExpiredInventory extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -330,9 +334,9 @@ export default class ExpiredInventory extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -340,6 +344,7 @@ export default class ExpiredInventory extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -393,7 +398,9 @@ export default class ExpiredInventory extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
+                    const lan = 'en';
                     var db1;
+                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -401,9 +408,10 @@ export default class ExpiredInventory extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        planningunitRequest.onerror = function () {
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
                         };
-                        planningunitRequest.onsuccess = function () {
+                        planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -513,9 +521,11 @@ export default class ExpiredInventory extends Component {
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
                 this.setState({ loading: true })
                 var db1;
+                var storeOS;
                 getDatabase();
+                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'), loading: false
                     })
@@ -530,7 +540,7 @@ export default class ExpiredInventory extends Component {
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'), loading: false
                         })
@@ -538,17 +548,17 @@ export default class ExpiredInventory extends Component {
                     var program1 = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                     var getRequest1 = program1.getAll();
                     var programPlanningUnitList = [];
-                    getRequest1.onerror = function () {
+                    getRequest1.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: '#BA0C2F',
                             loading: false
                         })
                     }.bind(this);
-                    getRequest1.onsuccess = function () {
+                    getRequest1.onsuccess = function (event) {
                         programPlanningUnitList = getRequest1.result;
                     }
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (e) {
                         this.setState({
                             localProgramId: programRequest.result.id
                         })
@@ -596,6 +606,7 @@ export default class ExpiredInventory extends Component {
                                     if (temp1.length > 0) {
                                         cost = temp1[0].rate;
                                     }
+                                    let expiredQuantity = document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps;
                                     var json = {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
@@ -731,6 +742,7 @@ export default class ExpiredInventory extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -794,9 +806,13 @@ export default class ExpiredInventory extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const headers = columns.map((item) => (item.text));
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        const headers = columns.map((item, idx) => (item.text));
         const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate), (this.formatter(Math.round(ele.cost * ele.expiredQty)))]);
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -831,6 +847,7 @@ export default class ExpiredInventory extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = outPutListArray;
         var options = {
             data: data,
@@ -896,7 +913,7 @@ export default class ExpiredInventory extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -939,7 +956,7 @@ export default class ExpiredInventory extends Component {
             expiredStockModal: !this.state.expiredStockModal
         })
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     render() {
@@ -992,7 +1009,7 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     return getLabelText(cell, this.state.lang);
                 }
             },
@@ -1003,7 +1020,7 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     var decimalFixedValue = cell;
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -1076,7 +1093,7 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '170px' },
-                formatter: (cell) => {
+                formatter: (cell, row) => {
                     var decimalFixedValue = cell;
                     decimalFixedValue += '';
                     var x = decimalFixedValue.split('.');
@@ -1090,6 +1107,32 @@ export default class ExpiredInventory extends Component {
                 }
             },
         ];
+        const tabelOptions = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.outPutList.length
+            }]
+        }
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1168,7 +1211,7 @@ export default class ExpiredInventory extends Component {
                                                         name="includePlanningShipments"
                                                         id="includePlanningShipments"
                                                         bsSize="sm"
-                                                        onChange={() => { this.fetchData() }}
+                                                        onChange={(e) => { this.fetchData() }}
                                                     >
                                                         <option value="true">{i18n.t('static.program.yes')}</option>
                                                         <option value="false">{i18n.t('static.program.no')}</option>

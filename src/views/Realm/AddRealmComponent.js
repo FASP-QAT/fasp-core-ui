@@ -9,7 +9,22 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.realm.realm');
-const validationSchema = function () {
+const initialValues = {
+    realmCode: '',
+    label: '',
+    minMosMinGaurdrail: '',
+    minMosMaxGaurdrail: '',
+    maxMosMaxGaurdrail: '',
+    minQplTolerance: '',
+    minQplToleranceCutOff: '',
+    maxQplTolerance: '',
+    actualConsumptionMonthsInPast: '',
+    forecastConsumptionMonthsInPast: '',
+    inventoryMonthsInPast: '',
+    minCountForMode: '',
+    minPercForMode: ''
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
             .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
@@ -258,7 +273,7 @@ export default class AddRealmComponent extends Component {
                                     minPercForMode: this.state.realm.minPercForMode,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -317,11 +332,13 @@ export default class AddRealmComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

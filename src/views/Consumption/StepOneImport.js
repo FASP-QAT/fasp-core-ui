@@ -222,7 +222,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -239,9 +239,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var getRequest = program.getAll();
             var datasetList = [];
             var datasetList1 = [];
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -249,6 +249,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
                     var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
@@ -647,7 +648,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true
                 }
             ],
-            updateTable: function (el, cell, x, y) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
@@ -689,7 +690,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -700,7 +701,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
-    filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r) {
+    filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[5];
         var mylist = this.state.planningUnitListJexcel;

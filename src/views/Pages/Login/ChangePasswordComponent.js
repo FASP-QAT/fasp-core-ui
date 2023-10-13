@@ -124,7 +124,7 @@ class ChangePasswordComponent extends Component {
                                     username: ""
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     if (isSiteOnline()) {
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
@@ -176,11 +176,13 @@ class ChangePasswordComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched
                                     }) => (

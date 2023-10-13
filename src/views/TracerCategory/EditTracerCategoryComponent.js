@@ -11,7 +11,12 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.tracercategory.tracercategory');
-const validationSchema = function () {
+const initialValues = {
+    tracerCategoryName: "",
+    healthAreaId: "",
+    submittedToApprovedLeadTime: ""
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         tracerCategoryName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -283,7 +288,7 @@ class EditTracerCategoryComponent extends Component {
                                         submittedToApprovedLeadTime: this.state.tracerCategory.submittedToApprovedLeadTime
                                     }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -341,11 +346,14 @@ class EditTracerCategoryComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm' autocomplete="off">

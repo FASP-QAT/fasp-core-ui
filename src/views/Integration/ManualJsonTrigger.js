@@ -192,7 +192,7 @@ export default class ConsumptionDetails extends Component {
       license: JEXCEL_PRO_KEY,
       editable: true,
       onload: this.loadedModal,
-      contextMenu: function (obj, x, y) {
+      contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {
         } else {
@@ -416,10 +416,10 @@ export default class ConsumptionDetails extends Component {
         }
       });
   }
-  loaded = function (instance) {
+  loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
   };
-  loadedModal = function (instance) {
+  loadedModal = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     if (document.getElementsByClassName("jss").length > 1) {
       var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
@@ -435,7 +435,7 @@ export default class ConsumptionDetails extends Component {
       tr.children[3].classList.add("AsteriskTheadtrTd");
     }
   };
-  filterVersion = function (instance, cell, c, r) {
+  filterVersion = function (instance, cell, c, r, source) {
     var value = this.state.dataEL.getJson(null, false)[r][0];
     var versionList = this.state.programList.filter((c) => c.id == value)[0]
       .versionList;
@@ -460,7 +460,7 @@ export default class ConsumptionDetails extends Component {
     data[2] = "";
     obj.insertRow(data);
   }
-  changed = function (instance, cell, x, y) {
+  changed = function (instance, cell, x, y, value) {
     if (this.state.changedFlag == false) {
       this.setState({
         changedFlag: true,
@@ -1041,7 +1041,7 @@ export default class ConsumptionDetails extends Component {
                 license: JEXCEL_PRO_KEY,
                 editable: false,
                 onload: this.loaded,
-                contextMenu: function () {
+                contextMenu: function (obj, x, y, e) {
                   var items = [];
                   return items;
                 }.bind(this),
@@ -1125,7 +1125,7 @@ export default class ConsumptionDetails extends Component {
     const { countrys } = this.state;
     let countryList =
       countrys.length > 0 &&
-      countrys.map((item) => {
+      countrys.map((item, i) => {
         return {
           label: getLabelText(item.label, this.state.lang),
           value: item.id,
@@ -1135,7 +1135,7 @@ export default class ConsumptionDetails extends Component {
     let programList = [];
     programList =
       programListBasedOnCountry.length > 0 &&
-      programListBasedOnCountry.map((item) => {
+      programListBasedOnCountry.map((item, i) => {
         return (
           { label: item.name, value: item.id }
         );

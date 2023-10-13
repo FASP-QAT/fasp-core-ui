@@ -15,7 +15,7 @@ let initialValues = {
     organisationTypeName: '',
 }
 const entityname = i18n.t('static.organisationType.organisationType');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -269,7 +269,7 @@ export default class EditOrganisationTypeComponent extends Component {
                                     realmId: this.state.organisationType.realm.id,
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -327,12 +327,18 @@ export default class EditOrganisationTypeComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
-                                        setTouched                                    }) => (
+                                        isSubmitting,
+                                        isValid,
+                                        setTouched,
+                                        setFieldValue,
+                                        setFieldTouched
+                                    }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='organisationTypeForm' autocomplete="off">
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>

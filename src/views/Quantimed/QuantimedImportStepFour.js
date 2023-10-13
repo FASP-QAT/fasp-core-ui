@@ -14,9 +14,13 @@ import {
 import * as Yup from 'yup';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import i18n from '../../i18n';
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 const initialValuesFour = {
 }
-const validationSchemaFour = function () {
+const validationSchemaFour = function (values) {
     return Yup.object().shape({
     })
 }
@@ -111,10 +115,12 @@ class QuantimedImportStepFour extends Component {
                 <Formik
                     initialValues={initialValuesFour}
                     validate={validateFour(validationSchemaFour)}
-                    onSubmit={(values) => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.setState({
                             loading: true
                         })
+                        let startDate = moment(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01').format("YYYY-MM-DD");
+                        let endDate = moment(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
                         this.props.items.program.rangeValue = this.state.rangeValue;
                         this.props.finishedStepFour && this.props.finishedStepFour();
                         this.props.triggerStepFive();
@@ -124,7 +130,16 @@ class QuantimedImportStepFour extends Component {
                     }}
                     render={
                         ({
-                            handleSubmit                        }) => (
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched
+                        }) => (
                             <div className="animated fadeIn">
                                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                                     <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>

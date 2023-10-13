@@ -341,6 +341,7 @@ export default class PlanningUnitSetting extends Component {
             if (value != -1 && value !== null && value !== '') {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
+                let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
                 PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
                     .then(response => {
                         if (response.status == 200) {
@@ -845,7 +846,9 @@ export default class PlanningUnitSetting extends Component {
         );
     }
     procurementAgentList() {
+        const lan = 'en';
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -853,7 +856,8 @@ export default class PlanningUnitSetting extends Component {
             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
             var procurementAgentRequest = procurementAgentOs.getAll();
-            procurementAgentRequest.onerror = function () {
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
                 this.setState({
                     message: 'unknown error occured', loading: false
                 },
@@ -861,7 +865,7 @@ export default class PlanningUnitSetting extends Component {
                         this.hideSecondComponent();
                     })
             };
-            procurementAgentRequest.onsuccess = function () {
+            procurementAgentRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = procurementAgentRequest.result;
                 var listArray = myResult;
@@ -924,9 +928,9 @@ export default class PlanningUnitSetting extends Component {
             var getRequest = program.getAll();
             var datasetList = [];
             var datasetList1 = [];
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -934,6 +938,7 @@ export default class PlanningUnitSetting extends Component {
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
                     var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
+                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
@@ -1065,7 +1070,9 @@ export default class PlanningUnitSetting extends Component {
         }
     }
     productCategoryList() {
+        const lan = 'en';
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -1073,7 +1080,8 @@ export default class PlanningUnitSetting extends Component {
             var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
             var productCategoryOs = productCategoryTransaction.objectStore('productCategory');
             var productCategoryRequest = productCategoryOs.getAll();
-            productCategoryRequest.onerror = function () {
+            var planningList = []
+            productCategoryRequest.onerror = function (event) {
                 this.setState({
                     message: 'unknown error occured', loading: false
                 },
@@ -1081,7 +1089,7 @@ export default class PlanningUnitSetting extends Component {
                         this.hideSecondComponent();
                     })
             };
-            productCategoryRequest.onsuccess = function () {
+            productCategoryRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = productCategoryRequest.result;
                 myResult = myResult.filter(c => c.payload.active == true || c.payload.realm.id == 0);
@@ -1127,6 +1135,8 @@ export default class PlanningUnitSetting extends Component {
         }.bind(this)
     }
     filterData(addRowInJexcel) {
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var forecastProgramId = this.state.forecastProgramId;
         if (forecastProgramId > 0) {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
@@ -1241,6 +1251,7 @@ export default class PlanningUnitSetting extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = outPutListArray;
         this.setState({ dropdownList: dropdownList })
         var options = {
@@ -1383,7 +1394,7 @@ export default class PlanningUnitSetting extends Component {
                     readOnly: true
                 },
             ],
-            updateTable: function () {
+            updateTable: function (el, cell, x, y, source, value, id) {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
@@ -1400,7 +1411,7 @@ export default class PlanningUnitSetting extends Component {
             onchange: this.changed,
             onpaste: this.onPaste,
             onchangepage: this.onchangepage,
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
                 } else {
@@ -1427,7 +1438,7 @@ export default class PlanningUnitSetting extends Component {
                 }
                 return items;
             }.bind(this),
-            oneditionstart: function (instance, cell, x, y) {
+            oneditionstart: function (instance, cell, x, y, value) {
                 this.setState({ sortOrderLoading: true })
                 let tempId = data[y][0]
                 let sortOrder;
@@ -1459,11 +1470,11 @@ export default class PlanningUnitSetting extends Component {
             }
         })
     }
-    filterPlanningUnitList = function () {
+    filterPlanningUnitList = function (instance, cell, c, r, source) {
         var mylist = [];
         return mylist;
     }.bind(this)
-    filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r) {
+    filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.languageEl.getJson(null, false)[r])[0];
         var puList = [];
@@ -1487,7 +1498,7 @@ export default class PlanningUnitSetting extends Component {
         }
         return mylist;
     }.bind(this)
-    filterTracerCategoryByHealthArea = function () {
+    filterTracerCategoryByHealthArea = function (instance, cell, c, r, source) {
         var mylist = [];
         let selectedForecastProgramHealthAreaList = this.state.selectedForecastProgram.healthAreaList;
         for (var i = 0; i < selectedForecastProgramHealthAreaList.length; i++) {
@@ -1512,6 +1523,7 @@ export default class PlanningUnitSetting extends Component {
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B'];
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -1538,7 +1550,7 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
-    loaded = function (instance, cell) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1556,6 +1568,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
+        var colArr = ['A', 'B'];
         var jsonLength;
         if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
             jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1593,6 +1606,7 @@ export default class PlanningUnitSetting extends Component {
             })
             var tableJson = this.el.getJson(null, false);
             var programs = [];
+            var count = 0;
             var planningUnitList = [];
             let indexVar = 0;
             var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
@@ -1600,6 +1614,7 @@ export default class PlanningUnitSetting extends Component {
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             let originalPlanningUnitList = programData.planningUnitList;
             let listOfDisablePuNode = [];
+            let listOfDisablePuNodeActiveInactive = [];
             let planningUnitIds = [];
             for (let i = 0; i < tableJson.length; i++) {
                 planningUnitIds.push(parseInt(tableJson[i][1]));
@@ -1719,7 +1734,7 @@ export default class PlanningUnitSetting extends Component {
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function () {
+                        openRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 color: 'red'
@@ -1731,17 +1746,18 @@ export default class PlanningUnitSetting extends Component {
                             var transaction = db1.transaction(['datasetData'], 'readwrite');
                             var programTransaction = transaction.objectStore('datasetData');
                             programs.forEach(program => {
+                                var programRequest = programTransaction.put(program);
                             })
-                            transaction.oncomplete = function () {
+                            transaction.oncomplete = function (event) {
                                 db1 = e.target.result;
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                                datasetDetailsRequest.onsuccess = function () {
+                                datasetDetailsRequest.onsuccess = function (e) {
                                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                     datasetDetailsRequestJson.changed = 1;
                                     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                    datasetDetailsRequest1.onsuccess = function () {
+                                    datasetDetailsRequest1.onsuccess = function (event) {
                                     }
                                 }
                                 this.setState({
@@ -1758,7 +1774,7 @@ export default class PlanningUnitSetting extends Component {
                                     this.hideSecondComponent();
                                 });
                             }.bind(this);
-                            transaction.onerror = function () {
+                            transaction.onerror = function (event) {
                                 this.setState({
                                     loading: false,
                                     color: "red",
@@ -1902,7 +1918,7 @@ export default class PlanningUnitSetting extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: 'red'
@@ -1914,17 +1930,18 @@ export default class PlanningUnitSetting extends Component {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
                     programs.forEach(program => {
+                        var programRequest = programTransaction.put(program);
                     })
-                    transaction.oncomplete = function () {
+                    transaction.oncomplete = function (event) {
                         db1 = e.target.result;
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                        datasetDetailsRequest.onsuccess = function () {
+                        datasetDetailsRequest.onsuccess = function (e) {
                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
                             datasetDetailsRequestJson.changed = 1;
                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                            datasetDetailsRequest1.onsuccess = function () {
+                            datasetDetailsRequest1.onsuccess = function (event) {
                             }
                         }
                         this.setState({
@@ -1941,7 +1958,7 @@ export default class PlanningUnitSetting extends Component {
                             this.hideSecondComponent();
                         });
                     }.bind(this);
-                    transaction.onerror = function () {
+                    transaction.onerror = function (event) {
                         this.setState({
                             loading: false,
                             color: "red",
@@ -1975,7 +1992,7 @@ export default class PlanningUnitSetting extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
@@ -1987,21 +2004,22 @@ export default class PlanningUnitSetting extends Component {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var programTransaction = transaction.objectStore('datasetData');
                 programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
                 })
-                transaction.oncomplete = function () {
+                transaction.oncomplete = function (event) {
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function () {
+                    datasetDetailsRequest.onsuccess = function (e) {
                         var datasetDetailsRequestJson = datasetDetailsRequest.result;
                         datasetDetailsRequestJson.changed = 1;
                         var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                        datasetDetailsRequest1.onsuccess = function () {
+                        datasetDetailsRequest1.onsuccess = function (event) {
                         }
                     }
                 }.bind(this);
-                transaction.onerror = function () {
+                transaction.onerror = function (event) {
                     this.setState({
                         loading: false,
                         color: "red",
@@ -2058,7 +2076,7 @@ export default class PlanningUnitSetting extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
@@ -2070,24 +2088,25 @@ export default class PlanningUnitSetting extends Component {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var programTransaction = transaction.objectStore('datasetData');
                 programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
                 })
-                transaction.oncomplete = function () {
+                transaction.oncomplete = function (event) {
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function () {
+                    datasetDetailsRequest.onsuccess = function (e) {
                         var datasetDetailsRequestJson = datasetDetailsRequest.result;
                         datasetDetailsRequestJson.changed = 1;
                         var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                        datasetDetailsRequest1.onsuccess = function () {
+                        datasetDetailsRequest1.onsuccess = function (event) {
                         }
                     }
                     this.setState({
                     }, () => {
                     });
                 }.bind(this);
-                transaction.onerror = function () {
+                transaction.onerror = function (event) {
                     this.setState({
                         loading: false,
                         color: "red",
@@ -2219,6 +2238,11 @@ export default class PlanningUnitSetting extends Component {
             entries: " ",
         });
         const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {

@@ -19,7 +19,10 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const validationSchema = function () {
+const initialValues = {
+    programId: ''
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
             .required(i18n.t('static.program.validselectprogramtext')),
@@ -110,7 +113,7 @@ class QuantimedImportStepOne extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -124,7 +127,7 @@ class QuantimedImportStepOne extends Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
@@ -132,7 +135,7 @@ class QuantimedImportStepOne extends Component {
                 })
                 this.hideFirstComponent()
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -174,7 +177,7 @@ class QuantimedImportStepOne extends Component {
                     initialValues={{
                     }}
                     validate={validate(validationSchema)}
-                    onSubmit={(values) => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         if (window.File && window.FileReader && window.FileList && window.Blob) {
                             if (document.querySelector('input[type=file]').files[0] == undefined) {
                                 this.setState({ loading: false })
@@ -253,11 +256,13 @@ class QuantimedImportStepOne extends Component {
                     }}
                     render={
                         ({
+                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
+                            isSubmitting,
                             isValid,
                             setTouched
                         }) => (

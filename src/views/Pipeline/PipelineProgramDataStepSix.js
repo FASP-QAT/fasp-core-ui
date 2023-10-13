@@ -21,7 +21,25 @@ import step5 from '../../assets/img/5-step.png';
 import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-const validationSchemaSix = function () {
+const initialValuesSix = {
+    programName: '',
+    userId: '',
+    airFreightPerc: '',
+    seaFreightPerc: '',
+    roadFreightPerc: '',
+    draftToSubmittedLeadTime: '',
+    plannedToDraftLeadTime: '',
+    submittedToApprovedLeadTime: '',
+    approvedToShippedLeadTime: '',
+    monthsInFutureForAmc: '',
+    monthsInPastForAmc: '',
+    programNotes: '',
+    arrivedToDeliveredLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedByRoadLeadTime: ''
+}
+const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -255,16 +273,19 @@ export default class PipelineProgramDataStepSix extends Component {
                         }
                     }
                     validate={validateSix(validationSchemaSix)}
-                    onSubmit={(values) => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepFive && this.props.endProgramInfoStepFive();
                     }}
                     render={
                         ({
+                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
+                            isSubmitting,
+                            isValid,
                             setTouched
                         }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' style={{ display: this.state.loading ? "none" : "block" }}>

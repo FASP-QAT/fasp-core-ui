@@ -52,6 +52,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.oneditionend = this.oneditionend.bind(this);
     }
     addRowInJexcel = function () {
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
@@ -102,6 +103,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
+        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
@@ -282,6 +284,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             changedFlag: 1
         })
         if (x == 1) {
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -348,13 +351,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
     }
-    onedit = function (instance, cell, x, y) {
+    onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
-    filterProcurmentUnitList = function () {
+    filterProcurmentUnitList = function (instance, cell, c, r, source) {
         return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
     }.bind(this);
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -426,6 +429,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     }
                                     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                     jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+                                    var json = [];
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
@@ -495,7 +499,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         oneditionend: this.oneditionend,
                                         onload: this.loaded,
                                         license: JEXCEL_PRO_KEY,
-                                        contextMenu: function (obj, x, y) {
+                                        contextMenu: function (obj, x, y, e) {
                                             var items = [];
                                             if (y == null) {
                                                 if (obj.options.allowInsertColumn == true) {
@@ -726,7 +730,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
             );
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

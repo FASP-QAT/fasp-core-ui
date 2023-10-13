@@ -188,7 +188,7 @@ class StockStatus extends Component {
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map(ele => '"' + ele + '"')
   }
-  rowtextFormatClassName = () => {
+  rowtextFormatClassName = (row) => {
     return 'textcolor-purple';
   }
   exportCSV() {
@@ -352,7 +352,7 @@ class StockStatus extends Component {
         })
       }
     }
-    const addHeaders = (doc) => {
+    const addHeaders = (doc, pageArray) => {
       const pageCount = doc.internal.getNumberOfPages()
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12)
@@ -493,17 +493,39 @@ class StockStatus extends Component {
     const unit = "pt";
     const size = "A4"; 
     const orientation = "landscape"; 
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
     doc.setFontSize(8);
     
     
     
     
+    var height = doc.internal.pageSize.height;
     
     
     
     
     
+    const header = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
+    { content: i18n.t("static.report.stock"), colSpan: 1 },
+    { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
+    { content: i18n.t("static.shipment.shipment"), colSpan: 2 },
+    { content: i18n.t("static.report.stock"), colSpan: 6 }
+    ],
+    [
+      i18n.t('static.supplyPlan.openingBalance'),
+      i18n.t('static.report.forecasted'),
+      i18n.t('static.report.actual'),
+      i18n.t('static.supplyPlan.qty'),
+      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
+      i18n.t('static.supplyPlan.adj'),
+      i18n.t('static.supplyplan.exipredStock'),
+      i18n.t('static.supplyPlan.endingBalance'),
+      i18n.t('static.report.amc'),
+      this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
+      i18n.t('static.supplyPlan.unmetDemandStr'),
+      
+    ]];
     
     
     
@@ -962,6 +984,7 @@ class StockStatus extends Component {
             }
           }
         })
+        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         
         
       }
@@ -985,6 +1008,7 @@ class StockStatus extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
       if (versionId.includes('Local')) {
         
@@ -993,7 +1017,7 @@ class StockStatus extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
             loading: false
@@ -1009,12 +1033,12 @@ class StockStatus extends Component {
           var program = `${programId}_v${version}_uId_${userId}`
           var data = [];
           var programRequest = programTransaction.get(program);
-          programRequest.onerror = function () {
+          programRequest.onerror = function (event) {
             this.setState({
               loading: false
             })
           }.bind(this);
-          programRequest.onsuccess = function () {
+          programRequest.onsuccess = function (event) {
             
             
             
@@ -1047,45 +1071,45 @@ class StockStatus extends Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
             var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-            realmRequest.onerror = function () {
+            realmRequest.onerror = function (event) {
               this.setState({
                 loading: false,
               })
               this.hideFirstComponent()
             }.bind(this);
-            realmRequest.onsuccess = function () {
+            realmRequest.onsuccess = function (event) {
               var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
               var dsOs = dsTransaction.objectStore('dataSource');
               var dsRequest = dsOs.getAll();
-              dsRequest.onerror = function () {
+              dsRequest.onerror = function (event) {
                 this.setState({
                   loading: false,
                 })
                 this.hideFirstComponent()
               }.bind(this);
-              dsRequest.onsuccess = function () {
+              dsRequest.onsuccess = function (event) {
                 var dsResult = dsRequest.result;
                 var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                 var fsOs = fsTransaction.objectStore('fundingSource');
                 var fsRequest = fsOs.getAll();
-                fsRequest.onerror = function () {
+                fsRequest.onerror = function (event) {
                   this.setState({
                     loading: false,
                   })
                   this.hideFirstComponent()
                 }.bind(this);
-                fsRequest.onsuccess = function () {
+                fsRequest.onsuccess = function (event) {
                   var fsResult = fsRequest.result;
                   var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                   var paOs = paTransaction.objectStore('procurementAgent');
                   var paRequest = paOs.getAll();
-                  paRequest.onerror = function () {
+                  paRequest.onerror = function (event) {
                     this.setState({
                       loading: false,
                     })
                     this.hideFirstComponent()
                   }.bind(this);
-                  paRequest.onsuccess = function () {
+                  paRequest.onsuccess = function (event) {
                     var paResult = paRequest.result;
                     var maxForMonths = 0;
                     var realm = realmRequest.result;
@@ -1186,6 +1210,7 @@ class StockStatus extends Component {
                     }
                     var monthstartfrom = this.state.rangeValue.from.month
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                      var monthlydata = [];
                       
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
@@ -1422,8 +1447,10 @@ class StockStatus extends Component {
       exportModal: false
     })
     let programId = document.getElementById("programId").value;
+    let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
     var PlanningUnitDataForExport = [];
     if (versionId.includes('Local')) {
@@ -1431,7 +1458,7 @@ class StockStatus extends Component {
       var db1;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function () {
+      openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
           loading: false
@@ -1446,12 +1473,12 @@ class StockStatus extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var program = `${programId}_v${version}_uId_${userId}`
         var programRequest = programTransaction.get(program);
-        programRequest.onerror = function () {
+        programRequest.onerror = function (event) {
           this.setState({
             loading: false
           })
         }.bind(this);
-        programRequest.onsuccess = function () {
+        programRequest.onsuccess = function (event) {
           
           
           
@@ -1463,45 +1490,45 @@ class StockStatus extends Component {
           var realmTransaction = db1.transaction(['realm'], 'readwrite');
           var realmOs = realmTransaction.objectStore('realm');
           var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-          realmRequest.onerror = function () {
+          realmRequest.onerror = function (event) {
             this.setState({
               loading: false,
             })
             this.hideFirstComponent()
           }.bind(this);
-          realmRequest.onsuccess = function () {
+          realmRequest.onsuccess = function (event) {
             var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
             var dsOs = dsTransaction.objectStore('dataSource');
             var dsRequest = dsOs.getAll();
-            dsRequest.onerror = function () {
+            dsRequest.onerror = function (event) {
               this.setState({
                 loading: false,
               })
               this.hideFirstComponent()
             }.bind(this);
-            dsRequest.onsuccess = function () {
+            dsRequest.onsuccess = function (event) {
               var dsResult = dsRequest.result;
               var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
               var fsOs = fsTransaction.objectStore('fundingSource');
               var fsRequest = fsOs.getAll();
-              fsRequest.onerror = function () {
+              fsRequest.onerror = function (event) {
                 this.setState({
                   loading: false,
                 })
                 this.hideFirstComponent()
               }.bind(this);
-              fsRequest.onsuccess = function () {
+              fsRequest.onsuccess = function (event) {
                 var fsResult = fsRequest.result;
                 var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                 var paOs = paTransaction.objectStore('procurementAgent');
                 var paRequest = paOs.getAll();
-                paRequest.onerror = function () {
+                paRequest.onerror = function (event) {
                   this.setState({
                     loading: false,
                   })
                   this.hideFirstComponent()
                 }.bind(this);
-                paRequest.onsuccess = function () {
+                paRequest.onsuccess = function (event) {
                   var paResult = paRequest.result;
                   
                   
@@ -1540,6 +1567,9 @@ class StockStatus extends Component {
                     
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
+                    var fromYear = this.state.rangeValue.from.year
+                    var toYear = this.state.rangeValue.to.year
+                    var toMonth = this.state.rangeValue.to.month
                     var maxForMonths = 0;
                     var realm = realmRequest.result;
                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1607,6 +1637,7 @@ class StockStatus extends Component {
                       }
                     })
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                      var monthlydata = [];
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
@@ -1710,7 +1741,7 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               type: 'line',
                               stack: 7,
-                              data: data.map((item) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                              data: data.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
                               fill: false,
                               borderColor: 'rgb(75, 192, 192)',
                               tension: 0.1,
@@ -1735,14 +1766,14 @@ class StockStatus extends Component {
                               pointStyle: 'line',
                               pointRadius: 0,
                               yValueFormatString: "$#,##0",
-                              data: data.map((item) => (item.finalConsumptionQty))
+                              data: data.map((item, index) => (item.finalConsumptionQty))
                             },
                             {
                               label: i18n.t('static.report.actualConsumption'),
                               yAxisID: 'A',
                               type: 'line',
                               stack: 7,
-                              data: data.map((item) => (item.actualConsumptionQty)),
+                              data: data.map((item, index) => (item.actualConsumptionQty)),
                               fill: false,
                               borderColor: 'rgb(75, 192, 192)',
                               tension: 0.1,
@@ -1762,9 +1793,9 @@ class StockStatus extends Component {
                               pointBorderColor: '#fff',
                               pointHoverBackgroundColor: '#fff',
                               pointHoverBorderColor: 'rgba(179,181,198,1)',
-                              data: data.map((item) => {
+                              data: data.map((item, index) => {
                                 let count = 0;
-                                (item.shipmentInfo.map((ele) => {
+                                (item.shipmentInfo.map((ele, index) => {
                                   ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
@@ -1780,9 +1811,9 @@ class StockStatus extends Component {
                               pointBorderColor: '#fff',
                               pointHoverBackgroundColor: '#fff',
                               pointHoverBorderColor: 'rgba(179,181,198,1)',
-                              data: data.map((item) => {
+                              data: data.map((item, index) => {
                                 let count = 0;
-                                (item.shipmentInfo.map((ele) => {
+                                (item.shipmentInfo.map((ele, index) => {
                                   (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
@@ -1798,9 +1829,9 @@ class StockStatus extends Component {
                               pointBorderColor: '#fff',
                               pointHoverBackgroundColor: '#fff',
                               pointHoverBorderColor: 'rgba(179,181,198,1)',
-                              data: data.map((item) => {
+                              data: data.map((item, index) => {
                                 let count = 0;
-                                (item.shipmentInfo.map((ele) => {
+                                (item.shipmentInfo.map((ele, index) => {
                                   (ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
@@ -1816,9 +1847,9 @@ class StockStatus extends Component {
                               pointHoverBorderColor: 'rgba(179,181,198,1)',
                               yAxisID: 'A',
                               stack: 1,
-                              data: data.map((item) => {
+                              data: data.map((item, index) => {
                                 let count = 0;
-                                (item.shipmentInfo.map((ele) => {
+                                (item.shipmentInfo.map((ele, index) => {
                                   (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
@@ -1837,7 +1868,7 @@ class StockStatus extends Component {
                               pointStyle: 'line',
                               pointRadius: 0,
                               showInLegend: true,
-                              data: data.map((item) => (Number(item.closingBalance)))
+                              data: data.map((item, index) => (Number(item.closingBalance)))
                             },
                             {
                               type: "line",
@@ -1858,7 +1889,7 @@ class StockStatus extends Component {
                               pointRadius: 0,
                               yValueFormatString: "$#,##0",
                               lineTension: 0,
-                              data: data.map((item) => (data[0].planBasedOn == 1 ? item.minMos : item.minStock))
+                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.minMos : item.minStock))
                             }
                             , {
                               type: "line",
@@ -1879,7 +1910,7 @@ class StockStatus extends Component {
                               pointRadius: 0,
                               showInLegend: true,
                               yValueFormatString: "$#,##0",
-                              data: data.map((item) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
+                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
                             }
                           ];
                           if (data.length > 0 && data[0].planBasedOn == 1) {
@@ -1898,7 +1929,7 @@ class StockStatus extends Component {
                               pointStyle: 'line',
                               pointRadius: 0,
                               yValueFormatString: "$#,##0",
-                              data: data.map((item) => {
+                              data: data.map((item, index) => {
                                 if (item.mos != '') {
                                   return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
                                 } else {
@@ -1908,7 +1939,7 @@ class StockStatus extends Component {
                             })
                           }
                           var bar = {
-                            labels: data.map((item) => (moment(item.dt).format('MMM YY'))),
+                            labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
                             datasets: datasets,
                           };
                           var chartOptions = {
@@ -2026,6 +2057,7 @@ class StockStatus extends Component {
                               custom: CustomTooltips,
                               callbacks: {
                                 label: function (tooltipItem, data) {
+                                  let label = data.labels[tooltipItem.index];
                                   let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                                   var cell1 = value
                                   cell1 += '';
@@ -2132,14 +2164,14 @@ class StockStatus extends Component {
             let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
             var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
             var bar = {
-              labels: filteredPlanningUnitData.map((item) => (this.dateFormatter(item.dt))),
+              labels: filteredPlanningUnitData.map((item, index) => (this.dateFormatter(item.dt))),
               datasets: [
                 {
                   label: i18n.t('static.supplyplan.exipredStock'),
                   yAxisID: 'A',
                   type: 'line',
                   stack: 7,
-                  data: filteredPlanningUnitData.map((item) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                  data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
                   fill: false,
                   borderColor: 'rgb(75, 192, 192)',
                   tension: 0.1,
@@ -2164,14 +2196,14 @@ class StockStatus extends Component {
                   pointStyle: 'line',
                   pointRadius: 0,
                   yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item) => (item.finalConsumptionQty))
+                  data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
                 },
                 {
                   label: i18n.t('static.report.actualConsumption'),
                   yAxisID: 'A',
                   type: 'line',
                   stack: 7,
-                  data: filteredPlanningUnitData.map((item) => (item.actualConsumptionQty)),
+                  data: filteredPlanningUnitData.map((item, index) => (item.actualConsumptionQty)),
                   fill: false,
                   borderColor: 'rgb(75, 192, 192)',
                   tension: 0.1,
@@ -2191,9 +2223,9 @@ class StockStatus extends Component {
                   pointBorderColor: '#fff',
                   pointHoverBackgroundColor: '#fff',
                   pointHoverBorderColor: 'rgba(179,181,198,1)',
-                  data: filteredPlanningUnitData.map((item) => {
+                  data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
-                    (item.shipmentInfo.map((ele) => {
+                    (item.shipmentInfo.map((ele, index) => {
                       ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
                     }))
                     return count
@@ -2209,9 +2241,9 @@ class StockStatus extends Component {
                   pointBorderColor: '#fff',
                   pointHoverBackgroundColor: '#fff',
                   pointHoverBorderColor: 'rgba(179,181,198,1)',
-                  data: filteredPlanningUnitData.map((item) => {
+                  data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
-                    (item.shipmentInfo.map((ele) => {
+                    (item.shipmentInfo.map((ele, index) => {
                       (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
                     }))
                     return count
@@ -2227,9 +2259,9 @@ class StockStatus extends Component {
                   pointBorderColor: '#fff',
                   pointHoverBackgroundColor: '#fff',
                   pointHoverBorderColor: 'rgba(179,181,198,1)',
-                  data: filteredPlanningUnitData.map((item) => {
+                  data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
-                    (item.shipmentInfo.map((ele) => {
+                    (item.shipmentInfo.map((ele, index) => {
                       (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
                     }))
                     return count
@@ -2245,9 +2277,9 @@ class StockStatus extends Component {
                   pointHoverBorderColor: 'rgba(179,181,198,1)',
                   yAxisID: 'A',
                   stack: 1,
-                  data: filteredPlanningUnitData.map((item) => {
+                  data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
-                    (item.shipmentInfo.map((ele) => {
+                    (item.shipmentInfo.map((ele, index) => {
                       (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
                     }))
                     return count
@@ -2266,7 +2298,7 @@ class StockStatus extends Component {
                   pointStyle: 'line',
                   pointRadius: 0,
                   showInLegend: true,
-                  data: filteredPlanningUnitData.map((item) => (item.closingBalance))
+                  data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
                 },
                 {
                   type: "line",
@@ -2287,7 +2319,7 @@ class StockStatus extends Component {
                   pointRadius: 0,
                   yValueFormatString: "$#,##0",
                   lineTension: 0,
-                  data: filteredPlanningUnitData.map((item) => (item.minMos))
+                  data: filteredPlanningUnitData.map((item, index) => (item.minMos))
                 }
                 , {
                   type: "line",
@@ -2308,7 +2340,7 @@ class StockStatus extends Component {
                   pointRadius: 0,
                   showInLegend: true,
                   yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item) => (item.maxMos))
+                  data: filteredPlanningUnitData.map((item, index) => (item.maxMos))
                 }
                 , {
                   type: "line",
@@ -2325,7 +2357,7 @@ class StockStatus extends Component {
                   pointStyle: 'line',
                   pointRadius: 0,
                   yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item) => (this.roundN(item.mos)))
+                  data: filteredPlanningUnitData.map((item, index) => (this.roundN(item.mos)))
                 }
               ],
             };
@@ -2416,6 +2448,7 @@ class StockStatus extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                   label: function (tooltipItem, data) {
+                    let label = data.labels[tooltipItem.index];
                     let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                     var cell1 = value
                     cell1 += '';
@@ -2621,6 +2654,7 @@ class StockStatus extends Component {
     }
   }
   consolidatedProgramList = () => {
+    const lan = 'en';
     const { programs } = this.state
     var proList = programs;
     var db1;
@@ -2631,10 +2665,10 @@ class StockStatus extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
         
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -2642,6 +2676,7 @@ class StockStatus extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             
@@ -2657,6 +2692,7 @@ class StockStatus extends Component {
             }
           }
         }
+        var lang = this.state.lang;
         if (proList.length == 1) {
           
           this.setState({
@@ -2783,6 +2819,7 @@ class StockStatus extends Component {
     }
   }
   consolidatedVersionList = (programId) => {
+    const lan = 'en';
     const { versions } = this.state
     var verList = versions;
     var db1;
@@ -2793,10 +2830,10 @@ class StockStatus extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      getRequest.onerror = function () {
+      getRequest.onerror = function (event) {
         
       };
-      getRequest.onsuccess = function () {
+      getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -2804,6 +2841,7 @@ class StockStatus extends Component {
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
@@ -2870,7 +2908,9 @@ class StockStatus extends Component {
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
+          const lan = 'en';
           var db1;
+          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -2878,10 +2918,11 @@ class StockStatus extends Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            planningunitRequest.onerror = function () {
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
               
             };
-            planningunitRequest.onsuccess = function () {
+            planningunitRequest.onsuccess = function (e) {
               var myResult = [];
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
@@ -3151,6 +3192,7 @@ class StockStatus extends Component {
         
         callbacks: {
           label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';
@@ -3235,6 +3277,148 @@ class StockStatus extends Component {
         custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+        
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black'
+        }
+      }
+    }
+    const optionsWithoutHeader = {
+      title: {
+        display: false,
+        text: ""
+      },
+      scales: {
+        yAxes: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }, {
+          id: 'B',
+          position: 'right',
+          scaleLabel: {
+            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+            fontColor: 'black',
+            display: true,
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }] : [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.common.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }]
+      },
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';
@@ -3266,7 +3450,7 @@ class StockStatus extends Component {
         yAxisID: 'A',
         type: 'line',
         stack: 7,
-        data: this.state.stockStatusList.map((item) => (item.expiredStock > 0 ? item.expiredStock : null)),
+        data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
@@ -3291,14 +3475,14 @@ class StockStatus extends Component {
         pointStyle: 'line',
         pointRadius: 0,
         yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item) => (item.finalConsumptionQty))
+        data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
       },
       {
         label: i18n.t('static.report.actualConsumption'),
         yAxisID: 'A',
         type: 'line',
         stack: 7,
-        data: this.state.stockStatusList.map((item) => (item.actualConsumptionQty)),
+        data: this.state.stockStatusList.map((item, index) => (item.actualConsumptionQty)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
@@ -3318,9 +3502,9 @@ class StockStatus extends Component {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(179,181,198,1)',
-        data: this.state.stockStatusList.map((item) => {
+        data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
-          (item.shipmentInfo.map((ele) => {
+          (item.shipmentInfo.map((ele, index) => {
             ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
           }))
           return count
@@ -3336,9 +3520,9 @@ class StockStatus extends Component {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(179,181,198,1)',
-        data: this.state.stockStatusList.map((item) => {
+        data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
-          (item.shipmentInfo.map((ele) => {
+          (item.shipmentInfo.map((ele, index) => {
             (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
           }))
           return count
@@ -3354,9 +3538,9 @@ class StockStatus extends Component {
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(179,181,198,1)',
-        data: this.state.stockStatusList.map((item) => {
+        data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
-          (item.shipmentInfo.map((ele) => {
+          (item.shipmentInfo.map((ele, index) => {
             (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
           }))
           return count
@@ -3372,9 +3556,9 @@ class StockStatus extends Component {
         pointHoverBorderColor: 'rgba(179,181,198,1)',
         yAxisID: 'A',
         stack: 1,
-        data: this.state.stockStatusList.map((item) => {
+        data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
-          (item.shipmentInfo.map((ele) => {
+          (item.shipmentInfo.map((ele, index) => {
             (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
           }))
           return count
@@ -3393,7 +3577,7 @@ class StockStatus extends Component {
         pointStyle: 'line',
         pointRadius: 0,
         showInLegend: true,
-        data: this.state.stockStatusList.map((item) => (item.closingBalance))
+        data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
       },
       {
         type: "line",
@@ -3414,7 +3598,7 @@ class StockStatus extends Component {
         pointRadius: 0,
         yValueFormatString: "$#,##0",
         lineTension: 0,
-        data: this.state.stockStatusList.map((item) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.minMos : item.minStock))
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.minMos : item.minStock))
       }
       , {
         type: "line",
@@ -3435,7 +3619,7 @@ class StockStatus extends Component {
         pointRadius: 0,
         showInLegend: true,
         yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
       }
     ]
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
@@ -3454,11 +3638,11 @@ class StockStatus extends Component {
         pointStyle: 'line',
         pointRadius: 0,
         yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item) => (item.mos != null ? this.roundN(item.mos) : item.mos))
+        data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
       })
     }
     const bar = {
-      labels: this.state.stockStatusList.map((item) => (this.dateFormatter(item.dt))),
+      labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
       datasets: datasets,
     };
     const { rangeValue } = this.state
@@ -3680,7 +3864,7 @@ class StockStatus extends Component {
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
                             </td>
                             <td align="center"><table >
-                              {this.state.stockStatusList[idx].shipmentInfo.map((item) => {
+                              {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
                                 return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                   item.primeLineNo == null &&
                                   item.roNo == null &&

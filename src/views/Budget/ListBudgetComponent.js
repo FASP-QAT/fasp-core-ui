@@ -193,6 +193,7 @@ class ListBudgetComponent extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), '');
     jexcel.destroy(document.getElementById("tableDiv"), true);
+    var json = [];
     var data = budgetArray;
     var options = {
       data: data,
@@ -275,7 +276,7 @@ class ListBudgetComponent extends Component {
       editable: false,
       license: JEXCEL_PRO_KEY,
       filters: true,
-      updateTable: function () {
+      updateTable: function (el, cell, x, y, source, value, id) {
       }.bind(this),
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
@@ -291,7 +292,7 @@ class ListBudgetComponent extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      contextMenu: function () {
+      contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
     };
@@ -315,7 +316,7 @@ class ListBudgetComponent extends Component {
       }
     }
   }.bind(this);
-  loaded = function (instance, cell) {
+  loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
@@ -561,6 +562,121 @@ class ListBudgetComponent extends Component {
           </option>
         )
       }, this);
+    const columns = [
+      {
+        dataField: 'program.label',
+        text: i18n.t('static.budget.program'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
+        dataField: 'label',
+        text: i18n.t('static.budget.budget'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
+        dataField: 'budgetCode',
+        text: i18n.t('static.budget.budgetCode'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+      },
+      {
+        dataField: 'fundingSource.label',
+        text: i18n.t('static.budget.fundingsource'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
+        dataField: 'budgetAmt',
+        text: i18n.t('static.budget.budgetamount'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.addCommas
+      },
+      {
+        dataField: 'usedUsdAmt',
+        text: i18n.t('static.budget.availableAmt'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          var cell1 = row.budgetAmt - row.usedUsdAmt
+          var currencyCode = row.currency.currencyCode;
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return currencyCode + " " + x1 + x2;
+        }
+      }
+      ,
+      {
+        dataField: 'startDate',
+        text: i18n.t('static.common.startdate'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatDate
+      },
+      {
+        dataField: 'stopDate',
+        text: i18n.t('static.common.stopdate'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatDate
+      },
+      {
+        dataField: 'active',
+        text: i18n.t('static.common.status'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cellContent, row) => {
+          return (
+            (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+          );
+        }
+      }];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t('static.common.first'),
+      prePageText: i18n.t('static.common.back'),
+      nextPageText: i18n.t('static.common.next'),
+      lastPageText: i18n.t('static.common.last'),
+      nextPageTitle: i18n.t('static.common.firstPage'),
+      prePageTitle: i18n.t('static.common.prevPage'),
+      firstPageTitle: i18n.t('static.common.nextPage'),
+      lastPageTitle: i18n.t('static.common.lastPage'),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [{
+        text: '10', value: 10
+      }, {
+        text: '30', value: 30
+      }
+        ,
+      {
+        text: '50', value: 50
+      },
+      {
+        text: 'All', value: this.state.selBudget.length
+      }]
+    }
     return (
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />

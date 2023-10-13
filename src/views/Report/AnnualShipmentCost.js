@@ -119,10 +119,12 @@ class AnnualShipmentCost extends Component {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
+                    var storeOS;
                     getDatabase();
+                    var regionList = [];
                     this.setState({ loading: true })
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function () {
+                    openRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             loading: false
@@ -137,36 +139,36 @@ class AnnualShipmentCost extends Component {
                         var program = `${programId}_v${version}_uId_${userId}`
                         var programDataOs = programDataTransaction.objectStore('programData');
                         var programRequest = programDataOs.get(program);
-                        programRequest.onerror = function () {
+                        programRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
                                 loading: false
                             })
                         }.bind(this);
-                        programRequest.onsuccess = function () {
+                        programRequest.onsuccess = function (e) {
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgent');
                             var papuRequest = papuOs.getAll();
-                            papuRequest.onerror = function () {
+                            papuRequest.onerror = function (event) {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false
                                 })
                             }.bind(this);
-                            papuRequest.onsuccess = function () {
+                            papuRequest.onsuccess = function (event) {
                                 var papuResult = [];
                                 papuResult = papuRequest.result;
                                 var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                                 var fsOs = fsTransaction.objectStore('fundingSource');
                                 var fsRequest = fsOs.getAll();
-                                fsRequest.onerror = function () {
+                                fsRequest.onerror = function (event) {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false
                                     })
                                 }.bind(this);
-                                fsRequest.onsuccess = function () {
+                                fsRequest.onsuccess = function (event) {
                                     var fsResult = [];
                                     fsResult = fsRequest.result;
                                     var outPutList = [];
@@ -375,6 +377,7 @@ class AnnualShipmentCost extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -385,9 +388,9 @@ class AnnualShipmentCost extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -395,6 +398,7 @@ class AnnualShipmentCost extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -408,6 +412,7 @@ class AnnualShipmentCost extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -516,6 +521,7 @@ class AnnualShipmentCost extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         var ystart = 200 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
         ystart = ystart + 10;
@@ -561,9 +567,9 @@ class AnnualShipmentCost extends Component {
         for (var j = 0; j < data.length; j++) {
             if (yindex > doc.internal.pageSize.height - 50) { doc.addPage(); yindex = 90 } else { yindex = yindex }
             var record = data[j]
-            var keys = Object.entries(record).map(([key]) => (key)
+            var keys = Object.entries(record).map(([key, value]) => (key)
             )
-            var values = Object.entries(record).map(([, value]) => (value)
+            var values = Object.entries(record).map(([key, value]) => (value)
             )
             var splittext = doc.splitTextToSize(record.procurementAgent, index);
             for (var i = 0; i < splittext.length; i++) {
@@ -814,6 +820,7 @@ class AnnualShipmentCost extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
+        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -824,9 +831,9 @@ class AnnualShipmentCost extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -834,6 +841,7 @@ class AnnualShipmentCost extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -884,7 +892,9 @@ class AnnualShipmentCost extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
+                    const lan = 'en';
                     var db1;
+                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -892,9 +902,10 @@ class AnnualShipmentCost extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        planningunitRequest.onerror = function () {
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
                         };
-                        planningunitRequest.onsuccess = function () {
+                        planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
@@ -1046,9 +1057,9 @@ class AnnualShipmentCost extends Component {
                 var fSourceTransaction = db3.transaction(['fundingSource'], 'readwrite');
                 var fSourceOs = fSourceTransaction.objectStore('fundingSource');
                 var fSourceRequest = fSourceOs.getAll();
-                fSourceRequest.onerror = function () {
+                fSourceRequest.onerror = function (event) {
                 }.bind(this);
-                fSourceRequest.onsuccess = function () {
+                fSourceRequest.onsuccess = function (event) {
                     for (var i = 0; i < fSourceRequest.result.length; i++) {
                         var arr = {
                             id: fSourceRequest.result[i].fundingSourceId,
@@ -1119,9 +1130,9 @@ class AnnualShipmentCost extends Component {
                 var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgent');
                 var papuRequest = papuOs.getAll();
-                papuRequest.onerror = function () {
+                papuRequest.onerror = function (event) {
                 }.bind(this);
-                papuRequest.onsuccess = function () {
+                papuRequest.onsuccess = function (event) {
                     papuResult = papuRequest.result;
                     var listArrays = []
                     for (var i = 0; i < papuResult.length; i++) {
@@ -1192,9 +1203,9 @@ class AnnualShipmentCost extends Component {
                 var sStatusTransaction = db2.transaction(['shipmentStatus'], 'readwrite');
                 var sStatusOs = sStatusTransaction.objectStore('shipmentStatus');
                 var sStatusRequest = sStatusOs.getAll();
-                sStatusRequest.onerror = function () {
+                sStatusRequest.onerror = function (event) {
                 }.bind(this);
-                sStatusRequest.onsuccess = function () {
+                sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
                     this.setState({ shipmentStatuses: sStatusResult });
                 }.bind(this)
@@ -1297,12 +1308,33 @@ class AnnualShipmentCost extends Component {
             }, this)
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { procurementAgents } = this.state;
+        let procurementAgentList = procurementAgents.length > 0 && procurementAgents.map((item, i) => {
+            return (
+                <option key={i} value={item.id}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+            )
+        }, this);
         const { fundingSources } = this.state;
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
+            return (
+                <option key={i} value={item.fundingSourceId}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+            )
+        }, this);
         const { shipmentStatuses } = this.state;
+        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
+            return (
+                <option key={i} value={item.shipmentStatusId}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+            )
+        }, this);
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
@@ -1422,7 +1454,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.procurementAgentValues}
                                                         onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                         options={procurementAgents.length > 0
-                                                            && procurementAgents.map((item) => {
+                                                            && procurementAgents.map((item, i) => {
                                                                 return ({ label: item.code, value: item.id })
                                                             }, this)}
                                                         disabled={this.state.loading}
@@ -1440,7 +1472,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.fundingSourceValues}
                                                         onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                         options={fundingSources.length > 0
-                                                            && fundingSources.map((item) => {
+                                                            && fundingSources.map((item, i) => {
                                                                 return (
                                                                     { label: item.code, value: item.id }
                                                                 )
@@ -1460,7 +1492,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.statusValues}
                                                         onChange={(e) => { this.handleStatusChange(e) }}
                                                         options={shipmentStatuses.length > 0
-                                                            && shipmentStatuses.map((item) => {
+                                                            && shipmentStatuses.map((item, i) => {
                                                                 return (
                                                                     { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
                                                                 )

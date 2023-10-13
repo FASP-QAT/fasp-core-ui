@@ -34,10 +34,68 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+var numberWithCommas = function (x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+var dataPack1 = [40, 47, 44, 38, 27];
+var dataPack2 = [10, 12, 7, 5, 4];
+var dataPack3 = [17, 11, 22, 18, 12];
+var dates = ["Some l-o-o-o-o-o-o-o-o-o-o-o-n-n-n-n-n-n-g-g-g-g-g-g-g label", "AAA", "BBB", "CCC", "DDDDDDDDD"];
+var bar_ctx = document.getElementById('bar-chart');
+const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
+const chartData = {
+    labels: ["Malawi", "Kenya", "Zimbabwe"],
+    datasets: [{
+        label: i18n.t('static.shipment.orderedShipment'),
+        data: [20000, 10000, 2000],
+        backgroundColor: '#6a82a8',
+        borderWidth: 0
+    },
+    {
+        label: i18n.t('static.shipment.plannedShipment'),
+        data: [20000, 20000, 2000],
+        backgroundColor: '#dee7f8',
+        borderWidth: 0,
+    }
+    ]
+};
+const chartData1 = {
+    labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
+    datasets: [
+        {
+            label: 'PSM',
+            data: [0, 40000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#4dbd74',
+            borderWidth: 0,
+        }, {
+            label: 'GF',
+            data: [0, 0, 4000, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#f86c6b',
+            borderWidth: 0
+        },
+        {
+            label: 'Local',
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#8aa9e6',
+            borderWidth: 0,
+        },
+        {
+            label: 'Govt',
+            data: [0, 0, 0, 30000, 0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#EDB944',
+            borderWidth: 0,
+        }
+    ]
+};
 const backgroundColor = [
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -311,13 +369,16 @@ class ShipmentGlobalView extends Component {
         const unit = "pt";
         const size = "A4"; 
         const orientation = "landscape"; 
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(10);
+        const title = i18n.t('static.dashboard.shipmentGlobalViewheader');
         var canvas = document.getElementById("cool-canvas1");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
+        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 260, 300, 200, 'a', 'CANVAS');
         canvas = document.getElementById("cool-canvas2");
         canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1287,7 +1348,7 @@ class ShipmentGlobalView extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = [];
         planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return (
                     { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
                 )
@@ -1295,7 +1356,7 @@ class ShipmentGlobalView extends Component {
         const { procurementAgents } = this.state;
         let procurementAgentList = [];
         procurementAgentList = procurementAgents.length > 0
-            && procurementAgents.map((item) => {
+            && procurementAgents.map((item, i) => {
                 return (
                     { label: item.code, value: item.id }
                 )
@@ -1303,7 +1364,7 @@ class ShipmentGlobalView extends Component {
         const { procurementAgentTypes } = this.state;
         let procurementAgentTypeList = [];
         procurementAgentTypeList = procurementAgentTypes.length > 0
-            && procurementAgentTypes.map((item) => {
+            && procurementAgentTypes.map((item, i) => {
                 return (
                     { label: item.procurementAgentTypeCode, value: item.procurementAgentTypeId }
                 )
@@ -1311,20 +1372,20 @@ class ShipmentGlobalView extends Component {
         const { fundingSources } = this.state;
         let fundingSourceList = [];
         fundingSourceList = fundingSources.length > 0
-            && fundingSources.map((item) => {
+            && fundingSources.map((item, i) => {
                 return (
                     { label: item.fundingSourceCode, value: item.fundingSourceId }
                 )
             }, this);
         const { countrys } = this.state;
-        let countryList = countrys.length > 0 && countrys.map((item) => {
+        let countryList = countrys.length > 0 && countrys.map((item, i) => {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
         const { productCategories } = this.state;
         const { programLst } = this.state;
         let programList = [];
         programList = programLst.length > 0
-            && programLst.map((item) => {
+            && programLst.map((item, i) => {
                 return (
                     { label: (item.code), value: item.id }
                 )
@@ -1384,6 +1445,7 @@ class ShipmentGlobalView extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -1454,6 +1516,7 @@ class ShipmentGlobalView extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -1596,6 +1659,7 @@ class ShipmentGlobalView extends Component {
             labels: [...new Set(this.state.dateSplitList.map(ele => (this.dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
         }
+        let viewby = this.state.viewby;
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1786,7 +1850,7 @@ class ShipmentGlobalView extends Component {
                                                         name="includeApprovedVersions"
                                                         id="includeApprovedVersions"
                                                         bsSize="sm"
-                                                        onChange={() => { this.fetchData() }}
+                                                        onChange={(e) => { this.fetchData() }}
                                                     >
                                                         <option value="true">{i18n.t('static.program.yes')}</option>
                                                         <option value="false">{i18n.t('static.program.no')}</option>
@@ -1803,7 +1867,7 @@ class ShipmentGlobalView extends Component {
                                                         name="includePlanningShipments"
                                                         id="includePlanningShipments"
                                                         bsSize="sm"
-                                                        onChange={() => { this.fetchData() }}
+                                                        onChange={(e) => { this.fetchData() }}
                                                     >
                                                         <option value="true">{i18n.t('static.program.yes')}</option>
                                                         <option value="false">{i18n.t('static.program.no')}</option>

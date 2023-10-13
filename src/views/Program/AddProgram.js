@@ -42,7 +42,7 @@ const initialValues = {
     programNotes: '',
     regionId: []
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .required(i18n.t('static.program.validprogramtext')),
@@ -646,7 +646,7 @@ export default class AddProgram extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -705,11 +705,13 @@ export default class AddProgram extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset,

@@ -185,6 +185,7 @@ export default class ProgramList extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
     jexcel.destroy(document.getElementById("tableDiv"), true);
+    var json = [];
     var data = programArray;
     var options = {
       data: data,
@@ -247,7 +248,7 @@ export default class ProgramList extends Component {
       position: "top",
       filters: true,
       license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y) {
+      contextMenu: function (obj, x, y, e) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')) {
           var items = [];
           if (y != null) {
@@ -306,7 +307,7 @@ export default class ProgramList extends Component {
       }
     }
   }.bind(this);
-  loaded = function (instance) {
+  loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
   };
   componentDidMount() {
@@ -484,6 +485,11 @@ export default class ProgramList extends Component {
       entries: " ",
     });
     const { SearchBar, ClearSearchButton } = Search;
+    const customTotal = (from, to, size) => (
+      <span className="react-bootstrap-table-pagination-total">
+        {i18n.t("static.common.result", { from, to, size })}
+      </span>
+    );
     const { countryList } = this.state;
     let countries =
       countryList.length > 0 &&

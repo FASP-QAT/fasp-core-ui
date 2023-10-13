@@ -14,7 +14,7 @@ const initialValues = {
   realmCountryId: [],
   region: ""
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
   return Yup.object().shape({
     realmCountryId: Yup.string()
       .required(i18n.t('static.region.validcountry')),
@@ -179,7 +179,7 @@ class AddRegionComponent extends Component {
               <Formik
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
-                onSubmit={(values) => {
+                onSubmit={(values, { setSubmitting, setErrors }) => {
                   RegionService.addRegion(this.state.region)
                     .then(response => {
                       if (response.status == 200) {
@@ -231,11 +231,13 @@ class AddRegionComponent extends Component {
                 }}
                 render={
                   ({
+                    values,
                     errors,
                     touched,
                     handleChange,
                     handleBlur,
                     handleSubmit,
+                    isSubmitting,
                     isValid,
                     setTouched,
                     handleReset

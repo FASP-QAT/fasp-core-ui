@@ -103,6 +103,7 @@ class ListRealmCountryComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = realmCountryArray;
         var options = {
             data: data,
@@ -159,7 +160,7 @@ class ListRealmCountryComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -184,7 +185,7 @@ class ListRealmCountryComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     editProcurementAgent(procurementAgent) {
@@ -336,19 +337,19 @@ class ListRealmCountryComponent extends Component {
                 }
             );
     }
-    showCountryLabel(cell) {
+    showCountryLabel(cell, row) {
         return cell.label.label_en;
     }
-    showCurrencyLabel(cell) {
+    showCurrencyLabel(cell, row) {
         return cell.label.label_en;
     }
-    showPalletUnitLabel(cell) {
+    showPalletUnitLabel(cell, row) {
         return cell.label.label_en;
     }
-    showRealmLabel(cell) {
+    showRealmLabel(cell, row) {
         return cell.label.label_en;
     }
-    showStatus(cell) {
+    showStatus(cell, row) {
         if (cell) {
             return "Active";
         } else {
@@ -370,6 +371,11 @@ class ListRealmCountryComponent extends Component {
                 )
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

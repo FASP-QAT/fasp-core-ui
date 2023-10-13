@@ -18,7 +18,14 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = i18n.t('static.dashboard.budget');
-const validationSchema = function () {
+let initialValues = {
+    budgetName: '',
+    budgetAmt: '',
+    budgetCode: '',
+    fundingSourceId: '',
+    programId: []
+}
+const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
@@ -487,7 +494,7 @@ class EditBudgetComponent extends Component {
                                     programs: this.state.budget.programs
                                 }}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -564,14 +571,19 @@ class EditBudgetComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
+                                        isValid,
                                         setTouched,
                                         setFieldValue,
-                                        setFieldTouched                                    }) => (
+                                        setFieldTouched,
+                                        setFieldError
+                                    }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup className="Selectcontrol-bdrNone">

@@ -261,7 +261,7 @@ export default class ManualTagging extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             onload: this.loadedOrderHistory,
-            updateTable: function (el, cell) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
                 var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
@@ -271,7 +271,7 @@ export default class ManualTagging extends Component {
                     cell.classList.add('historyBold');
                 }
             }.bind(this),
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -325,7 +325,7 @@ export default class ManualTagging extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             onload: this.loadedShipmentHistory,
-            updateTable: function (el, cell) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
                 var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
@@ -335,7 +335,7 @@ export default class ManualTagging extends Component {
                     cell.classList.add('historyBold');
                 }
             }.bind(this),
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -765,6 +765,7 @@ export default class ManualTagging extends Component {
                 if (x == 9) {
                     var col = ("J").concat(parseInt(y) + 1);
                     value = this.state.instance.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var qty = this.state.instance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.state.instance.setStyle(col, "background-color", "transparent");
                         this.state.instance.setStyle(col, "background-color", "yellow");
@@ -832,10 +833,10 @@ export default class ManualTagging extends Component {
             }
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y) {
+    onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(10, y, 1, true);
     }.bind(this);
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
@@ -941,6 +942,7 @@ export default class ManualTagging extends Component {
                 RealmCountryService.getRealmCountryForProgram(realmId)
                     .then(response => {
                         if (response.status == 200) {
+                            var listArray = response.data.map(ele => ele.realmCountry);
                             this.setState({
                                 countryList: response.data
                             }, () => {
@@ -1019,7 +1021,7 @@ export default class ManualTagging extends Component {
         } catch (e) {
         }
     }
-    getBudgetListByProgramId = () => {
+    getBudgetListByProgramId = (e) => {
         let programId1 = this.state.programId1.toString().split("_")[0];
         if (programId1 != "") {
             const filteredBudgetList = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId1)))
@@ -1029,7 +1031,7 @@ export default class ManualTagging extends Component {
             });
         }
     }
-    getBudgetListByFundingSourceId = () => {
+    getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = this.state.fundingSourceId;
         const filteredBudgetList = this.state.filteredBudgetListByProgram.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
         this.setState({
@@ -1148,6 +1150,7 @@ export default class ManualTagging extends Component {
         versionList.push({ versionId: filteredProgramList.currentVersionId })
         var programQPLDetailsList = this.state.programQPLDetailsList
         for (var v = 0; v < filterList.length; v++) {
+            var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
             versionList.push({ versionId: filterList[v].version + "  (Local)" })
         }
         var onlineVersionList = versionList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
@@ -1195,7 +1198,7 @@ export default class ManualTagging extends Component {
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
             }, this);
         this.setState({
@@ -1300,10 +1303,11 @@ export default class ManualTagging extends Component {
             var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == false);
             var setOfPlanningUnitIds = [...new Set(selectedChangedShipment.map(ele => ele[17].planningUnit.id))];
             var db1;
+            var storeOS;
             getDatabase();
             var thisAsParameter = this;
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                 this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
@@ -1317,7 +1321,7 @@ export default class ManualTagging extends Component {
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var programId = (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser);
                 var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var minDate = moment(Date.now()).format("YYYY-MM-DD");
@@ -1469,9 +1473,9 @@ export default class ManualTagging extends Component {
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function () {
+                    putRequest.onerror = function (event) {
                     }.bind(this);
-                    putRequest.onsuccess = function () {
+                    putRequest.onsuccess = function (event) {
                         calculateSupplyPlan(programId, 0, 'programData', "erpDelink", thisAsParameter, setOfPlanningUnitIds, moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }
                 }.bind(this)
@@ -1488,6 +1492,7 @@ export default class ManualTagging extends Component {
     link() {
         this.setState({ loading1: true })
         var validation = this.checkValidation();
+        let linkedShipmentCount = 0;
         if (validation == true) {
             var selectedShipment = this.state.instance.getJson(null, false).filter(c => c[0] == true && c[14] == 0);
             var valid = true;
@@ -1515,10 +1520,11 @@ export default class ManualTagging extends Component {
                 this.setState({ loading1: false })
             } else {
                 var db1;
+                var storeOS;
                 getDatabase();
                 var thisAsParameter = this;
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
@@ -1528,19 +1534,19 @@ export default class ManualTagging extends Component {
                     var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     ppuTransaction = ppuTransaction.objectStore('programPlanningUnit');
                     var ppuRequest = ppuTransaction.getAll();
-                    ppuRequest.onsuccess = function () {
+                    ppuRequest.onsuccess = function (event) {
                         var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         paTransaction = paTransaction.objectStore('procurementAgent');
                         var paRequest = paTransaction.getAll();
-                        paRequest.onsuccess = function () {
+                        paRequest.onsuccess = function (event) {
                             var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
                             dsTransaction = dsTransaction.objectStore('dataSource');
                             var dsRequest = dsTransaction.getAll();
-                            dsRequest.onsuccess = function () {
+                            dsRequest.onsuccess = function (event) {
                                 var cTransaction = db1.transaction(['currency'], 'readwrite');
                                 cTransaction = cTransaction.objectStore('currency');
                                 var cRequest = cTransaction.getAll();
-                                cRequest.onsuccess = function () {
+                                cRequest.onsuccess = function (event) {
                                     var transaction;
                                     var programTransaction;
                                     transaction = db1.transaction(['programData'], 'readwrite');
@@ -1548,7 +1554,7 @@ export default class ManualTagging extends Component {
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     var programId = this.state.active1 ? (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser) : this.state.programId1;
                                     var programRequest = programTransaction.get(programId);
-                                    programRequest.onsuccess = function () {
+                                    programRequest.onsuccess = function (event) {
                                         var programDataJson = programRequest.result.programData;
                                         var planningUnitDataList = programDataJson.planningUnitDataList;
                                         var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
@@ -1842,9 +1848,9 @@ export default class ManualTagging extends Component {
                                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                                         programRequest.result.programData = programDataJson;
                                         var putRequest = programTransaction.put(programRequest.result);
-                                        putRequest.onerror = function () {
+                                        putRequest.onerror = function (event) {
                                         }.bind(this);
-                                        putRequest.onsuccess = function () {
+                                        putRequest.onsuccess = function (event) {
                                             calculateSupplyPlan(programId, planningUnitId, 'programData', "erp", thisAsParameter, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                                         }
                                     }.bind(this)
@@ -2354,6 +2360,9 @@ export default class ManualTagging extends Component {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var arr = [];
+                            var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? shipmentList[sl].tempParentShipmentId != null && c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : shipmentList[sl].parentShipmentId != null && c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
+                                arr.push(item.shipmentId)
+                            });
                             shipmentList[sl].parentShipmentIdArr = arr;
                             var lsf = linkedShipmentsList.filter(c => shipmentList[sl].shipmentId > 0 ? c.childShipmentId == shipmentList[sl].shipmentId : c.tempChildShipmentId == shipmentList[sl].tempShipmentId);
                             if (lsf.length > 0) {
@@ -2377,7 +2386,7 @@ export default class ManualTagging extends Component {
                                 this.buildJExcel();
                             });
                         }).catch(
-                            () => {
+                            error => {
                             }
                         );
                 }
@@ -2682,6 +2691,8 @@ export default class ManualTagging extends Component {
             table1Loader: false
         },
             () => {
+                var realmCountryPlanningUnitList = [];
+                var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId)
                 var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
                 if (this.state.active1) {
                     var updatedList = [];
@@ -2839,7 +2850,7 @@ export default class ManualTagging extends Component {
                         filters: false,
                         onchange: this.changedTab1,
                         license: JEXCEL_PRO_KEY,
-                        contextMenu: function () {
+                        contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
                     };
@@ -2857,6 +2868,7 @@ export default class ManualTagging extends Component {
                     let erpDataArray = [];
                     let count = 0;
                     let qty = 0;
+                    let convertedQty = 0;
                     for (var j = 0; j < erpDataList.length; j++) {
                         data = [];
                         data[0] = this.state.active3 ? true : false;
@@ -3019,9 +3031,9 @@ export default class ManualTagging extends Component {
                             },
                         ],
                         editable: true,
-                        onsearch: function () {
+                        onsearch: function (el) {
                         },
-                        onfilter: function () {
+                        onfilter: function (el) {
                         },
                         onload: this.loadedERP,
                         pagination: localStorage.getItem("sesRecordCount"),
@@ -3035,7 +3047,7 @@ export default class ManualTagging extends Component {
                         allowManualInsertColumn: false,
                         allowDeleteRow: false,
                         onchange: this.changed,
-                        updateTable: function (el, cell, x, y) {
+                        updateTable: function (el, cell, x, y, source, value, id) {
                             var elInstance = el;
                             if (y != null) {
                                 var rowData = elInstance.getRowData(y);
@@ -3065,7 +3077,7 @@ export default class ManualTagging extends Component {
                         parseFormulas: true,
                         onpaste: this.onPaste,
                         license: JEXCEL_PRO_KEY,
-                        contextMenu: function () {
+                        contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
                     };
@@ -3103,6 +3115,7 @@ export default class ManualTagging extends Component {
             })
             let manualTaggingList = this.state.outputList;
             let manualTaggingArray = [];
+            let count = 0;
             if (this.state.active2) {
                 manualTaggingList = manualTaggingList.sort(function (a, b) {
                     a = a.parentShipmentId > 0 ? a.parentShipmentId : a.tempParentShipmentId;
@@ -3183,6 +3196,7 @@ export default class ManualTagging extends Component {
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
+            var json = [];
             var data = manualTaggingArray;
             if (this.state.active1) {
                 var options = {
@@ -3261,7 +3275,7 @@ export default class ManualTagging extends Component {
                     position: 'top',
                     filters: true,
                     license: JEXCEL_PRO_KEY,
-                    contextMenu: function () {
+                    contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
                 };
@@ -3485,7 +3499,7 @@ export default class ManualTagging extends Component {
                     position: 'top',
                     filters: true,
                     license: JEXCEL_PRO_KEY,
-                    updateTable: function (el, cell, x, y) {
+                    updateTable: function (el, cell, x, y, source, value, id) {
                         var elInstance = el;
                         if (y != null) {
                             var rowData = elInstance.getRowData(y);
@@ -3527,11 +3541,11 @@ export default class ManualTagging extends Component {
                             }
                         }
                     }.bind(this),
-                    onsearch: function () {
+                    onsearch: function (el) {
                     },
-                    onfilter: function () {
+                    onfilter: function (el) {
                     },
-                    contextMenu: function (obj, x, y) {
+                    contextMenu: function (obj, x, y, e) {
                         var items = [];
                         if (y != null) {
                             if (obj.options.allowInsertRow == true) {
@@ -3670,7 +3684,7 @@ export default class ManualTagging extends Component {
                     position: 'top',
                     filters: true,
                     license: JEXCEL_PRO_KEY,
-                    contextMenu: function () {
+                    contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
                 };
@@ -3683,21 +3697,21 @@ export default class ManualTagging extends Component {
             })
         })
     }
-    filterRealmCountryPlanningUnit = function (o, cell, x, y) {
+    filterRealmCountryPlanningUnit = function (o, cell, x, y, value, config) {
         var planningUnitId = this.el.getValueFromCoords(33, y);
         return this.state.realmCountryPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
     }.bind(this);
-    filterRealmCountryPlanningUnit1 = function () {
+    filterRealmCountryPlanningUnit1 = function (o, cell, x, y, value, config) {
         var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
         return this.state.realmCountryPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
     }.bind(this);
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
-    loadedERP1 = function (instance) {
+    loadedERP1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
-    loadedERP = function (instance) {
+    loadedERP = function (instance, cell, x, y, value) {
         if (this.state.active1) {
             jExcelLoadedFunctionForErp(instance, 1);
             var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
@@ -3810,28 +3824,29 @@ export default class ManualTagging extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var datasetTransaction = db1.transaction(['programData'], 'readwrite');
             var datasetOs = datasetTransaction.objectStore('programData');
             var getRequest = datasetOs.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var datasetTransaction1 = db1.transaction(['program'], 'readwrite');
                 var datasetOs1 = datasetTransaction1.objectStore('program');
                 var getRequest1 = datasetOs1.getAll();
-                getRequest1.onsuccess = function () {
+                getRequest1.onsuccess = function (event) {
+                    var programList = getRequest1.result;
                     var datasetTransaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
                     var datasetOs2 = datasetTransaction2.objectStore('programQPLDetails');
                     var getRequest2 = datasetOs2.getAll();
-                    getRequest2.onsuccess = function () {
+                    getRequest2.onsuccess = function (event) {
                         var budgetTransaction2 = db1.transaction(['budget'], 'readwrite');
                         var budgetOs2 = budgetTransaction2.objectStore('budget');
                         var budgetRequest2 = budgetOs2.getAll();
-                        budgetRequest2.onsuccess = function () {
+                        budgetRequest2.onsuccess = function (event) {
                             var budgetList = budgetRequest2.result;
                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -4169,7 +4184,7 @@ export default class ManualTagging extends Component {
             headerColumnStyle: {
                 headerAlign: 'center'
             },
-            onSelect: (row, isSelect, rowIndex) => {
+            onSelect: (row, isSelect, rowIndex, e) => {
                 var finalShipmentId = this.state.finalShipmentId;
                 if (isSelect) {
                     finalShipmentId.push({ "shipmentId": row.shipmentId, "tempShipmentId": row.shipmentId > 0 ? null : row.tempShipmentId, "index": rowIndex, "qty": row.shipmentQty })
@@ -4245,17 +4260,17 @@ export default class ManualTagging extends Component {
             )
         }, this);
         const { productCategories } = this.state;
-        let productCategoryMultList = productCategories.length > 0 && productCategories.map((item) => {
+        let productCategoryMultList = productCategories.length > 0 && productCategories.map((item, i) => {
             return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
         }, this);
         let planningUnitMultiList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
             }, this);
         planningUnitMultiList = Array.from(planningUnitMultiList);
         const { planningUnits1 } = this.state;
         let planningUnitMultiList1 = planningUnits1.length > 0
-            && planningUnits1.map((item) => {
+            && planningUnits1.map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
@@ -4365,6 +4380,149 @@ export default class ManualTagging extends Component {
                 style: { width: '40px' }
             }
         ];
+        const columns1 = [
+            {
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'planningUnitName',
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expectedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'status',
+                text: i18n.t('static.manualTagging.erpStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'qty',
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'cost',
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: "Change code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
+        const columns2 = [
+            {
+                dataField: 'procurementAgentShipmentNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'deliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatExpiryDate
+            },
+            {
+                dataField: 'qty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: "Change code",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.outputList.length
+            }]
+        }
         const { countryList } = this.state;
         let countries = countryList.length > 0
             && countryList.map((item, i) => {

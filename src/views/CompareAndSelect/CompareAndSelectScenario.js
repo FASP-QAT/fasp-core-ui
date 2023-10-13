@@ -111,10 +111,10 @@ class CompareAndSelectScenario extends Component {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
-    handleClickMonthBox2 = () => {
+    handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = () => {
+    handleAMonthChange2 = (value, text) => {
     }
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
@@ -289,6 +289,7 @@ class CompareAndSelectScenario extends Component {
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
         var totalArray = [];
+        var forecastError = [];
         let actualMax = moment.max(consumptionData.map(d => moment(d.month)));
         var monthArrayForError = [];
         if (consumptionData.length > 0) {
@@ -342,6 +343,7 @@ class CompareAndSelectScenario extends Component {
             data[0] = monthArrayListWithoutFormat[m];
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
@@ -364,6 +366,7 @@ class CompareAndSelectScenario extends Component {
             var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
+        var actualCalculationDataType = selectedPlanningUnit[0].consumptionDataType;
         var actualMultiplier = 1;
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
@@ -464,7 +467,7 @@ class CompareAndSelectScenario extends Component {
             license: JEXCEL_PRO_KEY,
             onchangepage: this.onchangepage,
             editable: false,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
         };
@@ -495,6 +498,7 @@ class CompareAndSelectScenario extends Component {
                 jexcel.destroy(document.getElementById("table1"), true);
             } catch (error) {
             }
+            var json = [];
             var data = dataArray;
             var options = {
                 data: data,
@@ -567,7 +571,7 @@ class CompareAndSelectScenario extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function () {
+                contextMenu: function (obj, x, y, e) {
                     return false;
                 }.bind(this),
                 editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? true : false
@@ -681,6 +685,7 @@ class CompareAndSelectScenario extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
         var columns = [];
         columns.push(i18n.t('static.equivalancyUnit.type'));
         columns.push(i18n.t('static.consumption.forcast'));
@@ -805,6 +810,7 @@ class CompareAndSelectScenario extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -894,6 +900,7 @@ class CompareAndSelectScenario extends Component {
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
+        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -902,6 +909,7 @@ class CompareAndSelectScenario extends Component {
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
         let col1 = []
+        let dataArr2 = [];
         let dataArr3 = [];
         col1.push(i18n.t('static.common.display?'));
         col1.push(i18n.t('static.equivalancyUnit.type'));
@@ -944,7 +952,7 @@ class CompareAndSelectScenario extends Component {
         doc.addPage();
         doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
         var columns = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item) => { columns.push(item.title) });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
         var dataArr1 = [];
         this.state.dataEl.getJson(null, false).map(ele => {
@@ -1006,20 +1014,20 @@ class CompareAndSelectScenario extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
             var datasetOs = datasetTransaction.objectStore('datasetData');
             var getRequest = datasetOs.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var euTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                 var euOs = euTransaction.objectStore('equivalencyUnit');
                 var euRequest = euOs.getAll();
-                euRequest.onerror = function () {
+                euRequest.onerror = function (event) {
                 }.bind(this);
                 euRequest.onsuccess = function (event) {
                     var euList = euRequest.result;
@@ -1081,7 +1089,7 @@ class CompareAndSelectScenario extends Component {
     componentDidMount() {
         this.getDatasets();
     }
-    loadedTable1 = function (instance, cell) {
+    loadedTable1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var elInstance = instance.worksheets[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1135,7 +1143,7 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
-    changeTable1 = function (instance, cell, x, y) {
+    changeTable1 = function (instance, cell, x, y, value) {
         this.setState({
             loading: true
         })
@@ -1159,7 +1167,7 @@ class CompareAndSelectScenario extends Component {
             })
         }
     }
-    loaded = function (instance, cell, x, y) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
@@ -1473,18 +1481,19 @@ class CompareAndSelectScenario extends Component {
         }
         var totalIndex = this.state.treeScenarioList.findIndex(c => c.id == this.state.selectedTreeScenarioId);
         var db1;
+        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
             var programRequest = programTransaction.get(this.state.datasetId);
-            programRequest.onerror = function () {
+            programRequest.onerror = function (event) {
             }.bind(this);
-            programRequest.onsuccess = function () {
+            programRequest.onsuccess = function (event) {
                 var dataset = programRequest.result;
                 var programDataJson = programRequest.result.programData;
                 var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
@@ -1503,18 +1512,18 @@ class CompareAndSelectScenario extends Component {
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
                 var putRequest = datasetOs.put(dataset);
-                putRequest.onerror = function () {
+                putRequest.onerror = function (event) {
                 }.bind(this);
-                putRequest.onsuccess = function () {
+                putRequest.onsuccess = function (event) {
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function () {
+                    datasetDetailsRequest.onsuccess = function (e) {
                         var datasetDetailsRequestJson = datasetDetailsRequest.result;
                         datasetDetailsRequestJson.changed = 1;
                         var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                        datasetDetailsRequest1.onsuccess = function () {
+                        datasetDetailsRequest1.onsuccess = function (event) {
                         }
                     }
                     this.setState({
@@ -1635,6 +1644,7 @@ class CompareAndSelectScenario extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -1664,6 +1674,7 @@ class CompareAndSelectScenario extends Component {
         let bar = {}
         if (this.state.showAllData) {
             var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
+            var monthArrayListWithoutFormat = [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY-MM-DD")))];
             var datasetsArr = [];
             datasetsArr.push(
                 {
@@ -1700,7 +1711,7 @@ class CompareAndSelectScenario extends Component {
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
-                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))
+                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))
                     }
                 )
             })
@@ -1759,6 +1770,7 @@ class CompareAndSelectScenario extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
+        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'

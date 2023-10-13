@@ -230,16 +230,16 @@ class ModelingValidation extends Component {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function () {
+            openRequest.onerror = function (event) {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
                 var getRequest = datasetOs.get(datasetId);
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 }.bind(this);
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
@@ -273,7 +273,7 @@ class ModelingValidation extends Component {
                     })
                 }
             }).catch(
-                () => {
+                error => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     jexcel.destroy(document.getElementById("tableDiv"), true);
                     this.el = jexcel(document.getElementById("tableDiv2"), '');
@@ -325,6 +325,8 @@ class ModelingValidation extends Component {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
+        var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+        var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var rangeValue = { from: { year: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("M")) }, to: { year: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("M")) } }
         var treeId = "";
         var event = {
@@ -522,6 +524,7 @@ class ModelingValidation extends Component {
             var treeList = datasetData.treeList;
             var tree = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var flatList = tree.tree.flatList;
+            var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
             let startDate;
             let stopDate;
@@ -704,6 +707,7 @@ class ModelingValidation extends Component {
             jexcel.destroy(document.getElementById("tableDiv"), true);
             this.el = jexcel(document.getElementById("tableDiv2"), '');
             jexcel.destroy(document.getElementById("tableDiv2"), true);
+            var json = [];
             var options = {
                 data: dataArr,
                 columnDrag: true,
@@ -725,7 +729,7 @@ class ModelingValidation extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function () {
+                contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
             };
@@ -752,7 +756,7 @@ class ModelingValidation extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function () {
+                contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
             };
@@ -781,7 +785,7 @@ class ModelingValidation extends Component {
             })
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
     setLevelId(e) {
@@ -800,6 +804,7 @@ class ModelingValidation extends Component {
                 flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             }
             var flatData = flatDataForLevel[0];
+            var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
             var levelListFilter = treeListFiltered.levelList != undefined ? treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0] : undefined;
             levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
             var nodeList = [];
@@ -945,7 +950,7 @@ class ModelingValidation extends Component {
                 })
             }
         }).catch(
-            () => {
+            error => {
                 this.getOfflineDatasetList();
             }
         );
@@ -957,20 +962,20 @@ class ModelingValidation extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
             var datasetOs = datasetTransaction.objectStore('datasetData');
             var getRequest = datasetOs.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             }.bind(this);
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var unitTransaction = db1.transaction(['unit'], 'readwrite');
                 var unitOs = unitTransaction.objectStore('unit');
                 var unitRequest = unitOs.getAll();
-                unitRequest.onerror = function () {
+                unitRequest.onerror = function (event) {
                 }.bind(this);
                 unitRequest.onsuccess = function (event) {
                     var unitList = unitRequest.result;
@@ -1142,6 +1147,7 @@ class ModelingValidation extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
@@ -1228,6 +1234,7 @@ class ModelingValidation extends Component {
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
+        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -1241,7 +1248,7 @@ class ModelingValidation extends Component {
         }
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
         var columns = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item) => { columns.push(item.title) });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
         var dataArr1 = [];
         this.state.dataEl.getJson(null, false).map(ele => {
@@ -1278,7 +1285,7 @@ class ModelingValidation extends Component {
         doc.autoTable(content);
         if (this.state.xAxisDisplayBy > 1) {
             var columns2 = [];
-            this.state.columns2.filter(c => c.type != 'hidden').map((item) => { columns2.push(item.title) });
+            this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { columns2.push(item.title) });
             var dataArr = [];
             var dataArr1 = [];
             this.state.dataEl2.getJson(null, false).map(ele => {
@@ -1350,6 +1357,8 @@ class ModelingValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
+        var columns = [];
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
         var A = [this.addDoubleQuoteToRowContent(headers)];
@@ -1503,6 +1512,7 @@ class ModelingValidation extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                         var cell1 = value
                         cell1 += '';
@@ -1578,6 +1588,7 @@ class ModelingValidation extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
+        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'

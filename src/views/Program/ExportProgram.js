@@ -14,6 +14,7 @@ import {
     Input,
     Label
 } from 'reactstrap';
+import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -22,6 +23,32 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     programId: ''
+}
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        programId: Yup.string()
+            .required(i18n.t('static.program.validselectprogramtext'))
+    })
+}
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
 }
 const entityname = i18n.t('static.dashboard.exportprogram')
 export default class ExportProgram extends Component {
@@ -45,6 +72,7 @@ export default class ExportProgram extends Component {
         })
     }
     componentDidMount() {
+        const lan = 'en'
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -54,13 +82,15 @@ export default class ExportProgram extends Component {
             var program = transaction.objectStore('programData');
             var prgList = [];
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var json = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < json.length; i++) {
+                    var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
+                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     var bytes1 = CryptoJS.AES.decrypt(json[i].programData.generalData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -69,7 +99,7 @@ export default class ExportProgram extends Component {
                     }
                 }
             }.bind(this)
-            transaction.oncomplete = function () {
+            transaction.oncomplete = function (event) {
                 this.setState({
                     programList: prgList.sort(function (a, b) {
                         a = a.label.toLowerCase();
@@ -90,6 +120,7 @@ export default class ExportProgram extends Component {
                 selectProgramMessage: ""
             })
             var db1;
+            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -97,21 +128,21 @@ export default class ExportProgram extends Component {
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var program = transaction.objectStore('programData');
                 var getRequest = program.getAll();
-                getRequest.onerror = function () {
+                getRequest.onerror = function (event) {
                 };
-                getRequest.onsuccess = function () {
+                getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
                     var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedProgramData');
                     var dGetRequest = dProgram.getAll();
-                    dGetRequest.onerror = function () {
+                    dGetRequest.onerror = function (event) {
                     };
-                    dGetRequest.onsuccess = function () {
+                    dGetRequest.onsuccess = function (event) {
                         var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.getAll();
-                        programQPLDetailsGetRequest.onsuccess = function () {
+                        programQPLDetailsGetRequest.onsuccess = function (event) {
                             var programQPLResult = [];
                             programQPLResult = programQPLDetailsGetRequest.result;
                             var dMyResult = [];
@@ -119,73 +150,73 @@ export default class ExportProgram extends Component {
                             var countryTransaction = db1.transaction(['country'], 'readwrite');
                             var countryOs = countryTransaction.objectStore('country');
                             var countryRequest = countryOs.getAll();
-                            countryRequest.onsuccess = function () {
+                            countryRequest.onsuccess = function (event) {
                                 var countryList = [];
                                 countryList = countryRequest.result;
                                 var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                                 var forecastingUnitOs = forecastingUnitTransaction.objectStore('forecastingUnit');
                                 var forecastingUnitRequest = forecastingUnitOs.getAll();
-                                forecastingUnitRequest.onsuccess = function () {
+                                forecastingUnitRequest.onsuccess = function (event) {
                                     var forecastingUnitList = [];
                                     forecastingUnitList = forecastingUnitRequest.result;
                                     var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                                     var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
                                     var planningUnitRequest = planningUnitOs.getAll();
-                                    planningUnitRequest.onsuccess = function () {
+                                    planningUnitRequest.onsuccess = function (event) {
                                         var planningUnitList = [];
                                         planningUnitList = planningUnitRequest.result;
                                         var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
                                         var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
                                         var procurementUnitRequest = procurementUnitOs.getAll();
-                                        procurementUnitRequest.onsuccess = function () {
+                                        procurementUnitRequest.onsuccess = function (event) {
                                             var procurementUnitList = [];
                                             procurementUnitList = procurementUnitRequest.result;
                                             var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
                                             var realmCountryOs = realmCountryTransaction.objectStore('realmCountry');
                                             var realmCountryRequest = realmCountryOs.getAll();
-                                            realmCountryRequest.onsuccess = function () {
+                                            realmCountryRequest.onsuccess = function (event) {
                                                 var realmCountryList = [];
                                                 realmCountryList = realmCountryRequest.result;
                                                 var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                                 var realmCountryPlanningUnitOs = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
                                                 var realmCountryPlanningUnitRequest = realmCountryPlanningUnitOs.getAll();
-                                                realmCountryPlanningUnitRequest.onsuccess = function () {
+                                                realmCountryPlanningUnitRequest.onsuccess = function (event) {
                                                     var realmCountryPlanningUnitList = [];
                                                     realmCountryPlanningUnitList = realmCountryPlanningUnitRequest.result;
                                                     var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                                                     var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                                     var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
-                                                    procurementAgentPlanningUnitRequest.onsuccess = function () {
+                                                    procurementAgentPlanningUnitRequest.onsuccess = function (event) {
                                                         var procurementAgentPlanningUnitList = [];
                                                         procurementAgentPlanningUnitList = procurementAgentPlanningUnitRequest.result;
                                                         var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
                                                         var procurementAgentProcurementUnitOs = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
                                                         var procurementAgentProcurementUnitRequest = procurementAgentProcurementUnitOs.getAll();
-                                                        procurementAgentProcurementUnitRequest.onsuccess = function () {
+                                                        procurementAgentProcurementUnitRequest.onsuccess = function (event) {
                                                             var procurementAgentProcurementUnitList = [];
                                                             procurementAgentProcurementUnitList = procurementAgentProcurementUnitRequest.result;
                                                             var programTransaction = db1.transaction(['program'], 'readwrite');
                                                             var programOs = programTransaction.objectStore('program');
                                                             var programRequest = programOs.getAll();
-                                                            programRequest.onsuccess = function () {
+                                                            programRequest.onsuccess = function (event) {
                                                                 var programList = [];
                                                                 programList = programRequest.result;
                                                                 var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                                                                 var programPlanningUnitOs = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                                                                 var programPlanningUnitRequest = programPlanningUnitOs.getAll();
-                                                                programPlanningUnitRequest.onsuccess = function () {
+                                                                programPlanningUnitRequest.onsuccess = function (event) {
                                                                     var programPlanningUnitList = [];
                                                                     programPlanningUnitList = programPlanningUnitRequest.result;
                                                                     var regionTransaction = db1.transaction(['region'], 'readwrite');
                                                                     var regionOs = regionTransaction.objectStore('region');
                                                                     var regionRequest = regionOs.getAll();
-                                                                    regionRequest.onsuccess = function () {
+                                                                    regionRequest.onsuccess = function (event) {
                                                                         var regionList = [];
                                                                         regionList = regionRequest.result;
                                                                         var budgetTransaction = db1.transaction(['budget'], 'readwrite');
                                                                         var budgetOs = budgetTransaction.objectStore('budget');
                                                                         var budgetRequest = budgetOs.getAll();
-                                                                        budgetRequest.onsuccess = function () {
+                                                                        budgetRequest.onsuccess = function (event) {
                                                                             var budgetList = [];
                                                                             budgetList = budgetRequest.result;
                                                                             var isUnEncrepted = false;

@@ -6,7 +6,27 @@ import { API_URL } from '../../Constants';
 import PipelineService from "../../api/PipelineService.js";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+const initialValues = {
+    fileTypeId: "",
+}
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        fileTypeId: Yup.string()
+            .required("Required"),
+    })
+}
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {

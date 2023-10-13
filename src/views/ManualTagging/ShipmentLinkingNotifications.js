@@ -83,7 +83,7 @@ export default class ShipmentLinkingNotifications extends Component {
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         this.setState({
@@ -114,6 +114,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     updateDetails() {
         document.getElementById('div2').style.display = 'block';
+        var programId = this.state.programId;
         this.setState({ loading: true })
         var validation = true;
         var changedmtList = []
@@ -129,7 +130,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 changedmtList.push(json);
             }
             ManualTaggingService.updateNotification(changedmtList)
-                .then(() => {
+                .then(response => {
                     this.setState({
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: 'green',
@@ -234,16 +235,16 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         return valid;
     }
-    changed = function (instance, cell, x, y) {
+    changed = function (instance, cell, x, y, value) {
         if (x == 0) {
             this.el.setValueFromCoords(19, y, 1, true);
         }
         this.displayButton();
     }.bind(this);
-    onedit = function (instance, cell, x, y) {
+    onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
@@ -366,7 +367,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     this.buildJExcel();
                                 });
                             }).catch(
-                                () => {
+                                error => {
                                 }
                             );
                     }).catch(
@@ -442,7 +443,7 @@ export default class ShipmentLinkingNotifications extends Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -528,6 +529,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = manualTaggingArray;
         var options = {
             data: data,
@@ -650,13 +652,13 @@ export default class ShipmentLinkingNotifications extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            updateTable: function () {
+            updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
-            onsearch: function () {
+            onsearch: function (el) {
             },
-            onfilter: function () {
+            onfilter: function (el) {
             },
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
@@ -746,6 +748,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         jexcel.destroy(document.getElementById("tableDiv1"), true);
+        var json = [];
         var data = notificationSummaryArray;
         var options = {
             data: data,
@@ -789,7 +792,7 @@ export default class ShipmentLinkingNotifications extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -825,12 +828,13 @@ export default class ShipmentLinkingNotifications extends Component {
             }
         }
     }.bind(this)
-    loaded1 = function (instance) {
+    loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
     }
     getNotificationSummary(callGetProgram) {
         ManualTaggingService.getNotificationSummary()
@@ -984,7 +988,7 @@ export default class ShipmentLinkingNotifications extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             onload: this.loadedOrderHistory,
-            updateTable: function (el, cell) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
                 var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[8] == 0);
@@ -994,7 +998,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     cell.classList.add('historyBold');
                 }
             }.bind(this),
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -1050,7 +1054,7 @@ export default class ShipmentLinkingNotifications extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             onload: this.loadedShipmentHistory,
-            updateTable: function (el, cell) {
+            updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
                 var elInstance = el;
                 var index = elInstance.getJson(null, false).findIndex(c => c[7] == 0);
@@ -1060,7 +1064,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     cell.classList.add('historyBold');
                 }
             }.bind(this),
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
@@ -1095,9 +1099,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     var db1;
+                    var storeOS;
                     getDatabase();
+                    var thisAsParameter = this;
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function () {
+                    openRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                         this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
@@ -1108,9 +1114,10 @@ export default class ShipmentLinkingNotifications extends Component {
                         var programTransaction;
                         transaction = db1.transaction(['programData'], 'readwrite');
                         programTransaction = transaction.objectStore('programData');
+                        var curUser = AuthenticationService.getLoggedInUserId();
                         var programId = (this.state.programId);
                         var programRequest = programTransaction.get(programId);
-                        programRequest.onsuccess = function () {
+                        programRequest.onsuccess = function (event) {
                             var programDataJson = programRequest.result;
                             this.setState({
                                 planningUnits: listArray,
@@ -1222,7 +1229,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         return x1 + x2;
     }
-    formatLabel(cell) {
+    formatLabel(cell, row) {
         if (cell != null && cell != "") {
             return getLabelText(cell.label, 'en');
         } else {
@@ -1240,6 +1247,149 @@ export default class ShipmentLinkingNotifications extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.artmisHistory.length
+            }]
+        }
+        const columns1 = [
+            {
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'planningUnitName',
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expectedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'status',
+                text: i18n.t('static.manualTagging.erpStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'qty',
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'cost',
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
+        const columns2 = [
+            {
+                dataField: 'procurementAgentShipmentNo',
+                text: i18n.t('static.mt.roNoAndRoLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'deliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatExpiryDate
+            },
+            {
+                dataField: 'qty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'dataReceivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'changeCode',
+                text: i18n.t('static.manualTagging.changeCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
+        ];
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -1250,7 +1400,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }, this);
         const { planningUnits } = this.state;
         let planningUnitMultiList = planningUnits.length > 0
-            && planningUnits.map((item) => {
+            && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         planningUnitMultiList = Array.from(planningUnitMultiList);

@@ -258,8 +258,11 @@ class CompareScenario extends Component {
     }
     filterData() {
         let programId = document.getElementById("programId").value;
+        let viewById = document.getElementById("viewById").value;
         let versionId = document.getElementById("versionId").value;
         let planningUnitId = document.getElementById("planningUnitId").value;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         if (planningUnitId > 0 && programId > 0 && versionId != 0) {
         }
     }
@@ -437,7 +440,7 @@ class CompareScenario extends Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems) {
+                    label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
                             var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
@@ -499,7 +502,7 @@ class CompareScenario extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.consumptionData.filter(c => c.actualFlag).map((item) => (item.consumptionQty > 0 ? item.consumptionQty : null))
+                    data: this.state.consumptionData.filter(c => c.actualFlag).map((item, index) => (item.consumptionQty > 0 ? item.consumptionQty : null))
                 }
             )
             this.state.scenarioList.filter(c => c.checked).map((item, idx) => {
@@ -519,7 +522,7 @@ class CompareScenario extends Component {
                         pointStyle: 'line',
                         pointRadius: 0,
                         showInLegend: true,
-                        data: this.state.consumptionData.filter(c => c.scenario.scenarioId == item.scenarioId && !c.actualFlag).map((item1) => (item1.consumptionQty > 0 ? item1.consumptionQty : null))
+                        data: this.state.consumptionData.filter(c => c.scenario.scenarioId == item.scenarioId && !c.actualFlag).map((item1, index) => (item1.consumptionQty > 0 ? item1.consumptionQty : null))
                     }
                 )
             })
@@ -748,7 +751,7 @@ class CompareScenario extends Component {
                                                 <td></td>
                                                 <td></td>
                                             </tr>
-                                            {this.state.scenarioList.map((item) => (
+                                            {this.state.scenarioList.map((item, idx) => (
                                                 <tr id="addr0">
                                                     <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.scenarioId} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.scenarioId)} /></td>
                                                     <td style={{ color: item.color }}>{item.label}</td>

@@ -38,6 +38,11 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const ref = React.createRef();
+const brandPrimary = getStyle("--primary");
+const brandSuccess = getStyle("--success");
+const brandInfo = getStyle("--info");
+const brandWarning = getStyle("--warning");
+const brandDanger = getStyle("--danger");
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -56,6 +61,7 @@ const pickerLang = {
   from: "From",
   to: "To",
 };
+let dendoLabels = [{ label: "Today", pointStyle: "triangle" }];
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
   { text: i18n.t("static.report.lowstock"), color: "#f48521", value: 1 },
@@ -63,6 +69,59 @@ const legendcolor = [
   { text: i18n.t("static.report.overstock"), color: "#edb944", value: 3 },
   { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: 4 },
 ];
+const options = {
+  title: {
+    display: true,
+    fontColor: "black",
+  },
+  scales: {
+    yAxes: [
+      {
+        scaleLabel: {
+          display: true,
+          labelString: "Consumption Qty ( Million )",
+          fontColor: "black",
+        },
+        stacked: true,
+        ticks: {
+          beginAtZero: true,
+          fontColor: "black",
+        },
+      },
+    ],
+    xAxes: [
+      {
+        ticks: {
+          fontColor: "black",
+        },
+      },
+    ],
+  },
+  annotation: {
+    annotations: [
+      {
+        type: "triangle",
+        drawTime: "beforeDatasetsDraw",
+        scaleID: "x-axis-0",
+        value: "Mar-2020",
+        backgroundColor: "rgba(0, 255, 0, 0.1)",
+      },
+    ],
+  },
+  tooltips: {
+    enabled: false,
+    custom: CustomTooltips,
+  },
+  maintainAspectRatio: false,
+  legend: {
+    display: true,
+    position: "bottom",
+    labels: {
+      usePointStyle: true,
+      fontColor: "black",
+    },
+  },
+};
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -122,10 +181,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       return pickerLang.months[m.month - 1] + ". " + m.year;
     return "?";
   };
-  handleClickMonthBox2 = () => {
+  handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show();
   };
-  handleAMonthChange2 = () => {
+  handleAMonthChange2 = (value, text) => {
   };
   handleAMonthDissmis2 = (value) => {
     this.setState({ singleValue2: value }, () => {
@@ -435,6 +494,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     const unit = "pt";
     const size = "A4";
     const orientation = "landscape";
+    const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
     doc.setFontSize(10);
     const headers = [
@@ -466,6 +526,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         ])
       )
     );
+    var height = doc.internal.pageSize.height;
     var startY =
       150 +
       this.state.countryValues.length * 2 +
@@ -637,6 +698,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
   filterProgram = () => {
     let countryIds = this.state.countryValues.map((ele) => ele.value);
+    let tracercategory =
+      this.state.tracerCategoryValues.length ==
+        this.state.tracerCategories.length
+        ? []
+        : this.state.tracerCategoryValues.map((ele) => ele.value.toString());
     this.setState(
       {
         programLstFiltered: [],
@@ -743,6 +809,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   };
   hideDiv() {
     setTimeout(function () {
+      var theSelect = document.getElementById("planningUnitId").length;
     }, 9000);
   }
   filterData = () => {
@@ -1145,13 +1212,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
   show() {
   }
-  handleRangeChange() {
+  handleRangeChange(value, text, listIndex) {
   }
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value });
     this.filterData();
   }
-  _handleClickRangeBox() {
+  _handleClickRangeBox(e) {
     this.refs.pickRange.show();
   }
   loading = () => (
@@ -1172,7 +1239,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     const { countrys } = this.state;
     let countryList =
       countrys.length > 0 &&
-      countrys.map((item) => {
+      countrys.map((item, i) => {
         return {
           label: getLabelText(item.label, this.state.lang),
           value: item.id,
@@ -1183,7 +1250,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let programList = [];
     programList =
       programLstFiltered.length > 0 &&
-      programLstFiltered.map((item) => {
+      programLstFiltered.map((item, i) => {
         return (
           { label: item.code, value: item.id }
         );
@@ -1317,7 +1384,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           disabled={this.state.loading}
                           options={
                             tracerCategories.length > 0
-                              ? tracerCategories.map((item) => {
+                              ? tracerCategories.map((item, i) => {
                                 return {
                                   label: getLabelText(
                                     item.label,
@@ -1342,7 +1409,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             name="includeApprovedVersions"
                             id="includeApprovedVersions"
                             bsSize="sm"
-                            onChange={() => {
+                            onChange={(e) => {
                               this.filterData();
                             }}
                           >
@@ -1367,7 +1434,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             name="stockStatusId"
                             id="stockStatusId"
                             bsSize="sm"
-                            onChange={() => {
+                            onChange={(e) => {
                               this.filterDataAsperstatus();
                             }}
                           >

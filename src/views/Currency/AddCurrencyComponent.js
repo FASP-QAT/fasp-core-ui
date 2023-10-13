@@ -13,7 +13,7 @@ const initialValues = {
     conversionRate: '',
     isSync: 'true'
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
@@ -129,7 +129,7 @@ export default class AddCurrencyComponent extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -187,11 +187,13 @@ export default class AddCurrencyComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

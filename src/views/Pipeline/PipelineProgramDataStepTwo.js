@@ -15,7 +15,10 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const validationSchemaTwo = function () {
+const initialValuesTwo = {
+    realmCountryId: ''
+}
+const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
@@ -140,16 +143,19 @@ export default class PipelineProgramDataStepTwo extends Component {
                     enableReinitialize={true}
                     initialValues={{ realmCountryId: this.props.items.program.realmCountry.realmCountryId }}
                     validate={validateTwo(validationSchemaTwo)}
-                    onSubmit={(values) => {
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepOne && this.props.endProgramInfoStepOne();
                     }}
                     render={
                         ({
+                            values,
                             errors,
                             touched,
                             handleChange,
                             handleBlur,
                             handleSubmit,
+                            isSubmitting,
+                            isValid,
                             setTouched
                         }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>

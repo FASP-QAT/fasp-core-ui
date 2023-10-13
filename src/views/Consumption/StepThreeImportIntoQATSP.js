@@ -158,9 +158,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var db1;
+                        var storeOS;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function () {
+                        openRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                             this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
@@ -173,12 +174,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             programTransaction = transaction.objectStore('programData');
                             var programId = this.props.items.programId;
                             var programRequest = programTransaction.get(programId);
-                            programRequest.onerror = function () {
+                            programRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                 this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
-                            programRequest.onsuccess = function () {
+                            programRequest.onsuccess = function (event) {
                                 var programDataJson = programRequest.result.programData;
                                 var planningUnitDataList = programDataJson.planningUnitDataList;
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
@@ -187,12 +188,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                 var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                 var rcpuRequest = rcpuOs.getAll();
-                                rcpuRequest.onerror = function () {
+                                rcpuRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                     this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
-                                rcpuRequest.onsuccess = function () {
+                                rcpuRequest.onsuccess = function (event) {
                                     var rcpuResult = [];
                                     rcpuResult = rcpuRequest.result;
                                     var actionList = (generalProgramJson.actionList);
@@ -241,7 +242,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             }
                                         }
                                         var consumptionDataList = (programJson.consumptionList);
-                                        var finalImportQATDataFilter = finalImportQATData.filter((c) => c.v10 == finalPuList[pu] && c.v18);
+                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && c.v18);
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
@@ -306,12 +307,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     transaction1 = db1.transaction(['programData'], 'readwrite');
                                     programTransaction1 = transaction1.objectStore('programData');
                                     var putRequest = programTransaction1.put(programRequest.result);
-                                    putRequest.onerror = function () {
+                                    putRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                         this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
-                                    putRequest.onsuccess = function () {
+                                    putRequest.onsuccess = function (event) {
                                         var finalQATPlanningList = [];
                                         for (var i = 0; i < finalImportQATData.length; i++) {
                                             var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10 && finalImportQATData[i].v18)
@@ -332,7 +333,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             ]
         });
     }
-    loaded = function () {
+    loaded = function (instance, cell, x, y, value) {
     }
     componentDidMount() {
     }
@@ -345,9 +346,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     filterData() {
         var realmId = AuthenticationService.getRealmId();
         var db1;
+        var storeOS;
+        var supplyPlanRegionList = [];
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
@@ -359,19 +362,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
-            realmRequest.onsuccess = function () {
+            realmRequest.onsuccess = function (event) {
                 var realm = realmRequest.result;
                 var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                 var programDataOs = programDataTransaction.objectStore('programData');
                 var programRequest = programDataOs.get(this.props.items.programId);
-                programRequest.onerror = function () {
+                programRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
                         color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                programRequest.onsuccess = function () {
+                programRequest.onsuccess = function (e) {
                     var fullConsumptionList = [];
                     var programData1 = programRequest.result.programData;
                     for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
@@ -557,6 +560,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
+        var json = [];
         var data = papuDataArr;
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);
@@ -662,7 +666,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: function (obj) {
+            onload: function (obj, x, y, e) {
                 jExcelLoadedFunction(obj);
             },
             editable: true,

@@ -209,6 +209,7 @@ class AccessControlComponent extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
+        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -259,7 +260,7 @@ class AccessControlComponent extends Component {
             onpaste: this.onPaste,
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y) {
+            contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
                     if (obj.options.allowInsertColumn == true) {
@@ -837,7 +838,7 @@ class AccessControlComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     checkValidation() {
@@ -891,7 +892,7 @@ class AccessControlComponent extends Component {
         }
         return valid;
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

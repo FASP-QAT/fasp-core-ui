@@ -103,7 +103,7 @@ class warehouseCapacity extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    exportPDF = () => {
+    exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
@@ -158,6 +158,7 @@ class warehouseCapacity extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size);
         doc.setFontSize(8);
         let headers = [
@@ -376,6 +377,7 @@ class warehouseCapacity extends Component {
         }
     }
     consolidatedProgramList = () => {
+        const lan = 'en';
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -385,9 +387,9 @@ class warehouseCapacity extends Component {
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var proList = []
-            getRequest.onerror = function () {
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -395,6 +397,7 @@ class warehouseCapacity extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var bytes1 = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = bytes1.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -510,7 +513,7 @@ class warehouseCapacity extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function () {
+                openRequest.onerror = function (event) {
                     this.setState({
                         loading: false
                     })
@@ -520,7 +523,7 @@ class warehouseCapacity extends Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var programTransaction = transaction.objectStore('programData');
                     var programRequest = programTransaction.get(programId);
-                    programRequest.onerror = function () {
+                    programRequest.onerror = function (event) {
                         this.setState({
                             loading: false
                         }, () => {
@@ -528,12 +531,13 @@ class warehouseCapacity extends Component {
                             jexcel.destroy(document.getElementById("tableDiv"), true);
                         })
                     }.bind(this);
-                    programRequest.onsuccess = function () {
+                    programRequest.onsuccess = function (event) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var regionList = (programJson.regionList);
                         var realmCountry = (programJson.realmCountry);
+                        var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
                         let offlineData = [];
                         for (var i = 0; i < regionList.length; i++) {
                             let json = {
@@ -585,6 +589,7 @@ class warehouseCapacity extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = regionListArray;
         var options = {
             data: data,
@@ -629,7 +634,7 @@ class warehouseCapacity extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -639,7 +644,7 @@ class warehouseCapacity extends Component {
             regionEl: regionEl, loading: false
         })
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     render() {
@@ -651,14 +656,14 @@ class warehouseCapacity extends Component {
         const { programs } = this.state;
         let programList = [];
         programList = programs.length > 0
-            && programs.map((item) => {
+            && programs.map((item, i) => {
                 return (
                     { label: (item.code), value: item.id }
                 )
             }, this);
         const { offlinePrograms } = this.state;
         const { countries } = this.state;
-        let countryList = countries.length > 0 && countries.map((item) => {
+        let countryList = countries.length > 0 && countries.map((item, i) => {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
         return (

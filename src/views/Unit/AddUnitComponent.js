@@ -16,7 +16,7 @@ const initialValues = {
     dimensionId: []
 }
 const entityname = i18n.t('static.unit.unit');
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         dimensionId: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
@@ -208,7 +208,7 @@ class AddUnitComponent extends Component {
                                                         <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values) => {
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
@@ -265,11 +265,13 @@ class AddUnitComponent extends Component {
                                 }}
                                 render={
                                     ({
+                                        values,
                                         errors,
                                         touched,
                                         handleChange,
                                         handleBlur,
                                         handleSubmit,
+                                        isSubmitting,
                                         isValid,
                                         setTouched,
                                         handleReset

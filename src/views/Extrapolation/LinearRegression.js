@@ -1,5 +1,5 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
-export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, page, regionId, planningUnitId) {
+export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId, planningUnitId) {
     const tTable = [
         { "df": 1, "zValue": [4.16529977009041, 6.31375151467504, 12.7062047361747, 63.6567411628715, 127.321336468872, 636.619248768789] },
         { "df": 2, "zValue": [2.28193058772768, 2.91998558035373, 4.30265272974946, 9.92484320091829, 14.0890472755553, 31.5990545764454] },
@@ -103,11 +103,14 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     let varX = sumOfXMinusXBarSqr / data.length;
     let sqrtOfRegression = Math.pow(SSE / (data.length - 2), 0.5);
     let criticalTValue = getCriticalTValue(data.length, Number(confidenceLevel));
+    let sumYMinusY1Sqr = 0;
     let a = sqrtOfRegression / Math.pow(data.length, 0.5);
     var output = [];
     for (let x = 0; x < data.length + count; x++) {
         let y = (gradient * (x + 1)) + yIntercept;
         let ciString = "";
+        let yString;
+        let cLevel = "";
         if (x >= data.length) {
             let b1 = Math.pow(x + 1 - xBar, 2);
             let b2 = Math.pow((1 + (b1 / varX)), 0.5);

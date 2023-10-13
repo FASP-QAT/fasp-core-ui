@@ -81,6 +81,7 @@ export default class DataSourceTypeListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = dataSourceTypeArray;
         var options = {
             data: data,
@@ -135,7 +136,7 @@ export default class DataSourceTypeListComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -157,7 +158,7 @@ export default class DataSourceTypeListComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     componentDidMount() {
@@ -312,6 +313,11 @@ export default class DataSourceTypeListComponent extends Component {
                 )
             }, this);
         const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

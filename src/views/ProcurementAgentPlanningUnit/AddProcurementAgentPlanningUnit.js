@@ -18,6 +18,17 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.procurementAgentPlanningUnit')
+let initialValues = {
+    planningUnitId: '',
+    skuCode: '',
+    catalogPrice: '',
+    moq: 0,
+    unitsPerPalletEuro1: 0,
+    unitsPerPalletEuro2: 0,
+    unitsPerContainer: 0,
+    volume: 0,
+    weight: 0,
+}
 export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);
@@ -61,7 +72,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    filterProduct = function () {
+    filterProduct = function (instance, cell, c, r, source) {
         return this.state.products.filter(c => c.active.toString() == "true");
     }.bind(this);
     componentDidMount() {
@@ -163,6 +174,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
                                                     jexcel.destroy(document.getElementById("paputableDiv"), true);
+                                                    var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
@@ -268,7 +280,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         oneditionend: this.oneditionend,
                                                         onload: this.loaded,
                                                         license: JEXCEL_PRO_KEY,
-                                                        contextMenu: function (obj, x, y) {
+                                                        contextMenu: function (obj, x, y, e) {
                                                             var items = [];
                                                             if (y == null) {
                                                                 if (obj.options.allowInsertColumn == true) {
@@ -511,7 +523,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }
             );
     }
-    oneditionend = function (instance, cell, x, y) {
+    oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
@@ -532,6 +544,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         elInstance.setValueFromCoords(12, y, 1, true);
     }
     addRow = function () {
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
@@ -653,6 +666,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
+        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
@@ -671,7 +685,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             return true;
         }
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;

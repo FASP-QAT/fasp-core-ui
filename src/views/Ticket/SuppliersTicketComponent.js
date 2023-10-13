@@ -12,7 +12,7 @@ const initialValues = {
     supplierName: "",
     notes: ""
 }
-const validationSchema = function () {
+const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
@@ -190,7 +190,7 @@ export default class SuppliersTicketComponent extends Component {
                     <Formik
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
-                        onSubmit={(values) => {
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
                             })
@@ -256,11 +256,13 @@ export default class SuppliersTicketComponent extends Component {
                         }}
                         render={
                             ({
+                                values,
                                 errors,
                                 touched,
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                isSubmitting,
                                 isValid,
                                 setTouched,
                                 handleReset

@@ -28,6 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
+const entityname = i18n.t('static.dashboard.inventoryTurns');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
 const pickerLang = {
@@ -154,6 +155,7 @@ export default class InventoryTurns extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -161,6 +163,11 @@ export default class InventoryTurns extends Component {
             this.state.costOfCountry.map(item => {
                 let sortOrderList = [];
                 let sortOrder = this.state.puList.filter(e => e.value == item.id).length > 0 ? this.state.puList.filter(e => e.value == item.id)[0].sortOrder : "";
+                let updatedItems = this.state.puList.map(item1 => {
+                    if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
+                        sortOrderList.push(item1.value);
+                    }
+                });
                 A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId == 1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id)).length, "", "", "", "", "", this.roundN1(item.inventoryTurns), this.roundN1(item.plannedInventoryTurns), this.roundN1(item.mape), this.roundN1(item.mse)]))
                 {
                     this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
@@ -274,14 +281,23 @@ export default class InventoryTurns extends Component {
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
+        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const headers = columns.map((item) => (item.text));
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        const headers = columns.map((item, idx) => (item.text));
         const data = [];
         {
             this.state.costOfCountry.map(item => {
                 let sortOrderList = [];
                 let sortOrder = this.state.puList.filter(e => e.value == item.id).length > 0 ? this.state.puList.filter(e => e.value == item.id)[0].sortOrder : "";
+                let updatedItems = this.state.puList.map(item1 => {
+                    if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
+                        sortOrderList.push(item1.value);
+                    }
+                });
                 data.push([" " + item.countryName, this.state.CostOfInventoryInput.displayId == 1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id)).length, "", "", "", "", "", this.formatterSingle(item.inventoryTurns), this.formatterSingle(item.plannedInventoryTurns), this.formatterSingle(item.mape), this.formatterSingle(item.mse)])
                 {
                     this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
@@ -349,15 +365,16 @@ export default class InventoryTurns extends Component {
                 }
             }
         };
+        var maxSecondColumnWidth = 0;
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.inventoryTurns') + ".pdf")
     }
-    handleClickMonthBox2 = () => {
+    handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = () => {
+    handleAMonthChange2 = (value, text) => {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
@@ -599,7 +616,7 @@ export default class InventoryTurns extends Component {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function () {
+        openRequest.onerror = function (event) {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
@@ -613,9 +630,10 @@ export default class InventoryTurns extends Component {
             var transaction = db1.transaction(['realm'], 'readwrite');
             var program = transaction.objectStore('realm');
             var getRequest = program.getAll();
-            getRequest.onerror = function () {
+            var proList = []
+            getRequest.onerror = function (event) {
             };
-            getRequest.onsuccess = function () {
+            getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
                 var minC;
@@ -793,6 +811,7 @@ export default class InventoryTurns extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
+        var json = [];
         var data = costOfInventoryArray;
         var options = {
             data: data,
@@ -838,7 +857,7 @@ export default class InventoryTurns extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function () {
+            contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
         };
@@ -848,7 +867,7 @@ export default class InventoryTurns extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance) {
+    loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
     formSubmit() {
@@ -871,15 +890,15 @@ export default class InventoryTurns extends Component {
                         for (let i = 0; i < this.state.CostOfInventoryInput.country.length; i++) {
                             let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
                             if (tempData.length > 0) {
-                                let level1Consumption = tempData.reduce((prev, curr) => prev + curr.totalConsumption, 0);
+                                let level1Consumption = tempData.reduce((prev, curr, index) => prev + curr.totalConsumption, 0);
                                 let unique = [...new Set(tempData.map((item) => item.program.id))];
-                                let level1NoOfMonths = tempData.reduce((prev, curr) => prev + curr.noOfMonths, 0);
-                                let level1AverageStock = tempData.reduce((prev, curr) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                let level1NoOfMonths = tempData.reduce((prev, curr, index) => prev + curr.noOfMonths, 0);
+                                let level1AverageStock = tempData.reduce((prev, curr, index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null && arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
                                 let level1PlannedInventoryTurns = this.mode(tempData.filter(arr => arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
-                                let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev, curr) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
-                                let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev, curr) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length) : 0;
+                                let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev, curr, index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
+                                let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev, curr, index) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length) : 0;
                                 level1Data.push({
                                     id: this.state.CostOfInventoryInput.country[i],
                                     countryName: tempData[0].realmCountry.label.label_en,
@@ -893,14 +912,14 @@ export default class InventoryTurns extends Component {
                                 })
                                 for (let j = 0; j < unique.length; j++) {
                                     let temp = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
-                                    let level2Consumption = temp.reduce((prev, curr) => prev + curr.totalConsumption, 0);
-                                    let level2NoOfMonths = temp.reduce((prev, curr) => prev + curr.noOfMonths, 0);
-                                    let level2AverageStock = temp.reduce((prev, curr) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                    let level2Consumption = temp.reduce((prev, curr, index) => prev + curr.totalConsumption, 0);
+                                    let level2NoOfMonths = temp.reduce((prev, curr, index) => prev + curr.noOfMonths, 0);
+                                    let level2AverageStock = temp.reduce((prev, curr, index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null && arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
                                     let level2PlannedInventoryTurns = this.mode(temp.filter(arr => arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
-                                    let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev, curr) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
-                                    let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev, curr) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
+                                    let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev, curr, index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
+                                    let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev, curr, index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
                                     level2Data.push({
                                         id: this.state.CostOfInventoryInput.country[i],
                                         programId: unique[j],
@@ -919,18 +938,23 @@ export default class InventoryTurns extends Component {
                         for (let i = 0; i < this.state.CostOfInventoryInput.pu.length; i++) {
                             let sortOrderList = [];
                             let sortOrder = this.state.puList.filter(e => e.value == this.state.CostOfInventoryInput.pu[i])[0].sortOrder;
+                            let updatedItems = this.state.puList.map(item => {
+                                if (item.sortOrder.toString().startsWith(sortOrder.toString())) {
+                                    sortOrderList.push(item.value);
+                                }
+                            });
                             let tempData = response.data.filter(e => sortOrderList.includes(e.productCategory.id));
                             let tempPU = this.state.puList.filter(e => e.value == this.state.CostOfInventoryInput.pu[i])[0].label;
                             if (tempData.length > 0) {
-                                let level1Consumption = tempData.reduce((prev, curr) => prev + curr.totalConsumption, 0);
+                                let level1Consumption = tempData.reduce((prev, curr, index) => prev + curr.totalConsumption, 0);
                                 let unique = [...new Set(tempData.map((item) => item.program.id))];
-                                let level1NoOfMonths = tempData.reduce((prev, curr) => prev + curr.noOfMonths, 0);
-                                let level1AverageStock = tempData.reduce((prev, curr) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                let level1NoOfMonths = tempData.reduce((prev, curr, index) => prev + curr.noOfMonths, 0);
+                                let level1AverageStock = tempData.reduce((prev, curr, index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null && arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
                                 let level1PlannedInventoryTurns = this.mode(tempData.filter(arr => arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
-                                let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev, curr) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
-                                let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev, curr) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length : 0;
+                                let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev, curr, index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
+                                let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev, curr, index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length : 0;
                                 level1Data.push({
                                     id: this.state.CostOfInventoryInput.pu[i],
                                     countryName: tempPU,
@@ -944,14 +968,14 @@ export default class InventoryTurns extends Component {
                                 })
                                 for (let j = 0; j < unique.length; j++) {
                                     let temp = response.data.filter(e => sortOrderList.includes(e.productCategory.id) && e.program.id == unique[j])
-                                    let level2Consumption = temp.reduce((prev, curr) => prev + curr.totalConsumption, 0);
-                                    let level2NoOfMonths = temp.reduce((prev, curr) => prev + curr.noOfMonths, 0);
-                                    let level2AverageStock = temp.reduce((prev, curr) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                    let level2Consumption = temp.reduce((prev, curr, index) => prev + curr.totalConsumption, 0);
+                                    let level2NoOfMonths = temp.reduce((prev, curr, index) => prev + curr.noOfMonths, 0);
+                                    let level2AverageStock = temp.reduce((prev, curr, index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null && arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
                                     let level2PlannedInventoryTurns = this.mode(temp.filter(arr => arr.reorderFrequencyInMonths <= 12).map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
-                                    let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev, curr) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
-                                    let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev, curr) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
+                                    let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev, curr, index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
+                                    let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev, curr, index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
                                     level2Data.push({
                                         id: this.state.CostOfInventoryInput.pu[i],
                                         programId: unique[j],
@@ -1105,7 +1129,7 @@ export default class InventoryTurns extends Component {
         }
         var mode_per = (maxCount / numbers.length) * 100;
         if (mode_per < this.state.minPercForMode || maxCount < this.state.minCountForMode) {
-            mode = numbers.filter(arr => arr != null).length > 0 ? numbers.reduce((prev, curr) => prev + curr, 0) / (numbers.filter(arr => arr != null).length) : 0;
+            mode = numbers.filter(arr => arr != null).length > 0 ? numbers.reduce((prev, curr, index) => prev + curr, 0) / (numbers.filter(arr => arr != null).length) : 0;
         }
         return mode;
     }
@@ -1134,6 +1158,11 @@ export default class InventoryTurns extends Component {
                     {this.state.costOfCountry.map(item => {
                         let sortOrderList = [];
                         let sortOrder = this.state.puList.filter(e => e.value == item.id).length > 0 ? this.state.puList.filter(e => e.value == item.id)[0].sortOrder : "";
+                        let updatedItems = this.state.puList.map(item1 => {
+                            if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
+                                sortOrderList.push(item1.value);
+                            }
+                        });
                         return (<>
                             <tr>
                                 <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
@@ -1325,6 +1354,32 @@ export default class InventoryTurns extends Component {
                 formatter: this.formatterDouble
             }
         ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.costOfInventory.length
+            }]
+        }
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
