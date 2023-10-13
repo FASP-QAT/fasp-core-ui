@@ -11,7 +11,7 @@ import i18n from '../../i18n'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -123,13 +123,24 @@ class UsagePeriod extends Component {
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 },
                 {
                     title: i18n.t('static.usagePeriod.conversionFactor'),
                     // type: 'text',
-                    type: 'numeric', mask: '#,##.00000000', decimal: '.'
+                    type: 'numeric', mask: '#,##.00000000', decimal: '.',
                     // readOnly: true
                     // textEditor: true,
+                    required: true,
+                    number:true, //i18n.t('static.program.validvaluetext')
+                    regex: {
+                        ex: /^\d{1,5}(\.\d{1,8})?$/,
+                        text: i18n.t('static.usagePeriod.conversionFactorTestString')
+                    }
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -603,57 +614,7 @@ class UsagePeriod extends Component {
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
-        //Usage Period
-        if (x == 1) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-
-        //conversion factor decimal 9,4
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
-            // var reg = /^\d{1,5}(\.\d{1,4})?$/;
-            var reg = /^\d{1,5}(\.\d{1,8})?$/;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value <= 0) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-
-                }
-
-            }
-        }
+        changed(instance, cell, x, y, value)
 
         this.setState({
             isChanged: true,
@@ -677,93 +638,16 @@ class UsagePeriod extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
-                //UsagePeriod
-                var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
-                // console.log("value-----", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                valid = checkValidation(this.el);
+                if(!valid){
                     this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    if (!(budgetRegx.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.spacetext'));
-                        valid = false;
-                        this.setState({
                             message: i18n.t('static.supplyPlan.validationFailed'),
                             color: 'red'
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //conversion factor decimal 9,4
-                var col = ("C").concat(parseInt(y) + 1);
-                // var value = this.el.getValueFromCoords(2, y);
-                var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = /^\d{1,5}(\.\d{1,8})?$/;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
                         () => {
                             this.hideSecondComponent();
                         })
-                } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
-                        valid = false;
-                        this.setState({
-                            message: i18n.t('static.supplyPlan.validationFailed'),
-                            color: 'red'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        if (isNaN(Number.parseInt(value)) || value <= 0) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                            valid = false;
-                            this.setState({
-                                message: i18n.t('static.supplyPlan.validationFailed'),
-                                color: 'red'
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
                 }
-
-
             }
         }
         return valid;

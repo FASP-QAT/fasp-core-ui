@@ -755,3 +755,140 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
 
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
+
+export function checkValidation(worksheets) {
+    var valid = true;
+    var json = worksheets.getJson(null, false);
+    var columns = worksheets.getConfig().columns;
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
+    for (var y = 0; y < json.length; y++) {
+        for (var c = 0; c < columns.length; c++) {
+            var columnValid = true;
+            var col = (colArr[c]).concat(parseInt(y) + 1);
+            var value = json[y][c];
+            if (columns[c].required === true) {
+                if (value === "") {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, "This field is required");
+                    valid = false;
+                    columnValid = false;
+                }
+            }
+            if (columns[c].number === true && columnValid != false && value != "") {
+                if (isNaN(parseInt(value))) {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, "Not a number");
+                    valid = false;
+                    columnValid = false;
+                } 
+            }
+            if (columns[c].decimal === false && columnValid != false && value != "") {
+                if (!Number.isInteger(Number(value))) {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                    columnValid = false;
+                } 
+            }
+            if (columns[c].maxValue && columnValid != false && value != "") {
+                if (parseInt(value) > columns[c].maxValue.value) {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, columns[c].maxValue.text);
+                    valid = false;
+                    columnValid = false;
+                } 
+            }
+            if (columns[c].minValue && columnValid != false && value != "") {
+                if (parseInt(value) < columns[c].minValue.value) {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, columns[c].minValue.text);
+                    valid = false;
+                    columnValid = false;
+                } 
+            }
+            if (columns[c].regex && columns[c].regex !== undefined && columnValid != false && value != "") {
+                var reg = columns[c].regex.ex;
+                if (value!=="" && value!==null && !reg.test(value)) {
+                    worksheets.setStyle(col, "background-color", "transparent");
+                    worksheets.setStyle(col, "background-color", "yellow");
+                    worksheets.setComments(col, columns[c].regex.text);
+                    valid = false;
+                    columnValid = false;
+                }
+            }
+            if(columnValid == true){
+                worksheets.setStyle(col, "background-color", "transparent");
+                worksheets.setComments(col, "");
+            }
+        }
+    }
+    return valid;
+}
+
+export function changed(worksheets, cell, x, y, value) {
+    var columns = worksheets.getConfig().columns
+    var isChangedColumnIndex = columns.findIndex(c => c.isChangedFlag == true);
+    var columnInfo = columns[x];
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
+    worksheets.setValueFromCoords(isChangedColumnIndex, y, 1, true);
+    var col = (colArr[x]).concat(parseInt(y) + 1);
+    var validFlag = true;
+    if (columnInfo.required === true) {
+        if (value === "") {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, "This field is required");
+            validFlag = false;
+        }
+    }
+    if (columnInfo.number === true && validFlag != false) {
+        if (isNaN(parseInt(value))) {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, "Not a number");
+            validFlag = false;
+        }
+    }
+    if (columnInfo.decimal === false && validFlag != false) {
+        if (!Number.isInteger(Number(value))) {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+            validFlag = false;
+        }
+    }
+    if (columnInfo.maxValue) {
+        if (value > columnInfo.maxValue.value) {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, columnInfo.maxValue.text);
+            validFlag = false;
+        }
+    }
+    if (columnInfo.minValue) {
+        if (value < columnInfo.minValue.value) {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, columnInfo.minValue.text);
+            validFlag = false;
+        }
+    }
+    if (columnInfo.regex && columnInfo.regex !== undefined && validFlag != false) {
+        var reg = columnInfo.regex.ex;
+        if (!reg.test(value)) {
+            worksheets.setStyle(col, "background-color", "transparent");
+            worksheets.setStyle(col, "background-color", "yellow");
+            worksheets.setComments(col, columnInfo.regex.text);
+            validFlag = false;
+        }
+    }
+    if(validFlag){
+        worksheets.setStyle(col, "background-color", "transparent");
+        worksheets.setComments(col, "");
+    }
+};

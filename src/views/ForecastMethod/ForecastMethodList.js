@@ -11,7 +11,7 @@ import i18n from '../../i18n'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -169,6 +169,7 @@ class forecastMethod extends Component {
                     // readOnly: true,
                     type: 'dropdown',
                     source: this.state.forecastMethodTypeList,
+                    required: true
                     // source: [
                     //     { id: 1, name: i18n.t('static.forecastMethod.historicalData') },
                     //     { id: 2, name: i18n.t('static.forecastMethod.tree') }
@@ -179,6 +180,11 @@ class forecastMethod extends Component {
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.validSpace.string')
+                    }
                 },
 
                 {
@@ -897,39 +903,7 @@ class forecastMethod extends Component {
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
-        //Forecast Method
-        if (x == 2) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validSpace.string'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-
-
-        //Methodlogy
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        changed(instance, cell, x, y, value)
 
         //Active
         if (x != 7) {
@@ -952,67 +926,16 @@ class forecastMethod extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
-                //Region
-                var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
-                // console.log("value-----", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                valid = checkValidation(this.el);
+                if(!valid){
                     this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    if (!(budgetRegx.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.validSpace.string'));
-                        valid = false;
-                        this.setState({
                             message: i18n.t('static.supplyPlan.validationFailed'),
                             color: 'red'
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-
-
-                //ForecastMethod
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
                         () => {
                             this.hideSecondComponent();
                         })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
                 }
-
-
-
-
             }
         }
         return valid;

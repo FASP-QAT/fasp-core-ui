@@ -27,6 +27,8 @@ import jexcel from "jspreadsheet";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
+  checkValidation,
+  changed,
   jExcelLoadedFunction,
   jExcelLoadedFunctionOnlyHideRow,
 } from "../../CommonComponent/JExcelCommonFunctions.js";
@@ -456,124 +458,23 @@ export default class RealmCountryPlanningUnitList extends Component {
     for (var y = 0; y < json.length; y++) {
       var value = this.el.getValueFromCoords(9, y);
       if (parseInt(value) == 1) {
-        //Country
-        var col = "A".concat(parseInt(y) + 1);
-        var value = this.el.getValueFromCoords(0, y);
-        // console.log("value-----", value);
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-        }
-
-        //Planning Unit
-        var col = "B".concat(parseInt(y) + 1);
-        var value = this.el.getValueFromCoords(1, y);
-        // console.log("value-----", value);
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-        }
-
-        //Country Planning Unit
-        var col = "C".concat(parseInt(y) + 1);
-        var value = this.el.getValueFromCoords(2, y);
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-        }
-
-        //Sku Code
-        var col = "D".concat(parseInt(y) + 1);
-        var value = this.el.getValueFromCoords(3, y);
-        var reg = /^[a-zA-Z0-9\b]+$/;
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          // if (!(reg.test(value))) {
-          //     this.el.setStyle(col, "background-color", "transparent");
-          //     this.el.setStyle(col, "background-color", "yellow");
-          //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
-          // } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-          // }
-        }
-
-        // Unit
-        var col = "E".concat(parseInt(y) + 1);
-        var value = this.el.getValueFromCoords(4, y);
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-        }
-
-        //Multiplier
-        // var col = ("F").concat(parseInt(y) + 1);
-        // var value = this.el.getValueFromCoords(5, y);
-        // // var reg = /^[0-9\b]+$/;
-        // var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
-        // // // console.log("---------VAL----------", value);
-        // if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-        //     this.el.setStyle(col, "background-color", "transparent");
-        //     this.el.setStyle(col, "background-color", "yellow");
-        //     valid = false;
-        //     if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-        //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-        //     }
-        //     else {
-        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-        //     }
-        // } else {
-        //     this.el.setStyle(col, "background-color", "transparent");
-        //     this.el.setComments(col, "");
-        // }
-
+        valid = checkValidation(this.el);
+        if(!valid){
+          this.setState({
+                  message: i18n.t('static.supplyPlan.validationFailed'),
+                  color: 'red'
+              },
+              () => {
+                  this.hideSecondComponent();
+              })
+      }
         var col = "F".concat(parseInt(y) + 1);
         // var value = this.el.getValueFromCoords(5, y);
         var value = this.el
           .getValue(`F${parseInt(y) + 1}`, true)
           .toString()
           .replaceAll(",", "");
-        var reg = JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER;
-        if (value == "") {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-          valid = false;
-        } else {
-          if (!reg.test(value)) {
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
-            this.el.setComments(col, i18n.t("static.message.invalidnumber"));
-            valid = false;
-          } else {
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setComments(col, "");
-          }
-        }
+
       }
     }
     return valid;
@@ -581,132 +482,9 @@ export default class RealmCountryPlanningUnitList extends Component {
 
   // -----------start of changed function
   changed = function (instance, cell, x, y, value) {
-    //Country
-    if (x == 0) {
-      var col = "A".concat(parseInt(y) + 1);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-        // this.el.setValueFromCoords(2, y, value, true);
-        // var text = this.el.getValueFromCoords(1, y);
-        // var text = this.el.getValue(`B${parseInt(y) + 1}`, true)
-        // // console.log("TEXT-------->", text);
-        // this.el.setVaslueFromCoords(2, y, text, true);
-      }
-    }
 
-    //Planning Unit
-    if (x == 1) {
-      var col = "B".concat(parseInt(y) + 1);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-        // this.el.setValueFromCoords(2, y, value, true);
-        // var text = this.el.getValueFromCoords(1, y);
-        var text = this.el.getValue(`B${parseInt(y) + 1}`, true);
-        // console.log("TEXT-------->", text);
-        // this.el.setVaslueFromCoords(2, y, text, true);
-      }
-    }
-
-    //Country sku code
-    if (x == 2) {
-      var col = "C".concat(parseInt(y) + 1);
-      // var value = this.el.getValueFromCoords(2, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-    }
-
-    //Sku code
-    if (x == 3) {
-      // console.log("-----------------3--------------------");
-      var col = "D".concat(parseInt(y) + 1);
-      // var value = this.el.getValueFromCoords(3, y);
-      // var reg = /^[a-zA-Z0-9\b]+$/;
-      if (value == "") {
-        // console.log("-----------------blank--------------------");
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        // console.log("-----------------3--------------------");
-        // if (!(reg.test(value))) {
-        //     this.el.setStyle(col, "background-color", "transparent");
-        //     this.el.setStyle(col, "background-color", "yellow");
-        //     this.el.setComments(col, i18n.t('static.message.skucodevalid'));
-        // } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-        // }
-      }
-    }
-
-    //Unit
-    if (x == 4) {
-      var col = "E".concat(parseInt(y) + 1);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-    }
-
-    //Multiplier
-    // if (x == 5) {
-    //     var col = ("F").concat(parseInt(y) + 1);
-    //     var reg = /^[0-9\b]+$/;
-    //     if (value == "" || isNaN(parseInt(value)) || !(reg.test(value))) {
-    //         this.el.setStyle(col, "background-color", "transparent");
-    //         this.el.setStyle(col, "background-color", "yellow");
-    //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-    //     }
-    //     else {
-    //         this.el.setStyle(col, "background-color", "transparent");
-    //         this.el.setComments(col, "");
-    //     }
-    // }
-
-    if (x == 5) {
-      var col = "F".concat(parseInt(y) + 1);
-      value = this.el
-        .getValue(`F${parseInt(y) + 1}`, true)
-        .toString()
-        .replaceAll(",", "");
-      // var reg = /^[0-9\b]+$/;
-      var reg = JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER;
-      if (this.el.getValueFromCoords(x, y) != "") {
-        if (!reg.test(value)) {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setStyle(col, "background-color", "yellow");
-          this.el.setComments(col, i18n.t("static.message.invalidnumber"));
-        } else {
-          this.el.setStyle(col, "background-color", "transparent");
-          this.el.setComments(col, "");
-        }
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      }
-    }
-
+    changed(instance, cell, x, y, value)
+    
     //Active
     if (x != 9) {
       this.el.setValueFromCoords(9, y, 1, true);
@@ -847,24 +625,29 @@ export default class RealmCountryPlanningUnitList extends Component {
           // readOnly: true
           type: "autocomplete",
           source: realmCountryArr,
+          required: true
         },
         {
           title: i18n.t("static.planningunit.planningunit"),
           type: "autocomplete",
           source: planningUnitArr,
+          required: true
         },
         {
           title: i18n.t("static.planningunit.countrysku"),
           type: "text",
+          required: true
         },
         {
           title: i18n.t("static.procurementAgentProcurementUnit.skuCode"),
           type: "text",
+          required: true
         },
         {
           title: i18n.t("static.unit.unit"),
           type: "autocomplete",
           source: unitArr,
+          required: true
         },
         {
           title: i18n.t("static.unit.multiplierFromARUTOPU"),
@@ -873,6 +656,11 @@ export default class RealmCountryPlanningUnitList extends Component {
           decimal: ".",
           mask: "#,##0.000000",
           disabledMaskOnEdition: true,
+          required: true,
+          regex: {
+            ex: JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER,
+            text: i18n.t("static.message.invalidnumber")
+          }
         },
 
         {

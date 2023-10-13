@@ -11,7 +11,7 @@ import i18n from '../../i18n'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { changed, checkValidation, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -801,7 +801,12 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
                     type: 'autocomplete',
                     source: this.state.equivalancyUnitList,
-                    filter: this.filterEquivalancyUnit
+                    filter: this.filterEquivalancyUnit,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
                 },
                 {
                     title: i18n.t('static.program.healtharea'),
@@ -815,14 +820,23 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     source: this.state.tracerCategoryList,
-                    filter: this.filterTracerCategoryList
-
+                    filter: this.filterTracerCategoryList,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
                 },
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
                     source: this.state.forecastingUnitList,
-                    filter: this.filterForecastingUnitBasedOnTracerCategory
+                    filter: this.filterForecastingUnitBasedOnTracerCategory,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
                 },
 
                 {
@@ -838,7 +852,13 @@ class EquivalancyUnit extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    required: true,
+                    number: true,
+                    regex: {
+                        ex: /^\d{1,14}(\.\d{1,4})?$/,
+                        text: i18n.t("static.usagePeriod.conversionTOFUTest")
+                    }
                 },
                 {
                     title: i18n.t('static.common.notes'),
@@ -852,7 +872,12 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.dataSource.program'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    filter: this.filterDataset
+                    filter: this.filterDataset,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -2490,206 +2515,35 @@ class EquivalancyUnit extends Component {
     changed = function (instance, cell, x, y, value) {
 
         var elInstance = this.state.table1Instance;
-        // console.log("LOG---------->1", elInstance);
+        changed(elInstance, cell, x, y, value)
 
         //Equivalancy Unit
         if (x == 1) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
-            elInstance.setValueFromCoords(8, y, '', true);
-            // let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
-            // if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
-            //     let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
-            //     let healthAreaId = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id)[0].id;
-            //     elInstance.setValueFromCoords(2, y, healthAreaId, true);//calculate
-            // } else {
-            //     elInstance.setValueFromCoords(2, y, '', true);
-            // }
-
-
             let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
             if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
                 let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
-                // console.log("selectedEqObj--------->", selectedEqObj);
                 let healthAreaList = selectedEqObj.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
                 elInstance.setValueFromCoords(2, y, healthAreaList, true);//calculate
             } else {
                 elInstance.setValueFromCoords(2, y, '', true);
             }
 
-            // elInstance.setValueFromCoords(2, y, '', true);
             elInstance.setValueFromCoords(3, y, '', true);
             elInstance.setValueFromCoords(4, y, '', true);
             elInstance.setValueFromCoords(5, y, '', true);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
         }
 
-
-        //HealthArea
-        // if (x == 2) {
-        //     // console.log("LOG---------->2", value);
-        //     var budgetRegx = /^\S+(?: \S+)*$/;
-        //     var col = ("C").concat(parseInt(y) + 1);
-        //     elInstance.setValueFromCoords(3, y, '', true);
-        //     elInstance.setValueFromCoords(4, y, '', true);
-        //     elInstance.setValueFromCoords(5, y, '', true);
-        //     if (value == "") {
-        //         elInstance.setStyle(col, "background-color", "transparent");
-        //         elInstance.setStyle(col, "background-color", "yellow");
-        //         elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-        //     } else {
-        //         if (!(budgetRegx.test(value))) {
-        //             elInstance.setStyle(col, "background-color", "transparent");
-        //             elInstance.setStyle(col, "background-color", "yellow");
-        //             elInstance.setComments(col, i18n.t('static.message.spacetext'));
-        //         } else {
-        //             elInstance.setStyle(col, "background-color", "transparent");
-        //             elInstance.setComments(col, "");
-        //         }
-        //     }
-        // }
-
-
         //Tracer Category
-        if (x == 3) {
-            // console.log("LOG---------->3", value);
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
+        else if (x == 3) {
             elInstance.setValueFromCoords(4, y, '', true);
             elInstance.setValueFromCoords(5, y, '', true);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
         }
 
         //Forecasting Unit
-        if (x == 4) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-
-                    let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
-                    // console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
-                    if (obj != undefined && obj != null) {
-                        this.el.setValueFromCoords(5, y, obj.unit.id, true);
-                    }
-                }
-            }
-
-        }
-
-        //conversion To FU 14,4
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == '' || value == null) {
-                value = elInstance.getValueFromCoords(6, y);
-            }
-            var reg = /^\d{1,14}(\.\d{1,4})?$/;
-            if (value != "") {
-                if (isNaN(parseInt(value))) {//string value check
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, 'String value not allowed')
-                }
-                // else if (!Number.isInteger(Number(value))) {//decimal value check
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, 'Decimal value not allowed')
-                // } 
-                else if (!(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-
-            }
-            //// var reg = DECIMAL_NO_REGEX;
-            // var reg = /^\d{1,14}(\.\d{1,4})?$/;
-            // if (value == "") {
-            //     elInstance.setStyle(col, "background-color", "transparent");
-            //     elInstance.setStyle(col, "background-color", "yellow");
-            //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            // } else {
-            //     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-            //     if (!(reg.test(value))) {
-            //         elInstance.setStyle(col, "background-color", "transparent");
-            //         elInstance.setStyle(col, "background-color", "yellow");
-            //         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
-            //     } else {
-            //         if (isNaN(Number.parseInt(value)) || value <= 0) {
-            //             elInstance.setStyle(col, "background-color", "transparent");
-            //             elInstance.setStyle(col, "background-color", "yellow");
-            //             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
-            //         } else {
-            //             elInstance.setStyle(col, "background-color", "transparent");
-            //             elInstance.setComments(col, "");
-            //         }
-
-            //     }
-
-            // }
-        }
-
-        //Type
-        if (x == 8) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("I").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
+        else if (x == 4) {
+            let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
+            if (obj != undefined && obj != null) {
+                this.el.setValueFromCoords(5, y, obj.unit.id, true);
             }
         }
 
@@ -2800,215 +2654,19 @@ class EquivalancyUnit extends Component {
         var valid = true;
         var elInstance = this.state.table1Instance;
         var json = elInstance.getJson(null, false);
-        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = elInstance.getValueFromCoords(12, y);
             if (parseInt(value) == 1) {
-
-                //Equivalancy Unit
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(1, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                valid = checkValidation(elInstance);
+                if(!valid){
                     this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                //HealthArea
-                // var col = ("C").concat(parseInt(y) + 1);
-                // var value = elInstance.getValueFromCoords(2, y);
-                // if (value == "") {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                //     valid = false;
-                // } else {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setComments(col, "");
-                // }
-
-                //TracerCategory
-                var col = ("D").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(3, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-
-                //ForecastingUnit
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-
-                //conversion to FU decimal 14,4
-                // var col = ("G").concat(parseInt(y) + 1);
-                // var value = elInstance.getValueFromCoords(6, y);
-                // var reg = /^\d{1,14}(\.\d{1,4})?$/;
-                // if (value == "") {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                //     valid = false;
-                //     this.setState({
-                //         message: i18n.t('static.supplyPlan.validationFailed'),
-                //         color: 'red'
-                //     },
-                //         () => {
-                //             this.hideSecondComponent();
-                //         })
-                // } else {
-                //     if (!(reg.test(value))) {
-                //         elInstance.setStyle(col, "background-color", "transparent");
-                //         elInstance.setStyle(col, "background-color", "yellow");
-                //         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
-                //         valid = false;
-                //         this.setState({
-                //             message: i18n.t('static.supplyPlan.validationFailed'),
-                //             color: 'red'
-                //         },
-                //             () => {
-                //                 this.hideSecondComponent();
-                //             })
-                //     } else {
-                //         if (isNaN(Number.parseInt(value)) || value <= 0) {
-                //             elInstance.setStyle(col, "background-color", "transparent");
-                //             elInstance.setStyle(col, "background-color", "yellow");
-                //             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
-                //             valid = false;
-                //             this.setState({
-                //                 message: i18n.t('static.supplyPlan.validationFailed'),
-                //                 color: 'red'
-                //             },
-                //                 () => {
-                //                     this.hideSecondComponent();
-                //                 })
-                //         } else {
-                //             elInstance.setStyle(col, "background-color", "transparent");
-                //             elInstance.setComments(col, "");
-                //         }
-                //     }
-                // }
-
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value == '' || value == null) {
-                    value = elInstance.getValueFromCoords(6, y);
-                }
-                // var value = elInstance.getValueFromCoords(5, y);
-                var reg = /^\d{1,14}(\.\d{1,4})?$/;
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    if (isNaN(parseInt(value))) {//string value check
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, 'String value not allowed');
-                        valid = false;
-                        this.setState({
                             message: i18n.t('static.supplyPlan.validationFailed'),
                             color: 'red'
                         },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    }
-                    // else if (!Number.isInteger(Number(value))) {//decimal value check
-                    //     this.el.setStyle(col, "background-color", "transparent");
-                    //     this.el.setStyle(col, "background-color", "yellow");
-                    //     this.el.setComments(col, 'Decimal value not allowed');
-                    //     valid = false;
-                    // }
-                    else if (!(reg.test(value))) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
-                        valid = false;
-                        this.setState({
-                            message: i18n.t('static.supplyPlan.validationFailed'),
-                            color: 'red'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                }
-
-
-                //Type
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(8, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
                         () => {
                             this.hideSecondComponent();
                         })
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
                 }
-
-
-
             }
         }
         return valid;
