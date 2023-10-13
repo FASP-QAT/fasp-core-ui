@@ -1,6 +1,5 @@
-import axios from "axios"
-import { API_URL } from '../Constants.js'
-
+import axios from "axios";
+import { API_URL } from '../Constants.js';
 class DatasetService {
     getDatasetList() {
         return axios.get(`${API_URL}/api/dataset/`, {
@@ -33,7 +32,6 @@ class DatasetService {
         return axios.get(`${API_URL}/api/nodeType`, {
         });
     }
-
     getUsageTypeList() {
         return axios.get(`${API_URL}/api/usageType`, {
         });
@@ -50,11 +48,9 @@ class DatasetService {
         return axios.put(`${API_URL}/api/datasetData/${comparedVersionId}`, json, {}
         );
     }
-
-    getDatasetData(programId,versionId) {
+    getDatasetData(programId, versionId) {
         return axios.get(`${API_URL}/api/datasetData/programId/${programId}/versionId/${versionId}`, {
         });
     }
-
 }
 export default new DatasetService()

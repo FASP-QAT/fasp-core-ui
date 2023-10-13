@@ -1,14 +1,11 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import ForecastingUnitService from '../../api/ForecastingUnitService';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL, SPACE_REGEX } from '../../Constants.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.planningunit.planningunit');
 let initialValues = {
     label: '',
@@ -16,21 +13,17 @@ let initialValues = {
     forecastingUnitList: [],
     multiplier: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.planningUnit.plannignUnitName')),
         multiplier: Yup.string()
             .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
-            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningUnit.multiplier'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -42,7 +35,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -53,11 +45,9 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 export default class EditPlanningUnitComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
-
             planningUnit: {
                 message: '',
                 active: '',
@@ -82,9 +72,7 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             },
             loading: true
-
         }
-
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -92,25 +80,20 @@ export default class EditPlanningUnitComponent extends Component {
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
-
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     dataChange(event) {
         let { planningUnit } = this.state
-
         if (event.target.name === "label") {
             planningUnit.label.label_en = event.target.value
         }
@@ -125,14 +108,12 @@ export default class EditPlanningUnitComponent extends Component {
         } if (event.target.name === "active") {
             planningUnit.active = event.target.id === "active2" ? false : true
         }
-
         this.setState(
             {
                 planningUnit
             }
         )
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             'label': true,
@@ -156,27 +137,22 @@ export default class EditPlanningUnitComponent extends Component {
             }
         }
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { planningUnit } = this.state
             planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
-
     }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     componentWillMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
                     planningUnit: response.data, loading: false
                 });
             } else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -184,19 +160,15 @@ export default class EditPlanningUnitComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -227,10 +199,8 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             }
         );
-
     }
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -238,9 +208,6 @@ export default class EditPlanningUnitComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -253,8 +220,6 @@ export default class EditPlanningUnitComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log(JSON.stringify(this.state.planningUnit))
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -271,13 +236,11 @@ export default class EditPlanningUnitComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -308,7 +271,6 @@ export default class EditPlanningUnitComponent extends Component {
                                                 }
                                             }
                                         );
-
                                 }}
                                 render={
                                     ({
@@ -326,7 +288,6 @@ export default class EditPlanningUnitComponent extends Component {
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="forecastingUnitId">{i18n.t('static.planningUnit.associatedForecastingUnit')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         type="text"
                                                         name="forecastingUnitId"
@@ -344,7 +305,6 @@ export default class EditPlanningUnitComponent extends Component {
                                                         id="multiplier"
                                                         bsSize="sm"
                                                         valid={!errors.multiplier}
-                                                        // invalid={touched.multiplier && !!errors.multiplier || this.state.planningUnit.multiplier == ''}
                                                         invalid={(touched.multiplier && !!errors.multiplier) || !!errors.multiplier}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
@@ -353,40 +313,22 @@ export default class EditPlanningUnitComponent extends Component {
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                        <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            // invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.planningUnit.label.label_en}
-                                                            required
-                                                        >
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    {/* <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            id="active2"
-                                                            name="active"
-                                                            value={false}
-                                                            checked={this.state.planningUnit.active === false}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2">
-                                                            {i18n.t('static.common.disabled')}
-                                                        </Label>
-                                                    </FormGroup> */}
+                                                    <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.planningUnit.label.label_en}
+                                                        required
+                                                    >
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
@@ -430,9 +372,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -446,40 +386,29 @@ export default class EditPlanningUnitComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
-                    {/* <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6> */}
                 </div>
             </div>
         );
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             this.setState({
                 planningUnit: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -510,7 +439,5 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             }
         );
-
     }
-
 }

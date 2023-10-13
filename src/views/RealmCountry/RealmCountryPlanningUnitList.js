@@ -1,29 +1,16 @@
+import jexcel from "jspreadsheet";
 import React, { Component } from "react";
-import BootstrapTable from "react-bootstrap-table-next";
-import filterFactory from "react-bootstrap-table2-filter";
-import paginationFactory from "react-bootstrap-table2-paginator";
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
+import { Search } from "react-bootstrap-table2-toolkit";
+import { MultiSelect } from "react-multi-select-component";
 import {
   Button,
   Card,
-  CardFooter,
   CardBody,
-  CardHeader,
-  Col,
-  FormGroup,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  Label,
+  CardFooter,
   Form,
+  FormGroup,
+  Label
 } from "reactstrap";
-import getLabelText from "../../CommonComponent/getLabelText";
-import i18n from "../../i18n";
-import AuthenticationService from "../Common/AuthenticationService.js";
-import RealmCountryService from "../../api/RealmCountryService";
-import PlanningUnitService from "../../api/PlanningUnitService";
-import UnitService from "../../api/UnitService";
-import jexcel from "jspreadsheet";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
@@ -32,25 +19,21 @@ import {
   jExcelLoadedFunction,
   jExcelLoadedFunctionOnlyHideRow,
 } from "../../CommonComponent/JExcelCommonFunctions.js";
-import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import moment from "moment";
-import ProgramService from "../../api/ProgramService";
-import { MultiSelect } from "react-multi-select-component";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import CryptoJS from "crypto-js";
+import getLabelText from "../../CommonComponent/getLabelText";
 import {
-  SECRET_KEY,
-  INDEXED_DB_NAME,
-  INDEXED_DB_VERSION,
-  DATE_FORMAT_CAP,
-  JEXCEL_PAGINATION_OPTION,
-  JEXCEL_DECIMAL_NO_REGEX,
-  JEXCEL_PRO_KEY,
-  JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER,
   API_URL,
-  PROGRAM_TYPE_SUPPLY_PLAN,
+  JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER,
+  JEXCEL_PAGINATION_OPTION,
+  JEXCEL_PRO_KEY,
+  PROGRAM_TYPE_SUPPLY_PLAN
 } from "../../Constants";
 import DropdownService from "../../api/DropdownService";
+import PlanningUnitService from "../../api/PlanningUnitService";
+import RealmCountryService from "../../api/RealmCountryService";
+import UnitService from "../../api/UnitService";
+import i18n from "../../i18n";
+import AuthenticationService from "../Common/AuthenticationService.js";
+import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const entityname = i18n.t("static.dashboad.planningunitcountry");
 export default class RealmCountryPlanningUnitList extends Component {
   constructor(props) {
@@ -113,7 +96,6 @@ export default class RealmCountryPlanningUnitList extends Component {
     this.buildJexcel = this.buildJexcel.bind(this);
     this.addNewEntity = this.addNewEntity.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
-
     this.cancelClicked = this.cancelClicked.bind(this);
     this.addRow = this.addRow.bind(this);
     this.formSubmit = this.formSubmit.bind(this);
@@ -125,86 +107,56 @@ export default class RealmCountryPlanningUnitList extends Component {
     this.handleChangeProgram = this.handleChangeProgram.bind(this);
     this.oneditionend = this.oneditionend.bind(this);
   }
-
   cancelClicked() {
-    // this.props.history.push(`/realmCountry/listRealmCountryPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(
       `/ApplicationDashboard/` +
-        `${id}` +
-        "/red/" +
-        i18n.t("static.message.cancelled", { entityname })
+      `${id}` +
+      "/red/" +
+      i18n.t("static.message.cancelled", { entityname })
     );
   }
-
   hideSecondComponent() {
     document.getElementById("div2").style.display = "block";
     setTimeout(function () {
       document.getElementById("div2").style.display = "none";
     }, 30000);
   }
-
   addRow = function () {
-    // var json = this.el.getJson(null, false);
-    // var data = [];
-    // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-    // data[1] = "";
-    // data[2] = "";
-    // data[3] = "";
-    // data[4] = "";
-    // data[5] = "";
-    // data[6] = true;
-    // data[7] = document.getElementById("realmCountryId").value;
-    // data[8] = 0;
-    // data[9] = 1;
-
-    // this.el.insertRow(
-    //     data, 0, 1
-    // );
-
     var json = this.el.getJson(null, false);
     var data = [];
-    data[0] = ""; //c
+    data[0] = "";
     data[1] = "";
     data[2] = "";
     data[3] = "";
     data[4] = "";
     data[5] = "";
     data[6] = true;
-    data[7] = ""; //c
+    data[7] = "";
     data[8] = 0;
     data[9] = 1;
     data[10] = "";
-
     this.el.insertRow(data, 0, 1);
   };
-
   oneditionend = function (instance, cell, x, y, value) {
     var elInstance = instance;
     var rowData = elInstance.getRowData(y);
-
     if (
       x == 5 &&
       !isNaN(rowData[5]) &&
       rowData[5].toString().indexOf(".") != -1
     ) {
-      // console.log("RESP---------", parseFloat(rowData[5]));
       elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
     }
     this.el.setValueFromCoords(9, y, 1, true);
   };
-
   onPaste(instance, data) {
     var z = -1;
     for (var i = 0; i < data.length; i++) {
       if (z != data[i].y) {
         var index = instance.getValue(`I${parseInt(data[i].y) + 1}`, true);
         if (index === "" || index == null || index == undefined) {
-          // (instance).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-          // (instance).setValueFromCoords(0, data[i].y, '', true);
           instance.setValueFromCoords(6, data[i].y, true, true);
-          // (instance).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
-          // (instance).setValueFromCoords(7, data[i].y, '', true);
           instance.setValueFromCoords(8, data[i].y, 0, true);
           instance.setValueFromCoords(9, data[i].y, 1, true);
           z = data[i].y;
@@ -212,7 +164,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       }
     }
   }
-
   handleChangeProgram(programId) {
     programId = programId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -224,21 +175,17 @@ export default class RealmCountryPlanningUnitList extends Component {
         loading: true,
       },
       () => {
-        // console.log("VALUE--------->", this.state.programValues);
         this.filterData();
       }
     );
   }
-
   formSubmit = function () {
-    // var duplicateValidation = this.checkDuplicatePlanningUnit();
     var validation = this.checkValidation();
     if (validation == true) {
       this.setState({
         loading: true,
       });
       var tableJson = this.el.getJson(null, false);
-      // console.log("tableJson---", tableJson);
       let changedpapuList = [];
       var isMultiplierChanged = 0;
       for (var i = 0; i < tableJson.length; i++) {
@@ -251,7 +198,6 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (value != oldValue && map1.get("8") > 0) {
           isMultiplierChanged = 1;
         }
-        // console.log("9 map---" + map1.get("9"));
         if (parseInt(map1.get("9")) === 1) {
           let json = {
             planningUnit: {
@@ -264,7 +210,6 @@ export default class RealmCountryPlanningUnitList extends Component {
             unit: {
               unitId: parseInt(map1.get("4")),
             },
-            // multiplier: map1.get("5"),
             multiplier: this.el
               .getValue(`F${parseInt(i) + 1}`, true)
               .toString()
@@ -289,12 +234,9 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
       }
       if (submitChanges) {
-        // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         RealmCountryService.editPlanningUnitCountry(changedpapuList)
           .then((response) => {
-            // console.log(response.data);
             if (response.status == "200") {
-              // console.log(response);
               this.filterData();
               this.setState(
                 {
@@ -306,7 +248,6 @@ export default class RealmCountryPlanningUnitList extends Component {
                   this.hideSecondComponent();
                 }
               );
-              // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
             } else {
               this.setState(
                 {
@@ -321,16 +262,14 @@ export default class RealmCountryPlanningUnitList extends Component {
             }
           })
           .catch((error) => {
-            // console.log("Error", error);
             if (error.message === "Network Error") {
               this.setState(
                 {
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   color: "#BA0C2F",
                   loading: false,
                 },
@@ -382,9 +321,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                     },
                     () => {
                       this.hideSecondComponent();
-                      var json=this.el.getJson(null,false);
-                      for(var j=0;j<json.length;j++){
-                        if(json[j][9]==1 && json[j][6].toString()=="false" && json[j][10]==1){
+                      var json = this.el.getJson(null, false);
+                      for (var j = 0; j < json.length; j++) {
+                        if (json[j][9] == 1 && json[j][6].toString() == "false" && json[j][10] == 1) {
                           var col = "G".concat(parseInt(j) + 1);
                           this.el.setStyle(col, "background-color", "transparent");
                           this.el.setStyle(col, "background-color", "yellow");
@@ -415,17 +354,12 @@ export default class RealmCountryPlanningUnitList extends Component {
         });
       }
     } else {
-      // console.log("Something went wrong");
     }
   };
-
   checkDuplicatePlanningUnit = function () {
     var tableJson = this.el.getJson(null, false);
     let count = 0;
-
     let tempArray = tableJson;
-    // console.log("hasDuplicate------", tempArray);
-
     var hasDuplicate = false;
     tempArray
       .map((v) => parseInt(v[Object.keys(v)[1]]))
@@ -433,7 +367,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       .sort((a, b) => {
         if (a === b) hasDuplicate = true;
       });
-    // console.log("hasDuplicate", hasDuplicate);
     if (hasDuplicate) {
       this.setState(
         {
@@ -450,11 +383,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       return true;
     }
   };
-
   checkValidation = function () {
     var valid = true;
     var json = this.el.getJson(null, false);
-    // console.log("json.length-------", json.length);
     for (var y = 0; y < json.length; y++) {
       var value = this.el.getValueFromCoords(9, y);
       if (parseInt(value) == 1) {
@@ -469,7 +400,6 @@ export default class RealmCountryPlanningUnitList extends Component {
               })
       }
         var col = "F".concat(parseInt(y) + 1);
-        // var value = this.el.getValueFromCoords(5, y);
         var value = this.el
           .getValue(`F${parseInt(y) + 1}`, true)
           .toString()
@@ -479,8 +409,6 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
     return valid;
   };
-
-  // -----------start of changed function
   changed = function (instance, cell, x, y, value) {
 
     changed(instance, cell, x, y, value)
@@ -490,8 +418,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       this.el.setValueFromCoords(9, y, 1, true);
     }
   }.bind(this);
-  // -----end of changed function
-
   addNewEntity() {
     let realmCountryId = document.getElementById("realmCountryId").value;
     if (realmCountryId != 0) {
@@ -500,16 +426,13 @@ export default class RealmCountryPlanningUnitList extends Component {
       });
     }
   }
-
   buildJexcel() {
     const { planningUnits } = this.state;
     const { units } = this.state;
     const { realmCountrys } = this.state;
-
     let planningUnitArr = [];
     let unitArr = [];
     let realmCountryArr = [];
-
     if (realmCountrys.length > 0) {
       for (var i = 0; i < realmCountrys.length; i++) {
         var paJson = {
@@ -519,7 +442,6 @@ export default class RealmCountryPlanningUnitList extends Component {
         realmCountryArr[i] = paJson;
       }
     }
-
     if (planningUnits.length > 0) {
       for (var i = 0; i < planningUnits.length; i++) {
         var paJson = {
@@ -541,29 +463,12 @@ export default class RealmCountryPlanningUnitList extends Component {
         unitArr[i] = paJson;
       }
     }
-
-    // Jexcel starts
     var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
-
     var count = 0;
     if (papuList.length != 0) {
       for (var j = 0; j < papuList.length; j++) {
-        // data = [];
-        // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-        // data[1] = parseInt(papuList[j].planningUnit.id);
-        // data[2] = papuList[j].label.label_en;
-        // data[3] = papuList[j].skuCode;
-        // data[4] = parseInt(papuList[j].unit.unitId);
-        // data[5] = papuList[j].multiplier;
-        // data[6] = papuList[j].active;
-        // data[7] = papuList[j].realmCountry.id;
-        // data[8] = papuList[j].realmCountryPlanningUnitId;
-        // data[9] = 0;
-        // papuDataArr[count] = data;
-        // count++;
-
         data = [];
         data[0] = parseInt(papuList[j].realmCountry.id);
         data[1] = parseInt(papuList[j].planningUnit.id);
@@ -581,36 +486,21 @@ export default class RealmCountryPlanningUnitList extends Component {
       }
     }
     if (papuDataArr.length == 0) {
-      // data = [];
-      // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-      // data[1] = "";
-      // data[2] = "";
-      // data[3] = "";
-      // data[4] = "";
-      // data[5] = "";
-      // data[6] = true;
-      // data[7] = realmCountryId;
-      // data[8] = 0;
-      // data[9] = 1;
-      // papuDataArr[0] = data;
-
       data = [];
-      data[0] = ""; //c
+      data[0] = "";
       data[1] = "";
       data[2] = "";
       data[3] = "";
       data[4] = "";
       data[5] = "";
       data[6] = true;
-      data[7] = ""; //c
+      data[7] = "";
       data[8] = 0;
       data[9] = 1;
       data[10] = "";
       papuDataArr[0] = data;
     }
-
     this.el = jexcel(document.getElementById("tableDiv"), "");
-    // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = papuDataArr;
@@ -621,8 +511,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       columns: [
         {
           title: i18n.t("static.dashboard.realmcountry"),
-          // type: 'text',
-          // readOnly: true
           type: "autocomplete",
           source: realmCountryArr,
           required: true
@@ -662,7 +550,6 @@ export default class RealmCountryPlanningUnitList extends Component {
             text: i18n.t("static.message.invalidnumber")
           }
         },
-
         {
           title: i18n.t("static.checkbox.active"),
           type: "checkbox",
@@ -705,16 +592,13 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
       },
       onsearch: function (el) {
-        // el.jexcel.updateTable();
       },
       onfilter: function (el) {
-        // el.jexcel.updateTable();
       },
       pagination: localStorage.getItem("sesRecordCount"),
       filters: true,
       search: true,
       columnSorting: true,
-      // tableOverflow: true,
       wordWrap: true,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
@@ -724,28 +608,18 @@ export default class RealmCountryPlanningUnitList extends Component {
       onchange: this.changed,
       onblur: this.blur,
       onfocus: this.focus,
-      // oneditionend: this.onedit,
       copyCompatibility: true,
       allowManualInsertRow: false,
       parseFormulas: true,
       onpaste: this.onPaste,
       oneditionend: this.oneditionend,
-      // text: {
-      //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-      //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //     show: '',
-      //     entries: '',
-      // },
       filters: true,
       license: JEXCEL_PRO_KEY,
       onload: this.loaded,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         var items = [];
-        //Add consumption batch info
-
         if (y == null) {
-          // Insert a new column
           if (obj.options.allowInsertColumn == true) {
             items.push({
               title: obj.options.text.insertANewColumnBefore,
@@ -754,7 +628,6 @@ export default class RealmCountryPlanningUnitList extends Component {
               },
             });
           }
-
           if (obj.options.allowInsertColumn == true) {
             items.push({
               title: obj.options.text.insertANewColumnAfter,
@@ -763,32 +636,8 @@ export default class RealmCountryPlanningUnitList extends Component {
               },
             });
           }
-
-          // Delete a column
-          // if (obj.options.allowDeleteColumn == true) {
-          //     items.push({
-          //         title: obj.options.text.deleteSelectedColumns,
-          //         onclick: function () {
-          //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-          //         }
-          //     });
-          // }
-
-          // Rename column
-          // if (obj.options.allowRenameColumn == true) {
-          //     items.push({
-          //         title: obj.options.text.renameThisColumn,
-          //         onclick: function () {
-          //             obj.setHeader(x);
-          //         }
-          //     });
-          // }
-
-          // Sorting
           if (obj.options.columnSorting == true) {
-            // Line
             items.push({ type: "line" });
-
             items.push({
               title: obj.options.text.orderAscending,
               onclick: function () {
@@ -803,33 +652,19 @@ export default class RealmCountryPlanningUnitList extends Component {
             });
           }
         } else {
-          // Insert new row before
           if (obj.options.allowInsertRow == true) {
             items.push({
               title: i18n.t("static.common.insertNewRowBefore"),
               onclick: function () {
-                // var data = [];
-                // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-                // data[1] = "";
-                // data[2] = "";
-                // data[3] = "";
-                // data[4] = "";
-                // data[5] = "";
-                // data[6] = true;
-                // data[7] = realmCountryId;
-                // data[8] = 0;
-                // data[9] = 1;
-                // obj.insertRow(data, parseInt(y), 1);
-
                 var data = [];
-                data[0] = ""; //c
+                data[0] = "";
                 data[1] = "";
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
                 data[6] = true;
-                data[7] = ""; //c
+                data[7] = "";
                 data[8] = 0;
                 data[9] = 1;
                 data[10] = "";
@@ -837,33 +672,19 @@ export default class RealmCountryPlanningUnitList extends Component {
               }.bind(this),
             });
           }
-          // after
           if (obj.options.allowInsertRow == true) {
             items.push({
               title: i18n.t("static.common.insertNewRowAfter"),
               onclick: function () {
-                // var data = [];
-                // data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
-                // data[1] = "";
-                // data[2] = "";
-                // data[3] = "";
-                // data[4] = "";
-                // data[5] = "";
-                // data[6] = true;
-                // data[7] = realmCountryId;
-                // data[8] = 0;
-                // data[9] = 1;
-                // obj.insertRow(data, parseInt(y));
-
                 var data = [];
-                data[0] = ""; //c
+                data[0] = "";
                 data[1] = "";
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
                 data[6] = true;
-                data[7] = ""; //c
+                data[7] = "";
                 data[8] = 0;
                 data[9] = 1;
                 data[10] = "";
@@ -871,9 +692,7 @@ export default class RealmCountryPlanningUnitList extends Component {
               }.bind(this),
             });
           }
-          // Delete a row
           if (obj.options.allowDeleteRow == true) {
-            // region id
             if (obj.getRowData(y)[8] == 0) {
               items.push({
                 title: i18n.t("static.common.deleterow"),
@@ -883,71 +702,32 @@ export default class RealmCountryPlanningUnitList extends Component {
               });
             }
           }
-
           if (x) {
-            // if (obj.options.allowComments == true) {
-            //     items.push({ type: 'line' });
-            //     var title = obj.records[y][x].getAttribute('title') || '';
-            //     items.push({
-            //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-            //         onclick: function () {
-            //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-            //         }
-            //     });
-            //     if (title) {
-            //         items.push({
-            //             title: obj.options.text.clearComments,
-            //             onclick: function () {
-            //                 obj.setComments([x, y], '');
-            //             }
-            //         });
-            //     }
-            // }
           }
         }
-
-        // Line
         items.push({ type: "line" });
-
-        // // Save
-        // if (obj.options.allowExport) {
-        //     items.push({
-        //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-        //         shortcut: 'Ctrl + S',
-        //         onclick: function () {
-        //             obj.download(true);
-        //         }
-        //     });
-        // }
-
         return items;
       }.bind(this),
     };
-
     this.el = jexcel(document.getElementById("tableDiv"), options);
     this.setState({
       loading: false,
     });
   }
-
   filterOptions = async (options, filter) => {
     if (filter) {
-        return options.filter((i) =>
-            i.label.toLowerCase().includes(filter.toLowerCase())
-        );
+      return options.filter((i) =>
+        i.label.toLowerCase().includes(filter.toLowerCase())
+      );
     } else {
-        return options;
+      return options;
     }
-};
-
+  };
   filterData() {
     if (this.state.programValues.length > 0) {
-      // console.log("VALUE--------->IF");
-      // let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
       let programIds = this.state.programValues.map((ele) =>
         ele.value.toString()
       );
-      // console.log("RESP--->", programIds);
       const { programs } = this.state;
       let realmCountryList = [];
       for (var i = 0; i < programIds.length; i++) {
@@ -962,72 +742,63 @@ export default class RealmCountryPlanningUnitList extends Component {
           }
         }
       }
-
       if (realmCountryList.length != 0) {
         realmCountryList.sort((a, b) => {
           var itemLabelA = getLabelText(
             a.country.label,
             this.state.lang
-          ).toUpperCase(); // ignore upper and lowercase
+          ).toUpperCase();
           var itemLabelB = getLabelText(
             b.country.label,
             this.state.lang
-          ).toUpperCase(); // ignore upper and lowercase
+          ).toUpperCase();
           return itemLabelA > itemLabelB ? 1 : -1;
         });
       }
-
-      // console.log("REALM-COUNTRY--->1", realmCountryList);
       const realmCountrys = [
         ...new Map(
           realmCountryList.map((item) => [item.realmCountryId, item])
         ).values(),
       ];
-      // console.log("REALM-COUNTRY--->2", realmCountrys);
-
       RealmCountryService.getRealmCountryPlanningUnitByProgramId(programIds)
         .then((response1) => {
-          // console.log("RESP--->1", response1.data);
           UnitService.getUnitListAll()
             .then((response2) => {
-              // console.log("RESP--->2", response2.data);
-              // PlanningUnitService.getActivePlanningUnitList()
               PlanningUnitService.getPlanningUnitByProgramIds(programIds)
                 .then((response3) => {
-                  // console.log("RESP--->3", response3.data);
                   this.setState(
                     {
                       rows: response1.data.sort((a, b) => {
                         var itemLabelA = getLabelText(
                           a.planningUnit.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         var itemLabelB = getLabelText(
                           b.planningUnit.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       }),
                       units: response2.data.sort((a, b) => {
                         var itemLabelA = getLabelText(
                           a.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         var itemLabelB = getLabelText(
                           b.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       }),
                       planningUnits: response3.data.sort((a, b) => {
                         var itemLabelA = getLabelText(
                           a.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         var itemLabelB = getLabelText(
                           b.label,
                           this.state.lang
-                        ).toUpperCase(); // ignore upper and lowercase
+                        ).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       }),
                       allowAdd: true,
@@ -1042,12 +813,11 @@ export default class RealmCountryPlanningUnitList extends Component {
                   if (error.message === "Network Error") {
                     this.setState(
                       {
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat")
                           ? i18n.t("static.common.uatNetworkErrorMessage")
                           : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                            ? i18n.t("static.common.demoNetworkErrorMessage")
+                            : i18n.t("static.common.prodNetworkErrorMessage"),
                         loading: false,
                       },
                       () => {
@@ -1107,12 +877,11 @@ export default class RealmCountryPlanningUnitList extends Component {
               if (error.message === "Network Error") {
                 this.setState(
                   {
-                    // message: 'static.unkownError',
                     message: API_URL.includes("uat")
                       ? i18n.t("static.common.uatNetworkErrorMessage")
                       : API_URL.includes("demo")
-                      ? i18n.t("static.common.demoNetworkErrorMessage")
-                      : i18n.t("static.common.prodNetworkErrorMessage"),
+                        ? i18n.t("static.common.demoNetworkErrorMessage")
+                        : i18n.t("static.common.prodNetworkErrorMessage"),
                     loading: false,
                   },
                   () => {
@@ -1172,12 +941,11 @@ export default class RealmCountryPlanningUnitList extends Component {
           if (error.message === "Network Error") {
             this.setState(
               {
-                // message: 'static.unkownError',
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
                 loading: false,
               },
               () => {
@@ -1231,7 +999,6 @@ export default class RealmCountryPlanningUnitList extends Component {
           }
         });
     } else {
-      // console.log("VALUE--------->ELSE");
       this.setState(
         {
           allowAdd: false,
@@ -1239,17 +1006,12 @@ export default class RealmCountryPlanningUnitList extends Component {
         },
         () => {
           this.el = jexcel(document.getElementById("tableDiv"), "");
-          // this.el.destroy();
           jexcel.destroy(document.getElementById("tableDiv"), true);
         }
       );
     }
   }
   loaded = function (instance, cell, x, y, value) {
-    // jExcelLoadedFunction(instance);
-    // var asterisk = document.getElementsByClassName("resizable")[0];
-    // var tr = asterisk.firstChild;
-    // tr.children[7].title = i18n.t("static.message.tooltipMultiplier")
     jExcelLoadedFunction(instance);
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1262,24 +1024,16 @@ export default class RealmCountryPlanningUnitList extends Component {
     tr.children[6].classList.add("AsteriskTheadtrTd");
     tr.children[6].title = i18n.t("static.message.tooltipMultiplier");
   };
-
   blur = function (instance) {
-    // console.log("on blur called");
   };
-
   focus = function (instance) {
-    // console.log("on focus called");
   };
-
   onedit = function (instance, cell, x, y, value) {
-    // console.log("------------onedit called");
     this.el.setValueFromCoords(9, y, 1, true);
   }.bind(this);
-
   componentDidMount() {
     this.getPrograms();
   }
-
   getPrograms = () => {
     DropdownService.getUpdateProgramInfoDetailsBasedRealmCountryId(
       PROGRAM_TYPE_SUPPLY_PLAN,
@@ -1287,14 +1041,12 @@ export default class RealmCountryPlanningUnitList extends Component {
       1
     )
       .then((response) => {
-        // // console.log(JSON.stringify(response.data))
-        // console.log("Program----->", response.data);
         this.setState({
           programs: response.data.sort(function (a, b) {
             a = a.program.code.toLowerCase();
             b = b.program.code.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
-        }),
+          }),
           loading: false,
         });
       })
@@ -1306,12 +1058,11 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (error.message === "Network Error") {
           this.setState(
             {
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             },
             () => {
@@ -1369,17 +1120,14 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
       });
   };
-
   formatLabel(cell, row) {
     return getLabelText(cell, this.state.lang);
   }
-
   render() {
     jexcel.setDictionary({
       Show: " ",
       entries: " ",
     });
-
     const { realmCountrys } = this.state;
     let realmCountryList =
       realmCountrys.length > 0 &&
@@ -1392,26 +1140,12 @@ export default class RealmCountryPlanningUnitList extends Component {
           </option>
         );
       }, this);
-
     const { programs } = this.state;
     let programList =
       programs.length > 0 &&
       programs.map((item, i) => {
-        // return ({ label: getLabelText(item.label, this.state.lang), value: item.programId })
         return { label: item.program.code, value: item.program.id };
       }, this);
-
-    // const { programLst } = this.state;
-    // let programList = [];
-    // programList = programLst.length > 0
-    //     && programLst.map((item, i) => {
-    //         return (
-
-    //             { label: getLabelText(item.label, this.state.lang), value: item.programId }
-
-    //         )
-    //     }, this);
-
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -1460,42 +1194,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           {i18n.t(this.state.message, { entityname })}
         </h5>
         <Card>
-          {/* <CardHeader className="mb-md-3 pb-lg-1">
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
-                        <div className="card-header-actions">
-
-                        </div>
-
-                    </CardHeader> */}
-          {/* {
-                        this.state.allowAdd &&
-                        < div className="Card-header-addicon">
-                            <div className="card-header-actions">
-                                <div className="card-header-action">
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewEntity}><i className="fa fa-plus-square"></i></a>}
-                                </div>
-                            </div>
-                        </div>
-                    } */}
-
           <CardBody className="pb-lg-2 pt-lg-1">
-            {/* <FormGroup className="Selectdiv mt-md-2 mb-md-0">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.realmcountry')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmCountryId"
-                                            id="realmCountryId"
-                                            bsSize="sm"
-                                            onChange={this.filterData}
-                                        >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                            {realmCountryList}
-                                        </Input>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup> */}
             <Form>
               <div className="pl-0">
                 <div className="row">
@@ -1504,7 +1203,6 @@ export default class RealmCountryPlanningUnitList extends Component {
                       {i18n.t("static.program.program")}
                     </Label>
                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-
                     <MultiSelect
                       bsSize="sm"
                       name="programIds"
@@ -1527,7 +1225,6 @@ export default class RealmCountryPlanningUnitList extends Component {
                 </div>
               </div>
             </Form>
-
             <div className="consumptionDataEntryTable ARUMarginTop">
               <div
                 id="tableDiv"
@@ -1546,53 +1243,51 @@ export default class RealmCountryPlanningUnitList extends Component {
                       <strong>{i18n.t("static.common.loading")}</strong>
                     </h4>
                   </div>
-
                   <div class="spinner-border blue ml-4" role="status"></div>
                 </div>
               </div>
             </div>
           </CardBody>
-
           {this.state.allowAdd && (
             <CardFooter>
               {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
                 "ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"
               ) && (
-                <FormGroup>
-                  <Button
-                    type="button"
-                    size="md"
-                    color="danger"
-                    className="float-right mr-1"
-                    onClick={this.cancelClicked}
-                  >
-                    <i className="fa fa-times"></i>{" "}
-                    {i18n.t("static.common.cancel")}
-                  </Button>
-                  <Button
-                    type="submit"
-                    size="md"
-                    color="success"
-                    onClick={this.formSubmit}
-                    className="float-right mr-1"
-                  >
-                    <i className="fa fa-check"></i>
-                    {i18n.t("static.common.submit")}
-                  </Button>
-                  <Button
-                    color="info"
-                    size="md"
-                    className="float-right mr-1"
-                    type="button"
-                    onClick={() => this.addRow()}
-                  >
-                    {" "}
-                    <i className="fa fa-plus"></i>{" "}
-                    {i18n.t("static.common.addRow")}
-                  </Button>
-                  &nbsp;
-                </FormGroup>
-              )}
+                  <FormGroup>
+                    <Button
+                      type="button"
+                      size="md"
+                      color="danger"
+                      className="float-right mr-1"
+                      onClick={this.cancelClicked}
+                    >
+                      <i className="fa fa-times"></i>{" "}
+                      {i18n.t("static.common.cancel")}
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="md"
+                      color="success"
+                      onClick={this.formSubmit}
+                      className="float-right mr-1"
+                    >
+                      <i className="fa fa-check"></i>
+                      {i18n.t("static.common.submit")}
+                    </Button>
+                    <Button
+                      color="info"
+                      size="md"
+                      className="float-right mr-1"
+                      type="button"
+                      onClick={() => this.addRow()}
+                    >
+                      {" "}
+                      <i className="fa fa-plus"></i>{" "}
+                      {i18n.t("static.common.addRow")}
+                    </Button>
+                    &nbsp;
+                  </FormGroup>
+                )}
             </CardFooter>
           )}
         </Card>

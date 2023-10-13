@@ -1,46 +1,44 @@
+import { Formik } from 'formik';
 import React, { Component } from 'react';
+import {
+    Button,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label,
+    Row
+} from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL, MAX_PROGRAM_CODE_LENGTH } from '../../Constants';
+import ProgramService from "../../api/ProgramService";
+import step1 from '../../assets/img/1-step.png';
+import step2 from '../../assets/img/2-step.png';
+import step3 from '../../assets/img/3-step.png';
+import step4 from '../../assets/img/4-step.png';
+import step5 from '../../assets/img/5-step.png';
+import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import ProgramService from "../../api/ProgramService";
-import { Formik } from 'formik';
-import step1 from '../../assets/img/1-step.png'
-import step2 from '../../assets/img/2-step.png'
-import step3 from '../../assets/img/3-step.png'
-import step4 from '../../assets/img/4-step.png'
-import step5 from '../../assets/img/5-step.png'
-import step6 from '../../assets/img/6-step.png'
-import * as Yup from 'yup';
-
-// import Setupprogram from '../../assets/img/SetupProgram.png'
-import {
-    Button, FormFeedback, CardBody, Row,
-    Form, FormGroup, Label, Input, Col
-} from 'reactstrap';
-import { API_URL, MAX_PROGRAM_CODE_LENGTH } from '../../Constants';
-
 const initialValuesSix = {
     programName: '',
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
     roadFreightPerc: '',
-    // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
     submittedToApprovedLeadTime: '',
     approvedToShippedLeadTime: '',
     monthsInFutureForAmc: '',
     monthsInPastForAmc: '',
-    // healthAreaId: '',
     programNotes: '',
-
     arrivedToDeliveredLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
     shippedToArrivedByAirLeadTime: '',
     shippedToArrivedByRoadLeadTime: ''
-
 }
-
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
@@ -49,34 +47,26 @@ const validationSchemaSix = function (values) {
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validairfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         roadFreightPerc: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validroadfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-        // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validplantosubmittext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validsubmittoapprovetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
             .min(0, i18n.t('static.program.validvaluetext')),
@@ -88,34 +78,23 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         shelfLife: Yup.number()
             .integer().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            // .max(31, i18n.t('static.pipeline.shelfLifeValidation'))
             .required((i18n.t('static.pipeline.entershelflife'))).min(0, i18n.t('static.program.validvaluetext')),
-
         arrivedToDeliveredLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.arrivedToReceivedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByRoadLeadTime: Yup.string()
-            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.realmcountry.shippedToArrivedRoadLeadTimetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        // healthAreaId: Yup.string()
-        //     .required(i18n.t('static.program.validhealthareatext')),
-        // programNotes: Yup.string()
-        //     .required(i18n.t('static.program.validnotestext')),
-
         programCode1: Yup.string()
             .test('programCode', i18n.t('static.programValidation.programCode'),
                 function (value) {
@@ -125,10 +104,8 @@ const validationSchemaSix = function (values) {
                         return true;
                     }
                 }),
-
     })
 }
-
 const validateSix = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -140,7 +117,6 @@ const validateSix = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationErrorSix = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -150,9 +126,7 @@ const getErrorsFromValidationErrorSix = (validationError) => {
         }
     }, {})
 }
-
 export default class PipelineProgramDataStepSix extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -163,9 +137,7 @@ export default class PipelineProgramDataStepSix extends Component {
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
         this.setErrorMessage = this.setErrorMessage.bind(this);
-
     }
-
     startLoading() {
         this.setState({ loading: true });
     }
@@ -175,7 +147,6 @@ export default class PipelineProgramDataStepSix extends Component {
     setErrorMessage(message) {
         this.setState({ message: message });
     }
-
     touchAllSix(setTouched, errors) {
         setTouched({
             programName: true,
@@ -183,20 +154,14 @@ export default class PipelineProgramDataStepSix extends Component {
             airFreightPerc: true,
             seaFreightPerc: true,
             roadFreightPerc: true,
-            // deliveredToReceivedLeadTime: true,
             plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
-            // monthsInFutureForAmc: true,
-            // monthsInPastForAmc: true,
-            // healthAreaId: true,
-            // programNotes: true,
             arrivedToDeliveredLeadTime: '',
             shippedToArrivedBySeaLeadTime: '',
             shippedToArrivedByAirLeadTime: '',
             shippedToArrivedByRoadLeadTime: '',
             programCode1: true
-
         }
         )
         this.validateFormSix(errors)
@@ -215,27 +180,7 @@ export default class PipelineProgramDataStepSix extends Component {
             }
         }
     }
-
-    // getProgramManagerList() {
-
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     ProgramService.getProgramManagerList(1)
-    //         .then(response => {
-    //             if (response.status == 200) {
-    //                 this.setState({
-    //                     programManagerList: response.data
-    //                 })
-    //             } else {
-    //                 this.setState({
-    //                     message: response.data.messageCode
-    //                 })
-    //             }
-    //         })
-
-    // }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors(); 
-
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getProgramManagerList(realmId)
             .then(response => {
@@ -254,13 +199,11 @@ export default class PipelineProgramDataStepSix extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -291,12 +234,9 @@ export default class PipelineProgramDataStepSix extends Component {
                     }
                 }
             );
-
     }
-
     render() {
         const { programManagerList } = this.state;
-
         let programManagers = programManagerList.length > 0
             && programManagerList.map((item, i) => {
                 return (
@@ -305,7 +245,6 @@ export default class PipelineProgramDataStepSix extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -318,7 +257,6 @@ export default class PipelineProgramDataStepSix extends Component {
                             airFreightPerc: this.props.items.program.airFreightPerc,
                             seaFreightPerc: this.props.items.program.seaFreightPerc,
                             roadFreightPerc: this.props.items.program.roadFreightPerc,
-                            // deliveredToReceivedLeadTime: this.props.items.program.deliveredToReceivedLeadTime,
                             plannedToSubmittedLeadTime: this.props.items.program.plannedToSubmittedLeadTime,
                             submittedToApprovedLeadTime: this.props.items.program.submittedToApprovedLeadTime,
                             approvedToShippedLeadTime: this.props.items.program.approvedToShippedLeadTime,
@@ -336,9 +274,7 @@ export default class PipelineProgramDataStepSix extends Component {
                     }
                     validate={validateSix(validationSchemaSix)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // this.props.finishedStepSix && this.props.finishedStepSix();
                         this.props.endProgramInfoStepFive && this.props.endProgramInfoStepFive();
-
                     }}
                     render={
                         ({
@@ -352,7 +288,6 @@ export default class PipelineProgramDataStepSix extends Component {
                             isValid,
                             setTouched
                         }) => (
-
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' style={{ display: this.state.loading ? "none" : "block" }}>
                                 <Row >
                                     <FormGroup style={{ display: 'flex' }} className="col-md-6">
@@ -384,7 +319,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                                     value={this.props.items.program.programCode}
                                                     maxLength={6}
                                                     name="programCode1" id="programCode1" />
-                                                {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
                                             </FormGroup>
                                         </Col>
                                     </FormGroup>
@@ -401,7 +335,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                             id="programName" />
                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -418,7 +351,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.userId}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                         <Input
@@ -504,21 +436,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
-                                    {/* <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.deliveredToReceivedLeadTime && this.props.items.program.deliveredToReceivedLeadTime != ''}
-                                            invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="number"
-                                            min="0"
-                                            value={this.props.items.program.deliveredToReceivedLeadTime}
-                                            name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
-                                        <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
-                                    </FormGroup> */}
-
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -575,7 +492,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                         <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -614,12 +530,10 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            // max="31"
                                             value={this.props.items.program.shelfLife}
                                             name="shelfLife" id="shelfLife" />
                                         <FormFeedback className="red">{errors.shelfLife}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                         <Input
@@ -629,7 +543,6 @@ export default class PipelineProgramDataStepSix extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="textarea"
-                                            // maxLength={600}
                                             name="programNotes"
                                             id="programNotes"
                                             value={this.props.items.program.programNotes} />
@@ -645,28 +558,21 @@ export default class PipelineProgramDataStepSix extends Component {
                                             <li>
                                                 <i ><img className="img-right" src={step3} /></i>
                                                 <span>{i18n.t('static.setupprogram.SubmittedtoApproved')}</span>
-
                                             </li>
                                             <li>
                                                 <i ><img className="img-right" src={step4} /></i>
                                                 <span>{i18n.t('static.setupprogram.ApprovedtoShipped')}</span>
-
                                             </li>
                                             <li>
                                                 <i ><img className="img-right" src={step5} /></i>
                                                 <span>{i18n.t('static.setupprogram.ShippedtoArrived')}</span>
-
                                             </li>
                                             <li>
                                                 <i ><img className="img-right" src={step6} /></i>
                                                 <span>{i18n.t('static.setupprogram.ArrivedtoReceived')}</span>
                                             </li>
                                         </ul>
-                                        {/* <img src={Setupprogram} style={{ width: '500px'}} /> */}
                                     </FormGroup>
-                                    {/* <FormGroup className="col-md-6">
-                                            <img src={Setupprogram} style={{ width: '500px' }} />
-                                        </FormGroup> */}
                                     <FormGroup className="col-md-12">
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
@@ -674,22 +580,17 @@ export default class PipelineProgramDataStepSix extends Component {
                                     </FormGroup>
                                 </Row>
                             </Form>
-
                         )} />
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
         );
     }
 }

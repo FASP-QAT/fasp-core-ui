@@ -1,18 +1,14 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
 import 'react-select/dist/react-select.min.css';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import DimensionService from '../../api/DimensionService';
 import UnitService from '../../api/UnitService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import '../Forms/ValidationForms/ValidationForms.css';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL, SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
-
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValues = {
     unitName: "",
     unitCode: "",
@@ -24,18 +20,14 @@ const validationSchema = function (values) {
         dimensionId: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
-            // .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string()
-            // .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .max(20, i18n.t('static.common.max20digittext'))
             .required(i18n.t('static.unit.unitcodetext'))
-
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -47,7 +39,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -57,7 +48,6 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 class AddUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -75,14 +65,12 @@ class AddUnitComponent extends Component {
             message: '',
             dimensions: []
         }
-
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { unit } = this.state;
         if (event.target.name == "dimensionId") {
@@ -99,7 +87,6 @@ class AddUnitComponent extends Component {
         },
             () => { });
     };
-
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -107,7 +94,6 @@ class AddUnitComponent extends Component {
             return "";
         }
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             unitName: true,
@@ -136,23 +122,20 @@ class AddUnitComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         dimensions: listArray, loading: false,
                     })
                 } else {
-
                     this.setState({
                         message: response.data.messageCode, loading: false
                     },
@@ -164,13 +147,11 @@ class AddUnitComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -202,14 +183,10 @@ class AddUnitComponent extends Component {
                 }
             );
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
-
-
     render() {
         const { dimensions } = this.state;
         let dimensionList = dimensions.length > 0
@@ -227,10 +204,7 @@ class AddUnitComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
-                            <Formik
+                                                        <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -252,13 +226,11 @@ class AddUnitComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    // message: 'static.unkownError',
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
@@ -307,9 +279,7 @@ class AddUnitComponent extends Component {
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                    <Input
+                                                                                                                                                            <Input
                                                         type="select"
                                                         bsSize="sm"
                                                         name="dimensionId"
@@ -324,10 +294,8 @@ class AddUnitComponent extends Component {
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {dimensionList}
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
-                                                    <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
+                                                                                                        <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -339,7 +307,6 @@ class AddUnitComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.Capitalize(this.state.unit.label.label_en)}
-
                                                         required />
                                                     <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                 </FormGroup>
@@ -362,9 +329,7 @@ class AddUnitComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -374,7 +339,6 @@ class AddUnitComponent extends Component {
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -383,7 +347,6 @@ class AddUnitComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message, { entityname })}</h6>
                     <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>
@@ -391,24 +354,18 @@ class AddUnitComponent extends Component {
             </div>
         );
     }
-
     cancelClicked() {
         this.props.history.push(`/unit/listUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         let { unit } = this.state;
-
         unit.dimension.id = ''
         unit.label.label_en = ''
         unit.unitCode = ''
-
         this.setState({
             unit
         },
             () => { });
     }
-
-
 }
 export default AddUnitComponent;

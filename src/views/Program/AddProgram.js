@@ -1,23 +1,27 @@
-import React, { Component } from "react";
-import {
-    Row, Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText, FormText
-} from 'reactstrap';
-import Select from 'react-select';
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
+import React, { Component } from "react";
+import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import ProgramService from "../../api/ProgramService";
+import {
+    Button,
+    Card, CardBody,
+    CardFooter,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label,
+    Row
+} from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from "../../Constants";
 import HealthAreaService from "../../api/HealthAreaService";
-import getLabelText from '../../CommonComponent/getLabelText'
-import AuthenticationService from '../Common/AuthenticationService.js';
+import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import classNames from 'classnames';
-import { API_URL } from "../../Constants";
-
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
     programName: '',
@@ -36,9 +40,7 @@ const initialValues = {
     healthAreaId: '',
     programNotes: '',
     regionId: []
-
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
@@ -56,12 +58,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validairfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        // deliveredToReceivedLeadTime: Yup.number()
-        //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validplantosubmittext'))
@@ -88,15 +87,10 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        // programNotes: Yup.string()
-        //     .required(i18n.t('static.program.validnotestext')),
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext'))
-
-
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -108,7 +102,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -118,9 +111,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class AddProgram extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -163,12 +154,7 @@ export default class AddProgram extends Component {
                 programNotes: '',
                 regionArray: [],
                 loading: true
-
-
             },
-            // regionList: [{ value: '1', label: 'R1' },
-            // { value: '2', label: 'R2' },
-            // { value: '3', label: 'R3' }],
             lang: localStorage.getItem('lang'),
             regionId: '',
             realmList: [],
@@ -178,7 +164,6 @@ export default class AddProgram extends Component {
             programManagerList: [],
             regionList: [],
             message: ''
-
         }
         this.dataChange = this.dataChange.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
@@ -188,13 +173,11 @@ export default class AddProgram extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     Capitalize(str) {
         let { program } = this.state
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
@@ -211,13 +194,11 @@ export default class AddProgram extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -258,7 +239,6 @@ export default class AddProgram extends Component {
         if (e.target.value != 0) {
             ProgramService.getProgramManagerList(e.target.value)
                 .then(response => {
-                    // console.log("manager list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             programManagerList: response.data
@@ -272,13 +252,11 @@ export default class AddProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -309,10 +287,8 @@ export default class AddProgram extends Component {
                         }
                     }
                 );
-
             ProgramService.getRealmCountryList(e.target.value)
                 .then(response => {
-                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             realmCountryList: response.data
@@ -326,13 +302,11 @@ export default class AddProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -365,7 +339,6 @@ export default class AddProgram extends Component {
                 );
             ProgramService.getOrganisationList(e.target.value)
                 .then(response => {
-                    // console.log("organisation list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             organisationList: response.data
@@ -379,13 +352,11 @@ export default class AddProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -416,10 +387,8 @@ export default class AddProgram extends Component {
                         }
                     }
                 );
-
             ProgramService.getHealthAreaList(e.target.value)
                 .then(response => {
-                    // console.log("health area list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             healthAreaList: response.data
@@ -433,13 +402,11 @@ export default class AddProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -479,12 +446,9 @@ export default class AddProgram extends Component {
             })
         }
     }
-
     getRegionList(e) {
-        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
-                // console.log("health area list---", response.data);
                 if (response.status == 200) {
                     var json = response.data;
                     var regList = [];
@@ -504,13 +468,11 @@ export default class AddProgram extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -590,9 +552,7 @@ export default class AddProgram extends Component {
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
-
         this.setState({ program }, () => { })
-
     }
     touchAll(setTouched, errors) {
         setTouched({
@@ -610,9 +570,7 @@ export default class AddProgram extends Component {
             shippedToArrivedBySeaLeadTime: true,
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
-            // programNotes: true,
             regionId: true
-
         }
         )
         this.validateForm(errors)
@@ -631,14 +589,12 @@ export default class AddProgram extends Component {
             }
         }
     }
-
     render() {
         const { realmList } = this.state;
         const { programManagerList } = this.state;
         const { realmCountryList } = this.state;
         const { organisationList } = this.state;
         const { healthAreaList } = this.state;
-
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
                 return (
@@ -647,7 +603,6 @@ export default class AddProgram extends Component {
                     </option>
                 )
             }, this);
-
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
@@ -656,7 +611,6 @@ export default class AddProgram extends Component {
                     </option>
                 )
             }, this);
-
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
@@ -665,7 +619,6 @@ export default class AddProgram extends Component {
                     </option>
                 )
             }, this);
-
         let realmHealthArea = healthAreaList.length > 0
             && healthAreaList.map((item, i) => {
                 return (
@@ -674,8 +627,6 @@ export default class AddProgram extends Component {
                     </option>
                 )
             }, this);
-
-
         let programManagers = programManagerList.length > 0
             && programManagerList.map((item, i) => {
                 return (
@@ -684,8 +635,6 @@ export default class AddProgram extends Component {
                     </option>
                 )
             }, this);
-
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -700,7 +649,6 @@ export default class AddProgram extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProgramService.addProgram(this.state.program).then(response => {
                                         if (response.status == "200") {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -718,13 +666,11 @@ export default class AddProgram extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    // message: 'static.unkownError',
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
@@ -755,7 +701,6 @@ export default class AddProgram extends Component {
                                             }
                                         }
                                     );
-
                                 }}
                                 render={
                                     ({
@@ -772,15 +717,10 @@ export default class AddProgram extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-
                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm' autocomplete="off">
-                                            {/* <CardHeader>
-                                                    <strong>{i18n.t('static.program.programadd')}</strong>
-                                                </CardHeader> */}
                                             <CardBody>
                                                 <FormGroup>
                                                     <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName && this.state.program.label.label_en != ''}
                                                         bsSize="sm"
@@ -793,9 +733,7 @@ export default class AddProgram extends Component {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
-                                                        // value={this.state.program.realm.realmId}
                                                         bsSize="sm"
                                                         valid={!errors.realmId && this.state.program.realm.realmId != ''}
                                                         invalid={touched.realmId && !!errors.realmId}
@@ -806,13 +744,10 @@ export default class AddProgram extends Component {
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {realms}
                                                     </Input>
-
                                                     <FormFeedback>{errors.realmId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.realmCountry.realmCountryId}
                                                         bsSize="sm"
@@ -822,17 +757,12 @@ export default class AddProgram extends Component {
                                                         onBlur={handleBlur}
                                                         type="select" name="realmCountryId" id="realmCountryId">
                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                        {/* <option value="1">Country #1</option>
-                                                        <option value="2">Country #2</option>
-                                                        <option value="3">Country #3</option> */}
                                                         {realmCountries}
                                                     </Input>
-
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
-
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -865,9 +795,6 @@ export default class AddProgram extends Component {
                                                         type="select" name="organisationId" id="organisationId">
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {realmOrganisation}
-                                                        {/* <option value="1">product #1</option>
-                                                        <option value="2">product #2</option>
-                                                        <option value="3">product #3</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
@@ -882,12 +809,8 @@ export default class AddProgram extends Component {
                                                         onBlur={handleBlur} type="select" name="healthAreaId" id="healthAreaId">
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {realmHealthArea}
-                                                        {/* <option value="1">Health Area #1</option>
-                                                        <option value="2">Health Area #2</option>
-                                                        <option value="3">Health Area #3</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.healthAreaId}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
@@ -899,24 +822,17 @@ export default class AddProgram extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                        {/* <option value="1">Anchal</option> */}
-                                                        {/* <option value="2">Akil</option>
-                                                        <option value="3">Sameer</option> */}
                                                         {programManagers}
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                                     <Input
                                                         value={this.state.program.programNotes}
                                                         bsSize="sm"
-                                                        // valid={!errors.programNotes}
-                                                        // invalid={touched.programNotes && !!errors.programNotes}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        // maxLength={600}
                                                         type="textarea" name="programNotes" id="programNotes" />
                                                     <FormFeedback>{errors.programNotes}</FormFeedback>
                                                 </FormGroup>
@@ -949,9 +865,7 @@ export default class AddProgram extends Component {
                                                     <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.plannedToSubmittedLeadTime}
                                                         bsSize="sm"
@@ -963,12 +877,9 @@ export default class AddProgram extends Component {
                                                         min="0"
                                                         name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
                                                     <FormFeedback>{errors.plannedToSubmittedLeadTime}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.submittedToApprovedLeadTime}
                                                         bsSize="sm"
@@ -980,12 +891,9 @@ export default class AddProgram extends Component {
                                                         min="0"
                                                         name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
                                                     <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.approvedToShippedLeadTime}
                                                         bsSize="sm"
@@ -997,29 +905,9 @@ export default class AddProgram extends Component {
                                                         min="0"
                                                         name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                                     <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
-
                                                 </FormGroup>
-                                                {/* <FormGroup>
-
-                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            value={this.state.program.deliveredToReceivedLeadTime}
-                                                            bsSize="sm"
-                                                            valid={!errors.deliveredToReceivedLeadTime && this.state.program.deliveredToReceivedLeadTime != ''}
-                                                            invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="number"
-                                                            min="0"
-                                                            name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
-                                                        <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
-
-                                                    </FormGroup> */}
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.shippedToArrivedByAirLeadTime}
                                                         bsSize="sm"
@@ -1031,12 +919,9 @@ export default class AddProgram extends Component {
                                                         min="0"
                                                         name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
                                                     <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.shippedToArrivedBySeaLeadTime}
                                                         bsSize="sm"
@@ -1048,12 +933,9 @@ export default class AddProgram extends Component {
                                                         min="0"
                                                         name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                                     <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={this.state.program.arrivedToDeliveredLeadTime}
                                                         bsSize="sm"
@@ -1066,15 +948,12 @@ export default class AddProgram extends Component {
                                                         name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                                     <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                                 </FormGroup>
-
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
-                                                    {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -1087,15 +966,12 @@ export default class AddProgram extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         );
     }
     cancelClicked() {
@@ -1103,7 +979,6 @@ export default class AddProgram extends Component {
     }
     resetClicked() {
         let { program } = this.state;
-
         program.label.label_en = ''
         program.realm.realmId = ''
         program.realmCountry.realmCountryId = ''
@@ -1120,8 +995,6 @@ export default class AddProgram extends Component {
         program.arrivedToDeliveredLeadTime = ''
         program.shippedToArrivedBySeaLeadTime = ''
         program.shippedToArrivedByAirLeadTime = ''
-
         this.setState({ program }, () => { })
-
     }
 }

@@ -1,38 +1,31 @@
+import { Formik } from "formik";
 import React, { Component } from "react";
 import {
-  Row,
-  Col,
-  Card,
-  CardHeader,
-  CardFooter,
   Button,
-  FormFeedback,
+  Card,
   CardBody,
+  CardFooter,
+  Col,
   Form,
+  FormFeedback,
   FormGroup,
-  Label,
   Input,
+  Label,
+  Row
 } from "reactstrap";
-import { Formik } from "formik";
 import * as Yup from "yup";
-import Select from "react-select";
-import "../Forms/ValidationForms/ValidationForms.css";
-import AuthenticationService from "../Common/AuthenticationService.js";
+import getLabelText from "../../CommonComponent/getLabelText";
+import {
+  API_URL,
+  PROGRAM_TYPE_SUPPLY_PLAN
+} from "../../Constants.js";
 import DataSourceService from "../../api/DataSourceService";
 import DataSourceTypeService from "../../api/DataSourceTypeService";
-import i18n from "../../i18n";
-import RealmService from "../../api/RealmService";
-import ProgramService from "../../api/ProgramService";
-import getLabelText from "../../CommonComponent/getLabelText";
-import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import {
-  ALPHABET_NUMBER_REGEX,
-  API_URL,
-  PROGRAM_TYPE_SUPPLY_PLAN,
-  SPACE_REGEX,
-} from "../../Constants.js";
 import DropdownService from "../../api/DropdownService";
-
+import RealmService from "../../api/RealmService";
+import i18n from "../../i18n";
+import AuthenticationService from "../Common/AuthenticationService.js";
+import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 let initialValues = {
   realmId: [],
   label: "",
@@ -40,13 +33,9 @@ let initialValues = {
   dataSourceTypeList: [],
 };
 const entityname = i18n.t("static.datasource.datasource");
-
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string().required(i18n.t("static.common.realmtext")),
-    // label: Yup.string()
-    //     .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-    //     .required(i18n.t('static.datasource.datasourcetext')),
     label: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t("static.validSpace.string"))
       .required(i18n.t("static.datasource.datasourcetext")),
@@ -55,7 +44,6 @@ const validationSchema = function (values) {
     ),
   });
 };
-
 const validate = (getValidationSchema) => {
   return (values) => {
     const validationSchema = getValidationSchema(values);
@@ -67,7 +55,6 @@ const validate = (getValidationSchema) => {
     }
   };
 };
-
 const getErrorsFromValidationError = (validationError) => {
   const FIRST_ERROR = 0;
   return validationError.inner.reduce((errors, error) => {
@@ -77,7 +64,6 @@ const getErrorsFromValidationError = (validationError) => {
     };
   }, {});
 };
-
 export default class AddDataSource extends Component {
   constructor(props) {
     super(props);
@@ -109,7 +95,6 @@ export default class AddDataSource extends Component {
       loading: true,
     };
     this.Capitalize = this.Capitalize.bind(this);
-
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
@@ -118,7 +103,6 @@ export default class AddDataSource extends Component {
     this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
-
   dataChange(event) {
     if (event.target.name === "label") {
       this.state.label.label_en = event.target.value;
@@ -136,7 +120,6 @@ export default class AddDataSource extends Component {
       dataSource,
     });
   }
-
   touchAll(setTouched, errors) {
     setTouched({
       label: true,
@@ -158,16 +141,13 @@ export default class AddDataSource extends Component {
       }
     }
   }
-
   componentDidMount() {
-    // AuthenticationService.setupAxiosInterceptors();
-
     RealmService.getRealmListAll()
       .then((response) => {
         var listArray = response.data;
         listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
           return itemLabelA > itemLabelB ? 1 : -1;
         });
         this.setState({
@@ -178,12 +158,11 @@ export default class AddDataSource extends Component {
       .catch((error) => {
         if (error.message === "Network Error") {
           this.setState({
-            // message: 'static.unkownError',
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
@@ -217,14 +196,11 @@ export default class AddDataSource extends Component {
           }
         }
       });
-
     let realmId = AuthenticationService.getRealmId();
     if (realmId != -1) {
-      // document.getElementById('realmId').value = realmId;
       initialValues = {
         realmId: realmId,
       };
-
       this.state.realm.id = realmId;
       let { dataSource } = this.state;
       document.getElementById("realmId").disabled = true;
@@ -244,23 +220,20 @@ export default class AddDataSource extends Component {
       document.getElementById("div2").style.display = "none";
     }, 30000);
   }
-
   getDataSourceTypeByRealmId(e) {
-    // AuthenticationService.setupAxiosInterceptors();
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          // console.log("getDataSourceTypeByRealmId---", response.data);
           var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); // ignore upper and lowercase
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); // ignore upper and lowercase
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -271,12 +244,11 @@ export default class AddDataSource extends Component {
         .catch((error) => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -317,11 +289,8 @@ export default class AddDataSource extends Component {
       });
     }
   }
-
   getProgramByRealmId(e) {
-    // AuthenticationService.setupAxiosInterceptors();
     let realmId = AuthenticationService.getRealmId();
-
     if (realmId != 0) {
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then((response) => {
@@ -338,15 +307,14 @@ export default class AddDataSource extends Component {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); // ignore upper and lowercase
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); // ignore upper and lowercase
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
-            // programs: (response.data).filter(c => c.active.toString() == "true")
             programs: proList,
             loading: false,
           });
@@ -354,12 +322,11 @@ export default class AddDataSource extends Component {
         .catch((error) => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -400,25 +367,21 @@ export default class AddDataSource extends Component {
       });
     }
   }
-
   Capitalize(str) {
     this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
   }
   render() {
     const { realms } = this.state;
-
     const { programs } = this.state;
     let programList =
       programs.length > 0 &&
       programs.map((item, i) => {
         return (
           <option key={i} value={item.programId}>
-            {/* {getLabelText(item.label, this.state.lang)} */}
             {item.programCode}
           </option>
         );
       }, this);
-
     let realmList =
       realms.length > 0 &&
       realms.map((item, i) => {
@@ -428,7 +391,6 @@ export default class AddDataSource extends Component {
           </option>
         );
       }, this);
-
     const { dataSourceTypeList } = this.state;
     let dataSourceTypes =
       dataSourceTypeList.length > 0 &&
@@ -439,16 +401,10 @@ export default class AddDataSource extends Component {
           </option>
         );
       }, this);
-
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent
           history={this.props.history}
-          // message={(message) => {
-          //     this.setState({ message: message })
-          // }} loading={(loading) => {
-          //     this.setState({ loading: loading })
-          // }}
         />
         <h5 className="red" id="div2">
           {i18n.t(this.state.message, { entityname })}
@@ -456,9 +412,6 @@ export default class AddDataSource extends Component {
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: "auto" }}>
             <Card>
-              {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
               <Formik
                 enableReinitialize={true}
                 initialValues={initialValues}
@@ -467,14 +420,13 @@ export default class AddDataSource extends Component {
                   this.setState({
                     loading: true,
                   });
-                  // console.log("this.state----", this.state);
                   DataSourceService.addDataSource(this.state)
                     .then((response) => {
                       if (response.status == 200) {
                         this.props.history.push(
                           `/dataSource/listDataSource/` +
-                            "green/" +
-                            i18n.t(response.data.messageCode, { entityname })
+                          "green/" +
+                          i18n.t(response.data.messageCode, { entityname })
                         );
                       } else {
                         this.setState(
@@ -491,12 +443,11 @@ export default class AddDataSource extends Component {
                     .catch((error) => {
                       if (error.message === "Network Error") {
                         this.setState({
-                          // message: 'static.unkownError',
                           message: API_URL.includes("uat")
                             ? i18n.t("static.common.uatNetworkErrorMessage")
                             : API_URL.includes("demo")
-                            ? i18n.t("static.common.demoNetworkErrorMessage")
-                            : i18n.t("static.common.prodNetworkErrorMessage"),
+                              ? i18n.t("static.common.demoNetworkErrorMessage")
+                              : i18n.t("static.common.prodNetworkErrorMessage"),
                           loading: false,
                         });
                       } else {
@@ -693,7 +644,6 @@ export default class AddDataSource extends Component {
                               <strong>{i18n.t("static.common.loading")}</strong>
                             </h4>
                           </div>
-
                           <div
                             class="spinner-border blue ml-4"
                             role="status"
@@ -701,7 +651,6 @@ export default class AddDataSource extends Component {
                         </div>
                       </div>
                     </div>
-
                     <CardFooter>
                       <FormGroup>
                         <Button
@@ -744,23 +693,16 @@ export default class AddDataSource extends Component {
             </Card>
           </Col>
         </Row>
-
-        {/* <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div> */}
       </div>
     );
   }
-
   cancelClicked() {
     this.props.history.push(
       `/dataSource/listDataSource/` +
-        "red/" +
-        i18n.t("static.message.cancelled", { entityname })
+      "red/" +
+      i18n.t("static.message.cancelled", { entityname })
     );
   }
-
   resetClicked() {
     this.state.label.label_en = "";
     this.state.dataSourceType.id = "";
@@ -772,7 +714,6 @@ export default class AddDataSource extends Component {
       this.state.realm.id = "";
     }
     this.state.program.id = "";
-
     let { dataSource } = this.state;
     this.setState({
       dataSource,

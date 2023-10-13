@@ -1,18 +1,15 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
-
-class ShipmentStatusService{
-
+class ShipmentStatusService {
     addShipmentStatus(json) {
         return axios.put(`${API_URL}/api/addShipmentStatus/`, json, {}
         );
     }
-
-    getShipmentStatusListAll(){
+    getShipmentStatusListAll() {
         return axios.get(`${API_URL}/api/getShipmentStatusListAll/`, {
         });
     }
-    getShipmentStatusListActive(){
+    getShipmentStatusListActive() {
         return axios.get(`${API_URL}/api/getShipmentStatusListActive`, {
         });
     }
@@ -20,6 +17,5 @@ class ShipmentStatusService{
         return axios.put(`${API_URL}/api/editShipmentStatus/`, json, {
         });
     }
-
 }
 export default new ShipmentStatusService();

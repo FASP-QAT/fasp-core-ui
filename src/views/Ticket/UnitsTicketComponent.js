@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import DimensionService from '../../api/DimensionService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { UNIT_LABEL_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
-
+import { API_URL, SPACE_REGEX, UNIT_LABEL_REGEX } from '../../Constants';
+import DimensionService from '../../api/DimensionService';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import i18n from '../../i18n';
 const initialValues = {
     summary: "Add Unit",
     dimension: "",
@@ -18,7 +14,6 @@ const initialValues = {
     unitCode: "",
     notes: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -29,14 +24,8 @@ const validationSchema = function (values) {
         unit: Yup.string()
             .required(i18n.t('static.unit.unittext'))
             .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),
-        // unitCode: Yup.string()
-        //     .required(i18n.t('static.unit.unitcodetext'))
-        //     .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext')),        
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -48,7 +37,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -58,9 +46,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class UnitsTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -80,7 +66,6 @@ export default class UnitsTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { units } = this.state
         if (event.target.name == "summary") {
@@ -105,7 +90,6 @@ export default class UnitsTicketComponent extends Component {
             units
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -130,9 +114,7 @@ export default class UnitsTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -140,7 +122,6 @@ export default class UnitsTicketComponent extends Component {
                         dimensions: response.data
                     })
                 } else {
-
                     this.setState({
                         message: response.data.messageCode
                     },
@@ -152,13 +133,11 @@ export default class UnitsTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -190,21 +169,17 @@ export default class UnitsTicketComponent extends Component {
                 }
             );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { units } = this.state;
-        // units.summary = '';
         units.dimension = '';
         units.unit = '';
         units.unitCode = '';
@@ -214,9 +189,7 @@ export default class UnitsTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { dimensions } = this.state;
         let dimensionList = dimensions.length > 0
             && dimensions.map((item, i) => {
@@ -226,7 +199,6 @@ export default class UnitsTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -241,7 +213,6 @@ export default class UnitsTicketComponent extends Component {
                                 loading: true
                             })
                             JiraTikcetService.addEmailRequestIssue(this.state.units).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -265,13 +236,11 @@ export default class UnitsTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -360,8 +329,6 @@ export default class UnitsTicketComponent extends Component {
                                         <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
                                         <Input type="text" name="unitCode" id="unitCode"
                                             bsSize="sm"
-                                            // valid={!errors.unitCode && this.state.units.unitCode != ''}
-                                            // invalid={touched.unitCode && !!errors.unitCode}
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.units.unitCode}
@@ -377,7 +344,6 @@ export default class UnitsTicketComponent extends Component {
                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                             onBlur={handleBlur}
                                             value={this.state.units.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
@@ -386,11 +352,7 @@ export default class UnitsTicketComponent extends Component {
                                         <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                    <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                </Form>
+                                                                    </Form>
                             )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -404,5 +366,4 @@ export default class UnitsTicketComponent extends Component {
             </div>
         );
     }
-
 }

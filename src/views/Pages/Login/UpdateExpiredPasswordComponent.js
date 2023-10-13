@@ -1,24 +1,16 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, Container, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../../Forms/ValidationForms/ValidationForms.css'
-
-import CryptoJS from 'crypto-js'
-import AuthenticationService from '../../Common/AuthenticationService.js';
-import { Online } from "react-detect-offline";
-import bcrypt from 'bcryptjs';
-import jwt_decode from 'jwt-decode'
-import { API_URL, SECRET_KEY } from '../../../Constants.js'
-import UserService from '../../../api/UserService'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import CryptoJS from 'crypto-js';
+import jwt_decode from 'jwt-decode';
 import moment from 'moment';
-import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../assets/img/QAT-login-logo.png';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
-
-
-
+import { API_URL, SECRET_KEY } from '../../../Constants.js';
+import UserService from '../../../api/UserService';
+import image1 from '../../../assets/img/QAT-login-logo.png';
+import i18n from '../../../i18n';
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()
@@ -48,7 +40,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -60,7 +51,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -80,30 +70,16 @@ class UpdateExpiredPasswordComponent extends Component {
         this.logoutClicked = this.logoutClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
-
     componentDidMount() {
-        // console.log("Update expired password email id--->" + this.props.location.state.emailId)
     }
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
-
-        // setTimeout(function () {
-        //     this.setState({
-        //         message:''
-        //     },
-        //     () => { 
-        //         document.getElementById('div1').style.display = 'block';
-        //     });
-        // }, 8000);
-
     }
-
     logoutClicked() {
         this.props.history.push(`/login/` + i18n.t('static.logoutSuccess'))
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             oldPassword: true,
@@ -128,7 +104,6 @@ class UpdateExpiredPasswordComponent extends Component {
             }
         }
     }
-
     render() {
         return (
             <div className="app flex-row align-items-center">
@@ -156,17 +131,13 @@ class UpdateExpiredPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
-                                                // console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
                                                         let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
-
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
-                                                        // decoded.user.syncExpiresOn = moment("2020-05-12 15:13:19").format("YYYY-MM-DD HH:mm:ss");
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                                        // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
                                                         localStorage.setItem('sessionType', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
@@ -181,10 +152,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         error => {
                                                             if (error.message === "Network Error") {
                                                                 this.setState({
-                                                                    //  message: error.message 
                                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 }, () => {
-                                                                    // console.log("inside412");
                                                                     document.getElementById('div1').style.display = 'block';
                                                                     this.hideFirstComponent();
                                                                 });
@@ -196,19 +165,15 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
-
                                                                         this.setState({ message: error.response.data.messageCode },
                                                                             () => {
-                                                                                // console.log("inside412");
                                                                                 document.getElementById('div1').style.display = 'block';
                                                                                 this.hideFirstComponent();
                                                                             });
                                                                         break;
                                                                     default:
-
                                                                         this.setState({ message: 'static.unkownError' },
                                                                             () => {
-                                                                                // console.log("inside412");
                                                                                 document.getElementById('div1').style.display = 'block';
                                                                                 this.hideFirstComponent();
                                                                             });
@@ -217,12 +182,9 @@ class UpdateExpiredPasswordComponent extends Component {
                                                             }
                                                         }
                                                     );
-
                                             } else {
-
                                                 this.setState({ message: 'static.common.onlinepasswordtext' },
                                                     () => {
-                                                        // console.log("inside412");
                                                         document.getElementById('div1').style.display = 'block';
                                                         this.hideFirstComponent();
                                                     });
@@ -303,12 +265,10 @@ class UpdateExpiredPasswordComponent extends Component {
                                 </Card>
                             </Col>
                         </Row>
-
                     </Container>
                 </div>
             </div>
         );
     }
 }
-
 export default UpdateExpiredPasswordComponent;

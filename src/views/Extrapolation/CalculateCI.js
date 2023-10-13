@@ -1,4 +1,4 @@
-import { std, sqrt, mean, abs } from 'mathjs';
+import { sqrt, std } from 'mathjs';
 export function calculateCI(data, confidence, methodName, props) {
     let population = new Array()
     for (let x = 0; x < data.length; x++) {
@@ -12,11 +12,8 @@ export function calculateCI(data, confidence, methodName, props) {
             data[x].ci = zValue * stdDev / sqrt(population.length)
         }
     }
-    // console.log("confidence@@@@@@@@@@@&&&&&&&&&&&&&&&&&&&&&&",confidence)
-    // console.log("Data@@@@@@@@@@@&&&&&&&&&&&&&&&&&&&&&",data)
     props.updateState(methodName, data);
 }
-
 function getZValue(df, confidence) {
     const tTable = [
         { "df": 1, "zValue": [1.963, 3.078, 6.32, 3.747, 4.604, 7.173] },

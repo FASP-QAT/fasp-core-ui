@@ -1,21 +1,16 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import RegionService from "../../api/RegionService";
-import AuthenticationService from '../Common/AuthenticationService.js';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { API_URL } from '../../Constants';
-
+import RegionService from "../../api/RegionService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.region.region');
-
 let initialValues = {
     region: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()
@@ -33,7 +28,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -43,12 +37,10 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 class EditRegionComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // region: this.props.location.state.region,
             region: {
                 realmCountry: {
                     country: {
@@ -67,7 +59,6 @@ class EditRegionComponent extends Component {
                     label_sp: '',
                     label_pr: ''
                 },
-
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -81,7 +72,6 @@ class EditRegionComponent extends Component {
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     dataChange(event) {
         let { region } = this.state;
         if (event.target.name == "region") {
@@ -95,7 +85,6 @@ class EditRegionComponent extends Component {
         },
             () => { });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             region: true
@@ -124,23 +113,19 @@ class EditRegionComponent extends Component {
         }
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
                 region: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -172,7 +157,6 @@ class EditRegionComponent extends Component {
             }
         );
     }
-
     render() {
         return (
             <div className="animated fadeIn">
@@ -189,10 +173,8 @@ class EditRegionComponent extends Component {
                                 initialValues={{ region: getLabelText(this.state.region.label, this.state.lang) }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
-                                            // console.log("---------->", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/region/listRegion/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
@@ -204,13 +186,11 @@ class EditRegionComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -280,7 +260,6 @@ class EditRegionComponent extends Component {
                                                         onBlur={handleBlur}
                                                         value={getLabelText(this.state.region.label, this.state.lang)}
                                                         required />
-
                                                     <FormText className="red">{errors.region}</FormText>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -321,7 +300,6 @@ class EditRegionComponent extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    {/* <Button type="reset" size="md" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
@@ -339,25 +317,20 @@ class EditRegionComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
                 region: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -390,5 +363,4 @@ class EditRegionComponent extends Component {
         );
     }
 }
-
 export default EditRegionComponent;

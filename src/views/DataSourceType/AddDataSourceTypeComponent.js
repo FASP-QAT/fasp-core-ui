@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants.js';
+import DataSourceTypeService from '../../api/DataSourceTypeService.js';
+import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import DataSourceTypeService from '../../api/DataSourceTypeService.js'
-import RealmService from "../../api/RealmService";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import getLabelText from '../../CommonComponent/getLabelText';
-import { ALPHABET_NUMBER_REGEX, API_URL, SPACE_REGEX } from '../../Constants.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 let initialValues = {
     realmId: [],
     label: ''
@@ -21,12 +19,10 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
-            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -38,7 +34,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -48,10 +43,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
 export default class AddDataSourceTypeComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -70,15 +62,12 @@ export default class AddDataSourceTypeComponent extends Component {
             },
             loading: true
         }
-
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
-
     dataChange(event) {
         let { dataSourceType } = this.state
         if (event.target.name === "label") {
@@ -87,7 +76,6 @@ export default class AddDataSourceTypeComponent extends Component {
         if (event.target.name == "realmId") {
             dataSourceType.realm.id = event.target.value;
         }
-
         this.setState(
             {
                 dataSourceType
@@ -95,7 +83,6 @@ export default class AddDataSourceTypeComponent extends Component {
             }
         )
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
@@ -118,15 +105,13 @@ export default class AddDataSourceTypeComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -138,13 +123,11 @@ export default class AddDataSourceTypeComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -175,14 +158,11 @@ export default class AddDataSourceTypeComponent extends Component {
                     }
                 }
             );
-
         let realmId = AuthenticationService.getRealmId();
         if (realmId != -1) {
-            // document.getElementById('realmId').value = realmId;
             initialValues = {
                 realmId: realmId
             }
-
             let { dataSourceType } = this.state;
             dataSourceType.realm.id = realmId;
             document.getElementById("realmId").disabled = true;
@@ -196,7 +176,6 @@ export default class AddDataSourceTypeComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     Capitalize(str) {
         let { dataSourceType } = this.state
         dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -218,9 +197,6 @@ export default class AddDataSourceTypeComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={initialValues}
@@ -246,13 +222,11 @@ export default class AddDataSourceTypeComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -284,8 +258,6 @@ export default class AddDataSourceTypeComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -334,23 +306,18 @@ export default class AddDataSourceTypeComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.label}</FormFeedback>
                                                 </FormGroup>
-
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <CardFooter>
                                                 <FormGroup>
-
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -358,13 +325,10 @@ export default class AddDataSourceTypeComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -375,16 +339,12 @@ export default class AddDataSourceTypeComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         let { dataSourceType } = this.state
-
         dataSourceType.label.label_en = ''
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
             dataSourceType.realm.id = '';
         }
-
-
         this.setState(
             {
                 dataSourceType

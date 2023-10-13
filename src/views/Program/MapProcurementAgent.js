@@ -1,30 +1,23 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n';
-
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import ProcurementAgentService from '../../api/ProcurementAgentService';
-import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import { API_URL } from '../../Constants.js';
-import classNames from 'classnames';
-
+import ProcurementAgentService from '../../api/ProcurementAgentService';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValues = {
     label: ""
 }
 const entityname = i18n.t('static.report.procurementAgentName');
 const validationSchema = function (values) {
     return Yup.object().shape({
-        // programId: Yup.string()
-        //     .required(i18n.t('static.common.realmtext')),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -36,7 +29,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -46,10 +38,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
 export default class AddDimensionComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -69,13 +58,11 @@ export default class AddDimensionComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             programId: true,
@@ -97,11 +84,9 @@ export default class AddDimensionComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
-            ProcurementAgentService.getProcurementAgentForProgram(this.state.program.id)
+        ProcurementAgentService.getProcurementAgentForProgram(this.state.program.id)
             .then(response => {
                 this.setState({
                     program: {
@@ -110,7 +95,6 @@ export default class AddDimensionComponent extends Component {
                     },
                     loading: false
                 })
-
                 var procurementAgentListArray = [];
                 for (var i = 0; i < response.data.procurementAgentList.length; i++) {
                     if (this.state.procurementAgentList.id != 0) {
@@ -119,51 +103,45 @@ export default class AddDimensionComponent extends Component {
                 }
                 var listArray = procurementAgentListArray;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = a.label.toUpperCase();
+                    var itemLabelB = b.label.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-
                 var paJson = {
                     value: -1,
                     label: "All",
                 }
                 listArray.unshift(paJson);
-
-                this.setState({ 
-                    procurementAgentList: listArray 
+                this.setState({
+                    procurementAgentList: listArray
                 })
-
                 var selectedProcurementAgentListArray = [];
                 for (var i = 0; i < response.data.selectedProcurementAgentList.length; i++) {
                     selectedProcurementAgentListArray[i] = { value: response.data.selectedProcurementAgentList[i].id, label: response.data.selectedProcurementAgentList[i].label.label_en }
                 }
                 var listArray = selectedProcurementAgentListArray;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = a.label.toUpperCase();
+                    var itemLabelB = b.label.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
                     program: {
-                        ...this.state.program, 
+                        ...this.state.program,
                         procurementAgents: listArray
                     },
                     selectedProcurementAgentList: listArray
-                })                
-
+                })
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -194,9 +172,7 @@ export default class AddDimensionComponent extends Component {
                     }
                 }
             );
-
     }
-
     procurementAgentChange(selectedProcurementAgentList) {
         var selectedArray = [];
         for (var p = 0; p < selectedProcurementAgentList.length; p++) {
@@ -212,9 +188,7 @@ export default class AddDimensionComponent extends Component {
             var selectedProcurementAgentList = selectedProcurementAgentList;
         }
     }
-
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -222,10 +196,6 @@ export default class AddDimensionComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
-
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={
@@ -237,10 +207,8 @@ export default class AddDimensionComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    
                                     let selectedProcurementAgentListArray = [];
                                     selectedProcurementAgentListArray = this.state.selectedProcurementAgentList.map(e => e.value);
-
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgentsForProgram(this.state.program.id, selectedProcurementAgentListArray)
                                         .then(response => {
@@ -258,13 +226,11 @@ export default class AddDimensionComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -315,8 +281,6 @@ export default class AddDimensionComponent extends Component {
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="programId">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                     <Input
                                                         type="text"
                                                         name="programId"
@@ -326,7 +290,6 @@ export default class AddDimensionComponent extends Component {
                                                         value={this.state.program.code}
                                                     >
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="procurementAgentId">{i18n.t('static.report.procurementAgentName')}</Label>
@@ -347,7 +310,6 @@ export default class AddDimensionComponent extends Component {
                                                         multi
                                                         options={this.state.procurementAgentList}
                                                         value={this.state.selectedProcurementAgentList}
-
                                                     />
                                                     <FormFeedback className="red">{errors.procurementAgentId}</FormFeedback>
                                                 </FormGroup>
@@ -356,9 +318,7 @@ export default class AddDimensionComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -372,23 +332,18 @@ export default class AddDimensionComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         this.state.selectedProcurementAgentList = this.state.program.procurementAgents
-
         let { selectedProcurementAgentList } = this.state
         this.setState(
             {

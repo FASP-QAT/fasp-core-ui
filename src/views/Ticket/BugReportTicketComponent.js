@@ -1,16 +1,10 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Col, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
 import { API_URL, SPACE_REGEX } from '../../Constants';
-
-// let summaryText_1 = (i18n.t('static.common.bugreport'))
-// let summaryText_2 = "Report a bug"
+import JiraTikcetService from '../../api/JiraTikcetService';
+import i18n from '../../i18n';
 const initialValues = {
     summary: "",
     description: ""
@@ -27,7 +21,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.selectfile'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -39,7 +32,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -49,9 +41,7 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 export default class BugReportTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -68,7 +58,6 @@ export default class BugReportTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { bugReport } = this.state
         if (event.target.name == "summary") {
@@ -85,7 +74,6 @@ export default class BugReportTicketComponent extends Component {
             bugReport
         }, () => { })
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             summary: true,
@@ -107,22 +95,17 @@ export default class BugReportTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
     }
-
     resetClicked() {
         let { bugReport } = this.state;
         bugReport.summary = '';
@@ -134,9 +117,7 @@ export default class BugReportTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -150,15 +131,11 @@ export default class BugReportTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            // this.state.bugReport.summary = summaryText_2;
                             JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
-
                                     });
-
                                     this.setState({
                                         message: msg, loading: false
                                     },
@@ -180,13 +157,11 @@ export default class BugReportTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -269,7 +244,6 @@ export default class BugReportTicketComponent extends Component {
                                                     onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                     onBlur={handleBlur}
                                                 />
-                                    
                                                 <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.bugReport.attachFile}</label>
                                                 <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                             </div>
@@ -278,13 +252,10 @@ export default class BugReportTicketComponent extends Component {
                                                 <p>{i18n.t('static.ticket.filesuploadnote')}</p>
                                             </div>
                                         </FormGroup>
-                                       
                                         <ModalFooter className="pr-0 pb-0">
-
                                             <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-
                                         </ModalFooter>
                                     </Form>
                                 )} />
@@ -300,5 +271,4 @@ export default class BugReportTicketComponent extends Component {
             </div>
         );
     }
-
 }

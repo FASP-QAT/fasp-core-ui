@@ -1,7 +1,5 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
-
-
 class UserService {
     getLanguageList() {
         return axios.get(`${API_URL}/api/getLanguageList`, {
@@ -27,13 +25,11 @@ class UserService {
         return axios.post(`${API_URL}/api/role/`, json, {
         });
     }
-
     getUserList() {
         return axios.get(`${API_URL}/api/user`, {
         });
     }
     getUserByUserId(userId) {
-        // console.log("decryptedCurUser sync data api---",userId)
         return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }
@@ -45,7 +41,6 @@ class UserService {
         return axios.put(`${API_URL}/api/user/`, json, {
         });
     }
-
     editRole(json) {
         return axios.put(`${API_URL}/api/role/`, json, {
         });
@@ -57,7 +52,6 @@ class UserService {
     updateExpiredPassword(emailId, oldPassword, newPassword) {
         return axios.post(`${API_URL}/api/updateExpiredPassword/`, { emailId, oldPassword, newPassword }, {});
     }
-
     changePassword(userId, oldPassword, newPassword) {
         return axios.post(`${API_URL}/api/changePassword/`, { userId, oldPassword, newPassword }, {});
     }
@@ -89,5 +83,4 @@ class UserService {
         );
     }
 }
-
 export default new UserService()

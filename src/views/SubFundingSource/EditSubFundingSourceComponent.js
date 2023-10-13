@@ -1,14 +1,11 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import SubFundingSourceService from "../../api/SubFundingSourceService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import { API_URL } from '../../Constants';
-
+import SubFundingSourceService from "../../api/SubFundingSourceService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 let initialValues = {
     subFundingSource: ""
 }
@@ -19,7 +16,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.fundingsource.validsubfundingsource'))
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -31,7 +27,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -41,12 +36,10 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
 class EditSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // subFundingSource: this.props.location.state.subFundingSource,
             subFundingSource: {
                 fundingSource: {
                     label: {
@@ -74,24 +67,20 @@ class EditSubFundingSourceComponent extends Component {
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     componentDidMount() {
         SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
             this.setState({
                 subFundingSource: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -122,16 +111,13 @@ class EditSubFundingSourceComponent extends Component {
                 }
             }
         );
-
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { subFundingSource } = this.state;
             subFundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
-
     dataChange(event) {
         let { subFundingSource } = this.state;
         if (event.target.name == "subFundingSource") {
@@ -145,7 +131,6 @@ class EditSubFundingSourceComponent extends Component {
         },
             () => { });
     };
-
     touchAll(setTouched, errors) {
         setTouched({
             subFundingSource: true
@@ -167,8 +152,6 @@ class EditSubFundingSourceComponent extends Component {
             }
         }
     }
-
-
     render() {
         return (
             <div className="animated fadeIn">
@@ -189,7 +172,6 @@ class EditSubFundingSourceComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
-                                            // console.log("my response---", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             }
@@ -198,13 +180,11 @@ class EditSubFundingSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -235,7 +215,6 @@ class EditSubFundingSourceComponent extends Component {
                                                 }
                                             }
                                         );
-
                                 }}
                                 render={
                                     ({
@@ -322,9 +301,7 @@ class EditSubFundingSourceComponent extends Component {
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
@@ -334,24 +311,20 @@ class EditSubFundingSourceComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled', { entityname }));
     }
-
     resetClicked() {
         SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
             this.setState({
                 subFundingSource: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -382,8 +355,6 @@ class EditSubFundingSourceComponent extends Component {
                 }
             }
         );
-
     }
 }
-
 export default EditSubFundingSourceComponent;

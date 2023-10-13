@@ -1,22 +1,16 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import UserService from "../../api/UserService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import Select from 'react-select';
-import 'react-select/dist/react-select.min.css';
 import moment from "moment";
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import React, { Component } from 'react';
+import 'react-select/dist/react-select.min.css';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-
+import getLabelText from '../../CommonComponent/getLabelText';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import i18n from '../../i18n';
 const initialValues = {
   programId: '',
-  // problemId: '',
   planningUnitId: ''
 }
 const entityname = i18n.t('static.problem.problem');
@@ -24,14 +18,10 @@ const validationSchema = function (values) {
   return Yup.object().shape({
     programId: Yup.string()
       .required(i18n.t('static.budget.programtext')),
-    // problemId: Yup.string()
-    //   .required(i18n.t('static.addProblem.problemError')),
     planningUnitId: Yup.string()
       .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-
   })
 }
-
 const validate = (getValidationSchema) => {
   return (values) => {
     const validationSchema = getValidationSchema(values)
@@ -43,7 +33,6 @@ const validate = (getValidationSchema) => {
     }
   }
 }
-
 const getErrorsFromValidationError = (validationError) => {
   const FIRST_ERROR = 0
   return validationError.inner.reduce((errors, error) => {
@@ -66,27 +55,20 @@ class AddRoleComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
-    // this.dataChange = this.dataChange.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
     this.addProblem = this.addProblem.bind(this);
-
   }
-
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
-
   touchAll(setTouched, errors) {
     setTouched({
       programId: true,
       planningUnitId: true,
-      // problemId: true
-      // businessFunctions: true,
-      // canCreateRoles: true
     }
     )
     this.validateForm(errors)
@@ -105,7 +87,6 @@ class AddRoleComponent extends Component {
       }
     }
   }
-
   componentDidMount() {
     var db1;
     getDatabase();
@@ -150,13 +131,10 @@ class AddRoleComponent extends Component {
         this.setState({
           programList: proList
         })
-
-        // openRequest.onsuccess = function (e) {
         db1 = e.target.result;
         var transactionP = db1.transaction(['problem'], 'readwrite');
         var problem = transactionP.objectStore('problem');
         var getRequestP = problem.getAll();
-        // var proList = []
         getRequestP.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
@@ -167,17 +145,11 @@ class AddRoleComponent extends Component {
           var probList = [];
           probList = getRequestP.result;
           var filteredList = probList.filter(c => c.problemType.id != 1)
-          // // console.log("problemList====>", filteredList);
           this.setState({ problemList: filteredList });
-
         }.bind(this);
-
       }.bind(this);
     }.bind(this)
-
-
   }
-
   getPlanningUnitList(event) {
     var db1;
     var storeOS;
@@ -204,7 +176,6 @@ class AddRoleComponent extends Component {
       planningunitRequest.onsuccess = function (e) {
         var myResult = [];
         myResult = planningunitRequest.result;
-
         var planningUnitTransactionAll = db1.transaction(['planningUnit'], 'readwrite');
         var planningunitOsAll = planningUnitTransactionAll.objectStore('planningUnit');
         var planningunitRequestAll = planningunitOsAll.getAll();
@@ -216,17 +187,11 @@ class AddRoleComponent extends Component {
           })
         }.bind(this);
         planningunitRequestAll.onsuccess = function (e) {
-          // var myResultAll = [];
           planningUnitListAll = planningunitRequestAll.result;
-          // // console.log("myResult", myResult);
-          // alert((document.getElementById("programId").value).split("_")[0]);
           var programId = (document.getElementById("programId").value).split("_")[0];
-          // // console.log('programId----->>>', programId)
-          // // console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
             var pu = planningUnitListAll.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0];
-
             if (myResult[i].program.id == programId && myResult[i].active == true && pu.active == true) {
               var productJson = {
                 name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
@@ -235,13 +200,10 @@ class AddRoleComponent extends Component {
               proList[i] = productJson
             }
           }
-          // // console.log("planningUnitList---" + proList);
           this.setState({
             planningUnitList: proList
           })
-
           var programId = document.getElementById('programId').value;
-          // alert(programId);
           this.setState({ programId: programId });
           var db1;
           getDatabase();
@@ -268,18 +230,13 @@ class AddRoleComponent extends Component {
               var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
               var programJson = JSON.parse(programData);
-
-
               for (var i = 0; i < programJson.regionList.length; i++) {
                 var regionJson = {
-                  // name: // programJson.regionList[i].regionId,
                   name: getLabelText(programJson.regionList[i].label, this.state.lang),
                   id: programJson.regionList[i].regionId
                 }
                 regionList.push(regionJson);
-
               }
-              // // console.log("regionList---->", regionList);
               this.setState({
                 regionList: regionList
               })
@@ -289,20 +246,14 @@ class AddRoleComponent extends Component {
       }.bind(this);
     }.bind(this)
   }
-
   addProblem() {
-    // alert("hi");
-
-
     var programId = document.getElementById("programId").value;
     var regionId = document.getElementById("regionId").value;
     var planningUnitId = document.getElementById("planningUnitId").value;
-    // var problemId = document.getElementById("problemId").value;
     var problemDescription = document.getElementById("problemDescription").value;
     var suggession = document.getElementById("suggession").value;
     var problemId = 13;
     var problemActionIndex = 0;
-
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -317,13 +268,11 @@ class AddRoleComponent extends Component {
         })
     }.bind(this);
     openRequest.onsuccess = function (e) {
-
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
       var programTransaction = transaction.objectStore('programData');
       var programRequest = programTransaction.get(programId);
       var programRequestList = "";
-
       programRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -334,21 +283,15 @@ class AddRoleComponent extends Component {
           })
       }.bind(this);
       programRequest.onsuccess = function (event) {
-
         programRequestList = programRequest.result;
-
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         let username = decryptedUser.username;
-
         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
-        // // console.log("programJson===>", programJson);
-
         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
         var planningunitRequest = planningunitOs.getAll();
@@ -365,10 +308,7 @@ class AddRoleComponent extends Component {
           var planningUnitResult = [];
           planningUnitResult = planningunitRequest.result;
           planningUnitList = planningUnitResult.filter(c => c.program.id == programId.split("_")[0]);
-          // // console.log("planing Unit List===>", planningUnitList);
           var regionList = programJson.regionList;
-          // // console.log("regionList===>", regionList);
-
           var transactionP = db1.transaction(['problem'], 'readwrite');
           var problem = transactionP.objectStore('problem');
           var getRequestP = problem.getAll();
@@ -384,7 +324,6 @@ class AddRoleComponent extends Component {
           getRequestP.onsuccess = function (event) {
             var probList = [];
             probList = getRequestP.result;
-            // // console.log("problemList====>", probList);
             var programObj = programJson;
             var planningUnitObj = planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
             var regionObj = { id: 0 };
@@ -395,20 +334,12 @@ class AddRoleComponent extends Component {
             }
             var problemObj = probList.filter(c => c.problem.problemId == problemId)[0];
             var problemActionList = programJson.problemReportList;
-
             if (problemId == 13) {
-              // // console.log("programObj====>", programObj);
-              // // console.log("planningUnitObj====>", planningUnitObj);
-              // // console.log("regionObj====>", regionObj);
-              // console.log("problemObj====>", problemObj);
-              // // console.log("problemActionList====>", problemActionList);
               problemActionIndex = problemActionList.length;
-
               var index = problemActionList.findIndex(
                 c => c.program.id == programObj.programId
                   && c.planningUnit.id == planningUnitObj.planningUnit.id
                   && c.realmProblem.problem.problemId == 13);
-
               if (index == -1) {
                 var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                 var json = {
@@ -420,23 +351,18 @@ class AddRoleComponent extends Component {
                   },
                   versionId: programObj.currentVersion.versionId,
                   realmProblem: problemObj,
-
                   dt: '',
                   region: regionObj,
                   planningUnit: {
                     id: planningUnitObj.planningUnit.id,
                     label: planningUnitObj.planningUnit.label,
-
                   },
                   shipmentId: '',
-                  // data5: '',
                   data5: {
                     problemDescription: problemDescription,
                     suggession: suggession
                   },
-
                   problemActionIndex: problemActionIndex,
-
                   index: '',
                   problemCategory: {
                     id: 4,
@@ -488,12 +414,8 @@ class AddRoleComponent extends Component {
                       createdDate: curDate
                     }
                   ]
-
                 }
                 problemActionList.push(json);
-                // console.log("problemActionList===>", problemActionList);
-
-
                 var problemTransaction = db1.transaction(['programData'], 'readwrite');
                 var problemOs = problemTransaction.objectStore('programData');
                 var paList = problemActionList.filter(c => c.program.id == programObj.programId)
@@ -512,28 +434,17 @@ class AddRoleComponent extends Component {
                 putRequest.onsuccess = function (event) {
                   var programId = document.getElementById("programId").value;
                   this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
-                  // this.props.history.push(`/report/supplyPlanVersionAndReview/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
-
                 }.bind(this);
-
-
               } else {
                 this.props.history.push(`/report/addProblem/` + 'red/' + i18n.t('static.problem.allreadyExist'));
                 this.hideSecondComponent();
-                // // console.log("in else============>");
-
               }
-
             }
-
           }.bind(this);
         }.bind(this)
       }.bind(this);
     }.bind(this);
-
-
   }
-
   render() {
     const lan = 'en';
     const { programList } = this.state;
@@ -543,8 +454,6 @@ class AddRoleComponent extends Component {
           <option key={i} value={item.id}>{item.name}</option>
         )
       }, this);
-
-
     const { planningUnitList } = this.state;
     let planningUnits = planningUnitList.length > 0
       && planningUnitList.map((item, i) => {
@@ -552,7 +461,6 @@ class AddRoleComponent extends Component {
           <option key={i} value={item.id}>{item.name}</option>
         )
       }, this);
-
     const { regionList } = this.state;
     let regions = regionList.length > 0
       && regionList.map((item, i) => {
@@ -560,15 +468,6 @@ class AddRoleComponent extends Component {
           <option key={i} value={item.id}>{item.name}</option>
         )
       }, this);
-
-    // const { problemList } = this.state;
-    // let problems = problemList.length > 0
-    //   && problemList.map((item, i) => {
-    //     return (
-    //       <option key={i} value={item.problem.problemId}>{getLabelText(item.problem.label, this.state.lang)}</option>
-    //     )
-    //   }, this);
-
     return (
       <div className="animated fadeIn">
         <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -581,7 +480,6 @@ class AddRoleComponent extends Component {
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   this.addProblem && this.addProblem();
-                  // this.props.history.push(`/report/problemList/` + 'green/' + i18n.t('static.problem.addedSuccessfully'))
                 }}
                 render={
                   ({
@@ -611,12 +509,10 @@ class AddRoleComponent extends Component {
                             onChange={(e) => { handleChange(e); this.getPlanningUnitList() }}
                             onBlur={handleBlur}
                             required
-                          // value={this.state.budget.program.id}
                           >
                             <option value="">{i18n.t('static.common.select')}</option>
                             {programs}
                           </Input>
-
                           <FormFeedback className="red">{errors.programId}</FormFeedback>
                         </FormGroup>
                         <FormGroup>
@@ -643,72 +539,36 @@ class AddRoleComponent extends Component {
                             bsSize="sm"
                             name="regionId"
                             id="regionId"
-
                           >
                             <option value="0">{i18n.t('static.common.select')}</option>
                             {regions}
                           </Input>
                           <FormFeedback className="red">{errors.createdDate}</FormFeedback>
                         </FormGroup>
-                        {/* <FormGroup>
-                          <Label>{i18n.t('static.report.problem')} <span className="red Reqasterisk">*</span></Label>
-                          <Input type="select"
-                            bsSize="sm"
-                            name="problemId"
-                            id="problemId"
-                            valid={!errors.problemId}
-                            invalid={touched.problemId && !!errors.problemId}
-                            onChange={(e) => { handleChange(e) }}
-                            onBlur={handleBlur}
-                            required
-                          >
-                            <option value="">{i18n.t('static.common.select')}</option>
-                            {problems}
-                          </Input>
-                          <FormFeedback className="red">{errors.problemId}</FormFeedback>
-                        </FormGroup> */}
                         <FormGroup>
                           <Label>{i18n.t('static.report.problemDescription')}</Label>
                           <Input type="text"
-                            // maxLength={600}
                             bsSize="sm"
                             name="problemDescription"
                             id="problemDescription"
-                          // valid={!errors.problemId}
-                          // invalid={touched.problemId && !!errors.problemId}
-                          // onChange={(e) => { handleChange(e) }}
-                          // onBlur={handleBlur}
-                          // required
                           >
                           </Input>
                         </FormGroup>
                         <FormGroup>
                           <Label>{i18n.t('static.report.suggession')}</Label>
                           <Input type="textarea"
-                            // maxLength={600}
                             bsSize="sm"
                             name="suggession"
                             id="suggession"
-                          // valid={!errors.problemId}
-                          // invalid={touched.problemId && !!errors.problemId}
-                          // onChange={(e) => { handleChange(e) }}
-                          // onBlur={handleBlur}
-                          // required
                           >
                           </Input>
                         </FormGroup>
                         <FormGroup>
                           <Label>{i18n.t('static.common.notes')}</Label>
                           <Input type="textarea"
-                            // maxLength={600}
                             bsSize="sm"
                             name="notes"
                             id="notes"
-                          // valid={!errors.problemId}
-                          // invalid={touched.problemId && !!errors.problemId}
-                          // onChange={(e) => { handleChange(e) }}
-                          // onBlur={handleBlur}
-                          // required
                           >
                           </Input>
                         </FormGroup>
@@ -718,7 +578,6 @@ class AddRoleComponent extends Component {
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                           <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                           <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
                           &nbsp;
                         </FormGroup>
                       </CardFooter>
@@ -731,23 +590,18 @@ class AddRoleComponent extends Component {
     );
   }
   cancelClicked() {
-    // this.props.history.push(`/report/problemList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
-
   resetClicked() {
     let { role } = this.state;
     role.label.label_en = '';
     this.state.businessFunctionId = '';
     this.state.canCreateRoleId = '';
-
     this.setState(
       {
         role
       }
     )
-
   }
 }
-
 export default AddRoleComponent;

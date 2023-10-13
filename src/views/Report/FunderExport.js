@@ -1,41 +1,33 @@
-import React, { Component } from 'react';
-import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import i18n from '../../i18n'
-import RegionService from "../../api/RegionService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import RealmCountryService from "../../api/RealmCountryService.js";
-
-import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import pdfIcon from '../../assets/img/pdf.png';
-import csvicon from '../../assets/img/csv.png';
-import Picker from 'react-month-picker';
-import MonthBox from '../../CommonComponent/MonthBox.js';
-import ProgramService from '../../api/ProgramService';
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import ProductService from '../../api/ProductService';
-import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import moment from 'moment';
+import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { LOGO } from '../../CommonComponent/Logo.js';
-import ReportService from '../../api/ReportService';
-import { Online, Offline } from "react-detect-offline";
-import FundingSourceService from '../../api/FundingSourceService';
+import moment from 'moment';
+import React, { Component } from 'react';
+import BootstrapTable from 'react-bootstrap-table-next';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import Picker from 'react-month-picker';
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-
+import { LOGO } from '../../CommonComponent/Logo.js';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import FundingSourceService from '../../api/FundingSourceService';
+import ProgramService from '../../api/ProgramService';
+import ReportService from '../../api/ReportService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
 class FunderExport extends Component {
     constructor(props) {
         super(props);
@@ -56,7 +48,6 @@ class FunderExport extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
@@ -67,18 +58,14 @@ class FunderExport extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
     getPrograms = () => {
         if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
-                    // // console.log(JSON.stringify(response.data))
                     this.setState({
                         programs: response.data
                     }, () => { this.consolidatedProgramList() })
@@ -89,13 +76,11 @@ class FunderExport extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -126,41 +111,14 @@ class FunderExport extends Component {
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             programs: []
-            //         }, () => { this.consolidatedProgramList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
         } else {
-            // console.log('offline')
             this.consolidatedProgramList()
         }
-
     }
     consolidatedProgramList = () => {
         const lan = 'en';
         const { programs } = this.state
         var proList = programs;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -169,9 +127,7 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -184,40 +140,27 @@ class FunderExport extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        // console.log(programNameLabel)
-
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
                             proList.push(programData)
                         }
                     }
-
-
                 }
-
                 this.setState({
                     programs: proList
                 })
-
             }.bind(this);
-
         }.bind(this);
-
-
     }
-
     getFundingSource = () => {
         if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
-                    // // console.log(JSON.stringify(response.data))
                     this.setState({
                         fundingSources: response.data
                     }, () => { this.consolidatedFundingSourceList() })
@@ -228,13 +171,11 @@ class FunderExport extends Component {
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -265,42 +206,14 @@ class FunderExport extends Component {
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             fundingSources: []
-            //         }, () => { this.consolidatedFundingSourceList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
         } else {
-            // console.log('offline')
             this.consolidatedFundingSourceList()
         }
-
     }
-
     consolidatedFundingSourceList = () => {
         const lan = 'en';
         const { fundingSources } = this.state
         var proList = fundingSources;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -309,9 +222,7 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['fundingSource'], 'readwrite');
             var fundingSource = transaction.objectStore('fundingSource');
             var getRequest = fundingSource.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -319,37 +230,27 @@ class FunderExport extends Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-
                     var f = 0
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
                         if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
                             f = 1;
-                            // console.log('already exist')
                         }
                     }
                     var programData = myResult[i];
                     if (f == 0) {
                         proList.push(programData)
                     }
-
                 }
-
                 this.setState({
                     fundingSources: proList
                 })
-
             }.bind(this);
-
         }.bind(this);
     }
-
-
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
-
             const program = this.state.programs.filter(c => c.programId == programId)
-            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -361,19 +262,15 @@ class FunderExport extends Component {
                             })
                         }, () => { this.consolidatedVersionList(programId) });
                     });
-
-
                 } else {
                     this.setState({
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
-
                 this.setState({
                     versions: []
                 })
-
             }
         } else {
             this.setState({
@@ -385,7 +282,6 @@ class FunderExport extends Component {
         const lan = 'en';
         const { versions } = this.state
         var verList = versions;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -394,9 +290,7 @@ class FunderExport extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -410,31 +304,18 @@ class FunderExport extends Component {
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
-
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
-
                     }
-
-
                 }
-
-                // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
                     })
                 })
-
             }.bind(this);
-
-
-
         }.bind(this)
-
-
     }
-
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -454,17 +335,14 @@ class FunderExport extends Component {
                     var planningunitRequest = planningunitOs.getAll();
                     var planningList = []
                     planningunitRequest.onerror = function (event) {
-                        // Handle errors!
                     };
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                        // // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
-
                                 proList[i] = myResult[i]
                             }
                         }
@@ -475,15 +353,9 @@ class FunderExport extends Component {
                         })
                     }.bind(this);
                 }.bind(this)
-
-
             }
             else {
-                // AuthenticationService.setupAxiosInterceptors();
-
-                //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                    // // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''
                     }, () => {
@@ -496,13 +368,11 @@ class FunderExport extends Component {
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -533,59 +403,28 @@ class FunderExport extends Component {
                         }
                     }
                 );
-                // .catch(
-                //     error => {
-                //         this.setState({
-                //             planningUnits: [],
-                //         })
-                //         if (error.message === "Network Error") {
-                //             this.setState({ message: error.message });
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-                //                 case 500:
-                //                 case 401:
-                //                 case 404:
-                //                 case 406:
-                //                 case 412:
-                //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                //                     break;
-                //                 default:
-                //                     this.setState({ message: 'static.unkownError' });
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
             }
         });
-
     }
-
     handlePlanningUnitChange = (planningUnitIds) => {
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele.value),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
-
             this.fetchData()
         })
     }
-
-
     handleRangeChange(value, text, listIndex) {
-        //
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData()
         })
     }
-
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
     formatter = (value) => {
-
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -600,9 +439,7 @@ class FunderExport extends Component {
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-
     exportCSV(columns) {
-
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -621,23 +458,14 @@ class FunderExport extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-
-
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
         this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost])));
-        // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
-            // console.log(A[i])
             csvRow.push(A[i].join(","))
-
         }
-
         var csvString = csvRow.join("%0A")
-        // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -645,17 +473,13 @@ class FunderExport extends Component {
         document.body.appendChild(a)
         a.click()
     }
-
     exportPDF = (columns) => {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -663,14 +487,10 @@ class FunderExport extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
@@ -692,34 +512,23 @@ class FunderExport extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-
                     doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
-
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 200, {
                         align: 'left'
                     })
-
                 }
-
             }
         }
-
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size);
-
         doc.setFontSize(8);
-
-
-
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost]);
@@ -735,26 +544,19 @@ class FunderExport extends Component {
                 2: { cellWidth: 170 },
             }
         };
-
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.report.fundingSource') + ".pdf")
     }
-
-
-
     fetchData = () => {
-        // console.log("-------------------IN FETCHDATA-----------------------------");
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let fundingSourceId = document.getElementById("fundingSourceId").value;
         let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
-
         let planningUnitIds = this.state.planningUnitValues;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-
         if (programId > 0 && versionId != 0 && planningUnitIds.length > 0 && fundingSourceId > 0 && isPlannedShipmentId > 0) {
             if (versionId.includes('Local')) {
                 var db1;
@@ -769,18 +571,12 @@ class FunderExport extends Component {
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
                     var version = (versionId.split('(')[0]).trim()
-
-                    //for user id
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-                    //for program id
                     var program = `${programId}_v${version}_uId_${userId}`
-
                     db1 = e.target.result;
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    // // console.log(program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -791,8 +587,6 @@ class FunderExport extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-
-
                         var programTransaction = db1.transaction(['program'], 'readwrite');
                         var programOs = programTransaction.objectStore('program');
                         var program1Request = programOs.getAll();
@@ -807,26 +601,16 @@ class FunderExport extends Component {
                                     seaFreight = programResult[k].seaFreightPerc;
                                 }
                             }
-
                             var shipmentList = (programJson.shipmentList);
-
                             const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                            // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-
                             let isPlannedShipment = [];
-                            if (isPlannedShipmentId == 1) {//yes
+                            if (isPlannedShipmentId == 1) {
                                 isPlannedShipment = activeFilter;
-                            } else {//no
+                            } else {
                                 isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id != 1 || c.shipmentStatus.id != "1"));
                             }
-
                             const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
-
                             const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-
-                            // console.log("DB LIST---", dateFilter);
-                            // console.log("SELECTED LIST---", planningUnitIds);
-
                             let data = [];
                             let planningUnitFilter = [];
                             for (let i = 0; i < planningUnitIds.length; i++) {
@@ -836,8 +620,6 @@ class FunderExport extends Component {
                                     }
                                 }
                             }
-
-                            // console.log("offline data----", planningUnitFilter);
                             for (let j = 0; j < planningUnitFilter.length; j++) {
                                 let freight = 0;
                                 if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -858,7 +640,6 @@ class FunderExport extends Component {
                                 }
                                 data.push(json);
                             }
-                            // console.log("end offline data----", data);
                             this.setState({
                                 data: data
                                 , message: ''
@@ -885,10 +666,8 @@ class FunderExport extends Component {
                     planningUnitIds: planningUnitIds,
                     includePlannedShipments: includePlannedShipments,
                 }
-                // AuthenticationService.setupAxiosInterceptors();
                 ReportService.fundingSourceExportList(inputjson)
                     .then(response => {
-                        // // console.log(JSON.stringify(response.data))
                         this.setState({
                             data: response.data
                         }, () => {
@@ -905,13 +684,11 @@ class FunderExport extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -942,65 +719,27 @@ class FunderExport extends Component {
                             }
                         }
                     );
-                // .catch(
-                //     error => {
-                //         this.setState({
-                //             data: []
-                //         }, () => {
-                //             this.consolidatedProgramList();
-                //             this.consolidatedFundingSourceList();
-                //         })
-                //         if (error.message === "Network Error") {
-                //             this.setState({ message: error.message });
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-                //                 case 500:
-                //                 case 401:
-                //                 case 404:
-                //                 case 406:
-                //                 case 412:
-                //                     this.setState({ message: i18n.t(error.response.data.messageCode) });
-                //                     break;
-                //                 default:
-                //                     this.setState({ message: 'static.unkownError' });
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
-
-
             }
         } else if (fundingSourceId == 0) {
             this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] });
-
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.report.selectProgram'), data: [] });
-
         } else if (versionId == -1) {
             this.setState({ message: i18n.t('static.program.validversion'), data: [] });
-
         } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
-
         } else if (isPlannedShipmentId == 0) {
             this.setState({ message: i18n.t('static.report.isincludeplannedshipmentSelect'), data: [] });
         }
     }
-
     componentDidMount() {
         this.getFundingSource();
         this.getPrograms();
-
     }
-
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
-
     addCommas(cell, row) {
-        // // console.log("row---------->", row);
-        // var currencyCode = row.currency.currencyCode;
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -1009,10 +748,8 @@ class FunderExport extends Component {
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
-        // return "(" + currencyCode + ")" + "  " + x1 + x2;
         return x1 + x2;
     }
-
     render() {
         const checkOnline = localStorage.getItem('sessionType');
         const { SearchBar, ClearSearchButton } = Search;
@@ -1021,32 +758,23 @@ class FunderExport extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
         const { fundingSources } = this.state;
-
         const { programs } = this.state;
-
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {/* {item.versionId} */}
                         {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
-
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-
             }, this);
-
         const { rangeValue } = this.state
-
-
         const columns = [
             {
                 dataField: 'fundingSource.label',
@@ -1124,7 +852,6 @@ class FunderExport extends Component {
                 headerAlign: 'center',
                 formatter: this.addCommas
             },
-
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -1159,11 +886,6 @@ class FunderExport extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.fundingSource')}</strong> */}
-                        {/* <div className="card-header-actions">
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                        </div> */}
                         {checkOnline === 'Online' &&
                             this.state.data.length > 0 &&
                             <div className="card-header-actions">
@@ -1184,7 +906,6 @@ class FunderExport extends Component {
                         }
                     </div>
                     <CardBody className="pb-lg-2 mt-3">
-
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
@@ -1196,17 +917,14 @@ class FunderExport extends Component {
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 value={rangeValue}
                                                 lang={pickerLang}
-                                                //theme="light"
                                                 onChange={this.handleRangeChange}
                                                 onDismiss={this.handleRangeDissmis}
                                             >
                                                 <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <div className="controls SelectGo">
@@ -1227,13 +945,10 @@ class FunderExport extends Component {
                                                             </option>
                                                         )
                                                     }, this)}
-
                                             </Input>
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
@@ -1254,13 +969,10 @@ class FunderExport extends Component {
                                                             </option>
                                                         )
                                                     }, this)}
-
                                             </Input>
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls SelectGo">
@@ -1275,11 +987,9 @@ class FunderExport extends Component {
                                                 <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {versionList}
                                             </Input>
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1292,13 +1002,11 @@ class FunderExport extends Component {
                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                 options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             />
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
                             </div>
                         </Col>
-
                         <br /><br /><br /><br />
                         <Col md="12 pl-0">
                             <div className="d-md-flex Selectdiv2">
@@ -1317,16 +1025,11 @@ class FunderExport extends Component {
                                                 <option value="1">{i18n.t('static.program.yes')}</option>
                                                 <option value="2">{i18n.t('static.program.no')}</option>
                                             </Input>
-
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
                             </div>
                         </Col>
-
-
-
-
                         <ToolkitProvider
                             keyField="shipmentId"
                             data={this.state.data}
@@ -1337,7 +1040,6 @@ class FunderExport extends Component {
                         >
                             {
                                 props => (
-
                                     <div className="TableCust">
                                         <div className="col-md-3 pr-0 offset-md-9 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
@@ -1345,11 +1047,6 @@ class FunderExport extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            /* rowEvents={{
-                                                 onClick: (e, row, rowIndex) => {
-                                                     this.editRegion(row);
-                                                 }
-                                             }}*/
                                             {...props.baseProps}
                                         />
                                     </div>
@@ -1362,9 +1059,7 @@ class FunderExport extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div className="align-items-center">
                             <div ><h4> <strong>Loading...</strong></h4></div>
-
                             <div className="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
@@ -1374,5 +1069,3 @@ class FunderExport extends Component {
     }
 }
 export default FunderExport;
-
-

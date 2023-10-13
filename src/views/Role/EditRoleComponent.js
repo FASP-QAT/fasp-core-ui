@@ -1,56 +1,32 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import UserService from "../../api/UserService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import getLabelText from '../../CommonComponent/getLabelText';
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { API_URL, LABEL_REGEX } from '../../Constants.js';
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
-import classNames from 'classnames';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants.js';
+import UserService from "../../api/UserService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const initialValues = {
     roleName: "",
     businessFunctions: [],
     canCreateRole: []
 }
-
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.role.roletext')),
-        // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
             .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRoles: Yup.string()
             .required(i18n.t('static.role.cancreateroletext'))
-
-        // businessFunctions: Yup.array()
-        //     .min(1, i18n.t('static.role.businessfunctiontext'))
-        //     .of(
-        //         Yup.object().shape({
-        //             label: Yup.string().required(),
-        //             value: Yup.string().required(),
-        //         })
-        //     ),
-
-        // canCreateRoles: Yup.array()
-        //     .min(1, i18n.t('static.role.cancreateroletext'))
-        //     .of(
-        //         Yup.object().shape({
-        //             label: Yup.string().required(),
-        //             value: Yup.string().required(),
-        //         })
-        //     ),
     })
 }
-
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -62,7 +38,6 @@ const validate = (getValidationSchema) => {
         }
     }
 }
-
 const getErrorsFromValidationError = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -79,7 +54,6 @@ class EditRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
-            // role: this.props.location.state.role,
             role: {
                 businessFunctions: [],
                 canCreateRoles: [],
@@ -106,13 +80,11 @@ class EditRoleComponent extends Component {
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -120,8 +92,6 @@ class EditRoleComponent extends Component {
             return "";
         }
     }
-
-
     dataChange(event) {
         let { role } = this.state;
         if (event.target.name == "roleName") {
@@ -145,7 +115,6 @@ class EditRoleComponent extends Component {
         },
             () => { });
     }
-
     canCreateRoleChange(canCreateRoleId) {
         let { role } = this.state;
         this.setState({ canCreateRoleId });
@@ -159,7 +128,6 @@ class EditRoleComponent extends Component {
         },
             () => { });
     }
-
     touchAll(setTouched, errors) {
         setTouched({
             roleName: true,
@@ -183,12 +151,7 @@ class EditRoleComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-
-        // console.log("----**************---", this.props.match.params.roleId);
-        // alert("hi");
-        // AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
                 if (response.status == 200) {
@@ -198,8 +161,8 @@ class EditRoleComponent extends Component {
                     }
                     var listArray = businessFunctionList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase();
+                        var itemLabelB = b.label.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -218,13 +181,11 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -264,8 +225,8 @@ class EditRoleComponent extends Component {
                     }
                     var listArray = canCreateRoleList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase();
+                        var itemLabelB = b.label.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -285,13 +246,11 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -329,7 +288,6 @@ class EditRoleComponent extends Component {
                         role: response.data, loading: false
                     },
                         () => {
-                            // console.log("ROLE****************> ", this.state.role)
                         });
                 } else {
                     this.setState({
@@ -344,13 +302,11 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -382,7 +338,6 @@ class EditRoleComponent extends Component {
                 }
             );
     }
-
     render() {
         return (
             <div className="animated fadeIn">
@@ -391,9 +346,6 @@ class EditRoleComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
@@ -403,7 +355,6 @@ class EditRoleComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // console.log("INSUBMIT");
                                     this.setState({
                                         loading: true
                                     })
@@ -419,19 +370,16 @@ class EditRoleComponent extends Component {
                                                         this.hideSecondComponent();
                                                     })
                                             }
-
                                         })
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -462,8 +410,6 @@ class EditRoleComponent extends Component {
                                                 }
                                             }
                                         );
-
-
                                 }}
                                 render={
                                     ({
@@ -500,10 +446,6 @@ class EditRoleComponent extends Component {
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
                                                     <Select
-                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                        //     { 'is-valid': !errors.businessFunctions },
-                                                        //     { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || this.state.role.businessFunctions.length == 0) }
-                                                        // )}
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.businessFunctions },
                                                             { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || !!errors.businessFunctions) }
@@ -532,10 +474,6 @@ class EditRoleComponent extends Component {
                                                             { 'is-valid': !errors.canCreateRoles },
                                                             { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
                                                         )}
-                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                        //     { 'is-valid': !errors.canCreateRoles },
-                                                        //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
-                                                        // )}
                                                         bsSize="sm"
                                                         onChange={(e) => {
                                                             handleChange(e);
@@ -558,21 +496,12 @@ class EditRoleComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <CardFooter>
-                                                {/* <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
-
-                                                        &nbsp;
-                                                 </FormGroup> */}
                                                 <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
@@ -585,7 +514,6 @@ class EditRoleComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
@@ -603,13 +531,11 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -640,8 +566,6 @@ class EditRoleComponent extends Component {
                     }
                 }
             );
-
     }
 }
-
 export default EditRoleComponent;

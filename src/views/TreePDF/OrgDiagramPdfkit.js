@@ -1,19 +1,17 @@
 import AnnotationLabelTemplate from './AnnotationLabelTemplate';
 import CheckBoxTemplate from './CheckBoxTemplate';
-import CustomRenderTemplate from './CustomRenderTemplate';
 import CursorTemplate from './CursorTemplate';
+import CustomRenderTemplate from './CustomRenderTemplate';
 import DummyTemplate from './DummyTemplate';
 import GroupTitleTemplate from './GroupTitleTemplate';
 import HighlightTemplate from './HighlightTemplate';
 import ItemTemplate from './ItemTemplate';
-import UserTemplate from './UserTemplate';
 import LabelAnnotationTemplate from './LabelAnnotationTemplate';
-import LevelTitleTemplate from './LevelTitleTemplate';
 import LevelBackgroundTemplate from './LevelBackgroundTemplate';
-
-import BasePdfkitPlugin from './BasePdfkitPlugin';
+import LevelTitleTemplate from './LevelTitleTemplate';
+import UserTemplate from './UserTemplate';
 import OrgPdfkitTaskManagerFactory from '../../../node_modules/basicprimitives/src/OrgPdfkitTaskManagerFactory';
-
+import BasePdfkitPlugin from './BasePdfkitPlugin';
 /**
  * Creates PDFKit Organizational Chart Plugin
  * @class OrgDiagramPdfkit
@@ -36,7 +34,6 @@ export default function OrgDiagramPdfkit(options, templates) {
     UserTemplate,
     LevelTitleTemplate,
     LevelBackgroundTemplate,
-    /* FamDiagram specific templates */
     LabelAnnotationTemplate,
     ...templates
   });

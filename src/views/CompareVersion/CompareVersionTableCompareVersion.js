@@ -1,23 +1,19 @@
-import React, { Component } from 'react';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import i18n from '../../i18n'
-import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, TITLE_FONT } from '../../Constants';
+import jsPDF from "jspdf";
 import jexcel from 'jspreadsheet';
+import moment from "moment";
+import React, { Component } from 'react';
+import {
+    Button,
+    Modal, ModalBody, ModalFooter, ModalHeader
+} from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import getLabelText from '../../CommonComponent/getLabelText'
-import {
-    Col, Row, Card, CardBody, Form,
-    FormGroup, Label, InputGroup, Input, Button,
-    Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader,
-    FormFeedback
-} from 'reactstrap';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import jsPDF from "jspdf";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo';
-import moment from "moment";
+import getLabelText from '../../CommonComponent/getLabelText';
+import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, TITLE_FONT } from '../../Constants';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
-
 export default class CompareVersionTableCompareVersion extends Component {
     constructor(props) {
         super(props);
@@ -35,13 +31,10 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.acceptCurrentChanges = this.acceptCurrentChanges.bind(this);
         this.acceptIncomingChanges = this.acceptIncomingChanges.bind(this);
     }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-
     formatter = value => {
-
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -53,17 +46,13 @@ export default class CompareVersionTableCompareVersion extends Component {
         }
         return x1 + x2;
     }
-
     exportPDF() {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -71,22 +60,10 @@ export default class CompareVersionTableCompareVersion extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
-
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
@@ -94,7 +71,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setFontSize(8)
                 doc.setFont('helvetica', 'normal')
-
                 doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                     align: 'right'
                 })
@@ -110,40 +86,23 @@ export default class CompareVersionTableCompareVersion extends Component {
                 doc.text(getLabelText(this.props.datasetData.label, this.state.lang), doc.internal.pageSize.width - 40, 60, {
                     align: 'right'
                 })
-
-                /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
-                });*/
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
-                    // doc.setFont('helvetica', 'normal')
-                    // doc.setFontSize(8)
-                    // doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                    //     align: 'left'
-                    // })
-
                 }
-
             }
         }
-
-
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
         doc.setTextColor("#002f6c");
-
-
         var y = 100;
         doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
@@ -165,33 +124,14 @@ export default class CompareVersionTableCompareVersion extends Component {
             align: 'left'
         })
         y = y + 10;
-
-
-
-
-
-        //   const title = i18n.t('static.dashboard.globalconsumption');
-        //   var canvas = document.getElementById("cool-canvas");
-        //   //creates image
-
-        //   var canvasImg = canvas.toDataURL("image/png", 1.0);
-        //   var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        //   var aspectwidth1 = (width - h1);
         let startY = y + 10
-        //   console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
-        //   doc.setTextColor("#fff");
-        //   if (startYtable > (height - 400)) {
-        //     doc.addPage()
-        //     startYtable = 80
-        //   }
-        //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
         var columns = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         const headers2 = [
@@ -216,74 +156,38 @@ export default class CompareVersionTableCompareVersion extends Component {
             dataArr1.push(dataArr);
         })
         const data = dataArr1;
-        // doc.addPage()
         let content = {
             margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [headers2, columns],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
         };
-
-
-        //doc.text(title, marginLeft, 40);
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
         doc.save(this.props.datasetData.programCode + "-" + i18n.t('static.dashboard.compareVersion').concat('.pdf'));
-        //creates PDF from img
-        /*  var doc = new jsPDF('landscape');
-          doc.setFontSize(20);
-          doc.text(15, 15, "Cool Chart");
-          doc.save('canvas.pdf');*/
     }
-
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (this.props.datasetData.programCode).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (getLabelText(this.props.datasetData.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
-
-
-        // csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ", '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', '') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ", '%20') + '"')
-        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', '') + '"')
-        // csvRow.push('')
-
-
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
         var columns = [];
-        // columns.push(i18n.t('static.common.level'));
-        // columns.push(i18n.t('static.supplyPlan.type'));
-        // columns.push(i18n.t('static.forecastingunit.forecastingunit'));
-        // columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
-        // columns.push(i18n.t('static.common.product'));
-        // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
-        // columns.push(i18n.t('static.productValidation.cost'));
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
-
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var C = [this.addDoubleQuoteToRowContent(["", "", this.props.versionLabel, this.props.versionLabel, this.props.versionLabel, this.props.versionLabel1, this.props.versionLabel1, this.props.versionLabel1])];
         var B = []
@@ -296,14 +200,12 @@ export default class CompareVersionTableCompareVersion extends Component {
             })
             A.push(this.addDoubleQuoteToRowContent(B));
         })
-
         for (var i = 0; i < C.length; i++) {
             csvRow.push(C[i].join(","))
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
-
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
@@ -312,14 +214,11 @@ export default class CompareVersionTableCompareVersion extends Component {
         document.body.appendChild(a)
         a.click()
     }
-
     componentDidMount() {
-        // console.log("DatasetData+++", this.props.datasetData);
-        // console.log("DatasetData1+++", this.props.datasetData1);
         this.props.updateState("loading", true);
-        var datasetData = this.props.datasetData;// local working copy
-        var datasetData1 = this.props.datasetData1;//server latest version
-        var datasetData2 = this.props.datasetData2;// local downloaded data
+        var datasetData = this.props.datasetData;
+        var datasetData1 = this.props.datasetData1;
+        var datasetData2 = this.props.datasetData2;
         var page = this.props.page;
         var planningUnitList = []
         if (page != "compareVersion") {
@@ -335,7 +234,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                 return a < b ? -1 : a > b ? 1 : 0;
             }.bind(this));
         }
-
         var planningUnitSet = [...new Set(planningUnitList.map(ele => (ele.planningUnit.id)))]
         let dataArray = [];
         let data = [];
@@ -358,7 +256,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                 return a < b ? -1 : a > b ? 1 : 0;
             }.bind(this));
         }
-
         var regionSet = [...new Set(combineRegionList.map(ele => (ele.regionId)))]
         this.setState({
             regionList: regionList, regionList1: regionList1, regionList2: regionList2
@@ -383,105 +280,31 @@ export default class CompareVersionTableCompareVersion extends Component {
                 },
             ]
         );
-        // var regionJson = [];
-        // regionJson.push({
-        //     title: "",
-        //     rowspan: '3'
-        // })
-        // for (var r = 0; r < regionList.length; r++) {
-        //     regionJson.push({
-        //         title: regionList[r].label.label_en,
-        //         colspan: 3
-        //     })
-        // }
-        // for (var r = 0; r < regionList1.length; r++) {
-        //     regionJson.push({
-        //         title: regionList1[r].label.label_en,
-        //         colspan: 3
-        //     })
-        // }
-        // for (var r = 0; r < regionList2.length; r++) {
-        //     regionJson.push({
-        //         title: regionList2[r].label.label_en,
-        //         colspan: 3,
-        //         type:'hidden'
-        //     })
-        // }
-        // var regionJsonStr = regionJson.map(item => {
-        //     return { title: item.title, colspan: 3 }
-        // }).join(',')
-        // nestedHeaders.push(regionJson);
         columns.push({ title: i18n.t('static.consumption.planningunit'), width: 300 })
         columns.push({ title: i18n.t('static.dashboard.regionreport'), width: 100 })
-        // for (var r = 0; r < regionList.length; r++) {
         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
         columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120, type: 'numeric', mask: '#,##.00', decimal: '.' })
         columns.push({ title: i18n.t('static.program.notes'), width: 210 })
-        // }
-        // for (var r = 0; r < regionList1.length; r++) {
         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
         columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120, type: 'numeric', mask: '#,##.00', decimal: '.' })
         columns.push({ title: i18n.t('static.program.notes'), width: 210 })
-        // }
-        // for (var r = 0; r < regionList2.length; r++) {
         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200, type: 'hidden' })
         columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120, type: 'hidden' })
         columns.push({ title: i18n.t('static.program.notes'), width: 210, type: 'hidden' })
-        // }
-
-        // var scenarioList = [];
-        // var treeScenarioList = [];
-        // for (var t = 0; t < datasetData.treeList.length; t++) {
-        //     scenarioList = scenarioList.concat(datasetData.treeList[t].scenarioList);
-        //     var sl = datasetData.treeList[t].scenarioList;
-        //     for (var s = 0; s < sl.length; s++) {
-        //         treeScenarioList.push({ treeLabel: getLabelText(datasetData.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
-        //     }
-
-        // }
-
-        // var scenarioList1 = [];
-        // var treeScenarioList1 = [];
-        // for (var t = 0; t < datasetData1.treeList.length; t++) {
-        //     scenarioList1 = scenarioList1.concat(datasetData1.treeList[t].scenarioList);
-        //     var sl = datasetData1.treeList[t].scenarioList;
-        //     for (var s = 0; s < sl.length; s++) {
-        //         treeScenarioList1.push({ treeLabel: getLabelText(datasetData1.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData1.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
-        //     }
-        // }
-
-        // var scenarioList2 = [];
-        // var treeScenarioList2 = [];
-        // for (var t = 0; t < datasetData2.treeList.length; t++) {
-        //     scenarioList2 = scenarioList2.concat(datasetData2.treeList[t].scenarioList);
-        //     var sl = datasetData2.treeList[t].scenarioList;
-        //     for (var s = 0; s < sl.length; s++) {
-        //         treeScenarioList2.push({ treeLabel: getLabelText(datasetData2.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData2.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
-        //     }
-        // }
-
-        // var consumptionExtrapolation = datasetData.consumptionExtrapolation;
-        // var consumptionExtrapolation1 = datasetData1.consumptionExtrapolation;
-        // var consumptionExtrapolation2 = datasetData2.consumptionExtrapolation;
-
         for (var j = 0; j < planningUnitSet.length; j++) {
             for (var k = 0; k < regionSet.length; k++) {
                 data = [];
                 var pu = datasetData.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                 var pu1 = datasetData1.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                 var pu2 = datasetData2.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
-
                 var rg = regionList.filter(c => c.regionId == regionSet[k]);
                 var rg1 = regionList1.filter(c => c.regionId == regionSet[k]);
                 var rg2 = regionList2.filter(c => c.regionId == regionSet[k]);
-
                 var selectedForecastData = pu.length > 0 ? pu[0].selectedForecastMap : '';
                 var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
                 var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
-
                 var puFiltered = pu.filter(c => c.region.id == regionSet[k]);
                 var puFiltered1 = pu1.filter(c => c.region.id == regionSet[k]);
-                // console.log("consumptionExtrapolation", consumptionExtrapolation);
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
                 data[2] = puFiltered.length > 0 ? getLabelText(puFiltered[0].selectedForecast) : ""
@@ -497,26 +320,17 @@ export default class CompareVersionTableCompareVersion extends Component {
             }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
-
         var options = {
             data: dataArray,
             columnDrag: true,
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
             nestedHeaders: nestedHeaders,
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -533,20 +347,6 @@ export default class CompareVersionTableCompareVersion extends Component {
             editable: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
-                // //Resolve conflicts
-                // var rowData = obj.getRowData(y)
-                // // if (rowData[11].toString() == 2) {
-                // items.push({
-                //     title: "Resolve conflicts",
-                //     onclick: function () {
-                //         this.setState({ loading: true })
-                //         this.toggleLarge(rowData, y);
-                //     }.bind(this)
-                // })
-                // // } else {
-                // //     return false;
-                // // }
-
                 return items;
             }.bind(this),
         };
@@ -558,7 +358,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         })
         this.props.updateState("loading", false);
     }
-
     toggleLarge(data, index) {
         this.setState({
             conflicts: !this.state.conflicts,
@@ -568,16 +367,12 @@ export default class CompareVersionTableCompareVersion extends Component {
             this.showData(data, index);
         }
     }
-
-    // functions
     showData(data, index) {
-        // console.log('inside');
         var dataArray = [];
         dataArray.push([data[0], data[1], data[2], data[3], data[4]]);
         dataArray.push([data[0], data[1], data[5], data[6], data[7]]);
         var options = {
             data: dataArray,
-            // colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -595,27 +390,19 @@ export default class CompareVersionTableCompareVersion extends Component {
                 {
                     title: "Forecast Qty",
                     type: 'text',
-
                 },
                 {
                     title: "Notes",
                     type: 'text',
                 }
             ],
-            // text: {
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             pagination: false,
             search: false,
             columnSorting: false,
-            // tableOverflow: false,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            // tableOverflow: false,
             editable: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
@@ -632,7 +419,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         })
         document.getElementById("index").value = index;
     }
-
     loadedResolveConflicts = function (instance) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var elInstance = instance.worksheets[0];
@@ -654,7 +440,6 @@ export default class CompareVersionTableCompareVersion extends Component {
             }
         }
     }
-
     acceptCurrentChanges() {
         var elInstance = this.state.dataEl;
         elInstance.options.editable = true;
@@ -663,23 +448,19 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.props.updateState("json", elInstance.getJson(null, false));
         this.toggleLarge([], -1);
     }
-
     acceptIncomingChanges() {
         var elInstance = this.state.dataEl;
-        // console.log("this.state.index", this.state.index);
         elInstance.options.editable = true;
         elInstance.setValueFromCoords(11, this.state.index, 3, true);
         elInstance.options.editable = false;
         this.props.updateState("json", elInstance.getJson(null, false));
         this.toggleLarge([], -1);
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
             var elInstance = instance.worksheets[0];
             var json = elInstance.getJson(null, false);
-
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
             for (var r = 0; r < json.length; r++) {
                 var startPt = 2;
@@ -689,7 +470,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                     var local = (json[r])[startPt]
                     var server = (json[r])[startPt1 + i]
                     var downloaded = (json[r])[startPt2 + i]
-
                     if (local == server) {
                     } else {
                         if (local == downloaded) {
@@ -701,7 +481,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                         } else {
-                            //yellow color
                             var col = (colArr[0]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -726,7 +505,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                             var col = (colArr[7]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                            // elInstance.setValueFromCoords(11, r, 2, true);
                         }
                     }
                     startPt += 1;
@@ -734,33 +512,25 @@ export default class CompareVersionTableCompareVersion extends Component {
             }
         }
         else {
-            // var asterisk = document.getElementsByClassName("resizable")[0];
             var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-            // var tr = asterisk.firstChild;
             var tr = asterisk.firstChild.nextSibling;
-            // console.log("asterisk", asterisk.firstChild.nextSibling)
-
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');
             tr.children[6].classList.add('InfoTr');
             tr.children[7].classList.add('InfoTr');
-
             tr.children[3].title = i18n.t('static.compareVersion.selectedForecastTitle');
             tr.children[4].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
             tr.children[6].title = i18n.t('static.compareVersion.selectedForecastTitle');
             tr.children[7].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
         }
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         return (
             <div>
-                {/* Resolve conflicts modal */}
                 <Modal isOpen={this.state.conflicts}
                     className={'modal-lg ' + this.props.className + "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
@@ -781,7 +551,6 @@ export default class CompareVersionTableCompareVersion extends Component {
                         <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
                     </ModalFooter>
                 </Modal>
-                {/* Resolve conflicts modal */}
             </div>)
     }
 }

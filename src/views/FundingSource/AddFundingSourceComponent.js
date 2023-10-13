@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import getLabelText from '../../CommonComponent/getLabelText'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, API_URL } from '../../Constants.js';
-
-import i18n from '../../i18n'
 let initialValues = {
   fundingSourceId: [],
   subFundingSource: "",
@@ -21,21 +19,14 @@ const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
-    // fundingSource: Yup.string()
-    //   .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
-    //   .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSource: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
     fundingSourceCode: Yup.string()
-      // .max(6, i18n.t('static.common.max6digittext'))
-      // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
-      // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
       .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
       .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
   })
 }
-
 const validate = (getValidationSchema) => {
   return (values) => {
     const validationSchema = getValidationSchema(values)
@@ -47,7 +38,6 @@ const validate = (getValidationSchema) => {
     }
   }
 }
-
 const getErrorsFromValidationError = (validationError) => {
   const FIRST_ERROR = 0
   return validationError.inner.reduce((errors, error) => {
@@ -83,39 +73,30 @@ class AddFundingSourceComponent extends Component {
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.getDisplayName = this.getDisplayName.bind(this);
   }
-
   getDisplayName() {
     let realmId = document.getElementById("realmId").value;
-    // let realmId = 1;
     let fundingSourceValue = document.getElementById("fundingSource").value;
-    // let fundingSourceValue = "USAID"
     fundingSourceValue = fundingSourceValue.replace(/[^A-Za-z0-9]/g, "");
     fundingSourceValue = fundingSourceValue.trim().toUpperCase();
     if (realmId != '' && fundingSourceValue.length != 0) {
-
-      if (fundingSourceValue.length >= 7) {//minus 2
+      if (fundingSourceValue.length >= 7) {
         fundingSourceValue = fundingSourceValue.slice(0, 5);
-        // console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
-            // console.log("DISPLAYNAME-RESP----->", response);
             let { fundingSource } = this.state;
             fundingSource.fundingSourceCode = response.data;
             this.setState({
               fundingSource
             });
-
           }).catch(
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
                 switch (error.response ? error.response.status : "") {
-
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
                     break;
@@ -146,29 +127,23 @@ class AddFundingSourceComponent extends Component {
               }
             }
           );
-
-      } else {// not need to minus
-        // console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
+      } else {
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
-            // console.log("DISPLAYNAME-RESP-else----->", response);
             let { fundingSource } = this.state;
             fundingSource.fundingSourceCode = response.data;
             this.setState({
               fundingSource
             });
-
           }).catch(
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
                 switch (error.response ? error.response.status : "") {
-
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
                     break;
@@ -200,11 +175,8 @@ class AddFundingSourceComponent extends Component {
             }
           );
       }
-
     }
-
   }
-
   dataChange(event) {
     let { fundingSource } = this.state;
     if (event.target.name == "realmId") {
@@ -219,13 +191,11 @@ class AddFundingSourceComponent extends Component {
     if (event.target.name == "allowedInBudget") {
       fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
     }
-
     this.setState({
       fundingSource
     },
       () => { });
   };
-
   touchAll(setTouched, errors) {
     setTouched({
       realmId: true,
@@ -252,22 +222,19 @@ class AddFundingSourceComponent extends Component {
   Capitalize(str) {
     var reg = /^[1-9]\d*(\.\d+)?$/
     if (str != null && str != "") {
-      // return str.charAt(0).toUpperCase() + str.slice(1);
       return (!(reg.test(str)) ? str.charAt(0).toUpperCase() + str.slice(1) : str)
     } else {
       return "";
     }
   }
   componentDidMount() {
-    // AuthenticationService.setupAxiosInterceptors();
-    // this.getDisplayName();
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({ realms: listArray, loading: false })
@@ -278,13 +245,11 @@ class AddFundingSourceComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
             switch (error.response ? error.response.status : "") {
-
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
                 break;
@@ -317,11 +282,6 @@ class AddFundingSourceComponent extends Component {
       );
     let realmId = AuthenticationService.getRealmId();
     if (realmId != -1) {
-      // document.getElementById('realmId').value = realmId;
-      // initialValues = {
-      //   realmId: realmId
-      // }
-
       let { fundingSource } = this.state;
       fundingSource.realm.id = realmId;
       document.getElementById("realmId").disabled = true;
@@ -329,7 +289,6 @@ class AddFundingSourceComponent extends Component {
         fundingSource
       },
         () => {
-
         })
     }
   }
@@ -338,7 +297,6 @@ class AddFundingSourceComponent extends Component {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
-
   render() {
     const { realms } = this.state;
     let realmList = realms.length > 0
@@ -356,11 +314,7 @@ class AddFundingSourceComponent extends Component {
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
-              {/* <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-              </CardHeader> */}
               <Formik
-                // initialValues={initialValues}
                 enableReinitialize={true}
                 initialValues={{
                   realmId: this.state.fundingSource.realm.id,
@@ -372,10 +326,8 @@ class AddFundingSourceComponent extends Component {
                   this.setState({
                     loading: true
                   })
-                  // console.log("Submit clicked");
                   FundingSourceService.addFundingSource(this.state.fundingSource)
                     .then(response => {
-                      // console.log("Response->", response);
                       if (response.status == 200) {
                         this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
@@ -390,13 +342,11 @@ class AddFundingSourceComponent extends Component {
                       error => {
                         if (error.message === "Network Error") {
                           this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                           });
                         } else {
                           switch (error.response ? error.response.status : "") {
-
                             case 401:
                               this.props.history.push(`/login/static.message.sessionExpired`)
                               break;
@@ -470,7 +420,6 @@ class AddFundingSourceComponent extends Component {
                             valid={!errors.fundingSource && this.state.fundingSource.label.label_en != ''}
                             invalid={touched.fundingSource && !!errors.fundingSource}
                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                            // onBlur={handleBlur}
                             onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
                             maxLength={255}
                             value={this.Capitalize(this.state.fundingSource.label.label_en)}
@@ -493,7 +442,6 @@ class AddFundingSourceComponent extends Component {
                           />
                           <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                         </FormGroup>
-
                         <FormGroup>
                           <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
                           <FormGroup check inline className="ml-5">
@@ -529,43 +477,29 @@ class AddFundingSourceComponent extends Component {
                             </Label>
                           </FormGroup>
                         </FormGroup>
-
                       </CardBody>
                       <div style={{ display: this.state.loading ? "block" : "none" }}>
                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                           <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                           </div>
                         </div>
                       </div>
                       <CardFooter>
                         <FormGroup>
-
-
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                           <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                          {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
                           <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
                           &nbsp;
                         </FormGroup>
                       </CardFooter>
                     </Form>
-
                   )} />
-
             </Card>
           </Col>
         </Row>
-
-        {/* <div>
-          <h6>{i18n.t(this.state.message)}</h6>
-          <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div> */}
       </div>
     );
   }
@@ -574,19 +508,15 @@ class AddFundingSourceComponent extends Component {
   }
   resetClicked() {
     let { fundingSource } = this.state;
-
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
       fundingSource.realm.id = ''
     }
-
     fundingSource.label.label_en = ''
     fundingSource.fundingSourceCode = ''
-
     this.setState({
       fundingSource
     },
       () => { });
   }
 }
-
 export default AddFundingSourceComponent;
