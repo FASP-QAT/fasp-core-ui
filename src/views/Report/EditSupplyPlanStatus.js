@@ -4656,7 +4656,7 @@ class EditSupplyPlanStatus extends Component {
                             onclick: function () {
                                 var myObj = obj.getRowData(y);
                                 // console.log("my obj===>", myObj);
-                                this.toggleTransView(myObj[23]);
+                                this.toggleTransView(myObj[24]);
                             }.bind(this)
                         });
                     }
