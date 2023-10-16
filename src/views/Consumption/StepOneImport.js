@@ -11,7 +11,7 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -143,6 +143,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             );
     }
     changed = function (instance, cell, x, y, value) {
+        changed(instance, cell, x, y, value)
         this.props.removeMessageText && this.props.removeMessageText();
         var selectedPlanningUnitObj = "";
         let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
@@ -625,6 +626,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 },
                 {
                     title: 'ForecastMultiplier',
@@ -847,24 +853,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
+        valid = checkValidation(this.el);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
             if (value != -1) {
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == value)[0];
-                var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("H").concat(parseInt(y) + 1);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                    valid = false;
-                } else if (tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
+                if (tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));

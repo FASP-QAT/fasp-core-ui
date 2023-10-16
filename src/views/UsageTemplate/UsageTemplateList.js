@@ -20,7 +20,7 @@ import jexcel from 'jspreadsheet';
 import { Prompt } from 'react-router';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from "../../Constants";
 import ForecastingUnitService from '../../api/ForecastingUnitService';
@@ -796,20 +796,31 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     source: this.state.typeList,
                     width: '90',
-                    filter: this.filterDataset 
+                    filter: this.filterDataset,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
                     width: '180',
                     textEditor: true,
+                    required: true
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.tracerCategoryList, 
-                    filter: this.filterTracerCategoryByProgramId
+                    filter: this.filterTracerCategoryByProgramId,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.validSpace.string')
+                    }
                 },
                 {
                     title: i18n.t('static.product.unit1'),
@@ -837,12 +848,24 @@ class usageTemplate extends Component {
                         }.bind(this),
                     },
                     filter: this.filterForecastingUnitList,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.validSpace.string')
+                    }
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
                     width: '100',
                     textEditor: true, 
+                    required: true,
+                    number: true,
+                    minValue: 0,
+                    regex: {
+                        ex: INTEGER_NO_REGEX,
+                        text: i18n.t('static.common.onlyIntegers'),
+                    }
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
@@ -851,7 +874,12 @@ class usageTemplate extends Component {
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }
-                    ] 
+                    ],
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext'),
+                    }
                 },
                 {
                     title: i18n.t('static.usageTemplate.persons'),
@@ -866,13 +894,25 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList,
-                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true 
+                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true ,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext'),
+                    }
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
                     width: '130',
                     textEditor: true, 
+                    required: true,
+                    number: true,
+                    minValue: 0,
+                    regex: {
+                        ex: DECIMAL_NO_REGEX,
+                        text: i18n.t('static.common.onlyIntegers')
+                    }
                 },
                 {
                     title: i18n.t('static.usageTemplate.onTimeUsage?'),
@@ -1850,6 +1890,7 @@ class usageTemplate extends Component {
         }
     }
     changed = function (instance, cell, x, y, value) {
+        changed(instance, cell, x, y, value)
         if ((x == 7 || x == 9) && this.el.getValueFromCoords(10, y)) {
             let i1 = this.el.getValueFromCoords(7, y);
             let l1 = this.el.getValueFromCoords(9, y);
@@ -2068,10 +2109,9 @@ class usageTemplate extends Component {
         if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
         }
-        if (x == 3) {
+        if (x == 2) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            this.el.setValueFromCoords(4, y, '', true);
+            var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -2080,7 +2120,7 @@ class usageTemplate extends Component {
                 if (!(budgetRegx.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2109,22 +2149,6 @@ class usageTemplate extends Component {
         if (x == 1) {
             this.el.setValueFromCoords(3, y, '', true)
             this.el.setValueFromCoords(4, y, '', true)
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
             let realmId = AuthenticationService.getRealmId();
             if(value!=-1){
         TracerCategoryService.getTracerCategoryByProgramIds(realmId, [value])
@@ -2163,67 +2187,7 @@ class usageTemplate extends Component {
               });
         }
         }
-        if (x == 2) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = INTEGER_NO_REGEX;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-            }
-        }
-        if (x == 6) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+
         if (x == 7) {
             let selectedTypeID = this.el.getValueFromCoords(6, y);
             if (selectedTypeID == 1) {
@@ -2258,46 +2222,14 @@ class usageTemplate extends Component {
         }
         if (x == 8) {
             this.el.setValueFromCoords(24, y, 1, true);
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("I").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
         }
         if (x == 9) {
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = DECIMAL_NO_REGEX;
-            if (value == "") {
+            if (value == 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value <= 0) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
+                this.el.setComments(col, i18n.t('static.program.validvaluetext'));
             }
         }
         if (x == 11) {
@@ -2538,164 +2470,10 @@ class usageTemplate extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
+        valid = checkValidation(this.el);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(17, y);
             if (parseInt(value) == 1) {
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("D").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(3, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("F").concat(parseInt(y) + 1);
-                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = INTEGER_NO_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
-                        valid = false;
-                        this.setState({
-                            message: i18n.t('static.supplyPlan.validationFailed'),
-                            color: 'red'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        if (isNaN(Number.parseInt(value)) || value < 0) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                            valid = false;
-                            this.setState({
-                                message: i18n.t('static.supplyPlan.validationFailed'),
-                                color: 'red'
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
-                }
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(8, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(6, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
                 if (this.el.getValueFromCoords(6, y) == 1) {
                     var col = ("H").concat(parseInt(y) + 1);
                     var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -2760,49 +2538,10 @@ class usageTemplate extends Component {
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = INTEGER_NO_REGEX;
-                if (value == "") {
+                if (value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                    this.setState({
-                        message: i18n.t('static.supplyPlan.validationFailed'),
-                        color: 'red'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                } else {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
-                        valid = false;
-                        this.setState({
-                            message: i18n.t('static.supplyPlan.validationFailed'),
-                            color: 'red'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    } else {
-                        if (isNaN(Number.parseInt(value)) || value <= 0) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                            valid = false;
-                            this.setState({
-                                message: i18n.t('static.supplyPlan.validationFailed'),
-                                color: 'red'
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
+                    this.el.setComments(col, i18n.t('static.program.validvaluetext'));   
                 }
                 if (!this.el.getValueFromCoords(10, y)) {
                     var col = ("L").concat(parseInt(y) + 1);
