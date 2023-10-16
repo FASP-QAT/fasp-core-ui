@@ -223,15 +223,11 @@ export default class WhatIfReportComponent extends React.Component {
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
-        this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
-        this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.addRow = this.addRow.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.toggle = this.toggle.bind(this);
         this.tabPane = this.tabPane.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.dataChangeDate = this.dataChangeDate.bind(this);
-        this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
         this.saveSupplyPlan = this.saveSupplyPlan.bind(this);
@@ -653,12 +649,6 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ percentage: event.target.value });
         }
     };
-    dataChangeDate(date) {
-        this.setState({ startDate: date });
-    }
-    dataChangeEndDate(date) {
-        this.setState({ stopDate: date });
-    }
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -1885,32 +1875,6 @@ export default class WhatIfReportComponent extends React.Component {
         fields = document.getElementsByClassName("erpShipments");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionManualShipments() {
-        this.setState({
-            showManualShipment: !this.state.showManualShipment
-        })
-        var fields = document.getElementsByClassName("manualShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showManualShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionErpShipments() {
-        this.setState({
-            showErpShipment: !this.state.showErpShipment
-        })
-        var fields = document.getElementsByClassName("erpShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showErpShipment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";
@@ -3808,16 +3772,6 @@ export default class WhatIfReportComponent extends React.Component {
             }
         })
     }
-    filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[3];
-        if (value != 0) {
-            mylist = this.state.batchInfoList.filter(c => c.id != -1);
-        } else {
-            mylist = this.state.batchInfoList;
-        }
-        return mylist;
-    }.bind(this)
     tabPane() {
         const chartOptions = {
             title: {

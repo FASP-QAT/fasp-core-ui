@@ -9,10 +9,6 @@ class CountryService {
         return axios.get(`${API_URL}/api/country/all/`, {
         });
     }
-    getCountryListActive() {
-        return axios.get(`${API_URL}/api/country/`, {
-        });
-    }
     editCountry(json) {
         return axios.put(`${API_URL}/api/country/`, json, {}
         );
