@@ -36,9 +36,6 @@ const EditOrganisation = React.lazy(() => import('../../views/Organisation/EditO
 const AddOrganisationType = React.lazy(() => import('../../views/OrganisationType/AddOrganisationType'));
 const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationType/OrganisationTypeList'));
 const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
-const AddSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/AddSubFundingSourceComponent'));
-const ListSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
-const EditSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/EditSubFundingSourceComponent'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
@@ -73,7 +70,6 @@ const EditRole = React.lazy(() => import('../../views/Role/EditRoleComponent'));
 const AddUser = React.lazy(() => import('../../views/User/AddUserComponent'));
 const ListUser = React.lazy(() => import('../../views/User/ListUserComponent'));
 const EditUser = React.lazy(() => import('../../views/User/EditUserComponent'));
-const AccessControl = React.lazy(() => import('../../views/User/AccessControlComponent'));
 const AccessDenied = React.lazy(() => import('../../views/Common/AccessDeniedComponent'));
 const AddBudgetComponent = React.lazy(() => import('../../views/Budget/AddBudgetComponent'));
 const ListBudgetComponent = React.lazy(() => import('../../views/Budget/ListBudgetComponent'));
@@ -82,7 +78,6 @@ const AddProgramProduct = React.lazy(() => import('../../views/ProgramProduct/Ad
 const AddProgram = React.lazy(() => import('../../views/Program/AddProgram'));
 const Programs = React.lazy(() => import('../../views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('../../views/Program/EditProgram'));
-const SubFundingSourceList = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
 const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
@@ -277,17 +272,11 @@ const routes = [
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
   { path: '/fundingSource/listFundingSource/:color/:message', name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
-  { path: '/subFundingSource/addSubFundingSource', name: 'static.breadcrum.add', entityname: 'static.dashboard.subfundingsource', component: AddSubFundingSource },
-  { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.subfundingsource', component: ListSubFundingSource },
-  { path: '/subFundingSource/editSubFundingSource/:subFundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.subfundingsource', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/ApplicationDashboard/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/shipmentLinkingNotification', exact: true, name: 'static.mt.shipmentLinkingNotification', component: ShipmentLinkingNotifications },
-  { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
-  { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementagentheader', component: AddProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },
@@ -326,7 +315,6 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'static.breadcrum.list', entityname: 'static.userHead.user', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'static.breadcrum.add', entityname: 'static.userHead.user', component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.userHead.user', component: EditUser },
-  { path: '/user/accessControl/:userId', exact: true, name: 'static.dashboard.useraccessctrl', component: AccessControl },
   { path: '/accessDenied', exact: true, component: AccessDenied },
   { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
