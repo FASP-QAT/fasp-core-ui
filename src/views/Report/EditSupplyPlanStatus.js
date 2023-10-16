@@ -4360,6 +4360,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t("static.common.region"),
                     type: 'dropdown',
+                    visible: false,
                     width: 80,
                     source: this.state.regionList,
                     readOnly: true
@@ -4656,7 +4657,7 @@ class EditSupplyPlanStatus extends Component {
                             onclick: function () {
                                 var myObj = obj.getRowData(y);
                                 // console.log("my obj===>", myObj);
-                                this.toggleTransView(myObj[23]);
+                                this.toggleTransView(myObj[24]);
                             }.bind(this)
                         });
                     }
