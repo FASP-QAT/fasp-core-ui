@@ -85,8 +85,6 @@ const ConsumptionDetails = React.lazy(() => import('../../views/Consumption/Cons
 const AddLanguage = React.lazy(() => import('../../views/Language/AddLanguageComponent'));
 const ListLanguage = React.lazy(() => import('../../views/Language/LanguageListComponent'));
 const EditLanguage = React.lazy(() => import('../../views/Language/EditLanguageComponent'));
-const EditProblem = React.lazy(() => import('../../views/Report/EditProblem'));
-const AddProblem = React.lazy(() => import('../../views/Report/AddProblem'));
 const AddUnit = React.lazy(() => import('../../views/Unit/AddUnitComponent'));
 const ListUnit = React.lazy(() => import('../../views/Unit/UnitListComponent'));
 const EditUnit = React.lazy(() => import('../../views/Unit/EditUnitComponent'));
@@ -140,11 +138,9 @@ const StockStatusOverTime = React.lazy(() => import('../../views/Report/StockSta
 const SupplyPlanFormulas = React.lazy(() => import('../../views/SupplyPlan/SupplyPlanFormulas'));
 const ForecastMetrics = React.lazy(() => import('../../views/Report/ForecastMetrics'));
 const ProblemList = React.lazy(() => import('../../views/Report/ProblemList'));
-const FunderExport = React.lazy(() => import('../../views/Report/FunderExport'));
 const ProcurementAgentExport = React.lazy(() => import('../../views/Report/ProcurementAgentExport'));
 const SupplierLeadTimes = React.lazy(() => import('../../views/Report/SupplierLeadTimes'));
 const ShipmentGlobalDemandView = React.lazy(() => import('../../views/Report/ShipmentGlobalDemandView'));
-const AggregateShipmentByProduct = React.lazy(() => import('../../views/Report/AggregateShipmentByProduct'));
 const ShipmentGlobalView = React.lazy(() => import('../../views/Report/ShipmentGlobalView'));
 const AnnualShipmentCost = React.lazy(() => import('../../views/Report/AnnualShipmentCost'));
 const SupplyPlanVersionAndReview = React.lazy(() => import('../../views/Report/SupplyPlanVersionAndReview'));
@@ -216,11 +212,9 @@ const routes = [
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
-  { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/:programId/:calculate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/1/:programId/:calculate', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
-  { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
   { path: '/report/inventoryTurns', name: 'static.dashboard.inventoryTurns', component: InventoryTurnsReport },
   { path: '/report/costOfInventory', name: 'static.dashboard.costOfInventory', component: CostOfInventoryReport },
   { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitListNegativeInventory },
@@ -326,8 +320,6 @@ const routes = [
   { path: '/language/listLanguage', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.language', component: ListLanguage },
   { path: '/language/listLanguage/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.language', component: ListLanguage },
   { path: '/language/editLanguage/:languageId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.languageheader', component: EditLanguage },
-  { path: '/report/editProblem/:problemReportId/:programId/:index/:problemStatusId/:problemTypeId', name: 'static.breadcrum.edit', entityname: 'static.report.problem', component: EditProblem },
-  { path: '/report/addProblem', name: 'static.dashboard.add.problem', component: AddProblem },
   { path: '/unit/addUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.unit', component: AddUnit },
   { path: '/unit/listUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.unit', component: ListUnit },
   { path: '/unit/listUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.unit', component: ListUnit },
@@ -384,11 +376,9 @@ const routes = [
   { path: '/report/stockStatusOverTime', name: 'static.dashboard.stockstatusovertime', component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: 'static.dashboard.forecastmetrics', component: ForecastMetrics },
   { path: '/report/problemList', name: 'static.dashboard.qatProblemList', component: ProblemList },
-  { path: '/report/funderExport', name: 'static.dashboard.funderExport', component: FunderExport },
   { path: '/report/procurementAgentExport', name: 'static.report.shipmentCostReport', component: ProcurementAgentExport },
   { path: '/report/supplierLeadTimes', name: 'static.dashboard.supplierLeadTimes', component: SupplierLeadTimes },
   { path: '/report/shipmentGlobalDemandView', name: 'static.dashboard.shipmentGlobalDemandViewheader', component: ShipmentGlobalDemandView },
-  { path: '/report/aggregateShipmentByProduct', name: 'static.dashboard.aggregateShipmentByProduct', component: AggregateShipmentByProduct },
   { path: '/report/shipmentGlobalView', name: 'static.dashboard.shipmentGlobalViewheader', component: ShipmentGlobalView },
   { path: '/report/annualShipmentCost', name: 'static.report.annualshipmentcost', component: AnnualShipmentCost },
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
