@@ -475,8 +475,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-    getOtherFiltersData() {
-    }
     setDatasetId(e) {
         this.setState({ loading: true })
         var datasetId = e.target.value;
