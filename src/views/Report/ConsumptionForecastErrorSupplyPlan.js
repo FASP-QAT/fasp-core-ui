@@ -2591,11 +2591,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
         // doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
-        doc.addImage(canvasImg, 'png', 10, 280, 825, 220, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 10, 280, 750, 290, 'CANVAS');
         doc.addPage();
-        doc.text("No Actual Data = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 20, 100, {
+        var countOfNoData=0;
+        this.state.regionValues.map(r => {
+        this.state.monthArray.map((item1, count) => {
+            let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+            let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
+            // totalRegion += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
+            // totalRegionCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
+            if((errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) && (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null)){
+                countOfNoData+=1;
+            }
+        })
+        })
+        if(countOfNoData>0){
+        doc.text("! = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 20, 100, {
             align: 'left',
         })
+        }
 
         //table start
         const headers = [];
