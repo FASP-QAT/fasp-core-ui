@@ -1085,6 +1085,7 @@ export default class BuildTree extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.changed1 = this.changed1.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
@@ -1451,6 +1452,7 @@ export default class BuildTree extends Component {
                             // downloadedProgramData:downloadedProgramData,
                             // datasetListJexcel:datasetListJexcel
                         },()=>{
+                            this.hideThirdComponent()
                             if(this.state.missingPUList.length>0){
                                 this.getMissingPuListBranchTemplate();
                             }
@@ -1586,6 +1588,7 @@ export default class BuildTree extends Component {
                             // downloadedProgramData:downloadedProgramData,
                             // datasetListJexcel:datasetListJexcel
                         },()=>{
+                            this.hideThirdComponent()
                             if(this.state.missingPUList.length>0){
                                 this.getMissingPuListBranchTemplate();
                             }
@@ -2755,6 +2758,13 @@ export default class BuildTree extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
+        }, 30000);
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
 
@@ -14626,6 +14636,12 @@ export default class BuildTree extends Component {
                                                     </div>
                                                     {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
                                                 </div>
+                                                <h5 className="green" style={{display:"none"}} id="div3">
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.addSuccessMessageSelected")}
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.addSuccessMessageAll")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.updateSuccessMessageSelected")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.updateSuccessMessageAll")}
+                                                </h5>
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
