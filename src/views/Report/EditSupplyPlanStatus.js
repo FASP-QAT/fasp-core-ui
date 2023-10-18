@@ -411,81 +411,83 @@ class EditSupplyPlanStatus extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-
-            var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
+            var value = this.el.getValueFromCoords(0, y);
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-
-            var col = ("J").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(9, y);
-            var reg = /^[^'":\\]+$/;
-            var reg2 = /^\S+(?: \S+)*$/;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!reg.test(value)) {
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                    valid = false;
-                } else if(!reg2.test(value)){
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-            }
 
-            var col = ("K").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(10, y);
-            var reg = /^[^'":\\]+$/;
-            var reg2 = /^\S+(?: \S+)*$/;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!reg.test(value)) {
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                } else if(!reg2.test(value)){
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("K").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(10, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("U").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(20, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-            }
-
-            var col = ("U").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(20, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
             }
 
         }
@@ -1398,7 +1400,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     toggleAccordionErpShipments = () => {
-        console.log(this.state.showErpShipment)
+        // console.log(this.state.showErpShipment)
         this.setState({
             showErpShipment: !this.state.showErpShipment
         })
@@ -4340,7 +4342,7 @@ class EditSupplyPlanStatus extends Component {
         // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
         problemList = problemList;
-        console.log("problemList---->", problemList);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
