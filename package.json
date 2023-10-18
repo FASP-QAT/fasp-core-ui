@@ -105,6 +105,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.2",
+    "eslint": "^8.51.0",
     "eslint-loader": "^4.0.0",
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
