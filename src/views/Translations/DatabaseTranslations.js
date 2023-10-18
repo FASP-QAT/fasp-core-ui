@@ -10,7 +10,7 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { changed, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from "../../CommonComponent/getLabelText";
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import LabelsService from '../../api/LabelService.js';
@@ -59,7 +59,7 @@ export default class DatabaseTranslations extends React.Component {
                 colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.labelFor')}` })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.databaseTranslations.relatedTo')}` })
-                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.english')}` })
+                colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.english')}`, required: true })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.french')}` })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.pourtegese')}` })
                 colHeadersArray.push({ type: 'text', title: `${i18n.t('static.translation.spanish')}` })
@@ -227,8 +227,8 @@ export default class DatabaseTranslations extends React.Component {
                 <Row>
                     <Col xs="12" sm="12">
                         <Card>
-                                                        <CardBody className="pt-md-1 pb-md-1">
-                                                                <div id="databaseTranslationTable" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <CardBody className="pt-md-1 pb-md-1">
+                                <div id="databaseTranslationTable" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -258,25 +258,13 @@ export default class DatabaseTranslations extends React.Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     changed = function (instance, cell, x, y, value) {
-        if (x == 3) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-            } else {
-                this.el.setComments(col, "");
-                this.el.setStyle(col, "background-color", "transparent");
-            }
-        } else if (x == 4) {
-            var col = ("D").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
+        changed(instance, cell, x, y, value)
+        if (x == 4) {
+            positiveValidation("E", y, instance)
         } else if (x == 5) {
-            var col = ("E").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
+            positiveValidation("F", y, instance)
         } else if (x == 6) {
-            var col = ("F").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
+            positiveValidation("G", y, instance)
         }
         var labelList = this.state.labelList;
         var tableJson = this.el.getRowData(y);

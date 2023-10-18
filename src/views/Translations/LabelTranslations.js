@@ -10,7 +10,7 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import LabelsService from '../../api/LabelService.js';
 import LanguageService from '../../api/LanguageService';
@@ -72,7 +72,7 @@ export default class DatabaseTranslations extends React.Component {
                         var colHeadersArray = [];
                         colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.labelId')}` })
                         colHeadersArray.push({ type: 'text', readOnly: true, title: `${i18n.t('static.translation.labelId')}` })
-                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.isModified')}` })
+                        colHeadersArray.push({ type: 'hidden', title: `${i18n.t('static.translation.isModified')}`, required: true })
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
@@ -351,17 +351,7 @@ export default class DatabaseTranslations extends React.Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     changed = function (instance, cell, x, y, value) {
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setComments(col, `${i18n.t('static.label.fieldRequired')}`);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        changed(instance, cell, x, y, value)
         if (x != 2) {
             this.el.setValueFromCoords(2, y, 1, true);
         }
