@@ -1,22 +1,15 @@
 import React, { Component, lazy } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
     Col,
     Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter, Row
 } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, PROGRAM_TYPE_DATASET } from '../../Constants.js'
 import moment from "moment";
@@ -36,12 +29,6 @@ import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
 import DropdownService from '../../api/DropdownService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
-import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
-import FreightCost from '../../assets/img/FreightCost.png';
-import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
-import ProductCost from '../../assets/img/ProductCost.png';
-import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
-import TotalCost from '../../assets/img/TotalCost.png';
 import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/ForecastSummaryEn.html'
 import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
 import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
@@ -310,7 +297,7 @@ class ForecastSummary extends Component {
             headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
             headers.push(((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20')));
             if (!this.state.hideColumn) {
-                headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
+                headers.push((i18n.t('static.ForecastSummary.Stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
                 // headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastOutput.stockOrUnmedDemand')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
@@ -922,7 +909,7 @@ class ForecastSummary extends Component {
             let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastOutput.totalForecastQuantity')];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.forecastOutput.stockOrUnmedDemand') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.ForecastSummary.Stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.forecastOutput.stockOrUnmedDemand') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -1087,7 +1074,7 @@ class ForecastSummary extends Component {
 
         if (versionId != 0 && programId > 0) {
             if (versionId == -1) {
-                // console.log("1------------------------");
+                // console.log("1----------insdie 1--------------",versionId);
                 this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
                 try {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1412,8 +1399,8 @@ class ForecastSummary extends Component {
                                     }
 
                                     totalForecastedQuantity0ri = (totalForecastedQuantity0ri);
-                                    if(!isForecastSelected){
-                                        totalForecastedQuantity0ri=null;
+                                    if (!isForecastSelected) {
+                                        totalForecastedQuantity0ri = null;
                                     }
 
 
@@ -1421,14 +1408,14 @@ class ForecastSummary extends Component {
                                     let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                     let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
                                     let planningUnit = planningUnitList[j].planningUnit;
-                                    let totalForecastedQuantity = totalForecastedQuantity0ri!=null?totalForecastedQuantity0ri.toFixed(2):totalForecastedQuantity0ri;
-                                    let stock1 = planningUnitList[j].stock;
-                                    let existingShipments = planningUnitList[j].existingShipments;
-                                    let stock2 = ((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri);
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri != null ? Number(totalForecastedQuantity0ri).toFixed(2) : totalForecastedQuantity0ri;
+                                    let stock1 = Number(planningUnitList[j].stock);
+                                    let existingShipments = Number(planningUnitList[j].existingShipments);
+                                    let stock2 = (Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - (Number(totalForecastedQuantity0ri));
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
-                                    let tempProcurementGap = (((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri)) - ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
+                                    let desiredMonthOfStock2 = (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
+                                    let tempProcurementGap = ((Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri)) - (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                     procurementGap = (procurementGap)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
@@ -1436,7 +1423,7 @@ class ForecastSummary extends Component {
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                     let unitPrice = planningUnitList[j].price;
                                     // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
-                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * Number(unitPrice)).toFixed(2) : '');
                                     let notes = planningUnitList[j].consumptionNotes;
 
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2.toFixed(2), isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2.toFixed(2), procurementGap: procurementGap.toFixed(2), isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
@@ -1458,11 +1445,11 @@ class ForecastSummary extends Component {
                                     let totalForecastedQuantity = totalForecastedQuantity0ri;
                                     let stock1 = planningUnitList[j].stock;
                                     let existingShipments = planningUnitList[j].existingShipments;
-                                    let stock2 = ((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri);
+                                    let stock2 = (Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri);
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
-                                    let tempProcurementGap = (((planningUnitList[j].stock) + (planningUnitList[j].existingShipments)) - (totalForecastedQuantity0ri)) - ((planningUnitList[j].monthsOfStock) * (totalForecastedQuantity0ri) / (total_months));
+                                    let desiredMonthOfStock2 = (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
+                                    let tempProcurementGap = ((Number(planningUnitList[j].stock) + Number(planningUnitList[j].existingShipments)) - Number(totalForecastedQuantity0ri)) - (Number(planningUnitList[j].monthsOfStock) * Number(totalForecastedQuantity0ri) / Number(total_months));
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                     procurementGap = (procurementGap)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
@@ -1479,7 +1466,7 @@ class ForecastSummary extends Component {
 
 
                                     if (isProcurementGapRed == true) {
-                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * Number(unitPrice));
                                         // console.log("totalProductCost----------->4", totalProductCost);
                                     }
                                 }
@@ -1614,7 +1601,7 @@ class ForecastSummary extends Component {
                                                 } else {
                                                     totalForecast = null;
                                                 }
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast) : "";
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast != null ? Number(totalForecast) : "";
                                                 total += Number(filterForecastSelected != undefined ? Number(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
@@ -1735,26 +1722,15 @@ class ForecastSummary extends Component {
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.worksheets[0];
-                                            var json = elInstance.getJson(null, false);
-                                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-                                            for (var y = 0; y < json.length; y++) {
-                                                var rowData = elInstance.getRowData(y);
-                                                // console.log("RowData--------->1", rowData);
-                                                let rowDataSecondLast = rowData[rowData.length - 3];
-                                                // // console.log("RowData--------->2", rowDataSecondLast);
-                                                if (rowDataSecondLast == 1) {
-                                                    for (var r = 0; r < rowData.length; r++) {
-                                                        var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                        cell.classList.add('readonly');
-                                                        cell.classList.add('regionBold');
+                                            var rowElement = elInstance.records;
+                                            for (var r = 0; r < rowElement.length; r++) {
+                                                if (rowElement[r][6].v == 1) {
+                                                    for (var j = 0; j < rowElement[r].length; j++) {
+                                                        var ele = rowElement[r][j].element;
+                                                        ele.classList.add('readonly');
+                                                        ele.classList.add('regionBold');
                                                     }
                                                 }
-                                                // if (rowData[12] == 1) {
-                                                //     for (var r = 0; r < rowData.length; r++) {
-                                                //         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                //         cell.classList.add('readonly');
-                                                //     }
-                                                // }
                                             }
                                         },
                                         license: JEXCEL_PRO_KEY,
@@ -2040,18 +2016,15 @@ class ForecastSummary extends Component {
                                 onload: function (instance, cell, x, y, value) {
                                     jExcelLoadedFunctionOnlyHideRow(instance);
                                     var elInstance = instance.worksheets[0];
-                                    var json = elInstance.getJson(null, false);
-                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
-                                    for (var y = 0; y < json.length; y++) {
-                                        var rowData = elInstance.getRowData(y);
-                                        // console.log("RowData--------->1", rowData);
-                                        let rowDataSecondLast = rowData[0];
-                                        // // console.log("RowData--------->2", rowDataSecondLast);
-                                        if (rowDataSecondLast == 1) {
-                                            for (var r = 0; r < rowData.length; r++) {
-                                                var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
-                                                cell.classList.add('readonly');
-                                                cell.classList.add('regionBold');
+                                    var rowElement = elInstance.records;
+                                    console.log("hello1")
+
+                                    for (var r = 0; r < rowElement.length; r++) {
+                                        if (rowElement[r][0].v == 1) {
+                                            for (var j = 0; j < rowElement[r].length; j++) {
+                                                var ele = rowElement[r][j].element;
+                                                ele.classList.add('readonly');
+                                                ele.classList.add('regionBold');
                                             }
                                         }
                                     }
@@ -2373,8 +2346,8 @@ class ForecastSummary extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        programData.code=programData.programCode;
-                        programData.id=programData.programId;
+                        programData.code = programData.programCode;
+                        programData.id = programData.programId;
                         // console.log(programNameLabel)
 
                         var f = 0
@@ -3026,17 +2999,17 @@ class ForecastSummary extends Component {
                 // console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
                 if (json[j][(k + 1) * 3] != "") {
                     var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
-                    if(tsList.length>0){
-                    dataList.push({
-                        planningUnit: json[j][1],
-                        scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
-                        treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
-                        consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
-                        totalForecast: json[j][((k + 1) * 3) + 1],
-                        notes: json[j][((k + 1) * 3) + 2],
-                        region: this.state.regRegionList[k]
-                    })
-                }
+                    if (tsList.length > 0) {
+                        dataList.push({
+                            planningUnit: json[j][1],
+                            scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
+                            treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
+                            consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
+                            totalForecast: json[j][((k + 1) * 3) + 1],
+                            notes: json[j][((k + 1) * 3) + 2],
+                            region: this.state.regRegionList[k]
+                        })
+                    }
                 } else {
                     // console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
                     if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
@@ -3490,7 +3463,7 @@ class ForecastSummary extends Component {
                                                                         <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastOutput.totalForecastQuantity')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         {!this.state.hideColumn &&
                                                                             <>
-                                                                                <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                                <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.ForecastSummary.Stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                                 <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                                 {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                                 {/* <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}

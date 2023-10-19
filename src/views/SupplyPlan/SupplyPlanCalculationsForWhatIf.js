@@ -24,7 +24,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
             var compare = (curDate >= currentMonth);
             // var stockInHand = jsonList[0].closingBalance;
-            var amc = Number(jsonList[0].amc);
+            var amc = jsonList.length>0?Number(jsonList[0].amc):"";
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
@@ -649,8 +649,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             if (consumptionList[c].dayOfStockOut > 0) {
                                 var daysPerMonth = moment(startDate).daysInMonth();//days in month
                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;//days in stock
-                                var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;//Demand/day
-                                trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                if(daysOfData>0){
+                                    var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;//Demand/day
+                                    trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                }
                             } else {
                                 trueDemandPerMonth += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
                             }
@@ -1042,7 +1044,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
 
-                                actualConsumptionQtyAmc += trueDemandPerMonth1;
+                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
@@ -1083,7 +1085,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;//Demand/day
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
 
-                                actualConsumptionQtyAmc += trueDemandPerMonth1;
+                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);

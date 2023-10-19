@@ -1480,10 +1480,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 actualFlag = false;
             }
             if (parseInt(map.get("13")) != -1) {
-                consumptionDataList[parseInt(map.get("13"))].consumptionDate = moment(map.get("1")).startOf('month').format("YYYY-MM-DD");
-                consumptionDataList[parseInt(map.get("13"))].region.id = map.get("2");
-                consumptionDataList[parseInt(map.get("13"))].realmCountryPlanningUnit.id = map.get("5");
-                consumptionDataList[parseInt(map.get("13"))].actualFlag = actualFlag;
+                var indexForFullList;
+                if(map.get("16")>0){
+                    indexForFullList=consumptionDataList.findIndex(c=>Number(c.consumptionId)==Number(map.get("16")));
+                }else{
+                    var consumptionListUnFiltered = this.props.items.puData.filter(c => c.id == Number(map.get("0")))[0].consumptionListUnFiltered;
+                    indexForFullList=consumptionDataList.findIndex(c=>Number(c.planningUnit.id)==Number(map.get("0")) && c.region.id == consumptionListUnFiltered[parseInt(map.get("13"))].region.id && moment(c.consumptionDate).format("MMM YY") == moment(consumptionListUnFiltered[parseInt(map.get("13"))].consumptionDate).format("MMM YY") && c.realmCountryPlanningUnit.id == consumptionListUnFiltered[parseInt(map.get("13"))].realmCountryPlanningUnit.id && c.actualFlag.toString() == consumptionListUnFiltered[parseInt(map.get("13"))].actualFlag.toString());
+                }
+                consumptionDataList[Number(indexForFullList)].consumptionDate = moment(map.get("1")).startOf('month').format("YYYY-MM-DD");
+                consumptionDataList[Number(indexForFullList)].region.id = map.get("2");
+                consumptionDataList[Number(indexForFullList)].realmCountryPlanningUnit.id = map.get("5");
+                consumptionDataList[Number(indexForFullList)].actualFlag = actualFlag;
             } else {
                 var consumptionJson = {
                     consumptionId: 0,
