@@ -3261,7 +3261,7 @@ export default class BuildTree extends Component {
                 }
 
             }
-            if(parameterName == "nodeDataMomList"){
+            if (parameterName == "nodeDataMomList") {
                 this.saveTreeData(false, false);
             }
             // if (parameterName != 'currentItemConfig') {
@@ -4675,12 +4675,13 @@ export default class BuildTree extends Component {
     //     })
     // }
     formSubmit() {
-        // console.log("entry ---", new Date())
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             // console.log("validation---", validation);
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
+                    console.log("entry ---", this.state.isValidError, "===validation---", validation)
+
                     // console.log("entered if ---", new Date());
                     var tableJson = this.state.modelingEl.getJson(null, false);
                     // console.log("tableJson length---", tableJson.length);
@@ -4692,7 +4693,7 @@ export default class BuildTree extends Component {
                     var items = this.state.items;
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                    // console.log("itemIndex1--->>>", itemIndex1);
+                    console.log("itemIndex1--->>>", itemIndex1);
                     // if (itemIndex1 != -1) {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
@@ -4746,7 +4747,7 @@ export default class BuildTree extends Component {
                     }
                     // console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
@@ -4803,7 +4804,7 @@ export default class BuildTree extends Component {
 
                         }
                     } else {
-                        // console.log("this.state.isValidError---", this.state.isValidError)
+                        console.log("this.state.isValidError---", this.state.isValidError)
                         if (this.state.isValidError.toString() == "false") {
                             // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
@@ -5965,9 +5966,10 @@ export default class BuildTree extends Component {
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
-            currentModelingType: 2,
-            yearsOfTarget: 3,
-            isCalculateClicked: 1
+            firstMonthOfTarget: this.state.firstMonthOfTarget,
+            yearsOfTarget: this.state.yearsOfTarget,
+            actualOrTargetValueList: this.state.actualOrTargetValueList,
+            // isCalculateClicked: 1
         }, () => {
             this.buildModelingCalculatorJexcel();
         })
@@ -10348,6 +10350,8 @@ export default class BuildTree extends Component {
                 },//I8
                 {
                     title: "Calculated numbers (for Altius to check against when coding)",
+                    decimal: '.',
+                    mask: '#,##0.0000',
                     type: 'hidden'
                 }//J9
 
@@ -10431,31 +10435,35 @@ export default class BuildTree extends Component {
                 var monthlyChange = "";
                 var rowData = dataArr[j];
                 if (j == 0) {
-                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
+                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12), true);
                 }
                 if (j > 0) {
                     var rowData1 = dataArr[j - 1];
-                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
+                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100), true);
                     if (modelingType == "active1") {
-                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
+                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100);
                     } else {
-                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
+                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100);
                     }
                     elInstance.setValueFromCoords(3, j, monthlyChange, true);
 
                     var start = moment(moment(rowData[7].v, 'MMM YYYY'))
                     var stop = moment(moment(rowData[8].v, 'MMM YYYY'))
                     var count = 1;
-                    var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
-                    var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
+                    var calculatedTotal = parseFloat(rowData1[9].v);
+                    var calculatedTotal1 = parseFloat(rowData1[9].v);
                     var arr = [];
 
                     while (start.isSameOrBefore(stop)) {
                         if (modelingType == "active1") {
-                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                            calculatedTotal = parseFloat(calculatedTotal * (1 + monthlyChange / 100));
                         } else {
-                            var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
-                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                            if (count <= 12) {
+                                var a = parseFloat(1 + ((monthlyChange / 100) * count));
+                                calculatedTotal1 = parseFloat(calculatedTotal * a);
+                                console.log("aaaaaaaa", a, "====", calculatedTotal, "====", count, "==calculatedTotal1=", calculatedTotal1)
+
+                            }
                         }
 
                         var programJson = {
@@ -10469,7 +10477,7 @@ export default class BuildTree extends Component {
                         start.add(1, 'months');
                         count++;
                     }
-                    console.log("aaaa", arr)
+                    console.log("aaa1", arr)
                     elInstance.setValueFromCoords(9, j, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);
                 }
                 dataArray[j] = rowData[1].v;
@@ -10880,10 +10888,9 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
+                            console.log("Inside>>>>>   all ok>>>", this.state.addNodeFlag);
                             if (!this.state.isSubmitClicked) {
-                                // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                this.formSubmitLoader();
+                                console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")
@@ -10894,6 +10901,7 @@ export default class BuildTree extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
+                                        this.formSubmitLoader();
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0,
@@ -12296,7 +12304,7 @@ export default class BuildTree extends Component {
                                                         highlightItem: 0, activeTab1: new Array(3).fill('1')
                                                     })
                                                 } else {
-                    
+
                                                 }
                                             } else {
                                                 this.setState({
@@ -12532,7 +12540,7 @@ export default class BuildTree extends Component {
                                                         showCalculatorFields: false
                                                     });
                                                 }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
-                                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                {this.state.isCalculateClicked != 2 && <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                                                 {this.state.isCalculateClicked == 2 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
                                                 {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(2); }}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
                                             </FormGroup>
@@ -12940,7 +12948,7 @@ export default class BuildTree extends Component {
                                                     showMomDataPercent: false
                                                 })
                                             } else {
-                
+
                                             }
                                         } else {
                                             this.setState({

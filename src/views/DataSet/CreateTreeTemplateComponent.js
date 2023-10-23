@@ -3445,7 +3445,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("obj---", obj);
                     console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -5641,9 +5641,10 @@ export default class CreateTreeTemplate extends Component {
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
-            currentModelingType: 2,
-            yearsOfTarget: 3,
-            isCalculateClicked: 1
+            firstMonthOfTarget: this.state.firstMonthOfTarget,
+            yearsOfTarget: this.state.yearsOfTarget,
+            actualOrTargetValueList: this.state.actualOrTargetValueList,
+            // isCalculateClicked: 1
 
         }, () => {
             this.buildModelingCalculatorJexcel();
@@ -8038,11 +8039,11 @@ export default class CreateTreeTemplate extends Component {
                     } else {
                         this.setState({ collapseState: false })
                     }
-                    var treeTemplateList=this.state.treeTemplateList;
-                    if(response.data.active==false){
+                    var treeTemplateList = this.state.treeTemplateList;
+                    if (response.data.active == false) {
                         treeTemplateList.push({
-                            treeTemplateId:response.data.treeTemplateId,
-                            label:response.data.label
+                            treeTemplateId: response.data.treeTemplateId,
+                            label: response.data.label
                         })
                     }
                     this.setState({
@@ -8051,7 +8052,7 @@ export default class CreateTreeTemplate extends Component {
                         tempItems: items,
                         toggleArray: tempToggleList,
                         loading: true,
-                        treeTemplateList:treeTemplateList
+                        treeTemplateList: treeTemplateList
                     }, () => {
                         // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                         console.log("Tree Template---", this.state.items);
@@ -9746,31 +9747,33 @@ export default class CreateTreeTemplate extends Component {
                 var monthlyChange = "";
                 var rowData = dataArr[j];
                 if (j == 0) {
-                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12).toFixed(6), true);
+                    elInstance.setValueFromCoords(9, j, parseFloat(rowData[1].v / 12), true);
                 }
                 if (j > 0) {
                     var rowData1 = dataArr[j - 1];
-                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100).toFixed(2), true);
+                    elInstance.setValueFromCoords(2, j, rowData[1].v == "" ? '' : parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) * 100), true);
                     if (modelingType == "active1") {
-                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100).toFixed(6);
+                        monthlyChange = parseFloat((Math.pow(rowData[1].v / rowData1[1].v, (1 / 12)) - 1) * 100);
                     } else {
-                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100).toFixed(6);
+                        monthlyChange = parseFloat(((rowData[1].v - rowData1[1].v) / rowData1[1].v) / 12 * 100);
                     }
                     elInstance.setValueFromCoords(3, j, monthlyChange, true);
                     var start = rowData[7].v
                     var stop = rowData[8].v
                     var count = 1;
-                    var calculatedTotal = parseFloat(rowData1[9].v).toFixed(4);
-                    var calculatedTotal1 = parseFloat(rowData1[9].v).toFixed(4);
+                    var calculatedTotal = parseFloat(rowData1[9].v);
+                    var calculatedTotal1 = parseFloat(rowData1[9].v);
                     var arr = [];
 
                     while (start <= stop) {
                         start = (start == 0 ? (start + 1) : start)
                         if (modelingType == "active1") {
-                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                            calculatedTotal = parseFloat(calculatedTotal * (1 + monthlyChange / 100));
                         } else {
-                            var a = parseFloat(1 + (monthlyChange / 100 * count)).toFixed(6);
-                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                            if (count <= 12) {
+                                var a = parseFloat(1 + (monthlyChange / 100 * count));
+                                calculatedTotal1 = parseFloat(calculatedTotal * a);
+                            }
                         }
 
                         var programJson = {
@@ -10205,6 +10208,7 @@ export default class CreateTreeTemplate extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
+                                        this.formSubmitLoader();
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0
@@ -11813,9 +11817,9 @@ export default class CreateTreeTemplate extends Component {
                                                         showCalculatorFields: false
                                                     });
                                                 }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
-                                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetModelingCalculatorData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                                                 {this.state.isCalculateClicked == 2 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>}
-                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(2);}}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
+                                                {this.state.isCalculateClicked == 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => { this.changed3(2); }}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>}
                                             </FormGroup>
                                         </div>
                                     </div>
