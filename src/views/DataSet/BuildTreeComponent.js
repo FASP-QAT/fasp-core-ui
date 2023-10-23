@@ -4665,12 +4665,13 @@ export default class BuildTree extends Component {
     //     })
     // }
     formSubmit() {
-        console.log("entry ---", this.state.currentItemConfig.context.id)
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             // console.log("validation---", validation);
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
+                    console.log("entry ---", this.state.isValidError, "===validation---", validation)
+
                     // console.log("entered if ---", new Date());
                     var tableJson = this.state.modelingEl.getJson(null, false);
                     // console.log("tableJson length---", tableJson.length);
@@ -4736,7 +4737,7 @@ export default class BuildTree extends Component {
                     }
                     // console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
@@ -4788,7 +4789,7 @@ export default class BuildTree extends Component {
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
-                                alert("Please fill all the required fields in Node Data Tab 1");
+                                alert("Please fill all the required fields in Node Data Tab");
                             });
 
                         }
@@ -4802,7 +4803,7 @@ export default class BuildTree extends Component {
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
-                                alert("Please fill all the required fields in Node Data Tab 2");
+                                alert("Please fill all the required fields in Node Data Tab");
                             });
 
                         }
@@ -10877,10 +10878,9 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
+                            console.log("Inside>>>>>   all ok>>>", this.state.addNodeFlag);
                             if (!this.state.isSubmitClicked) {
                                 console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")
@@ -10891,6 +10891,7 @@ export default class BuildTree extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
+                                        this.formSubmitLoader();
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0,

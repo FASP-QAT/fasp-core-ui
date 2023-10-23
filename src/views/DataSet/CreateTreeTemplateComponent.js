@@ -3436,7 +3436,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("obj---", obj);
                     console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -10199,6 +10199,7 @@ export default class CreateTreeTemplate extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
+                                        this.formSubmitLoader();
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0
