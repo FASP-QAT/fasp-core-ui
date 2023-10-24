@@ -2593,23 +2593,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         // doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
         doc.addImage(canvasImg, 'png', 10, 280, 750, 290, 'CANVAS');
         doc.addPage();
-        var countOfNoData=0;
-        this.state.regionValues.map(r => {
-        this.state.monthArray.map((item1, count) => {
-            let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
-            let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
-            // totalRegion += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
-            // totalRegionCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-            if((errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) && (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null)){
-                countOfNoData+=1;
-            }
-        })
-        })
-        if(countOfNoData>0){
-        doc.text("! = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 20, 100, {
-            align: 'left',
-        })
-        }
 
         //table start
         const headers = [];
@@ -2638,7 +2621,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
                         totalRegion += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
                         totalRegionCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-                        A.push((errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? "!" : "No Actual Data" : errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? "" : this.PercentageFormatter(errorDataRegionData[0].errorPerc * 100) : "No Actual Data")
+                        A.push((errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? "No Data" : "No Actual Data" : errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? "" : this.PercentageFormatter(errorDataRegionData[0].errorPerc * 100) : "No Actual Data")
                     })
                 }
                 A.push(totalRegionCount > 0 ? this.PercentageFormatter((totalRegion / totalRegionCount) * 100) : 0)
@@ -2744,7 +2727,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                 totalError += (datavalue[0].actualQty === '' || datavalue[0].actualQty == null) ? 0 : (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? 0 : datavalue[0].errorPerc;
                 countError += (datavalue[0].actualQty === '' || datavalue[0].actualQty == null) ? 0 : (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? 0 : 1;
-                A.push((datavalue[0].actualQty === '' || datavalue[0].actualQty == null) ? (datavalue[0].forecastQty === '' || datavalue[0].forecastQty == null) ? "!" : "No Actual Data" : datavalue[0].actualQty >= 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? '' : this.PercentageFormatter(datavalue[0].errorPerc * 100) : "No Actual Data")
+                A.push((datavalue[0].actualQty === '' || datavalue[0].actualQty == null) ? (datavalue[0].forecastQty === '' || datavalue[0].forecastQty == null) ? "No Data" : "No Actual Data" : datavalue[0].actualQty >= 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? '' : this.PercentageFormatter(datavalue[0].errorPerc * 100) : "No Actual Data")
             })
             A.push(countError > 0 ? this.PercentageFormatter((totalError / countError) * 100) : 0)
         }
@@ -3419,6 +3402,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     <div className="col-md-12">
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
+                                               <ul className="legendcommitversion">
+                                                <li style={{marginLeft:'40px'}}><i class="fa fa-exclamation-triangle red"></i><i> {i18n.t('static.forecastErrorReport.missingDataNote')}</i></li>
+                                                </ul> 
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>
@@ -3446,7 +3432,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
                                                                         regionErrorTotal += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
                                                                         regionErrorTotalCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? "No months in this period contain both forecast and actual consumption" : "No Actual Data" : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : this.PercentageFormatter(errorDataRegionData[0].errorPerc * 100)) : "No Actual Data"}</b></td>)
+                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.missingDataNote") : i18n.t("static.forecastErrorReport.missingDataNote") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.missingDataNote")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : this.PercentageFormatter(errorDataRegionData[0].errorPerc * 100)) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                     })}
                                                                     <td className="sticky-col first-col clone hoverTd" align="left"><b>{regionErrorTotalCount > 0 ? this.PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100) : 0}</b></td>
                                                                 </tr>
@@ -3530,7 +3516,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : data[0].errorPerc;
                                                                     countError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? "No months in this period contain both forecast and actual consumption" : "No Actual Data" : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : this.PercentageFormatter(data[0].errorPerc * 100) : "No Actual Data"}</b></td>)
+                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.missingDataNote") : i18n.t("static.forecastErrorReport.missingDataNote") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.missingDataNote")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : this.PercentageFormatter(data[0].errorPerc * 100) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                 })}
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>{countError > 0 ? this.PercentageFormatter((totalError / countError) * 100) : 0}</b></td>
                                                             </tr>
