@@ -1330,6 +1330,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        }else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
                             return (tooltipItems.yLabel.toLocaleString());
                         }
@@ -1396,6 +1398,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        }else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
                             return (tooltipItems.yLabel.toLocaleString());
                         }
