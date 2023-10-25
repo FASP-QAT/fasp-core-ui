@@ -10741,7 +10741,7 @@ export default class BuildTree extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
