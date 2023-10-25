@@ -960,6 +960,7 @@ export default class BuildTree extends Component {
             programDataListForPuCheck: [],
             planningUnitObjList: [],
             allProcurementAgentList: [],
+            modelingChangedOrAdded: false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -6080,6 +6081,9 @@ export default class BuildTree extends Component {
         // })
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
+        this.setState({
+            modelingChangedOrAdded: true
+        })
 
         // instance.jexcel
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
@@ -10031,7 +10035,6 @@ export default class BuildTree extends Component {
 
 
     onCursoChanged(event, data) {
-        // console.log("Data@@@", data)
         const { context: item } = data;
         if (item != null) {
             this.setState({
@@ -10043,6 +10046,7 @@ export default class BuildTree extends Component {
                 showMomDataPercent: false,
                 addNodeFlag: false,
                 openAddNodeModal: data.context.templateName ? data.context.templateName == "contactTemplateMin" ? false : true : true,
+                modelingChangedOrAdded: false,
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
@@ -10891,7 +10895,9 @@ export default class BuildTree extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
-                                        this.formSubmitLoader();
+                                        if (this.state.modelingChangedOrAdded) {
+                                            this.formSubmitLoader();
+                                        }
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0,
@@ -13768,6 +13774,7 @@ export default class BuildTree extends Component {
                                             aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
                                             addNodeFlag: true,
                                             openAddNodeModal: true,
+                                            modelingChangedOrAdded: false,
                                             currentItemConfig: {
                                                 context: {
                                                     isVisible: '',

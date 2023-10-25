@@ -876,6 +876,7 @@ export default class CreateTreeTemplate extends Component {
             startDateDisplay: '',
             endDateDisplay: '',
             beforeEndDateDisplay: '',
+            modelingChangedOrAdded: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -5736,6 +5737,11 @@ export default class CreateTreeTemplate extends Component {
         // });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
+
+        this.setState({
+            modelingChangedOrAdded: true
+        })
+
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
@@ -9349,6 +9355,7 @@ export default class CreateTreeTemplate extends Component {
                 sameLevelNodeList: [],
                 showCalculatorFields: false,
                 openAddNodeModal: data.context.templateName ? data.context.templateName == "contactTemplateMin" ? false : true : true,
+                modelingChangedOrAdded: false,
                 addNodeFlag: false,
                 showMomDataPercent: false,
                 showMomData: false,
@@ -10199,7 +10206,9 @@ export default class CreateTreeTemplate extends Component {
                                         } else {
                                             this.updateNodeInfoInJson(this.state.currentItemConfig)
                                         }
-                                        this.formSubmitLoader();
+                                        if (this.state.modelingChangedOrAdded) {
+                                            this.formSubmitLoader();
+                                        }
                                         this.setState({
                                             cursorItem: 0,
                                             highlightItem: 0
@@ -12852,6 +12861,7 @@ export default class CreateTreeTemplate extends Component {
                                         aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
                                         addNodeFlag: true,
                                         openAddNodeModal: true,
+                                        modelingChangedOrAdded: false,
                                         currentItemConfig: {
                                             context: {
                                                 isVisible: '',
