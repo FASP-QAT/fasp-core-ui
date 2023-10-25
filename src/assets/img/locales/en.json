@@ -3229,5 +3229,6 @@
     "static.listTree.addSuccessMessageAll":"Your selected planning units have been added successfully. Please click create tree to dupliacte the tree.",
     "static.listTree.addSuccessMessageSelected":"Your selected planning units have been added successfully. Please click create tree without adding planning unit to dupliacte the tree.",
     "static.listTree.updateSuccessMessageAll":"Your selected planning units have been updated successfully. Please click create tree to dupliacte the tree.",
-    "static.listTree.updateSuccessMessageSelected":"Your selected planning units have been updated successfully. Please click create tree without adding planning unit to dupliacte the tree."
+    "static.listTree.updateSuccessMessageSelected":"Your selected planning units have been updated successfully. Please click create tree without adding planning unit to dupliacte the tree.",
+    "static.forecastErrorReport.missingDataNote":"`Current month does not contain actual consumption and forecasted consumption` OR `Current month does not contain actual consumption`. "
 }
