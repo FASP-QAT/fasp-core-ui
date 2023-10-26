@@ -10894,7 +10894,8 @@ export default class BuildTree extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             console.log("Inside>>>>>   all ok>>>", this.state.addNodeFlag);
                             if (!this.state.isSubmitClicked) {
-                                console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                // this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")
