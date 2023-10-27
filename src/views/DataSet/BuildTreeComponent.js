@@ -3207,7 +3207,7 @@ export default class BuildTree extends Component {
                     // console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         // console.log("node id for update state 4----", this.state.items);
-                        // this.saveTreeData(true, false);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
@@ -10894,7 +10894,8 @@ export default class BuildTree extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             console.log("Inside>>>>>   all ok>>>", this.state.addNodeFlag);
                             if (!this.state.isSubmitClicked) {
-                                console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                // this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")

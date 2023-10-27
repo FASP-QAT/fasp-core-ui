@@ -1321,6 +1321,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode: 'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -1337,8 +1338,9 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }.bind(this)
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -1389,6 +1391,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode: 'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -1405,8 +1408,9 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }.bind(this)
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
