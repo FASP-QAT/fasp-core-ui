@@ -3207,7 +3207,7 @@ export default class BuildTree extends Component {
                     // console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         // console.log("node id for update state 4----", this.state.items);
-                        // this.saveTreeData(true, false);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
