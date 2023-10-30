@@ -100,19 +100,10 @@ class ForecastOutput extends Component {
         this.xAxisChange = this.xAxisChange.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
         this.calculateEquivalencyUnitTotal = this.calculateEquivalencyUnitTotal.bind(this);
-        this.backToCompareAndSelect = this.backToCompareAndSelect.bind(this);
-        this.continueToForecastSummary = this.continueToForecastSummary.bind(this);
         this.toggleEu = this.toggleEu.bind(this);
-        this.toggleRv = this.toggleRv.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
         this.addGraphConsumptionData = this.addGraphConsumptionData.bind(this);
         this.addGraphId = this.addGraphId.bind(this);
-    }
-    backToCompareAndSelect() {
-        this.props.history.push(`/report/compareAndSelectScenario`)
-    }
-    continueToForecastSummary() {
-        this.props.history.push(`/forecastReport/forecastSummary`)
     }
     calculateEquivalencyUnitTotal() {
         let consumptionData = this.state.consumptionData;
@@ -1978,33 +1969,6 @@ class ForecastOutput extends Component {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({
@@ -2043,15 +2007,9 @@ class ForecastOutput extends Component {
             this.filterData()
         })
     }
-    getIndexAsKey = (d) => { return d.key };
     toggleEu() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
-        });
-    }
-    toggleRv() {
-        this.setState({
-            popoverOpen1: !this.state.popoverOpen1,
         });
     }
     filterOptions = async (options, filter) => {

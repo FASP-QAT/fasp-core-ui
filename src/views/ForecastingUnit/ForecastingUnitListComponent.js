@@ -31,10 +31,8 @@ export default class ForecastingUnitListComponent extends Component {
             realmId: '',
             loading: true
         }
-        this.editForecastingUnit = this.editForecastingUnit.bind(this);
         this.addNewForecastingUnit = this.addNewForecastingUnit.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -155,9 +153,6 @@ export default class ForecastingUnitListComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     filterDataForRealm() {
         this.setState({ loading: true })
@@ -554,13 +549,6 @@ export default class ForecastingUnitListComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    editForecastingUnit(forecastingUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
-            this.props.history.push({
-                pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
-            });
-        }
     }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {

@@ -119,17 +119,10 @@ class ForecastSummary extends Component {
         this.setViewById = this.setViewById.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-        this.setForecastingUnit = this.setForecastingUnit.bind(this);
-        this.setRegionVal = this.setRegionVal.bind(this);
-        this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
-        this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
-        this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
-        this.storeProduct = this.storeProduct.bind(this)
         this.hideCalculation = this.hideCalculation.bind(this);
         this.filterTsList = this.filterTsList.bind(this);
         this.saveSelectedForecast = this.saveSelectedForecast.bind(this);
         this.forecastChanged = this.forecastChanged.bind(this);
-        this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -145,91 +138,16 @@ class ForecastSummary extends Component {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
-    backToMonthlyForecast() {
-        this.props.history.push(`/forecastReport/forecastOutput`)
-    }
     hideCalculation(e) {
         this.setState({
             hideCalculation: e.target.checked,
             hideColumn: !this.state.hideColumn
         })
     }
-    storeProduct(e) {
-        var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
-        this.setState({
-            planningUnitId: e.target.value,
-            planningUnitLabel: name[0].label,
-        })
-    }
-    toggleAccordionTotalActual() {
-        this.setState({
-            showTotalActual: !this.state.showTotalActual
-        })
-        var fields = document.getElementsByClassName("totalActual");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalActual == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionTotalForecast() {
-        this.setState({
-            showTotalForecast: !this.state.showTotalForecast
-        })
-        var fields = document.getElementsByClassName("totalForecast");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalForecast == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionTotalDiffernce() {
-        this.setState({
-            showTotalDifference: !this.state.showTotalDifference
-        })
-        var fields = document.getElementsByClassName("totalDifference");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalDifference == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    setRegionVal(e) {
-        var regionIdArr = [];
-        for (var i = 0; i < e.length; i++) {
-            regionIdArr.push(e[i].value);
-        }
-        var regionListFiltered = this.state.regionList.filter(c => regionIdArr.includes(c.value));
-        this.setState({
-            regionVal: e,
-            regionListFiltered
-        })
-    }
-    setForecastingUnit(e) {
-        this.setState({
-            forecastingUnitId: e.target.value
-        }, () => {
-            this.filterPlanningUnit()
-        })
-    }
-    filterPlanningUnit() {
-        var planningUnitListAll = this.state.planningUnitListAll;
-        var planningUnits = planningUnitListAll.filter(c => c.program.programId == this.state.programId && c.forecastingUnit.forecastingUnitId == this.state.forecastingUnitId);
-        this.setState({
-            planningUnits
-        })
-    }
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -1914,9 +1832,6 @@ class ForecastSummary extends Component {
             this.filterData();
         })
     }
-    loaded(instance) {
-        jExcelLoadedFunction(instance);
-    }
     getVersionIds() {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -2075,33 +1990,6 @@ class ForecastSummary extends Component {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({

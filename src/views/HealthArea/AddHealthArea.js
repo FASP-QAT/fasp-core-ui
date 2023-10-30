@@ -649,13 +649,6 @@ export default class AddHealthAreaComponent extends Component {
       </div>
     );
   }
-  getCountryListByRealmId(event) {
-    let realmId = event.target.value;
-    const selCountries = this.state.countries.filter(c => c.realm.realmId == realmId)
-    this.setState({
-      selCountries: selCountries
-    });
-  }
   cancelClicked() {
     this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }

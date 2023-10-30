@@ -25,10 +25,8 @@ class FundingSourceListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editFundingSource = this.editFundingSource.bind(this);
         this.addFundingSource = this.addFundingSource.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -159,13 +157,6 @@ class FundingSourceListComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    editFundingSource(fundingSource) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
-            this.props.history.push({
-                pathname: `/fundingSource/editFundingSource/${fundingSource.fundingSourceId}`,
-            });
-        }
     }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
@@ -302,9 +293,6 @@ class FundingSourceListComponent extends Component {
                     }
                 }
             );
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

@@ -27,10 +27,8 @@ export default class HealthAreaListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang'),
         }
-        this.editHealthArea = this.editHealthArea.bind(this);
         this.addHealthArea = this.addHealthArea.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
@@ -267,9 +265,6 @@ export default class HealthAreaListComponent extends Component {
                 }
             );
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -345,13 +340,6 @@ export default class HealthAreaListComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    editHealthArea(healthArea) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
-            this.props.history.push({
-                pathname: `/healthArea/editHealthArea/${healthArea.healthAreaId}`,
-            });
-        }
     }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
