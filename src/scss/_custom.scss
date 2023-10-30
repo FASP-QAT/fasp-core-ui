@@ -10644,3 +10644,18 @@ legend.scheduler-border {
 .forecastErrorFistColumnWidth {
   min-width: 165px !important;
 }
+.jss>tbody>tr>td.lowestError {
+  color: #118b70 !important;
+}
+
+.jss>tbody>tr>td.readonly.lowestError {
+  color: #118b70 !important;
+}
+
+.jss>tbody>tr>td.notLowestError {
+  color: #000000 !important;
+}
+
+.jss>tbody>tr>td.readonly.notLowestError {
+  color: #000000 !important;
+}
