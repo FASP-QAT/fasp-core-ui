@@ -14,32 +14,6 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PRO_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValuesTwo = {
-}
-const validationSchemaTwo = function (values) {
-    return Yup.object().shape({
-    })
-}
-const validateTwo = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorTwo(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorTwo = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 const entityname = 'Quantimed Import'
 export default class QunatimedImportStepTwo extends Component {
     constructor(props) {
@@ -68,26 +42,6 @@ export default class QunatimedImportStepTwo extends Component {
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
-    }
-    touchAllTwo(setTouched, errors) {
-        setTouched({
-        }
-        )
-        this.validateFormTwo(errors)
-    }
-    validateFormTwo(errors) {
-        this.findFirstErrorTwo('realmCountryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorTwo(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
     }
     componentDidMount() {
         this.setState({

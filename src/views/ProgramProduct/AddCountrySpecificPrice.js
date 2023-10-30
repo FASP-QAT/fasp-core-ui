@@ -608,9 +608,6 @@ class CountrySpecificPrices extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
-    onedit = function (instance, cell, x, y, value) {
-        this.el.setValueFromCoords(7, y, 1, true);
-    }.bind(this);
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);

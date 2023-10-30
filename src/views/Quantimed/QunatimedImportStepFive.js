@@ -20,32 +20,6 @@ import { DATE_FORMAT_CAP_WITHOUT_DATE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-const initialValuesThree = {
-}
-const validationSchemaThree = function (values) {
-    return Yup.object().shape({
-    })
-}
-const validateThree = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorThree(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorThree = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class QunatimedImportStepFive extends Component {
     constructor(props) {
         super(props);
@@ -60,26 +34,6 @@ export default class QunatimedImportStepFive extends Component {
         this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
         this.changedImport = this.changedImport.bind(this);
         this.changeColor = this.changeColor.bind(this);
-    }
-    touchAllThree(setTouched, errors) {
-        setTouched({
-        }
-        )
-        this.validateFormThree(errors)
-    }
-    validateFormThree(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorThree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
     }
     componentDidMount() {
     }

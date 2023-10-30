@@ -26,8 +26,6 @@ export default class ReactListComponent extends Component {
             lang: localStorage.getItem("lang"),
         }
         this.addNewRealm = this.addNewRealm.bind(this);
-        this.editRealm = this.editRealm.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
@@ -267,13 +265,6 @@ export default class ReactListComponent extends Component {
             }
         }
     }.bind(this);
-    editRealm(realm) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_REALM')) {
-            this.props.history.push({
-                pathname: `/realm/updateRealm/${realm.realmId}`,
-            });
-        }
-    }
     addNewRealm() {
         if (isSiteOnline()) {
             this.props.history.push(`/realm/addRealm`)
@@ -281,20 +272,8 @@ export default class ReactListComponent extends Component {
             alert("You must be Online.")
         }
     }
-    RealmCountry(event, row) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REALM_COUNTRY')) {
-            this.props.history.push({
-                pathname: `/realmCountry/RealmCountry/${row.realmId}`,
-                state: { realm: row }
-            })
-        }
-    }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

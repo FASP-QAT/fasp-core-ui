@@ -152,20 +152,12 @@ export default class UpdateDataSourceComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     dataChange(event) {
         let { realm } = this.state

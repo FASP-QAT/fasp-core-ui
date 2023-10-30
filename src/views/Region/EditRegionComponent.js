@@ -67,10 +67,6 @@ class EditRegionComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     dataChange(event) {
         let { region } = this.state;

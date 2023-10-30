@@ -33,10 +33,7 @@ class RegionListComponent extends Component {
             countryValues: [],
             countryLabels: [],
         }
-        this.editRegion = this.editRegion.bind(this);
-        this.addRegion = this.addRegion.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
@@ -331,16 +328,6 @@ class RegionListComponent extends Component {
             });
         }
     }
-    editRegion(region) {
-        this.props.history.push({
-            pathname: `/region/editRegion/${region.regionId}`,
-        });
-    }
-    addRegion(region) {
-        this.props.history.push({
-            pathname: "/region/addRegion"
-        });
-    }
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getRealmCountryDropdownList(realmId)
@@ -401,9 +388,6 @@ class RegionListComponent extends Component {
                     }
                 }
             );
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);

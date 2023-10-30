@@ -151,8 +151,6 @@ class QuantimedImportStepThree extends Component {
             regionConversionFactor: '100'
         }
     }
-    show() {
-    }
     render() {
         const { regionList } = this.state;
         let regions = regionList.length > 0 && regionList.map((item, i) => {

@@ -21,18 +21,6 @@ const sortArray = (sourceArray) => {
 class ListRealmCountryComponent extends Component {
     constructor(props) {
         super(props);
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: false,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editProcurementAgent(row);
-            }.bind(this)
-        }
         this.state = {
             realms: [],
             realmCountryList: [],
@@ -41,10 +29,7 @@ class ListRealmCountryComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewRealmCountry = this.addNewRealmCountry.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -61,12 +46,6 @@ class ListRealmCountryComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
-    addNewRealmCountry() {
-        this.props.history.push("/realmCountry/addRealmCountry");
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -187,30 +166,6 @@ class ListRealmCountryComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    editProcurementAgent(procurementAgent) {
-        this.props.history.push({
-            pathname: "/procurementAgent/editProcurementAgent",
-            state: { procurementAgent }
-        });
-    }
-    PlanningUnitCountry(event, row) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT')) {
-            this.props.history.push({
-                pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
-                state: { realmCountry: row }
-            })
-        }
-    }
-    RealmCountryRegion(event, row) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
-            this.props.history.push({
-                pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
-                state: { realmCountry: row }
-            })
-        }
     }
     componentDidMount() {
         this.hideFirstComponent();
@@ -336,25 +291,6 @@ class ListRealmCountryComponent extends Component {
                     }
                 }
             );
-    }
-    showCountryLabel(cell, row) {
-        return cell.label.label_en;
-    }
-    showCurrencyLabel(cell, row) {
-        return cell.label.label_en;
-    }
-    showPalletUnitLabel(cell, row) {
-        return cell.label.label_en;
-    }
-    showRealmLabel(cell, row) {
-        return cell.label.label_en;
-    }
-    showStatus(cell, row) {
-        if (cell) {
-            return "Active";
-        } else {
-            return "Disabled";
-        }
     }
     render() {
         jexcel.setDictionary({

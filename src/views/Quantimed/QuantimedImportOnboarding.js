@@ -43,7 +43,6 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0,
             qatPlanningList: []
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.finishedStepTwo = this.finishedStepTwo.bind(this);
@@ -53,7 +52,6 @@ export default class QuantimedImportOnboarding extends Component {
         this.previousToStepTwo = this.previousToStepTwo.bind(this);
         this.previousToStepThree = this.previousToStepThree.bind(this);
         this.previousToStepFour = this.previousToStepFour.bind(this);
-        this.removeMessageText = this.removeMessageText.bind(this);
         this.triggerChildAlert = this.triggerChildAlert.bind(this);
         this.triggerStepThree = this.triggerStepThree.bind(this);
         this.triggerStepFour = this.triggerStepFour.bind(this);
@@ -138,9 +136,6 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 1
         })
     }
-    removeMessageText() {
-        this.setState({ message: '' });
-    }
     previousToStepOne() {
         this.setState({ progressPer: 0 });
         document.getElementById('stepOne').style.display = 'block';
@@ -200,10 +195,6 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 1,
             enableStepFive: 0
         })
-    }
-    Capitalize(str) {
-        let { program } = this.state
-        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     dataChange(event) {
     }

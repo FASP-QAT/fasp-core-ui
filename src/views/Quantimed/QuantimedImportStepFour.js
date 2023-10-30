@@ -57,12 +57,7 @@ class QuantimedImportStepFour extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.setMinMaxDate = this.setMinMaxDate.bind(this);
-        this.toggledata = this.toggledata.bind(this);
         this.pickRange = React.createRef();
-        this.dataChange = this.dataChange.bind(this);
-    }
-    dataChange(event) {
     }
     touchAll(setTouched, errors) {
         setTouched({
@@ -84,10 +79,7 @@ class QuantimedImportStepFour extends Component {
             }
         }
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     componentDidMount() {
-    }
-    setMinMaxDate() {
     }
     show() {
     }
