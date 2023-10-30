@@ -79,13 +79,9 @@ export default class UpdateDataSourceComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addParameter = this.addParameter.bind(this);
         this.clearParameter = this.clearParameter.bind(this);
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     hideSecondComponent() {
         setTimeout(function () {

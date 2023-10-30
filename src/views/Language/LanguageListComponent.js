@@ -24,7 +24,6 @@ export default class LanguageListComponent extends Component {
             selSource: [],
             loading: true
         }
-        this.editLanguage = this.editLanguage.bind(this);
         this.addLanguage = this.addLanguage.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -41,13 +40,6 @@ export default class LanguageListComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    editLanguage(language) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE')) {
-            this.props.history.push({
-                pathname: `/language/editLanguage/${language.languageId}`,
-            });
-        }
     }
     addLanguage() {
         if (isSiteOnline()) {

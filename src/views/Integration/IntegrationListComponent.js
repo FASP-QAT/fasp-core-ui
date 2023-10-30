@@ -24,8 +24,6 @@ export default class IntegrationListComponent extends Component {
             lang: localStorage.getItem('lang')
         }
         this.addNewIntegration = this.addNewIntegration.bind(this);
-        this.editIntegration = this.editIntegration.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
@@ -168,13 +166,6 @@ export default class IntegrationListComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    editIntegration(integration) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_INTEGRATION')) {
-            this.props.history.push({
-                pathname: `/integration/editIntegration/${integration.integrationId}`,
-            });
-        }
-    }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
@@ -195,9 +186,6 @@ export default class IntegrationListComponent extends Component {
         } else {
             alert("You must be Online.")
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

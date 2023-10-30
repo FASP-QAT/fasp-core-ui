@@ -68,7 +68,6 @@ export default class AddDimensionComponent extends Component {
             isHide: true,
             bodyParameter: ''
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -128,9 +127,6 @@ export default class AddDimensionComponent extends Component {
             }
         )
     };
-    Capitalize(str) {
-        this.state.dimension.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
@@ -260,10 +256,6 @@ export default class AddDimensionComponent extends Component {
                     }
                 }
             );
-    }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
     }
     render() {
         const { realms } = this.state;

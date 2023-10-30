@@ -67,7 +67,6 @@ class AddLanguageComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.toggleLarge = this.toggleLarge.bind(this);
     }
     dataChange(event) {
         let { language } = this.state;
@@ -85,9 +84,6 @@ class AddLanguageComponent extends Component {
         },
             () => { });
     };
-    toggleLarge() {
-        this.setState({ openModal: false });
-    }
     Capitalize(str) {
         let { language } = this.state
         language.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -122,10 +118,6 @@ class AddLanguageComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
     }
     render() {
         return (
