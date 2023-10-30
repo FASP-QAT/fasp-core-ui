@@ -22,17 +22,6 @@ class SupplyPlanFormulas extends Component {
             stockstatusmatrix: false,
         };
         this.toggle = this.toggle.bind(this);
-        this.toggleLarge = this.toggleLarge.bind(this);
-        this.toggleSmall = this.toggleSmall.bind(this);
-        this.toggleInfo = this.toggleInfo.bind(this);
-        this.togglecostOfInventory = this.togglecostOfInventory.bind(this);
-        this.toggleForecastMatrix = this.toggleForecastMatrix.bind(this);
-        this.toggleStockStatusOverTime = this.toggleStockStatusOverTime.bind(this);
-        this.toggleInventoryTurns = this.toggleInventoryTurns.bind(this);
-        this.toggleStockStatus = this.toggleStockStatus.bind(this);
-        this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
-        this.toggleShippmentCost = this.toggleShippmentCost.bind(this);
-        this.toggleStockStatusMatrix = this.toggleStockStatusMatrix.bind(this);
     }
     toggle(tab) {
         if (this.state.activeTab !== tab) {
@@ -44,61 +33,6 @@ class SupplyPlanFormulas extends Component {
     toggle() {
         this.setState({
             modal: !this.state.modal,
-        });
-    }
-    toggleLarge() {
-        this.setState({
-            large: !this.state.large,
-        });
-    }
-    toggleSmall() {
-        this.setState({
-            small: !this.state.small,
-        });
-    }
-    toggleInfo() {
-        this.setState({
-            info: !this.state.info,
-        });
-    }
-    togglecostOfInventory() {
-        this.setState({
-            costofinventory: !this.state.costofinventory,
-        });
-    }
-    toggleForecastMatrix() {
-        this.setState({
-            forecastmatrix: !this.state.forecastmatrix,
-        });
-    }
-    toggleStockStatusOverTime() {
-        this.setState({
-            stockstatusovertime: !this.state.stockstatusovertime,
-        });
-    }
-    toggleInventoryTurns() {
-        this.setState({
-            inventoryturns: !this.state.inventoryturns,
-        });
-    }
-    toggleStockStatus() {
-        this.setState({
-            stockstatus: !this.state.stockstatus,
-        });
-    }
-    toggleStockStatusAcrossPlaningUnit() {
-        this.setState({
-            stockstatusacrossplaningunit: !this.state.stockstatusacrossplaningunit,
-        });
-    }
-    toggleShippmentCost() {
-        this.setState({
-            shipmentcost: !this.state.shipmentcost,
-        });
-    }
-    toggleStockStatusMatrix() {
-        this.setState({
-            stockstatusmatrix: !this.state.stockstatusmatrix,
         });
     }
     render() {

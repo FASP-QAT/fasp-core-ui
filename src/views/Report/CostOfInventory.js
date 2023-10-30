@@ -60,7 +60,6 @@ export default class CostOfInventory extends Component {
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
@@ -345,24 +344,8 @@ export default class CostOfInventory extends Component {
             }.bind(this);
         }.bind(this)
     }
-    dateformatter = value => {
-        var dt = new Date(value)
-        return moment(dt).format('MMM-DD-YYYY');
-    }
     roundN = num => {
         return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    }
-    formatterDouble = value => {
-        var cell1 = this.roundN(value)
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
     }
     formatter = value => {
         var cell1 = value
@@ -775,11 +758,6 @@ export default class CostOfInventory extends Component {
             });
         }
     }
-    formatLabel(cell, row) {
-        if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-        }
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -812,59 +790,20 @@ export default class CostOfInventory extends Component {
         );
         const columns = [
             {
-                dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' }
             },
             {
-                dataField: 'planningUnit.label',
                 text: i18n.t('static.planningunit.planningunit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'stock',
                 text: i18n.t('static.report.stock'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' },
-                formatter: this.formatter
             }, {
-                dataField: 'calculated',
                 text: i18n.t('static.report.actualInv'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' },
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes'))
-                    );
-                }
             }, {
-                dataField: 'catalogPrice',
                 text: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center' },
-                headerAlign: 'center',
-                formatter: this.formatter
             },
             {
-                dataField: 'cost',
                 text: i18n.t('static.report.costUsd'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center' },
-                headerAlign: 'center',
-                formatter: this.formatterDouble
             }
         ];
         const options = {

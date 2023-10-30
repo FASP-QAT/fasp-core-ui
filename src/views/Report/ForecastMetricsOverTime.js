@@ -31,32 +31,13 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 class ForcastMatrixOverTime extends Component {
   constructor(props) {
     super(props);
-    this.toggle = this.toggle.bind(this);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
     var dt1 = new Date();
@@ -85,15 +66,8 @@ class ForcastMatrixOverTime extends Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
-  }
-  hideSecondComponent() {
-    document.getElementById('div2').style.display = 'block';
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 30000);
   }
   formatter = value => {
     if (value != null) {
@@ -120,13 +94,6 @@ class ForcastMatrixOverTime extends Component {
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
-  }
-  roundN = num => {
-    if (num != '' && num != null) {
-      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    } else {
-      return NaN
-    }
   }
   round = num => {
     if (num != '' && num != null) {
@@ -847,16 +814,6 @@ class ForcastMatrixOverTime extends Component {
     } else {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [], planningUnitLabel: '' });
     }
-  }
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
-    });
   }
   show() {
   }

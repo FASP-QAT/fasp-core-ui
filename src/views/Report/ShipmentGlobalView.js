@@ -34,68 +34,10 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-var numberWithCommas = function (x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-var dataPack1 = [40, 47, 44, 38, 27];
-var dataPack2 = [10, 12, 7, 5, 4];
-var dataPack3 = [17, 11, 22, 18, 12];
-var dates = ["Some l-o-o-o-o-o-o-o-o-o-o-o-n-n-n-n-n-n-g-g-g-g-g-g-g label", "AAA", "BBB", "CCC", "DDDDDDDDD"];
-var bar_ctx = document.getElementById('bar-chart');
-const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
-const chartData = {
-    labels: ["Malawi", "Kenya", "Zimbabwe"],
-    datasets: [{
-        label: i18n.t('static.shipment.orderedShipment'),
-        data: [20000, 10000, 2000],
-        backgroundColor: '#6a82a8',
-        borderWidth: 0
-    },
-    {
-        label: i18n.t('static.shipment.plannedShipment'),
-        data: [20000, 20000, 2000],
-        backgroundColor: '#dee7f8',
-        borderWidth: 0,
-    }
-    ]
-};
-const chartData1 = {
-    labels: ["Jan 2019", "Feb 2019", "Mar 2019", "Apr 2019", "May 19", "Jun 19", "Jul 19", "Aug 2019", "Sep 2019", "Oct 2019", "Nov 2019", "Dec 2019"],
-    datasets: [
-        {
-            label: 'PSM',
-            data: [0, 40000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: '#4dbd74',
-            borderWidth: 0,
-        }, {
-            label: 'GF',
-            data: [0, 0, 4000, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: '#f86c6b',
-            borderWidth: 0
-        },
-        {
-            label: 'Local',
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: '#8aa9e6',
-            borderWidth: 0,
-        },
-        {
-            label: 'Govt',
-            data: [0, 0, 0, 30000, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: '#EDB944',
-            borderWidth: 0,
-        }
-    ]
-};
 const backgroundColor = [
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -105,23 +47,9 @@ const backgroundColor = [
     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
 ]
-function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-    data1.push(random(50, 200));
-    data2.push(random(80, 100));
-    data3.push(65);
-}
 class ShipmentGlobalView extends Component {
     constructor(props) {
         super(props);
-        this.toggledata = this.toggledata.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
@@ -187,9 +115,7 @@ class ShipmentGlobalView extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.handleChange = this.handleChange.bind(this)
-        this.getRandomColor = this.getRandomColor.bind(this)
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
-        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
         this.filterProgram = this.filterProgram.bind(this);
     }
@@ -280,18 +206,6 @@ class ShipmentGlobalView extends Component {
         a.download = i18n.t('static.dashboard.shipmentGlobalViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
     }
     exportPDF = () => {
         const addFooters = doc => {
@@ -439,14 +353,6 @@ class ShipmentGlobalView extends Component {
         this.setState({
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData()
-        })
-    }
-    handlePlanningUnitChange(planningUnitIds) {
-        this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele.value),
-            planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
             this.fetchData()
         })
@@ -607,118 +513,6 @@ class ShipmentGlobalView extends Component {
         this.getCountrys();
         document.getElementById("procurementAgentDiv").style.display = "none";
         document.getElementById("procurementAgentTypeDiv").style.display = "none";
-    }
-    getPrograms = () => {
-        this.setState({
-            loading: true
-        })
-        ProgramService.getProgramList()
-            .then(response => {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = a.programCode.toUpperCase(); 
-                    var itemLabelB = b.programCode.toUpperCase(); 
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    programs: listArray, loading: false
-                }, () => {
-                    this.getProductCategories();
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        programs: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-    getRelamList = () => {
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmList: response.data, loading: false
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
     }
     getProcurementAgent = (programIds) => {
         this.setState({ loading: true })
@@ -917,12 +711,6 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
-    }
     show() {
     }
     handleRangeChange(value, text, listIndex) {
@@ -935,14 +723,6 @@ class ShipmentGlobalView extends Component {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    getRandomColor() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
     fetchData = () => {
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()

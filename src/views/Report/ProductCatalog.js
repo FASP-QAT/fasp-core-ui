@@ -30,17 +30,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3,000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456,870", "isActive": 'Active' }];
 class ProductCatalog extends Component {
     constructor(props) {
         super(props);
-        this.toggledata = this.toggledata.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
@@ -890,12 +882,6 @@ class ProductCatalog extends Component {
     }
     componentDidMount() {
         this.getPrograms();
-    }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
     render() {

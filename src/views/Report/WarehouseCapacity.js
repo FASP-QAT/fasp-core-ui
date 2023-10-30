@@ -47,7 +47,6 @@ class warehouseCapacity extends Component {
         this.getCountrylist = this.getCountrylist.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
@@ -64,9 +63,6 @@ class warehouseCapacity extends Component {
         } else {
             this.getPrograms();
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
@@ -247,40 +243,6 @@ class warehouseCapacity extends Component {
                     }
                 }
             );
-    }
-    filterProgram = () => {
-        let countryIds = this.state.countryValues.map(ele => ele.value);
-        this.setState({
-            programLst: [],
-            programValues: [],
-            programLabels: []
-        }, () => {
-            if (countryIds.length != 0) {
-                let programLst = [];
-                for (var i = 0; i < countryIds.length; i++) {
-                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-                }
-                if (programLst.length > 0) {
-                    this.setState({
-                        programLst: programLst
-                    }, () => {
-                        this.fetchData()
-                    });
-                } else {
-                    this.setState({
-                        programLst: []
-                    }, () => {
-                        this.fetchData()
-                    });
-                }
-            } else {
-                this.setState({
-                    programLst: []
-                }, () => {
-                    this.fetchData()
-                });
-            }
-        })
     }
     handleChange(countrysId) {
         countrysId = countrysId.sort(function (a, b) {

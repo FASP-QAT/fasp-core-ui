@@ -37,8 +37,6 @@ const brandDanger = getStyle('--danger')
 class SupplierLeadTimes extends Component {
     constructor(props) {
         super(props);
-        this.toggledata = this.toggledata.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
@@ -58,12 +56,8 @@ class SupplierLeadTimes extends Component {
             loading: true,
             programId: ''
         };
-        this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
-        this.handleChangeProgram = this.handleChangeProgram.bind(this);
         this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
-        this.filterVersion = this.filterVersion.bind(this);
-        this.consolidatedVersionList = this.consolidatedVersionList.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.getProcurementAgent = this.getProcurementAgent.bind(this);
         this.consolidatedProcurementAgentList = this.consolidatedProcurementAgentList.bind(this);
@@ -353,13 +347,6 @@ class SupplierLeadTimes extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplierLeadTimes').concat('.pdf'));
     }
-    handleChangeProgram(programIds) {
-        this.setState({
-            programValues: programIds.map(ele => ele.value),
-            programLabels: programIds.map(ele => ele.label)
-        }, () => {
-        })
-    }
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -381,67 +368,6 @@ class SupplierLeadTimes extends Component {
         }, () => {
             this.fetchData()
         })
-    }
-    filterData(rangeValue) {
-        setTimeout('', 10000);
-        let programIds = this.state.programValues;
-        if (programIds.length > 0) {
-            this.setState({ loading: true })
-            ReportService.getProcurementAgentExportData(programIds)
-                .then(response => {
-                    this.setState({
-                        procurementAgents: response.data,
-                        message: '',
-                        loading: false
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            procurementAgents: [],
-                            loading: false
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else if (programIds.length == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), procurementAgents: [] });
-        } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), procurementAgents: [] });
-        }
     }
     getPrograms() {
         if (isSiteOnline()) {
@@ -567,76 +493,6 @@ class SupplierLeadTimes extends Component {
                 }
             }.bind(this);
         }.bind(this);
-    }
-    filterVersion = () => {
-        let programId = document.getElementById("programId").value;
-        if (programId != 0) {
-            const program = this.state.programs.filter(c => c.programId == programId)
-            if (program.length == 1) {
-                if (isSiteOnline()) {
-                    this.setState({
-                        versions: [],
-                        planningUnits: [],
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
-                } else {
-                    this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
-                }
-            } else {
-                this.setState({
-                    versions: []
-                })
-            }
-        } else {
-            this.setState({
-                versions: []
-            })
-        }
-    }
-    consolidatedVersionList = (programId) => {
-        const lan = 'en';
-        const { versions } = this.state
-        var verList = versions;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
-                        version.versionId = `${version.versionId} (Local)`
-                        verList.push(version)
-                    }
-                }
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })
-                })
-            }.bind(this);
-        }.bind(this)
     }
     getPlanningUnit = () => {
         let programId = this.state.programId;
@@ -1154,12 +1010,6 @@ class SupplierLeadTimes extends Component {
             this.getPlanningUnit();
             this.getProcurementAgent();
         })
-    }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
     render() {

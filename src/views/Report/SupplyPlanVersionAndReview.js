@@ -4,7 +4,6 @@ import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
 import moment from "moment";
 import React, { Component } from 'react';
-import { Search } from 'react-bootstrap-table2-toolkit';
 import Picker from 'react-month-picker';
 import {
     Card, CardBody,
@@ -28,39 +27,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = ""
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.supplyplanversionandreview')
-    },
-    scales: {
-        yAxes: [
-            {
-                scaleLabel: {
-                    display: true,
-                    labelString: i18n.t('static.report.stock')
-                },
-                ticks: {
-                    beginAtZero: true,
-                    Max: 900
-                }
-            }
-        ]
-    },
-    tooltips: {
-        mode: 'index',
-        enabled: false,
-        custom: CustomTooltips
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-        }
-    }
-}
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -98,11 +64,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.getCountrylist = this.getCountrylist.bind(this);
         this.getStatusList = this.getStatusList.bind(this);
         this.fetchData = this.fetchData.bind(this);
-        this.handleChange = this.handleChange.bind(this)
         this.getPrograms = this.getPrograms.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
-        this.checkValue = this.checkValue.bind(this);
-        this.editprogramStatus = this.editprogramStatus.bind(this)
         this.buildJexcel = this.buildJexcel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -305,20 +267,6 @@ class SupplyPlanVersionAndReview extends Component {
         this.getVersionTypeList()
         this.getStatusList()
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
-    checkValue(cell, row) {
-        if (row.versionStatus.id == 2)
-            return cell;
-        else
-            return '';
-    }
-    editprogramStatus(supplyPlan) {
-        this.props.history.push({
-            pathname: `/report/editStatus/${supplyPlan.program.id}/${supplyPlan.versionId}`,
-        });
-    }
     show() {
     }
     handleRangeChange(value, text, listIndex) {
@@ -387,26 +335,6 @@ class SupplyPlanVersionAndReview extends Component {
                     }
                 }
             );
-    }
-    filterProgram = () => {
-        let countryId = document.getElementById("countryId").value;
-        if (countryId != 0 && countryId != -1) {
-            const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
-            if (programLst.length > 0) {
-                this.setState({
-                    programLst: programLst
-                }, () => { this.fetchData() });
-            } else {
-                this.setState({
-                    programLst: []
-                });
-            }
-        } else if (countryId == -1) {
-            const programLst = this.state.programs;
-            this.setState({
-                programLst: programLst
-            }, () => { this.fetchData() });
-        }
     }
     getPrograms() {
         let CountryIds = document.getElementById("countryId").value;
@@ -774,15 +702,6 @@ class SupplyPlanVersionAndReview extends Component {
         addFooters(doc)
         doc.save("SupplyPlanVersionAndReview.pdf")
     }
-    handleChange(countrysId) {
-        var countryIdArray = [];
-        for (var i = 0; i < countrysId.length; i++) {
-            countryIdArray[i] = countrysId[i].value;
-        }
-        this.setState({
-            countryValues: countryIdArray
-        })
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -861,111 +780,29 @@ class SupplyPlanVersionAndReview extends Component {
         }
         const columns = [
             {
-                dataField: 'program.label',
                 text: i18n.t('static.program.program'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
             },
             {
-                dataField: 'versionId',
                 text: i18n.t('static.report.version'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             },
             {
-                dataField: 'versionType.label',
                 text: i18n.t('static.report.versiontype'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
             },
             {
-                dataField: 'createdDate',
                 text: i18n.t('static.report.veruploaddate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.createdDate ? moment(row.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-                    );
-                }
             }
             , {
-                dataField: 'createdBy.username',
                 text: i18n.t('static.report.veruploaduser'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             }, {
-                dataField: 'versionStatus.label',
                 text: i18n.t('static.report.issupplyplanapprove'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
             }
             , {
-                dataField: 'lastModifiedBy.username',
                 text: i18n.t('static.report.reviewer'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.checkValue
             }, {
-                dataField: 'lastModifiedDate',
                 text: i18n.t('static.report.approvedRevieweddate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.versionStatus.id == 2) ? (row.lastModifiedDate ? moment(row.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
-                    );
-                }
             }, {
-                dataField: 'notes',
                 text: i18n.t('static.report.comment'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
             }];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.matricsList.length
-            }]
-        };
-        const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',

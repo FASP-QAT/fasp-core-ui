@@ -39,49 +39,6 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const options = {
-  title: {
-    display: true,
-    text: i18n.t('static.dashboard.globalconsumption')
-  },
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.dashboard.consumption')
-      },
-      stacked: true,
-      ticks: {
-        beginAtZero: true
-      }
-    }]
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false
-  ,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-    }
-  }
-}
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 class ForecastMetrics extends Component {
   constructor(props) {
     super(props);
@@ -113,20 +70,11 @@ class ForecastMetrics extends Component {
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
-    this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
-    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories = this.getProductCategories.bind(this)
-    this.getPrograms = this.getPrograms.bind(this)
     this.handleChange = this.handleChange.bind(this)
-    this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-    this.formatLabel = this.formatLabel.bind(this);
-    this.formatValue = this.formatValue.bind(this)
     this.pickAMonth2 = React.createRef();
-    this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
     this.filterProgram = this.filterProgram.bind(this)
     this.filterTracerCategory = this.filterTracerCategory.bind(this);
@@ -137,22 +85,6 @@ class ForecastMetrics extends Component {
   }
   roundN = num => {
     return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-  }
-  formatLabel(cell, row) {
-    if (cell != null && cell != "") {
-      return getLabelText(cell, this.state.lang);
-    }
-  }
-  formatValue(cell, row) {
-    if (cell != null && cell != "") {
-      return this.roundN(cell) + '%';
-    } else if ((cell == "0" && row.months == 0)) {
-      return "No data points containing both actual and forecast consumption ";
-    } else if (cell == null) {
-      return "No data points containing  actual consumption ";
-    } else {
-      return "0%"
-    }
   }
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map(ele => '"' + ele + '"')
@@ -319,9 +251,6 @@ class ForecastMetrics extends Component {
     addHeaders(doc)
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.forecastmetrics') + ".pdf")
-  }
-  rowClassNameFormat(row, rowIdx) {
-    return (row.forecastError > 50) ? 'background-red' : '';
   }
   handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
@@ -933,134 +862,10 @@ class ForecastMetrics extends Component {
       this.filterData();
     }
   }
-  getPrograms() {
-    ProgramService.getProgramList()
-      .then(response => {
-        var listArray = response.data;
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        this.setState({
-          programs: listArray, loading: false
-        })
-      }).catch(
-        error => {
-          this.setState({
-            programs: [], loading: false
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-  }
-  getProductCategories() {
-    let realmId = AuthenticationService.getRealmId();
-    ProductService.getProductCategoryList(realmId)
-      .then(response => {
-        var listArray = response.data;
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-          var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        this.setState({
-          productCategories: listArray
-        })
-      }).catch(
-        error => {
-          this.setState({
-            productCategories: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-  }
   componentDidMount() {
     this.getCountrys();
   }
-  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
-    });
-  }
   show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
-  handleRangeDissmis(value) {
-    this.setState({ rangeValue: value }, () => {
-      this.filterData();
-    })
   }
   handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show()
@@ -1072,18 +877,7 @@ class ForecastMetrics extends Component {
       this.filterData();
     })
   }
-  _handleClickRangeBox(e) {
-    this.refs.pickRange.show()
-  }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-  getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -1119,51 +913,6 @@ class ForecastMetrics extends Component {
         )
       }, this);
     const { tracerCategories } = this.state;
-    const columns = [
-      {
-        dataField: 'program.label',
-        text: i18n.t('static.program.program'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '420px' },
-        formatter: this.formatLabel
-      }, {
-        dataField: 'planningUnit.label',
-        text: i18n.t('static.dashboard.planningunit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '420px' },
-        formatter: this.formatLabel
-      }/*, {
-            dataField: 'historicalConsumptionDiff',
-            text: i18n.t('static.report.historicalConsumptionDiff'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-        }, {
-          dataField: 'historicalConsumptionActual',
-          text: i18n.t('static.report.historicalConsumptionActual'),
-          sort: true,
-          align: 'center',
-          headerAlign: 'center',
-      }*/, {
-        dataField: 'forecastError',
-        text: i18n.t('static.report.error'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        style: { align: 'center', width: '250px' },
-        formatter: this.formatValue
-      }, {
-        dataField: 'monthCount',
-        text: i18n.t('static.report.noofmonth'),
-        sort: true,
-        align: 'center',
-        style: { align: 'center', width: '250px' },
-        headerAlign: 'center',
-      }];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),

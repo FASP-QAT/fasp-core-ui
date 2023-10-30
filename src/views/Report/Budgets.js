@@ -124,11 +124,6 @@ class Budgets extends Component {
             jexcelDataEl: ""
         }
         this.formatDate = this.formatDate.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
-        this.addCommas = this.addCommas.bind(this);
-        this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -210,16 +205,6 @@ class Budgets extends Component {
         }, () => {
             this.filterData()
         })
-    }
-    hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
@@ -407,7 +392,6 @@ class Budgets extends Component {
             return "";
         }
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     getPrograms = () => {
         if (isSiteOnline()) {
             let realmId = AuthenticationService.getRealmId();
@@ -478,55 +462,9 @@ class Budgets extends Component {
             this.setState({ loading: false })
         }
     }
-    roundNStr = num => {
-        var roundNum = Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-        if (roundNum != 0) {
-            return roundNum + ' ' + i18n.t('static.common.million')
-        } else {
-            return num
-        }
-    }
-    roundN = num => {
-        return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-    }
     componentDidMount() {
         this.getPrograms()
         this.getFundingSource();
-    }
-    rowClassNameFormat(row, rowIdx) {
-        return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
-    }
-    formatLabel(cell, row) {
-        if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-        }
-    }
-    addCommas(cell, row) {
-        cell += '';
-        var x = cell.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2
-    }
-    formatter = value => {
-        if (value != null) {
-            var cell1 = parseFloat(value).toFixed(2)
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
-        } else {
-            return ''
-        }
     }
     formatterValue = value => {
         if (value != null) {
@@ -636,97 +574,35 @@ class Budgets extends Component {
         );
         const columns = [
             {
-                dataField: 'budget.label',
                 text: i18n.t('static.budget.budget'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'budget.code',
                 text: i18n.t('static.budget.budgetCode'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
             },
             {
-                dataField: 'fundingSource.code',
                 text: i18n.t('static.budget.fundingsource'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' }
             },
             {
-                dataField: 'currency.label',
                 text: i18n.t('static.dashboard.currency'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'budgetAmt',
                 text: i18n.t('static.budget.budgetamount'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatterValue,
             },
             {
-                dataField: 'plannedBudgetAmt',
                 text: i18n.t('static.report.plannedBudgetAmt'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
-                dataField: 'orderedBudgetAmt',
                 text: i18n.t('static.report.orderedBudgetAmt'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
-                dataField: 'orderedBudgetAmt',
                 text: i18n.t('static.report.remainingBudgetAmt'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: (cell, row) => {
-                    return Math.floor((row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                }
             },
             {
-                dataField: 'startDate',
                 text: i18n.t('static.common.startdate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatDate
             },
             {
-                dataField: 'stopDate',
                 text: i18n.t('static.common.stopdate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatDate
             }];
         const options = {
             hidePageListOnlyOnePage: true,

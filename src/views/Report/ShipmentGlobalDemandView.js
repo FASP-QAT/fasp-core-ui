@@ -35,24 +35,10 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-var numberWithCommas = function (x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-var dataPack1 = [40, 47, 44, 38, 27];
-var dataPack2 = [10, 12, 7, 5, 4];
-var dataPack3 = [17, 11, 22, 18, 12];
-var dates = ["Some l-o-o-o-o-o-o-o-o-o-o-o-n-n-n-n-n-n-g-g-g-g-g-g-g label", "AAA", "BBB", "CCC", "DDDDDDDDD"];
-var bar_ctx = document.getElementById('bar-chart');
-const colors = ['#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'];
 const options = {
     title: {
         display: true,
@@ -200,23 +186,9 @@ const optionsPie = {
         }
     },
 }
-function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-    data1.push(random(50, 200));
-    data2.push(random(80, 100));
-    data3.push(65);
-}
 class ShipmentGlobalDemandView extends Component {
     constructor(props) {
         super(props);
-        this.toggledata = this.toggledata.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
@@ -271,11 +243,8 @@ class ShipmentGlobalDemandView extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPrograms = this.getPrograms.bind(this)
-        this.getRandomColor = this.getRandomColor.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-        this.getProductCategories = this.getProductCategories.bind(this)
         this.handleChange = this.handleChange.bind(this)
-        this.filterProgram = this.filterProgram.bind(this)
     }
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -353,18 +322,6 @@ class ShipmentGlobalDemandView extends Component {
         a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
     }
     exportPDF = () => {
         const addFooters = doc => {
@@ -935,43 +892,6 @@ class ShipmentGlobalDemandView extends Component {
             this.getPrograms();
         })
     }
-    filterProgram = () => {
-        let countryIds = this.state.countryValues.map(ele => ele.value);
-        this.setState({
-            programLst: [],
-            programValues: [],
-            programLabels: [],
-            planningUnits: [],
-            planningUnitValues: [],
-            planningUnitLabels: []
-        }, () => {
-            if (countryIds.length != 0) {
-                let programLst = [];
-                for (var i = 0; i < countryIds.length; i++) {
-                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-                }
-                if (programLst.length > 0) {
-                    this.setState({
-                        programLst: programLst
-                    }, () => {
-                        this.fetchData()
-                    });
-                } else {
-                    this.setState({
-                        programLst: []
-                    }, () => {
-                        this.fetchData()
-                    });
-                }
-            } else {
-                this.setState({
-                    programLst: []
-                }, () => {
-                    this.fetchData()
-                });
-            }
-        })
-    }
     handleChangeProgram = (programIds) => {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -983,58 +903,6 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
             this.getPlanningUnit();
         })
-    }
-    getRelamList = () => {
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmList: response.data, loading: false
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
@@ -1206,9 +1074,6 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     getPrograms = () => {
         if (isSiteOnline()) {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
@@ -1378,58 +1243,6 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
-    getProductCategories() {
-        let realmId = AuthenticationService.getRealmId()
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                var list = response.data.slice(1);
-                this.setState({
-                    productCategories: list, loading: false
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-        this.getPlanningUnit();
-    }
     getPlanningUnit = () => {
         this.setState({
             planningUnits: [],
@@ -1552,12 +1365,6 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
-    }
     show() {
     }
     handleRangeChange(value, text, listIndex) {
@@ -1569,14 +1376,6 @@ class ShipmentGlobalDemandView extends Component {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    getRandomColor() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
     handleFundingSourceChange(fundingSourceIds) {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);

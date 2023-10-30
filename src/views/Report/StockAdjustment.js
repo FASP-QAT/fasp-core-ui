@@ -55,7 +55,6 @@ class StockAdjustmentComponent extends Component {
             programId: '',
             versionId: ''
         }
-        this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -881,9 +880,6 @@ class StockAdjustmentComponent extends Component {
                 this.getPlanningUnit();
             })
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

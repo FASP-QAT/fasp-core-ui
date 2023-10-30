@@ -568,23 +568,6 @@ class StockStatusAcrossPlanningUnits extends Component {
     roundN = num => {
         return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
-    round = num => {
-        if (num != null) {
-            return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
-        } else {
-            return null;
-        }
-    }
-    formatLabel = (cell, row) => {
-        if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-        }
-    }
-    formatterDate = (cell, row) => {
-        if (cell != null && cell != "") {
-            return moment(cell).format('MMM-yy');
-        }
-    }
     formatter = value => {
         var cell1 = this.round(value)
         cell1 += '';
@@ -608,11 +591,6 @@ class StockStatusAcrossPlanningUnits extends Component {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return x1 + x2;
-    }
-    style = (cell, row) => {
-        if (cell < row.minMOS) {
-            return { align: 'center', color: '#BA0C2F' }
-        }
     }
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
@@ -1143,148 +1121,38 @@ class StockStatusAcrossPlanningUnits extends Component {
         );
         const columns = [
             {
-                dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' }
             },
             {
-                dataField: 'planningUnit.label',
                 text: i18n.t('static.dashboard.product'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '350px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'mos',
                 text: i18n.t('static.programPU.planBasedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cell, row) => {
-                    if (cell < row.minMos) {
-                        return i18n.t('static.report.low')
-                    } else if (cell > row.maxMos) {
-                        return i18n.t('static.report.excess')
-                    } else {
-                        return i18n.t('static.report.ok')
-                    }
-                }
-                ,
-                style: function callback(cell, row, rowIndex, colIndex) {
-                    if (cell < row.minMos) {
-                        return { backgroundColor: '#f48282', align: 'center', width: '100px' };
-                    } else if (cell > row.maxMos) {
-                        return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
-                    } else {
-                        return { backgroundColor: '#00c596', align: 'center', width: '100px' };
-                    }
-                }
             },
             {
-                dataField: 'mos',
                 text: i18n.t('static.report.withinstock'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatterDouble,
-                style: function callback(cell, row, rowIndex, colIndex) {
-                    if (cell < row.minMos) {
-                        return { backgroundColor: '#f48282', align: 'center', width: '100px' };
-                    } else if (cell > row.maxMos) {
-                        return { backgroundColor: '#f3d679', align: 'center', width: '100px' };
-                    } else {
-                        return { backgroundColor: '#00c596', align: 'center', width: '100px' };
-                    }
-                }
             },
             {
-                dataField: 'minMos',
                 text: i18n.t('static.report.stock'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatterDouble
             },
             {
-                dataField: 'maxMos',
                 text: i18n.t('static.report.mos'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-                formatter: this.formatterDouble
             }
             ,
             {
-                dataField: 'stock',
                 text: i18n.t('static.report.minMosOrQty'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-                formatter: this.formatter
             }
             ,
             {
-                dataField: 'amc',
                 text: i18n.t('static.report.maxMosOrQty'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-                formatter: this.formatter
             },
             {
-                dataField: 'amc',
                 text: i18n.t('static.report.amc'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-                formatter: this.formatter
             },
             {
-                dataField: 'lastStockCount',
                 text: i18n.t('static.supplyPlan.lastinventorydt'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-                formatter: this.formatterDate
             }
         ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.data.length
-            }]
-        }
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />

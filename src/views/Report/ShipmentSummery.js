@@ -60,19 +60,6 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const ref = React.createRef();
-const brandPrimary = getStyle("--primary");
-const brandSuccess = getStyle("--success");
-const brandInfo = getStyle("--info");
-const brandWarning = getStyle("--warning");
-const brandDanger = getStyle("--danger");
-const colors = [
-  "#004876",
-  "#0063a0",
-  "#007ecc",
-  "#0093ee",
-  "#82caf8",
-  "#c8e6f4",
-];
 const options = {
   title: {
     display: true,
@@ -148,54 +135,6 @@ const options = {
     },
   },
 };
-const chartData = {
-  labels: [
-    "Jan 2020",
-    "Feb 2020",
-    "Mar 2020",
-    "Apr 2020",
-    "May 2020",
-    "Jun 2020",
-    "Jul 2020",
-    "Aug 2020",
-    "Sep 2020",
-    "Oct 2020",
-    "Nov 2020",
-    "Dec 2020",
-  ],
-  datasets: [
-    {
-      label: "Received",
-      data: [0, 3740000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#042e6a",
-      borderWidth: 0,
-    },
-    {
-      label: "Ordered",
-      data: [0, 0, 0, 0, 5610000, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#6a82a8",
-      borderWidth: 0,
-    },
-    {
-      label: "Planned",
-      data: [0, 0, 0, 0, 0, 7480000, 0, 0, 0, 0, 0, 0],
-      backgroundColor: "#dee7f8",
-      borderWidth: 0,
-    },
-  ],
-};
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -217,7 +156,6 @@ const pickerLang = {
 class ShipmentSummery extends Component {
   constructor(props) {
     super(props);
-    this.toggle = this.toggle.bind(this);
     var dt = new Date();
     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
     var dt1 = new Date();
@@ -269,7 +207,6 @@ class ShipmentSummery extends Component {
       filteredBudgetList: [],
       lang: localStorage.getItem("lang"),
     };
-    this.formatLabel = this.formatLabel.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -286,8 +223,6 @@ class ShipmentSummery extends Component {
       return pickerLang.months[m.month - 1] + ". " + m.year;
     return "?";
   };
-  toggledata = () =>
-    this.setState((currentState) => ({ show: !currentState.show }));
   formatter = (value) => {
     var cell1 = value;
     cell1 += "";
@@ -299,9 +234,6 @@ class ShipmentSummery extends Component {
       x1 = x1.replace(rgx, "$1" + "," + "$2");
     }
     return x1 + x2;
-  };
-  dateFormatter = (value) => {
-    return moment(value).format("MMM YY");
   };
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map((ele) => '"' + ele + '"');
@@ -2504,11 +2436,6 @@ class ShipmentSummery extends Component {
       );
     }
   };
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
   handleRangeChange(value, text, listIndex) {
   }
   handleRangeDissmis(value) {
@@ -2524,9 +2451,6 @@ class ShipmentSummery extends Component {
       {i18n.t("static.common.loading")}
     </div>
   );
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
   dateFormatterLanguage = (value) => {
     if (moment(value).format("MM") === "01") {
       return i18n.t("static.month.jan") + " " + moment(value).format("YY");

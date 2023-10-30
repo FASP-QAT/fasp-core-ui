@@ -32,23 +32,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -56,8 +39,6 @@ const pickerLang = {
 class Consumption extends Component {
   constructor(props) {
     super(props);
-    this.toggle = this.toggle.bind(this);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
     var dt1 = new Date();
@@ -95,27 +76,8 @@ class Consumption extends Component {
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.storeProduct = this.storeProduct.bind(this);
-    this.toggleView = this.toggleView.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
-  }
-  toggleView() {
-    var tempConsumptionList = [];
-    var tempConsumptionList1 = [];
-    var multiplier = this.state.multiplier;
-    tempConsumptionList = this.state.offlineConsumptionList;
-    for (let i = 0; i < tempConsumptionList.length; i++) {
-      let json = {
-        "transDate": tempConsumptionList[i].transDate,
-        "actualConsumption": this.round(tempConsumptionList[i].actualConsumption * multiplier),
-        "forecastedConsumption": this.round(tempConsumptionList[i].forecastedConsumption * multiplier)
-      }
-      tempConsumptionList1.push(json);
-    }
-    this.setState({
-      offlineConsumptionList: tempConsumptionList1,
-      consumptions: tempConsumptionList1
-    })
   }
   storeProduct() {
     let productId = document.getElementById("planningUnitId").value;
@@ -441,13 +403,6 @@ class Consumption extends Component {
     addHeaders(doc)
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.consumption').concat('.pdf'));
-  }
-  roundN = num => {
-    if (num != '' || num != null) {
-      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    } else {
-      return ''
-    }
   }
   round = num => {
     if (num === '' || num == null) {
@@ -1071,16 +1026,6 @@ class Consumption extends Component {
         this.getPlanningUnit();
       })
     }
-  }
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
-    });
   }
   show() {
   }

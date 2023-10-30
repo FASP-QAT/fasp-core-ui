@@ -76,7 +76,6 @@ class AnnualShipmentCost extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
         this.getPrograms = this.getPrograms.bind(this);
         this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
@@ -974,39 +973,6 @@ class AnnualShipmentCost extends Component {
                 }
             }
         });
-    }
-    getProductCategories() {
-        let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
     }
     getFundingSourceList() {
         const { fundingSources } = this.state

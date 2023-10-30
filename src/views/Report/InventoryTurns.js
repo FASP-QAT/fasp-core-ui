@@ -72,8 +72,6 @@ export default class InventoryTurns extends Component {
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
-        this.buildJExcel = this.buildJExcel.bind(this);
         this.radioChange = this.radioChange.bind(this);
         this.filterData = this.filterData.bind(this);
         this.updateCountryData = this.updateCountryData.bind(this);
@@ -85,33 +83,11 @@ export default class InventoryTurns extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    }
     roundN1 = num => {
         return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(1);
     }
     round = num => {
         return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
-    }
-    dateformatter = value => {
-        var dt = new Date(value)
-        return moment(dt).format('DD-MMM-YY');
-    }
-    formatterDouble = value => {
-        if (value == null) {
-            return null;
-        }
-        var cell1 = this.roundN(value)
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
     }
     formatterSingle = value => {
         if (value == null) {
@@ -781,95 +757,6 @@ export default class InventoryTurns extends Component {
                 }
             );
     }
-    getMonthArray = (currentDate) => {
-        var month = [];
-        var curDate = currentDate.subtract(0, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')) })
-        for (var i = 1; i < 12; i++) {
-            var curDate = currentDate.add(1, 'months');
-            month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')) })
-        }
-        return month;
-    }
-    buildJExcel() {
-        let costOfInventory = this.state.costOfInventory;
-        let costOfInventoryArray = [];
-        let count = 0;
-        for (var j = 0; j < costOfInventory.length; j++) {
-            data = [];
-            data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang);
-            data[1] = (costOfInventory[j].totalConsumption);
-            data[2] = Number(costOfInventory[j].avergeStock).toFixed(2);
-            data[3] = (costOfInventory[j].noOfMonths);
-            data[4] = (costOfInventory[j].inventoryTurns);
-            costOfInventoryArray[count] = data;
-            count++;
-        }
-        if (costOfInventory.length == 0) {
-            data = [];
-            costOfInventoryArray[0] = data;
-        }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
-        var data = costOfInventoryArray;
-        var options = {
-            data: data,
-            columnDrag: true,
-            colWidths: [150, 150, 100],
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: i18n.t('static.report.planningUnit'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.report.totconsumption'),
-                    type: 'numeric', mask: '#,##',
-                },
-                {
-                    title: i18n.t('static.report.avergeStock'),
-                    type: 'numeric', mask: '#,##',
-                },
-                {
-                    title: i18n.t('static.inventoryTurns.noofmonths'),
-                    type: 'numeric', mask: '#,##',
-                },
-                {
-                    title: i18n.t('static.dashboard.inventoryTurns'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
-                },
-            ],
-            editable: false,
-            onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
-        };
-        var languageEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = languageEl;
-        this.setState({
-            languageEl: languageEl, loading: false
-        })
-    }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
     formSubmit() {
         this.setState({ loading: true })
         var inputJson = {
@@ -1073,11 +960,6 @@ export default class InventoryTurns extends Component {
             });
         }
     }
-    formatLabel(cell, row) {
-        if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-        }
-    }
     toggleAccordion(parentId) {
         var childShowArr = this.state.childShowArr;
         if (parentId in childShowArr) {
@@ -1255,103 +1137,37 @@ export default class InventoryTurns extends Component {
         );
         const columns = [
             {
-                dataField: 'planningUnit.label',
                 text: "",
-                sort: true,
-                align: 'left',
-                headerAlign: 'left',
-                style: { align: 'left', width: '380px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'noOfPlanningUnits',
                 text: i18n.t('static.inventoryTurns.noofplanningunits'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'totalConsumption',
                 text: i18n.t('static.report.totconsumption'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'avergeStock',
                 text: i18n.t('static.report.avergeStock'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'noOfMonths',
                 text: i18n.t('static.inventoryTurns.noofmonths'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'reorderInterval',
                 text: i18n.t('static.supplyPlan.reorderInterval'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'minMonthOfStock',
                 text: i18n.t('static.product.minMonthOfStock'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatter
             },
             {
-                dataField: 'inventoryTurns',
                 text: i18n.t('static.inventoryTurns.actual'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatterDouble
             },
             {
-                dataField: 'plannedInventoryTurns',
                 text: i18n.t('static.inventoryTurns.planned'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatterDouble
             },
             {
-                dataField: 'mape',
                 text: i18n.t('static.extrapolation.mape'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatterDouble
             },
             {
-                dataField: 'mse',
                 text: i18n.t('static.extrapolation.mse'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '170px' },
-                formatter: this.formatterDouble
             }
         ];
         const options = {

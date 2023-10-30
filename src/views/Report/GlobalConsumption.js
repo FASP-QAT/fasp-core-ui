@@ -34,16 +34,10 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const options = {
   title: {
     display: true,
@@ -120,23 +114,10 @@ const options = {
     }
   }
 }
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 class GlobalConsumption extends Component {
   constructor(props) {
     super(props);
     this.toggledata = this.toggledata.bind(this);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
     var dt1 = new Date();
@@ -170,12 +151,9 @@ class GlobalConsumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getPrograms = this.getPrograms.bind(this)
     this.handleChange = this.handleChange.bind(this)
-    this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-    this.hideDiv = this.hideDiv.bind(this)
     this.handleDisplayChange = this.handleDisplayChange.bind(this)
     this.filterProgram = this.filterProgram.bind(this)
   }
@@ -465,11 +443,6 @@ class GlobalConsumption extends Component {
   handleDisplayChange() {
     this.filterData(this.state.rangeValue)
   }
-  hideDiv() {
-    setTimeout(function () {
-      var theSelect = document.getElementById('planningUnitId').length;
-    }, 9000);
-  }
   filterData(rangeValue) {
     setTimeout('', 10000);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -738,128 +711,10 @@ class GlobalConsumption extends Component {
       }
     })
   }
-  getPrograms() {
-    this.setState({ loading: true })
-    ProgramService.getProgramList()
-      .then(response => {
-        var listArray = response.data;
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        this.setState({
-          programs: listArray, loading: false
-        }, () => {
-          this.getCountrys();
-        })
-      }).catch(
-        error => {
-          this.setState({
-            programs: [], loading: false
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-  }
   componentDidMount() {
     this.getCountrys();
   }
-  getRelamList = () => {
-    this.setState({ loading: true })
-    RealmService.getRealmListAll()
-      .then(response => {
-        if (response.status == 200) {
-          this.setState({
-            realmList: response.data, loading: false
-          }, () => {
-            this.getPrograms()
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode, loading: false
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-  }
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
-    });
-  }
   show() {
   }
   handleRangeChange(value, text, listIndex) {
@@ -872,14 +727,6 @@ class GlobalConsumption extends Component {
     this.refs.pickRange.show()
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-  getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
   dateFormatterLanguage = value => {
     if (moment(value).format('MM') === '01') {
       return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))

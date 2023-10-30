@@ -61,10 +61,6 @@ export default class ConsumptionDetails extends React.Component {
         }
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.addMannualProblem = this.addMannualProblem.bind(this);
-        this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
-        this.buttonFormatter = this.buttonFormatter.bind(this);
-        this.addMapping = this.addMapping.bind(this);
         this.getNote = this.getNote.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -259,15 +255,6 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this);
         }.bind(this);
     };
-    rowClassNameFormat(row, rowIdx) {
-        if (row.realmProblem.criticality.id == 3) {
-            return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red-problemList' : '';
-        } else if (row.realmProblem.criticality.id == 2) {
-            return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
-        } else {
-            return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
-        }
-    }
     filterProblemStatus = function (instance, cell, c, r, source) {
         var hasRole = false;
         AuthenticationService.getLoggedInUserRole().map(c => {
@@ -692,7 +679,7 @@ export default class ConsumptionDetails extends React.Component {
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-    exportCSV(columns) {
+    exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
         csvRow.push('')
@@ -742,7 +729,7 @@ export default class ConsumptionDetails extends React.Component {
         document.body.appendChild(a)
         a.click()
     }
-    exportPDF(columns) {
+    exportPDF() {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             for (var i = 1; i <= pageCount; i++) {
@@ -1028,26 +1015,6 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }
-    addMannualProblem() {
-        this.props.history.push("/report/addProblem");
-    }
-    buttonFormatter(cell, row) {
-        if (row.problemStatus.id == 2) {
-            return <span></span>
-        } else {
-            return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell, row)} color="info"><i className="fa fa-pencil"></i></Button>;
-        }
-    }
-    addMapping(event, cell, row) {
-        var planningunitId = row.planningUnit.id;
-        var programId = document.getElementById('programId').value;
-        var versionId = row.versionId
-        event.stopPropagation();
-        alert(`${cell}/${programId}/${versionId}/${planningunitId}`);
-        this.props.history.push({
-            pathname: `${cell}/${programId}/${versionId}/${planningunitId}`,
-        });
-    }
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
         if (transList.length == 0) {
@@ -1115,133 +1082,6 @@ export default class ConsumptionDetails extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-        const columns = [
-            {
-                dataField: 'program.programCode',
-                text: i18n.t('static.program.programCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-            },
-            {
-                dataField: 'versionId',
-                text: i18n.t('static.program.versionId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '60px' },
-            },
-            {
-                dataField: 'region.label',
-                text: i18n.t('static.region.region'),
-                hidden: true,
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        return getLabelText(cell, this.state.lang);
-                    }
-                }
-            },
-            {
-                dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
-                sort: true,
-                hidden: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '170px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'dt',
-                text: i18n.t('static.report.month'),
-                sort: true,
-                hidden: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format('MMM-YY');
-                        return modifiedDate;
-                    }
-                }
-            },
-            {
-                dataField: 'createdDate',
-                text: i18n.t('static.report.createdDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '100px' },
-                formatter: (cell, row) => {
-                    if (cell != null && cell != "") {
-                        var modifiedDate = moment(cell).format('MMM-YY');
-                        return modifiedDate;
-                    }
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.label',
-                text: i18n.t('static.report.problemDescription'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '230px' },
-                formatter: (cell, row) => {
-                    return getProblemDesc(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.actionLabel',
-                text: i18n.t('static.report.suggession'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '250px' },
-                formatter: (cell, row) => {
-                    return getSuggestion(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemStatus.label',
-                text: i18n.t('static.report.problemStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '90px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
-            {
-                dataField: 'problemTransList',
-                text: i18n.t('static.program.notes'),
-                sort: true,
-                align: 'center',
-                style: { width: '100px' },
-                headerAlign: 'center',
-                style: { width: '170px' },
-                formatter: (cell, row) => {
-                    return this.getNote(row, this.state.lang);
-                }
-            },
-            {
-                dataField: 'realmProblem.problem.actionUrl',
-                text: i18n.t('static.common.action'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '50px' },
-                formatter: this.buttonFormatter
-            }
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1365,8 +1205,8 @@ export default class ConsumptionDetails extends React.Component {
                                 <a className="card-header-action">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
                                 </a>
-                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />} &nbsp;
-                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />} &nbsp;
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV()} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
                             </div>

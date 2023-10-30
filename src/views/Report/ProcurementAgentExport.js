@@ -106,7 +106,6 @@ class ProcurementAgentExport extends Component {
       programId: "",
       versionId: "",
     };
-    this.formatLabel = this.formatLabel.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -848,18 +847,6 @@ class ProcurementAgentExport extends Component {
   _handleClickRangeBox(e) {
     this.refs.pickRange.show();
   }
-  formatter = (value) => {
-    var cell1 = value;
-    cell1 += "";
-    var x = cell1.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  };
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map((ele) => '"' + ele + '"');
   };
@@ -2798,20 +2785,6 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
-  addCommas(cell, row) {
-    cell += "";
-    var x = cell.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  }
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -2854,43 +2827,17 @@ class ProcurementAgentExport extends Component {
     let obj2 = {};
     if (viewby == 1) {
       obj1 = {
-        dataField: "procurementAgent.label",
         text: "Procurement Agent",
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "70px" },
       };
       obj2 = {
-        dataField: "procurementAgent.code",
         text: "Procurement Agent Code",
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { width: "70px" },
       };
     } else if (viewby == 2) {
       obj1 = {
-        dataField: "fundingSource.label",
         text: i18n.t("static.budget.fundingsource"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "100px" },
       };
       obj2 = {
-        dataField: "fundingSource.code",
         text: i18n.t("static.fundingsource.fundingsourceCode"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { width: "100px" },
       };
     } else {
       obj1 = {
@@ -2904,70 +2851,25 @@ class ProcurementAgentExport extends Component {
       obj1,
       obj2,
       {
-        dataField: "planningUnit.id",
         text: i18n.t("static.report.qatPID"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { align: "center" },
       },
       {
-        dataField: "planningUnit.label",
         text: i18n.t("static.report.planningUnit"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "400px" },
       },
       {
-        dataField: "qty",
         text: i18n.t("static.report.qty"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "productCost",
         text: i18n.t("static.report.productCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "freightPerc",
         text: i18n.t("static.report.freightPer"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return cell.toFixed(2);
-        },
-        style: { width: "100px" },
       },
       {
-        dataField: "freightCost",
         text: i18n.t("static.report.freightCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "totalCost",
         text: i18n.t("static.report.totalCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
     ];
     const options = {

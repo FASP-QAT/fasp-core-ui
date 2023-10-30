@@ -104,10 +104,6 @@ export default class StockStatusMatrix extends React.Component {
       versionId: "",
     };
     this.filterData = this.filterData.bind(this);
-    this.formatLabel = this.formatLabel.bind(this);
-    this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
-    this.handleRangeChange = this.handleRangeChange.bind(this);
-    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
@@ -293,19 +289,6 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   }
-  makeText = (m) => {
-    if (m && m.year && m.month)
-      return pickerLang.months[m.month - 1] + ". " + m.year;
-    return "?";
-  };
-  show() { }
-  handleRangeChange(value, text, listIndex) {
-  }
-  handleRangeDissmis(value) {
-    this.setState({ rangeValue: value }, () => {
-      this.filterData();
-    });
-  }
   onYearChange = (value) => {
     this.setState(
       {
@@ -317,22 +300,6 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   };
-  _handleClickRangeBox(e) {
-    this.refs.pickRange.show();
-  }
-  getversion = () => {
-    let programId = document.getElementById("programId").value;
-    if (programId != 0) {
-      const program = this.state.programs.filter(
-        (c) => c.programId == programId
-      );
-      if (program.length == 1) {
-        return program[0].currentVersion.versionId;
-      } else {
-        return -1;
-      }
-    }
-  };
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -340,17 +307,6 @@ export default class StockStatusMatrix extends React.Component {
     this.setState(
       {
         planningUnitValues: planningUnitIds.map((ele) => ele),
-        planningUnitLabels: planningUnitIds.map((ele) => ele.label),
-      },
-      () => {
-        this.filterData();
-      }
-    );
-  };
-  handleProductCategoryChange = (planningUnitIds) => {
-    this.setState(
-      {
-        planningUnitValues: planningUnitIds.map((ele) => ele.value),
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
       },
       () => {
@@ -830,137 +786,6 @@ export default class StockStatusMatrix extends React.Component {
         data: [],
       });
     }
-  }
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
-    this.setState(
-      {
-        planningUnits: [],
-        productCategories: [],
-      },
-      () => {
-        if (versionId.includes("Local")) {
-          var db1;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(["programData"], "readwrite");
-            var programTransaction = transaction.objectStore("programData");
-            var version = versionId.split("(")[0].trim();
-            var userBytes = CryptoJS.AES.decrypt(
-              localStorage.getItem("curUser"),
-              SECRET_KEY
-            );
-            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-            var program = `${programId}_v${version}_uId_${userId}`;
-            var programRequest = programTransaction.get(program);
-            programRequest.onsuccess = function (event) {
-              let productCategories = [];
-              var planningUnitDataList =
-                programRequest.result.programData.planningUnitDataList;
-              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-                var planningUnitData = planningUnitDataList[pu];
-                var programDataBytes = CryptoJS.AES.decrypt(
-                  planningUnitData.planningUnitData,
-                  SECRET_KEY
-                );
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var InventoryList = programJson.inventoryList;
-                var json;
-                InventoryList.map((ele) =>
-                  productCategories.push({
-                    payload: {
-                      productCategoryId:
-                        ele.planningUnit.forecastingUnit.productCategory.id,
-                      label:
-                        ele.planningUnit.forecastingUnit.productCategory.label,
-                      active: true,
-                    },
-                  })
-                );
-              }
-              this.setState(
-                {
-                  productCategories: productCategories.reduce(
-                    (accumulator, current) =>
-                      accumulator.some(
-                        (x) => x.productCategoryId === current.productCategoryId
-                      )
-                        ? accumulator
-                        : [...accumulator, current],
-                    []
-                  ),
-                },
-                () => {
-                }
-              );
-            }.bind(this);
-          }.bind(this);
-        } else {
-          let realmId = AuthenticationService.getRealmId();
-          let programId = document.getElementById("programId").value;
-          ProductService.getProductCategoryListByProgram(realmId, programId)
-            .then((response) => {
-              this.setState({
-                productCategories: response.data,
-              });
-            })
-            .catch((error) => {
-              this.setState({
-                productCategories: [],
-              });
-              if (error.message === "Network Error") {
-                this.setState({
-                  message: API_URL.includes("uat")
-                    ? i18n.t("static.common.uatNetworkErrorMessage")
-                    : API_URL.includes("demo")
-                      ? i18n.t("static.common.demoNetworkErrorMessage")
-                      : i18n.t("static.common.prodNetworkErrorMessage"),
-                  loading: false,
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 401:
-                    this.props.history.push(
-                      `/login/static.message.sessionExpired`
-                    );
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`);
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, {
-                        entityname: i18n.t("static.dashboard.productcategory"),
-                      }),
-                      loading: false,
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, {
-                        entityname: i18n.t("static.dashboard.productcategory"),
-                      }),
-                      loading: false,
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: "static.unkownError",
-                      loading: false,
-                    });
-                    break;
-                }
-              }
-            });
-        }
-      }
-    );
   }
   getPrograms = () => {
     if (isSiteOnline()) {
@@ -2447,9 +2272,6 @@ export default class StockStatusMatrix extends React.Component {
     addFooters(doc);
     doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
   };
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
   roundN = (num) => {
     if (num == null) {
       return "";
@@ -2546,11 +2368,6 @@ export default class StockStatusMatrix extends React.Component {
       to: "To",
     };
     const { rangeValue } = this.state;
-    const makeText = (m) => {
-      if (m && m.year && m.month)
-        return pickerLang.months[m.month - 1] + ". " + m.year;
-      return "?";
-    };
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -2583,180 +2400,60 @@ export default class StockStatusMatrix extends React.Component {
     const { tracerCategories } = this.state;
     let columns = [
       {
-        dataField: "planningUnit.id",
-        text: i18n.t("static.report.qatPID"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { align: "center" },
+        text: i18n.t("static.report.qatPID")
       },
       {
-        dataField: "planningUnit.label",
         text: i18n.t("static.planningunit.planningunit"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { width: "350px" },
-        formatter: this.formatLabel,
       },
       {
-        dataField: "unit.label",
         text: i18n.t("static.stockStatus.plannedBy"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatLabel,
       },
       {
-        dataField: "minMonthsOfStock",
         text: i18n.t("static.report.minMosOrQty"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
       },
       {
-        dataField: "reorderFrequency",
         text: i18n.t("static.report.maxMosOrQty"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
       },
       {
-        dataField: "year",
         text: i18n.t("static.common.year"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
       },
       {
-        dataField: "jan",
         text: i18n.t("static.month.jan"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "feb",
         text: i18n.t("static.month.feb"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "mar",
         text: i18n.t("static.month.mar"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "apr",
         text: i18n.t("static.month.apr"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "may",
         text: i18n.t("static.month.may"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "jun",
         text: i18n.t("static.month.jun"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "jul",
         text: i18n.t("static.month.jul"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "aug",
         text: i18n.t("static.month.aug"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "sep",
         text: i18n.t("static.month.sep"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "oct",
         text: i18n.t("static.month.oct"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "nov",
         text: i18n.t("static.month.nov"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
       {
-        dataField: "dec",
         text: i18n.t("static.month.dec"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.formatter,
       },
     ];
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t("static.common.first"),
-      prePageText: i18n.t("static.common.back"),
-      nextPageText: i18n.t("static.common.next"),
-      lastPageText: i18n.t("static.common.last"),
-      nextPageTitle: i18n.t("static.common.firstPage"),
-      prePageTitle: i18n.t("static.common.prevPage"),
-      firstPageTitle: i18n.t("static.common.nextPage"),
-      lastPageTitle: i18n.t("static.common.lastPage"),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [
-        {
-          text: "10",
-          value: 10,
-        },
-        {
-          text: "30",
-          value: 30,
-        },
-        {
-          text: "50",
-          value: 50,
-        },
-        {
-          text: "All",
-          value: this.state.data.length,
-        },
-      ],
-    };
     const MyExportCSV = (props) => {
       const handleClick = () => {
         props.onExport();

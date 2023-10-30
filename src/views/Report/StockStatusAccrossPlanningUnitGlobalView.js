@@ -61,7 +61,6 @@ const pickerLang = {
   from: "From",
   to: "To",
 };
-let dendoLabels = [{ label: "Today", pointStyle: "triangle" }];
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
   { text: i18n.t("static.report.lowstock"), color: "#f48521", value: 1 },
@@ -69,75 +68,9 @@ const legendcolor = [
   { text: i18n.t("static.report.overstock"), color: "#edb944", value: 3 },
   { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: 4 },
 ];
-const options = {
-  title: {
-    display: true,
-    fontColor: "black",
-  },
-  scales: {
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: "Consumption Qty ( Million )",
-          fontColor: "black",
-        },
-        stacked: true,
-        ticks: {
-          beginAtZero: true,
-          fontColor: "black",
-        },
-      },
-    ],
-    xAxes: [
-      {
-        ticks: {
-          fontColor: "black",
-        },
-      },
-    ],
-  },
-  annotation: {
-    annotations: [
-      {
-        type: "triangle",
-        drawTime: "beforeDatasetsDraw",
-        scaleID: "x-axis-0",
-        value: "Mar-2020",
-        backgroundColor: "rgba(0, 255, 0, 0.1)",
-      },
-    ],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: "bottom",
-    labels: {
-      usePointStyle: true,
-      fontColor: "black",
-    },
-  },
-};
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
 class StockStatusAccrossPlanningUnitGlobalView extends Component {
   constructor(props) {
     super(props);
-    this.toggledata = this.toggledata.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.filterTracerCategory = this.filterTracerCategory.bind(this);
     this.filterProgram = this.filterProgram.bind(this);
@@ -190,59 +123,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     this.setState({ singleValue2: value }, () => {
       this.filterData();
     });
-  };
-  getRelamList = () => {
-    RealmService.getRealmListAll()
-      .then((response) => {
-        if (response.status == 200) {
-          this.setState({
-            realmList: response.data,
-            loading: false,
-          });
-        } else {
-          this.setState({
-            message: response.data.messageCode,
-            loading: false,
-          });
-        }
-      })
-      .catch((error) => {
-        if (error.message === "Network Error") {
-          this.setState({
-            message: "static.unkownError",
-            loading: false,
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`);
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false,
-              });
-              break;
-            case 412:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false,
-              });
-              break;
-            default:
-              this.setState({
-                message: "static.unkownError",
-                loading: false,
-              });
-              break;
-          }
-        }
-      });
   };
   roundN = (num) => {
     return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(
@@ -807,11 +687,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }
     );
   };
-  hideDiv() {
-    setTimeout(function () {
-      var theSelect = document.getElementById("planningUnitId").length;
-    }, 9000);
-  }
   filterData = () => {
     let countrysId =
       this.state.countryValues.length == this.state.countrys.length
@@ -1068,147 +943,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         }
       });
   };
-  getTracerCategoryList() {
-    let realmId = AuthenticationService.getRealmId();
-    TracerCategoryService.getTracerCategoryByRealmId(realmId)
-      .then((response) => {
-        if (response.status == 200) {
-          var listArray = response.data;
-          listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(
-              a.label,
-              this.state.lang
-            ).toUpperCase();
-            var itemLabelB = getLabelText(
-              b.label,
-              this.state.lang
-            ).toUpperCase();
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-          this.setState({
-            tracerCategories: listArray,
-          });
-        }
-      })
-      .catch((error) => {
-        if (error.message === "Network Error") {
-          this.setState({
-            message: API_URL.includes("uat")
-              ? i18n.t("static.common.uatNetworkErrorMessage")
-              : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
-            loading: false,
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`);
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, {
-                  entityname: i18n.t("static.dashboard.Country"),
-                }),
-                loading: false,
-              });
-              break;
-            case 412:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, {
-                  entityname: i18n.t("static.dashboard.Country"),
-                }),
-                loading: false,
-              });
-              break;
-            default:
-              this.setState({
-                message: "static.unkownError",
-                loading: false,
-              });
-              break;
-          }
-        }
-      });
-  }
   componentDidMount() {
     this.getCountrys();
-  }
-  getPrograms = () => {
-    ProgramService.getProgramList()
-      .then((response) => {
-        var listArray = response.data;
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        this.setState({
-          programs: listArray,
-          loading: false,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          programs: [],
-          loading: false,
-        });
-        if (error.message === "Network Error") {
-          this.setState({
-            message: API_URL.includes("uat")
-              ? i18n.t("static.common.uatNetworkErrorMessage")
-              : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
-            loading: false,
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`);
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, {
-                  entityname: i18n.t("static.dashboard.program"),
-                }),
-                loading: false,
-              });
-              break;
-            case 412:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, {
-                  entityname: i18n.t("static.dashboard.program"),
-                }),
-                loading: false,
-              });
-              break;
-            default:
-              this.setState({
-                message: "static.unkownError",
-                loading: false,
-              });
-              break;
-          }
-        }
-      });
-  };
-  toggledata = () =>
-    this.setState((currentState) => ({ show: !currentState.show }));
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
-    });
   }
   show() {
   }
@@ -1226,14 +962,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       {i18n.t("static.common.loading")}
     </div>
   );
-  getRandomColor() {
-    var letters = "0123456789ABCDEF".split("");
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
   render() {
     const { singleValue2 } = this.state;
     const { countrys } = this.state;
