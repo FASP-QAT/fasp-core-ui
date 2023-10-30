@@ -18,17 +18,6 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.procurementAgentPlanningUnit')
-let initialValues = {
-    planningUnitId: '',
-    skuCode: '',
-    catalogPrice: '',
-    moq: 0,
-    unitsPerPalletEuro1: 0,
-    unitsPerPalletEuro2: 0,
-    unitsPerContainer: 0,
-    volume: 0,
-    weight: 0,
-}
 export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);

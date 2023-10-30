@@ -77,20 +77,12 @@ export default class EditPlanningUnitComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     dataChange(event) {
         let { planningUnit } = this.state

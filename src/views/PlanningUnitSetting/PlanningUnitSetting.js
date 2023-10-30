@@ -101,11 +101,8 @@ export default class PlanningUnitSetting extends Component {
         this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.tracerCategoryList = this.tracerCategoryList.bind(this);
-        this.planningUnitList = this.planningUnitList.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
-        this.getPlanningUnitByTracerCategoryId = this.getPlanningUnitByTracerCategoryId.bind(this);
-        this.getProcurementAgentPlanningUnitByPlanningUnitIds = this.getProcurementAgentPlanningUnitByPlanningUnitIds.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -345,117 +342,6 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
-    getPlanningUnitByTracerCategoryId(tracerCategoryId) {
-        TracerCategoryService.getPlanningUnitByTracerCategoryId(tracerCategoryId)
-            .then(response => {
-                if (response.status == 200) {
-                    return response.data;
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-    getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitList) {
-        PlanningUnitService.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitList)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        responsePa: response.data,
-                    },
-                        () => {
-                            this.buildJExcel();
-                        })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
     tracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -535,73 +421,6 @@ export default class PlanningUnitSetting extends Component {
                     }
                 }
             );
-    }
-    planningUnitList() {
-        PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            let tempList = [];
-            if (listArray.length > 0) {
-                for (var i = 0; i < listArray.length; i++) {
-                    var paJson = {
-                        name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
-                        id: parseInt(listArray[i].planningUnitId),
-                        active: listArray[i].active,
-                        forecastingUnit: listArray[i].forecastingUnit,
-                        label: listArray[i].label
-                    }
-                    tempList[i] = paJson
-                }
-            }
-            this.setState({
-                allPlanningUnitList: tempList,
-                originalPlanningUnitList: response.data
-            }, () => {
-                this.tracerCategoryList();
-            });
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
     }
     procurementAgentList() {
         const lan = 'en';
@@ -935,22 +754,6 @@ export default class PlanningUnitSetting extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    dateformatter = value => {
-        var dt = new Date(value)
-        return moment(dt).format('DD-MMM-YY');
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
     buildJExcel(addRowInJexcel) {
         let outPutList = this.state.selsource;
         let outPutListArray = [];
@@ -1273,52 +1076,6 @@ export default class PlanningUnitSetting extends Component {
     }
     filterPlanningUnitList = function (instance, cell, c, r, source) {
         var mylist = [];
-        return mylist;
-    }.bind(this)
-    filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (this.state.languageEl.getJson(null, false)[r])[0];
-        var puList = [];
-        if (value != -1) {
-            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
-            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-            var pcIdArray = [];
-            for (var pcu = 0; pcu < pcList.length; pcu++) {
-                pcIdArray.push(pcList[pcu].payload.productCategoryId);
-            }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
-        } else {
-            puList = this.state.planningUnitList;
-        }
-        for (var k = 0; k < puList.length; k++) {
-            var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].id,
-                id: puList[k].id
-            }
-            mylist.push(planningUnitJson);
-        }
-        return mylist;
-    }.bind(this)
-    filterTracerCategoryByHealthArea = function (instance, cell, c, r, source) {
-        var mylist = [];
-        let selectedForecastProgramHealthAreaList = this.state.selectedForecastProgram.healthAreaList;
-        for (var i = 0; i < selectedForecastProgramHealthAreaList.length; i++) {
-            let list = [];
-            if (i == 0) {
-                list = this.state.allTracerCategoryList.filter(c => (c.id == -1 ? c : c.healthArea.id == selectedForecastProgramHealthAreaList[i].id));
-            } else {
-                list = this.state.allTracerCategoryList.filter(c => c.id != -1 && c.healthArea.id == selectedForecastProgramHealthAreaList[i].id);
-            }
-            if (list.length != 0) {
-                mylist = mylist.concat(list);
-            }
-        }
-        if (mylist.length > 0) {
-            sortArrayByName(mylist);
-            let mylistObj = mylist.filter(c => c.id == -1)[0];
-            mylist = mylist.filter(c => c.id != -1);
-            mylist.unshift(mylistObj);
-        }
         return mylist;
     }.bind(this)
     onchangepage(el, pageNo, oldPageNo) {

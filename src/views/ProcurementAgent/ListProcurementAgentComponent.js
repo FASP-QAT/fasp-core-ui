@@ -26,12 +26,8 @@ class ListProcurementAgentComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
-        this.buttonFormatter = this.buttonFormatter.bind(this);
-        this.buttonFormatterForProcurementUnit = this.buttonFormatterForProcurementUnit.bind(this);
         this.addPlanningUnitMapping = this.addPlanningUnitMapping.bind(this);
         this.addProcurementUnitMapping = this.addProcurementUnitMapping.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -86,19 +82,6 @@ class ListProcurementAgentComponent extends Component {
                 this.buildJExcel();
             });
         }
-    }
-    editProcurementAgent(procurementAgent) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-            this.props.history.push({
-                pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
-            });
-        }
-    }
-    buttonFormatter(cell, row) {
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
-    }
-    buttonFormatterForProcurementUnit(cell, row) {
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
@@ -373,9 +356,6 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -396,92 +376,6 @@ class ListProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.procurementagent.procurementagentname'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementAgentCode',
-                text: i18n.t('static.procurementagent.procurementagentcode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'colorHtmlCode',
-                text: i18n.t('static.procurementagent.procurementAgentColorCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'submittedToApprovedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'approvedToShippedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'localProcurementAgent',
-                text: i18n.t('static.procurementAgent.localProcurementAgent'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-                    );
-                }
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            },
-            {
-                dataField: 'procurementAgentId',
-                text: i18n.t('static.program.mapPlanningUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.buttonFormatter
-            },
-            {
-                dataField: 'procurementAgentId',
-                text: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.buttonFormatterForProcurementUnit
-            }
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),

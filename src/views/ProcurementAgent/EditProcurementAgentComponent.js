@@ -111,9 +111,7 @@ class EditProcurementAgentComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
         this.programChange = this.programChange.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
@@ -123,9 +121,6 @@ class EditProcurementAgentComponent extends Component {
     handleClose = () => {
         this.setState({ displayColorPicker: false })
     };
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
     handleChangeColor = (color) => {
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
@@ -142,9 +137,6 @@ class EditProcurementAgentComponent extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     Capitalize(str) {
         if (str != null && str != "") {

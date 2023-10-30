@@ -33,7 +33,6 @@ export default class PlanningUnitListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editPlanningUnit = this.editPlanningUnit.bind(this);
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -317,15 +316,6 @@ export default class PlanningUnitListComponent extends Component {
                 );
         }
     }
-    PlanningUnitCapacity(event, row) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT_CAPACITY')) {
-            this.props.history.push({
-                pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
-                state: { planningUnit: row }
-            })
-        }
-    }
     buildJExcel() {
         let planningUnitList = this.state.selSource;
         let planningUnitArray = [];
@@ -518,22 +508,12 @@ export default class PlanningUnitListComponent extends Component {
             this.filterDataForRealm(AuthenticationService.getRealmId());
         }
     }
-    editPlanningUnit(planningUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
-            this.props.history.push({
-                pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
-            });
-        }
-    }
     addNewPlanningUnit() {
         if (isSiteOnline()) {
             this.props.history.push(`/planningUnit/addPlanningUnit`)
         } else {
             alert(i18n.t('static.common.online'))
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({
@@ -582,54 +562,6 @@ export default class PlanningUnitListComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const columns = [{
-            dataField: 'label',
-            text: i18n.t('static.planningunit.planningunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'forecastingUnit.label',
-            text: i18n.t('static.forecastingunit.forecastingunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'unit.label',
-            text: i18n.t('static.unit.unit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'multiplier',
-            text: i18n.t('static.unit.multiplier'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-        }, {
-            dataField: 'active',
-            text: i18n.t('static.common.status'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (
-                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                );
-            }
-        }, {
-            dataField: 'planningUnitId',
-            text: i18n.t('static.common.action'),
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
-                )
-            }
-        }];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),

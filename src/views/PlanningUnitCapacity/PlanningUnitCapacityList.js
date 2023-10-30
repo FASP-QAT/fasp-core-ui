@@ -25,7 +25,6 @@ export default class PlanningUnitCapacityList extends Component {
             lang: localStorage.getItem('lang')
         }
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
     buildJexcel() {
@@ -238,9 +237,6 @@ export default class PlanningUnitCapacityList extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

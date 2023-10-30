@@ -86,21 +86,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    capitalize(event) {
-        if (event.target.name === "skuCode") {
-            let { skuCode } = this.state
-            skuCode = event.target.value.toUpperCase()
-            this.setState({
-                skuCode: skuCode
-            })
-        } else if (event.target.name === "gtin") {
-            let { gtin } = this.state
-            gtin = event.target.value.toUpperCase()
-            this.setState({
-                gtin: gtin
-            })
-        }
-    }
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
         let count = 0;
@@ -351,9 +336,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
     }
-    onedit = function (instance, cell, x, y, value) {
-        this.el.setValueFromCoords(7, y, 1, true);
-    }.bind(this);
     filterProcurmentUnitList = function (instance, cell, c, r, source) {
         return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
     }.bind(this);

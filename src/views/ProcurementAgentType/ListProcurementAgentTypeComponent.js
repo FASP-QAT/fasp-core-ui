@@ -26,10 +26,8 @@ class ListProcurementAgentComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editProcurementAgentType = this.editProcurementAgentType.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgentType = this.addNewProcurementAgentType.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -64,13 +62,6 @@ class ListProcurementAgentComponent extends Component {
                 selProcurementAgentType: this.state.procurementAgentTypeList
             }, () => {
                 this.buildJExcel();
-            });
-        }
-    }
-    editProcurementAgentType(procurementAgentType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-            this.props.history.push({
-                pathname: `/procurementAgentType/editProcurementAgentType/${procurementAgentType.procurementAgentTypeId}`,
             });
         }
     }
@@ -298,9 +289,6 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -321,43 +309,6 @@ class ListProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.procurementagenttype.procurementtypename'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementAgentTypeCode',
-                text: i18n.t('static.procurementagenttype.procurementagenttypecode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
