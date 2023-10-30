@@ -140,7 +140,6 @@ export default class ListTreeTemplate extends Component {
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-        this.buildTree = this.buildTree.bind(this);
         this.addTreeTemplate = this.addTreeTemplate.bind(this);
         this.copyDeleteTree = this.copyDeleteTree.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
@@ -1402,11 +1401,6 @@ export default class ListTreeTemplate extends Component {
     addTreeTemplate(event) {
         this.props.history.push({
             pathname: `/dataSet/createTreeTemplate/-1`,
-        });
-    }
-    buildTree() {
-        this.props.history.push({
-            pathname: `/dataSet/buildTree/`,
         });
     }
     buildJexcel() {

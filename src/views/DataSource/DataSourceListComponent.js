@@ -30,10 +30,8 @@ export default class DataSourceListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editDataSource = this.editDataSource.bind(this);
         this.addNewDataSource = this.addNewDataSource.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -424,13 +422,6 @@ export default class DataSourceListComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    editDataSource(dataSource) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
-            this.props.history.push({
-                pathname: `/dataSource/editDataSource/${dataSource.dataSourceId}`,
-            });
-        }
-    }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -449,9 +440,6 @@ export default class DataSourceListComponent extends Component {
         } else {
             alert(i18n.t('static.common.online'))
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

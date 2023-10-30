@@ -143,10 +143,8 @@ export default class ListTreeComponent extends Component {
             allProcurementAgentList: [],
             planningUnitObjList: []
         }
-        this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-        this.buildTree = this.buildTree.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
@@ -2196,11 +2194,6 @@ export default class ListTreeComponent extends Component {
             });
         }
     }
-    buildTree() {
-        this.props.history.push({
-            pathname: `/dataSet/buildTree/`,
-        });
-    }
     buildJexcel() {
         if (this.state.datasetId != 0) {
             let programList = this.state.treeData;
@@ -2546,12 +2539,6 @@ export default class ListTreeComponent extends Component {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
-    }
-    toggleDeropdownSetting(i) {
-        const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
-        this.setState({
-            dropdownOpen: newArray,
-        });
     }
     downloadClicked(treeId) {
         this.setState({ loading: true })

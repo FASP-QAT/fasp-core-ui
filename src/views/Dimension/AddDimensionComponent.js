@@ -99,10 +99,6 @@ export default class AddDimensionComponent extends Component {
     componentDidMount() {
         this.setState({ loading: false })
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     render() {
         return (
             <div className="animated fadeIn">

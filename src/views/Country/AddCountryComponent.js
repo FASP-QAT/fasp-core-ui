@@ -192,10 +192,6 @@ export default class AddCountryComponent extends Component {
         let { country } = this.state
         country.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     render() {
         const { currencyList } = this.state;
         let currencyItems = currencyList.length > 0

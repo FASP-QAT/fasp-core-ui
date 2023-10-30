@@ -26,7 +26,6 @@ export default class DataSourceTypeListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editDataSourceType = this.editDataSourceType.bind(this);
         this.addNewDataSourceType = this.addNewDataSourceType.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -281,22 +280,12 @@ export default class DataSourceTypeListComponent extends Component {
                 }
             );
     }
-    editDataSourceType(dataSourceType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE')) {
-            this.props.history.push({
-                pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
-            });
-        }
-    }
     addNewDataSourceType() {
         if (isSiteOnline()) {
             this.props.history.push(`/dataSourceType/addDataSourceType`)
         } else {
             alert(i18n.t('static.common.online'))
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

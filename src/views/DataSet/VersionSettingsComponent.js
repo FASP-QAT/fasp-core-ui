@@ -1125,12 +1125,6 @@ class VersionSettingsComponent extends Component {
             }
         }
     }
-    oncreateeditor = function (el, cell, x, y) {
-        if (x == 4) {
-            var config = el.options.columns[x].maxlength;
-            cell.children[0].setAttribute('maxlength', config);
-        }
-    }
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)

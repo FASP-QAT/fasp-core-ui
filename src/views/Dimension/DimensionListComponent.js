@@ -24,8 +24,6 @@ export default class DimensionListComponent extends Component {
             loading: true
         }
         this.addNewDimension = this.addNewDimension.bind(this);
-        this.editDimension = this.editDimension.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
@@ -173,13 +171,6 @@ export default class DimensionListComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    editDimension(dimension) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
-            this.props.history.push({
-                pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
-            });
-        }
-    }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
@@ -200,9 +191,6 @@ export default class DimensionListComponent extends Component {
         } else {
             alert("You must be Online.")
         }
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

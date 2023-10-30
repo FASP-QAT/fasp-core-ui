@@ -2794,26 +2794,6 @@ export default class CommitTreeComponent extends React.Component {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-    print() {
-        this.setState({ loading: true })
-        var tableName = document.getElementsByName("jxlTableData")
-        for (var t = 0; t < tableName.length; t++) {
-            tableName[t].classList.remove('consumptionDataEntryTable');
-        }
-        var content = document.getElementById("divcontents").innerHTML;
-        const styleTags = Array.from(document.getElementsByTagName("style")).map(x => x.outerHTML).join("");
-        var pri = document.getElementById("ifmcontentstoprint").contentWindow;
-        pri.document.open();
-        pri.document.write(content);
-        pri.document.write(styleTags);
-        pri.document.close();
-        pri.focus();
-        pri.print();
-        for (var t = 0; t < tableName.length; t++) {
-            tableName[t].classList.add('consumptionDataEntryTable');
-        }
-        this.setState({ loading: false })
-    }
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {

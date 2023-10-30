@@ -25,9 +25,7 @@ export default class CurrencyListComponent extends Component {
             selCurrency: [],
             loading: true
         }
-        this.editCurrency = this.editCurrency.bind(this);
         this.addNewCurrency = this.addNewCurrency.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
@@ -179,13 +177,6 @@ export default class CurrencyListComponent extends Component {
                 }
             );
     }
-    editCurrency(currency) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY')) {
-            this.props.history.push({
-                pathname: `/currency/editCurrency/${currency.currencyId}`,
-            });
-        }
-    }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -207,9 +198,6 @@ export default class CurrencyListComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({

@@ -358,104 +358,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         })
         this.props.updateState("loading", false);
     }
-    toggleLarge(data, index) {
-        this.setState({
-            conflicts: !this.state.conflicts,
-            index: index
-        });
-        if (index != -1) {
-            this.showData(data, index);
-        }
-    }
-    showData(data, index) {
-        var dataArray = [];
-        dataArray.push([data[0], data[1], data[2], data[3], data[4]]);
-        dataArray.push([data[0], data[1], data[5], data[6], data[7]]);
-        var options = {
-            data: dataArray,
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: i18n.t('static.planningunit.planningunit'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.region.region'),
-                    type: 'text',
-                },
-                {
-                    title: "Selected Forecast",
-                    type: 'text',
-                },
-                {
-                    title: "Forecast Qty",
-                    type: 'text',
-                },
-                {
-                    title: "Notes",
-                    type: 'text',
-                }
-            ],
-            pagination: false,
-            search: false,
-            columnSorting: false,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            editable: false,
-            filters: false,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
-            onload: this.loadedResolveConflicts
-        };
-        var resolveConflict = jexcel(document.getElementById("resolveConflictsTable"), options);
-        this.el = resolveConflict;
-        this.setState({
-            resolveConflict: resolveConflict,
-            loading: false
-        })
-        document.getElementById("index").value = index;
-    }
-    loadedResolveConflicts = function (instance) {
-        jExcelLoadedFunctionOnlyHideRow(instance);
-        var elInstance = instance.worksheets[0];
-        var jsonData = elInstance.getJson();
-        var colArr = ['A', 'B', 'C', 'D', 'E']
-        for (var j = 0; j < 8; j++) {
-            if (j == 2 || j == 3 || j == 4) {
-                var col = (colArr[j]).concat(1);
-                var col1 = (colArr[j]).concat(2);
-                var valueToCompare = (jsonData[0])[j];
-                var valueToCompareWith = (jsonData[1])[j];
-                if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                } else {
-                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
-                }
-            }
-        }
-    }
-    acceptCurrentChanges() {
-        var elInstance = this.state.dataEl;
-        elInstance.options.editable = true;
-        elInstance.setValueFromCoords(11, this.state.index, 1, true);
-        elInstance.options.editable = false;
-        this.props.updateState("json", elInstance.getJson(null, false));
-        this.toggleLarge([], -1);
-    }
-    acceptIncomingChanges() {
-        var elInstance = this.state.dataEl;
-        elInstance.options.editable = true;
-        elInstance.setValueFromCoords(11, this.state.index, 3, true);
-        elInstance.options.editable = false;
-        this.props.updateState("json", elInstance.getJson(null, false));
-        this.toggleLarge([], -1);
-    }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
@@ -531,26 +433,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         });
         return (
             <div>
-                <Modal isOpen={this.state.conflicts}
-                    className={'modal-lg ' + this.props.className + "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
-                    <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
-                        <ul className="legendcommitversion">
-                            <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')}</span></li>
-                            <li><span className="notawesome  legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                        </ul>
-                    </ModalHeader>
-                    <ModalBody>
-                        <div className="table-responsive RemoveStriped">
-                            <div id="resolveConflictsTable" />
-                            <input type="hidden" id="index" />
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-                        <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
-                    </ModalFooter>
-                </Modal>
             </div>)
     }
 }

@@ -270,7 +270,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.toggleTes = this.toggleTes.bind(this);
         this.toggleArima = this.toggleArima.bind(this);
         this.toggleSa = this.toggleSa.bind(this);
-        this.toggleStartMonth = this.toggleStartMonth.bind(this);
         this.toggleMa = this.toggleMa.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getExtrapolationMethodList = this.getExtrapolationMethodList.bind(this);
@@ -1996,8 +1995,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
-    getDatasetData(e) {
-    }
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
@@ -2063,11 +2060,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenSa: !this.state.popoverOpenSa,
         });
     }
-    toggleStartMonth() {
-        this.setState({
-            popoverOpenStartMonth: !this.state.popoverOpenStartMonth,
-        });
-    }
     toggleMa() {
         this.setState({
             popoverOpenMa: !this.state.popoverOpenMa,
@@ -2078,7 +2070,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenChooseMethod: !this.state.popoverOpenChooseMethod,
         });
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
     render() {
         jexcel.setDictionary({
             Show: " ",

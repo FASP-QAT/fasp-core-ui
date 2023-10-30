@@ -1092,21 +1092,9 @@ export function exportPDF(props) {
     addFooters(doc)
     doc.save(props.state.programCode + "-" + i18n.t("static.supplyPlan.v") + (props.state.version) + "-" + props.state.pageName + "-" + i18n.t('static.commitTree.forecastValidation') + ".pdf")
 }
-export function noForecastSelectedClicked(planningUnitId, regionId, props) {
-    localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
-    localStorage.setItem("sesDatasetRegionId", regionId);
-    localStorage.setItem("sesDatasetId", props.state.programId);
-    const win = window.open("/#/report/compareAndSelectScenario", "_blank");
-    win.focus();
-}
 export function missingMonthsClicked(planningUnitId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
-    win.focus();
-}
-export function missingBranchesClicked(treeId, props) {
-    localStorage.setItem("sesDatasetId", props.state.programId);
-    const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}`, "_blank");
     win.focus();
 }
 export function nodeWithPercentageChildrenClicked(treeId, scenarioId, props) {

@@ -31,8 +31,6 @@ class LoadDeleteDataSet extends Component {
     constructor(props) {
         super(props);
         this.toggletooltip = this.toggletooltip.bind(this);
-        this.toggle = this.toggle.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
@@ -386,11 +384,6 @@ class LoadDeleteDataSet extends Component {
             this.setState({ loading: false });
         }
     }
-    toggle() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen,
-        });
-    }
     toggletooltip() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
@@ -402,11 +395,6 @@ class LoadDeleteDataSet extends Component {
         }
         this.getTree();
     };
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
-    }
     getPrograms() {
         var db1;
         getDatabase();

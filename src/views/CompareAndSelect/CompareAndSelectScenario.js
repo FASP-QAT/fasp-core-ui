@@ -1384,20 +1384,6 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
-    scenarioCheckedChanged(id) {
-        this.setState({
-            loading: true
-        })
-        var treeScenarioList = this.state.treeScenarioList;
-        var index = this.state.treeScenarioList.findIndex(c => c.id == id);
-        treeScenarioList[index].checked = !treeScenarioList[index].checked;
-        this.setState({
-            treeScenarioList,
-            loading: false
-        }, () => {
-            this.buildJexcel()
-        })
-    }
     scenarioOrderChanged(id) {
         this.setState({
             loading: true
@@ -1417,33 +1403,6 @@ class CompareAndSelectScenario extends Component {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({

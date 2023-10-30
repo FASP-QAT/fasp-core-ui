@@ -31,120 +31,10 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
-const options = {
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.dashboard.programCount')
-      }
-    }],
-    xAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.supplier.realm')
-      }
-    }],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false
-}
-const pie = {
-  labels: [
-    'Realm Name 1',
-    'Realm Name 2',
-    'Realm Name 3',
-  ],
-  datasets: [
-    {
-      data: [60, 40, 100, 20, 10],
-      backgroundColor: [
-        '#4dbd74',
-        '#c8ced3',
-        '#000',
-        '#ffc107',
-        '#f86c6b',
-      ],
-      hoverBackgroundColor: [
-        '#4dbd74',
-        '#c8ced3',
-        '#000',
-        '#ffc107',
-        '#f86c6b',
-      ],
-    }],
-};
-const bar = {
-  labels: [i18n.t('static.realm.realmName'), i18n.t('static.realm.realmName1'), i18n.t('static.realm.realmName2')],
-  datasets: [
-    {
-      label: i18n.t('static.graph.activeProgram'),
-      backgroundColor: '#118B70',
-      borderColor: 'rgba(179,181,198,1)',
-      pointBackgroundColor: 'rgba(179,181,198,1)',
-      pointBorderColor: '#fff',
-      barThickness: 150,
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(179,181,198,1)',
-      data: [65, 59, 89, 81, 56, 55, 40],
-    },
-  ],
-};
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(65);
-}
-const mainChart = {
-  labels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-  datasets: [
-    {
-      label: 'My First dataset',
-      backgroundColor: hexToRgba(brandInfo, 10),
-      borderColor: brandInfo,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 2,
-      data: data1,
-    },
-    {
-      label: 'My Second dataset',
-      backgroundColor: 'transparent',
-      borderColor: brandSuccess,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 2,
-      data: data2,
-    },
-    {
-      label: 'My Third dataset',
-      backgroundColor: 'transparent',
-      borderColor: brandDanger,
-      pointHoverBackgroundColor: '#fff',
-      borderWidth: 1,
-      borderDash: [8, 5],
-      data: data3,
-    },
-  ],
-};
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.state = {
@@ -168,16 +58,8 @@ class ApplicationDashboard extends Component {
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
-    this.goToIndexProgram = this.goToIndexProgram.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
-    this.problemAction = this.problemAction.bind(this);
-    this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
-    this.addMapping = this.addMapping.bind(this);
-    this.editProblem = this.editProblem.bind(this);
-    this.nextProgramSlide = this.nextProgramSlide.bind(this);
-    this.previousProgramSlide = this.previousProgramSlide.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
@@ -185,15 +67,6 @@ class ApplicationDashboard extends Component {
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
     this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
-  }
-  rowClassNameFormat(row, rowIdx) {
-    if (row.realmProblem.criticality.id == 3) {
-      return row.realmProblem.criticality.id == 3 && row.problemStatus.id == 1 ? 'background-red' : '';
-    } else if (row.realmProblem.criticality.id == 2) {
-      return row.realmProblem.criticality.id == 2 && row.problemStatus.id == 1 ? 'background-orange' : '';
-    } else {
-      return row.realmProblem.criticality.id == 1 && row.problemStatus.id == 1 ? 'background-yellow' : '';
-    }
   }
   deleteSupplyPlanProgram(programId, versionId) {
     confirmAlert({
@@ -310,11 +183,6 @@ class ApplicationDashboard extends Component {
       ]
     })
   }
-  problemAction(problemAction) {
-    this.props.history.push({
-      pathname: `${problemAction.realmProblem.problem.actionUrl}`,
-    });
-  }
   redirectToCrud = (url) => {
     this.props.history.push(url);
   }
@@ -344,11 +212,6 @@ class ApplicationDashboard extends Component {
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
-  onRadioBtnClick(radioSelected) {
-    this.setState({
-      radioSelected: radioSelected,
     });
   }
   checkNewerVersions(programs) {
@@ -536,21 +399,6 @@ class ApplicationDashboard extends Component {
   onExited() {
     this.animating = false;
   }
-  buttonFormatter(cell, row) {
-    return <Button type="button" size="sm" onClick={(event) => this.addMapping(event, cell)} color="info"><i className="fa fa-pencil"></i></Button>;
-  }
-  addMapping(event, cell) {
-    event.stopPropagation();
-    this.props.history.push({
-      pathname: `${cell}`,
-    });
-  }
-  editProblem(problem, index) {
-    var programId = problem.program.id + "_v" + problem.versionId + "_uId_1";
-    this.props.history.push({
-      pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
-    });
-  }
   next() {
     if (this.animating) return;
     const nextIndex = this.state.activeIndex === this.state.users.length - 1 ? 0 :
@@ -562,22 +410,6 @@ class ApplicationDashboard extends Component {
     const nextIndex = this.state.activeIndex === 0 ? this.state.users.length - 1 :
       this.state.activeIndex - 1;
     this.setState({ activeIndex: nextIndex });
-  }
-  nextProgramSlide() {
-    if (this.animating) return;
-    const nextIndexProgram = this.state.activeIndexProgram === this.state.programList.length - 1 ? 0 :
-      this.state.activeIndexProgram + 1;
-    this.setState({ activeIndexProgram: nextIndexProgram });
-  }
-  previousProgramSlide() {
-    if (this.animating) return;
-    const nextIndexProgram = this.state.activeIndexProgram === 0 ? this.state.programList.length - 1 :
-      this.state.activeIndexProgram - 1;
-    this.setState({ activeIndexProgram: nextIndexProgram });
-  }
-  goToIndexProgram(newIndexProgram) {
-    if (this.animating) return;
-    this.setState({ activeIndexProgram: newIndexProgram });
   }
   goToIndex(newIndex) {
     if (this.animating) return;
@@ -622,103 +454,6 @@ class ApplicationDashboard extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    const columns = [
-      {
-        dataField: 'program.programCode',
-        text: i18n.t('static.program.program'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
-        dataField: 'versionId',
-        text: i18n.t('static.program.versionId'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-      },
-      {
-        dataField: 'region.label',
-        text: i18n.t('static.region.region'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'planningUnit.label',
-        text: i18n.t('static.planningunit.planningunit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'dt',
-        text: i18n.t('static.report.month'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format('MMM-YY');
-            return modifiedDate;
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.label',
-        text: i18n.t('static.report.problemDescription'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.actionLabel',
-        text: i18n.t('static.report.suggession'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'problemStatus.label',
-        text: i18n.t('static.report.problemStatus'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cell, row) => {
-          if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-          }
-        }
-      },
-      {
-        dataField: 'realmProblem.problem.actionUrl',
-        text: i18n.t('static.common.action'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.buttonFormatter
-      }
-    ];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),

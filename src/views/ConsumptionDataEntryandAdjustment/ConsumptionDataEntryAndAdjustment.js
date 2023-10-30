@@ -160,7 +160,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.consumptionDataChanged = this.consumptionDataChanged.bind(this);
     this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
     this.checkValidationInterpolate = this.checkValidationInterpolate.bind(this);
-    this.filterList = this.filterList.bind(this)
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
     this.saveConsumptionList = this.saveConsumptionList.bind(this);
@@ -175,10 +174,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
-  }
-  filterList = function (instance, cell, c, r, source) {
-    var value = (instance.jexcel.getJson(null, false)[r])[1];
-    return this.state.mixedList.filter(c => c.type == value);
   }
   touchAll(setTouched, errors) {
     setTouched({
@@ -2776,11 +2771,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (this.state.toggleDataCheck) {
         this.calculateData();
       }
-    })
-  }
-  setOtherUnitName(e) {
-    this.setState({
-      otherUnitName: e.target.value,
     })
   }
   calculateData() {

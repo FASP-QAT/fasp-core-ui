@@ -127,14 +127,9 @@ class AddBudgetComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.currentDate = this.currentDate.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.dataChangeDate = this.dataChangeDate.bind(this);
-        this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.addMonths = this.addMonths.bind(this);
-        this.CommaFormatted = this.CommaFormatted.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -176,46 +171,9 @@ class AddBudgetComponent extends Component {
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
-    CommaFormatted(cell) {
-        cell += '';
-        cell = cell.replace(/,/g, '');
-        var x = cell.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    addMonths(date, months) {
-        date.setMonth(date.getMonth() + months);
-        return date;
-    }
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
-    dataChangeDate(date) {
-        let { budget } = this.state
-        budget.startDate = date;
-        budget.stopDate = '';
-        this.setState({ budget: budget });
-    }
-    dataChangeEndDate(date) {
-        let { budget } = this.state;
-        budget.stopDate = date;
-        this.setState({ budget: budget });
-    }
-    currentDate() {
-        var todaysDate = new Date();
-        var yyyy = todaysDate.getFullYear().toString();
-        var mm = (todaysDate.getMonth() + 1).toString();
-        var dd = todaysDate.getDate().toString();
-        var mmChars = mm.split('');
-        var ddChars = dd.split('');
-        let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-        return date;
     }
     dataChange(event) {
         let { budget } = this.state;

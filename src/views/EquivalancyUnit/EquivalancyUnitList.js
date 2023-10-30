@@ -70,7 +70,6 @@ class EquivalancyUnit extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -78,7 +77,6 @@ class EquivalancyUnit extends Component {
         this.checkAndMarkDuplicate = this.checkAndMarkDuplicate.bind(this);
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
         this.getTracerCategory = this.getTracerCategory.bind(this);
-        this.getForecastingUnit = this.getForecastingUnit.bind(this);
         this.getForecastingUnitByTracerCategoriesId = this.getForecastingUnitByTracerCategoriesId.bind(this);
         this.getUnit = this.getUnit.bind(this);
         this.getType = this.getType.bind(this);
@@ -87,7 +85,6 @@ class EquivalancyUnit extends Component {
         this.getEquivalancyUnitAll = this.getEquivalancyUnitAll.bind(this);
         this.buildJexcel1 = this.buildJexcel1.bind(this);
         this.changed = this.changed.bind(this);
-        this.onPaste = this.onPaste.bind(this);
         this.oneditionend1 = this.oneditionend1.bind(this);
         this.addRow1 = this.addRow1.bind(this);
         this.formSubmit1 = this.formSubmit1.bind(this);
@@ -106,20 +103,6 @@ class EquivalancyUnit extends Component {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
         elInstance.setValueFromCoords(9, y, 1, true);
-    }
-    onPaste1(instance, data) {
-        var z = -1;
-        for (var i = 0; i < data.length; i++) {
-            if (z != data[i].y) {
-                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    (instance).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance).setValueFromCoords(8, data[i].y, 1, true);
-                    (instance).setValueFromCoords(9, data[i].y, 1, true);
-                    z = data[i].y;
-                }
-            }
-        }
     }
     changed1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
@@ -1065,82 +1048,6 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
-    getForecastingUnit() {
-        ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            if (response.status == 200) {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                let tempList = [];
-                if (listArray.length > 0) {
-                    for (var i = 0; i < listArray.length; i++) {
-                        var paJson = {
-                            name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
-                            id: parseInt(listArray[i].forecastingUnitId),
-                            active: listArray[i].active,
-                            tracerCategoryId: listArray[i].tracerCategory.id,
-                            unit: listArray[i].unit
-                        }
-                        tempList[i] = paJson
-                    }
-                }
-                this.setState({
-                    forecastingUnitList: tempList,
-                },
-                    () => {
-                        this.getUnit();
-                    })
-            } else {
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
-    }
     getUnit() {
         UnitService.getUnitListAll().then(response => {
             if (response.status == 200) {
@@ -1560,23 +1467,6 @@ class EquivalancyUnit extends Component {
             data, 0, 1
         );
     };
-    onPaste(instance, data) {
-        var z = -1;
-        for (var i = 0; i < data.length; i++) {
-            if (z != data[i].y) {
-                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    (instance).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance).setValueFromCoords(8, data[i].y, true, true);
-                    (instance).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance).setValueFromCoords(12, data[i].y, 0, true);
-                    (instance).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance).setValueFromCoords(14, data[i].y, 1, true);
-                    z = data[i].y;
-                }
-            }
-        }
-    }
     formSubmit1 = function () {
         var validation = this.checkValidation1();
         var elInstance = this.state.table2Instance

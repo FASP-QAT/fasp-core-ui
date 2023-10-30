@@ -30,9 +30,7 @@ export default class CountryListComponent extends Component {
             lang: localStorage.getItem('lang'),
         }
         this.addNewCountry = this.addNewCountry.bind(this);
-        this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -81,13 +79,6 @@ export default class CountryListComponent extends Component {
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")
-        }
-    }
-    editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
-            this.props.history.push({
-                pathname: `/country/editCountry/${country.countryId}`,
-            });
         }
     }
     buildJExcel() {
@@ -241,9 +232,6 @@ export default class CountryListComponent extends Component {
                     }
                 }
             );
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);

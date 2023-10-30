@@ -27,10 +27,8 @@ export default class ProgramList extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editProgram = this.editProgram.bind(this);
         this.addNewProgram = this.addNewProgram.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -120,13 +118,6 @@ export default class ProgramList extends Component {
                 selProgram: this.state.programlist
             }, () => {
                 this.buildJExcel();
-            });
-        }
-    }
-    editProgram(program) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
-            this.props.history.push({
-                pathname: `/program/editProgram/${program.programId}`,
             });
         }
     }
@@ -383,9 +374,6 @@ export default class ProgramList extends Component {
         this.props.history.push({
             pathname: "/dataset/addDataSet"
         });
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({
