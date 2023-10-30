@@ -116,7 +116,6 @@ export default class InitialTicketPageComponent extends Component {
       showChangeRequest: 0
     };
     this.togglehelp = this.togglehelp.bind(this);
-    this.toggleLarge = this.toggleLarge.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
     this.togglebugreport = this.togglebugreport.bind(this);
     this.togglechangemaster = this.togglechangemaster.bind(this);
@@ -124,8 +123,6 @@ export default class InitialTicketPageComponent extends Component {
     this.toggleMain1 = this.toggleMain1.bind(this);
     this.toggleMain2 = this.toggleMain2.bind(this);
     this.toggleMain3 = this.toggleMain3.bind(this);
-    this.toggleMasterInitial = this.toggleMasterInitial.bind(this);
-    this.toggleSubMaster = this.toggleSubMaster.bind(this);
     this.toggleUserMaster = this.toggleUserMaster.bind(this);
     this.toggleMasterList = this.toggleMasterList.bind(this);
     this.toggleEditMaster = this.toggleEditMaster.bind(this);
@@ -208,11 +205,6 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
-  toggleLarge() {
-    this.setState({
-      large: !this.state.large,
-    });
-  }
   toggleSmall(msg) {
     confirmAlert({
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
@@ -286,42 +278,6 @@ export default class InitialTicketPageComponent extends Component {
       showAddEditMaster: 1,
       showEditMaster: 0
     });
-  }
-  toggleMasterInitial(masterNo) {
-    if (masterNo == 1) {
-      this.setState({
-        showOnlyMaster: 1,
-        showOnlyApplicationMaster: 0
-      });
-    } else if (masterNo == 2) {
-      this.setState({
-        showOnlyMaster: 1,
-        showOnlyRealmMaster: 0
-      });
-    } else if (masterNo == 3) {
-      this.setState({
-        showOnlyMaster: 1,
-        showOnlyProgramMaster: 0
-      });
-    }
-  }
-  toggleSubMaster(masterNo) {
-    if (masterNo == 1) {
-      this.setState({
-        showOnlyMaster: 0,
-        showOnlyApplicationMaster: 1
-      });
-    } else if (masterNo == 2) {
-      this.setState({
-        showOnlyMaster: 0,
-        showOnlyRealmMaster: 1
-      });
-    } else if (masterNo == 3) {
-      this.setState({
-        showOnlyMaster: 0,
-        showOnlyProgramMaster: 1
-      });
-    }
   }
   showOnlyAddMasterForms(formNo) {
     if (formNo == 1) {

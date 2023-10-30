@@ -34,13 +34,7 @@ export default class SyncMasterDataForTree extends Component {
         this.syncMasters = this.syncMasters.bind(this);
         this.retryClicked = this.retryClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.fetchData = this.fetchData.bind(this);
-    }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
     }
     hideSecondComponent() {
         setTimeout(function () {

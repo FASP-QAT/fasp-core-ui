@@ -74,7 +74,6 @@ export default class FundingSourceTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
-        this.CapitalizeCode = this.CapitalizeCode.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
     dataChange(event) {
@@ -197,10 +196,6 @@ export default class FundingSourceTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     resetClicked() {
         let { fundingSource } = this.state;
         fundingSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -216,13 +211,6 @@ export default class FundingSourceTicketComponent extends Component {
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
-    CapitalizeCode(str) {
-        if (str != null && str != "") {
-            return str.toUpperCase();
         } else {
             return "";
         }

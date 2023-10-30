@@ -77,15 +77,7 @@ class EditTracerCategoryComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
     }
     hideSecondComponent() {
         setTimeout(function () {

@@ -173,10 +173,6 @@ export default class EditProgramTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     resetClicked() {
         let { program } = this.state;
         program.programName = '';

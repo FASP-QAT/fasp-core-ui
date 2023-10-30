@@ -30,13 +30,11 @@ class UsagePeriod extends Component {
             isChanged: false,
             lang: localStorage.getItem('lang')
         }
-        this.cancelClicked = this.cancelClicked.bind(this);
         this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getUsagePeriodData = this.getUsagePeriodData.bind(this);
@@ -306,21 +304,6 @@ class UsagePeriod extends Component {
             data, 0, 1
         );
     };
-    onPaste(instance, data) {
-        var z = -1;
-        for (var i = 0; i < data.length; i++) {
-            if (z != data[i].y) {
-                var index = (instance).getValue(`G${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    (instance).setValueFromCoords(0, 0, true);
-                    (instance).setValueFromCoords(3, data[i].y, true, true);
-                    (instance).setValueFromCoords(6, 1, true);
-                    (instance).setValueFromCoords(7, 1, true);
-                    z = data[i].y;
-                }
-            }
-        }
-    }
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -500,9 +483,6 @@ class UsagePeriod extends Component {
                 </Card>
             </div>
         )
-    }
-    cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 export default UsagePeriod

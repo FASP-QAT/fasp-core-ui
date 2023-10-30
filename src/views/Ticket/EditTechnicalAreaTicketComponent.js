@@ -177,10 +177,6 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     resetClicked() {
         let { technicalArea } = this.state;
         technicalArea.technicalAreaName = '';

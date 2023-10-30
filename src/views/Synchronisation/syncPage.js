@@ -126,7 +126,6 @@ export default class syncPage extends Component {
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
     this.notesChange = this.notesChange.bind(this);
     this.checkLastModifiedDateForProgram = this.checkLastModifiedDateForProgram.bind(this)
-    this.onchangepage = this.onchangepage.bind(this)
   }
   notesChange(event) {
     this.setState({
@@ -2884,8 +2883,6 @@ export default class syncPage extends Component {
     }
     elInstance.orderBy(19, 0);
     elInstance.options.editable = false;
-  }
-  onchangepage(el, pageNo, oldPageNo) {
   }
   recursiveConflictsForShipmentLinking(instance) {
     var elInstance = instance;

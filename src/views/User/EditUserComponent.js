@@ -128,7 +128,6 @@ class EditUserComponent extends Component {
     this.dataChange = this.dataChange.bind(this);
     this.roleChange = this.roleChange.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
-    this.changeLoading = this.changeLoading.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.getAccessControlData = this.getAccessControlData.bind(this);
     this.addRow = this.addRow.bind(this);
@@ -144,9 +143,6 @@ class EditUserComponent extends Component {
     setTimeout(function () {
       document.getElementById("div2").style.display = "none";
     }, 30000);
-  }
-  changeLoading(loading) {
-    this.setState({ loading: loading });
   }
   dataChange(event) {
     let { user } = this.state;

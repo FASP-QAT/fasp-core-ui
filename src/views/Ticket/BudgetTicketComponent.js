@@ -102,7 +102,6 @@ export default class BudgetTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addMonths = this.addMonths.bind(this);
-        this.currentDate = this.currentDate.bind(this);
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.programChange = this.programChange.bind(this);
@@ -373,10 +372,6 @@ export default class BudgetTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     resetClicked() {
         let { budget } = this.state;
         budget.programName = '';
@@ -409,16 +404,6 @@ export default class BudgetTicketComponent extends Component {
         let { budget } = this.state;
         budget.stopDate = date;
         this.setState({ budget: budget });
-    }
-    currentDate() {
-        var todaysDate = new Date();
-        var yyyy = todaysDate.getFullYear().toString();
-        var mm = (todaysDate.getMonth() + 1).toString();
-        var dd = todaysDate.getDate().toString();
-        var mmChars = mm.split('');
-        var ddChars = dd.split('');
-        let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-        return date;
     }
     render() {
         const { fundingSources } = this.state;

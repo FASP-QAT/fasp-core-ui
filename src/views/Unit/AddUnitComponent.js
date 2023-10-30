@@ -183,10 +183,6 @@ class AddUnitComponent extends Component {
                 }
             );
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     render() {
         const { dimensions } = this.state;
         let dimensionList = dimensions.length > 0

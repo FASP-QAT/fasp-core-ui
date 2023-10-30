@@ -124,7 +124,6 @@ class usageTemplate extends Component {
         this.getUnit = this.getUnit.bind(this);
         this.getUsagePeriod = this.getUsagePeriod.bind(this);
         this.getUsageTemplateData = this.getUsageTemplateData.bind(this);
-        this.getForcastingUnitById = this.getForcastingUnitById.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.getDimensionList = this.getDimensionList.bind(this);
@@ -157,63 +156,6 @@ class usageTemplate extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
-    }
-    getForcastingUnitById(forecastingUnitId) {
-        ForecastingUnitService.getForcastingUnitById(forecastingUnitId).then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    forecastingUnitObj: response.data, loading: false
-                },
-                    () => {
-                    })
-            }
-            else {
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
     }
     getDataSet() {
         ProgramService.getDataSetList()
@@ -1341,18 +1283,6 @@ class usageTemplate extends Component {
     filterForecastingUnitList = function (instance, cell, c, r, source) {
         var mylist = [];
         return mylist;
-    }.bind(this)
-    filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (this.state.dataEl.getJson(null, false)[r])[3];
-        if (value > 0) {
-            mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
-        }
-        return mylist.sort(function (a, b) {
-            a = a.name.toLowerCase();
-            b = b.name.toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        });
     }.bind(this)
     filterUsagePeriod1 = function (instance, cell, c, r, source) {
         var mylist = this.state.usagePeriodList;

@@ -29,7 +29,6 @@ class ListTracerCategoryComponent extends Component {
         this.editTracerCategory = this.editTracerCategory.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewTracerCategory = this.addNewTracerCategory.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -279,9 +278,6 @@ class ListTracerCategoryComponent extends Component {
                     }
                 }
             );
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);

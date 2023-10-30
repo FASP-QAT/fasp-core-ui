@@ -143,7 +143,6 @@ class AddUserComponent extends Component {
     this.filterOrganisation = this.filterOrganisation.bind(this);
     this.filterHealthArea = this.filterHealthArea.bind(this);
     this.filterProgram = this.filterProgram.bind(this);
-    this.filterData = this.filterData.bind(this);
   }
   hideSecondComponent() {
     document.getElementById("div2").style.display = "block";
@@ -335,19 +334,6 @@ class AddUserComponent extends Component {
     } else {
       this.setState({
         selOrganisation: this.state.organisations,
-      });
-    }
-  }
-  filterData() {
-    let realmId = this.state.user.realm.realmId;
-    if (realmId != 0 && realmId != null) {
-      const selRealmCountry = this.state.realmCountryList;
-      this.setState({
-        selRealmCountry,
-      });
-    } else {
-      this.setState({
-        selRealmCountry: this.state.realmCountryList,
       });
     }
   }

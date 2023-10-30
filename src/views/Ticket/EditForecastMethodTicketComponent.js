@@ -166,10 +166,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
     resetClicked() {
         let { forecastMethod } = this.state;
         forecastMethod.forecastMethodName = '';

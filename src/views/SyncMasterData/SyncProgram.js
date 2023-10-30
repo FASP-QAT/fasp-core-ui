@@ -39,11 +39,6 @@ export default class SyncProgram extends Component {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
     componentDidMount() {
         var db1;
         getDatabase();
