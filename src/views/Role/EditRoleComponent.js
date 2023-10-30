@@ -75,10 +75,6 @@ class EditRoleComponent extends Component {
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {

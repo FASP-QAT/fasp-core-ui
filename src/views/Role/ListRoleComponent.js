@@ -27,7 +27,6 @@ class ListRoleComponent extends Component {
         }
         this.editRole = this.editRole.bind(this);
         this.addNewRole = this.addNewRole.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -192,12 +191,6 @@ class ListRoleComponent extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-    }
-    showRoleLabel(cell, row) {
-        return cell.label_en;
-    }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({
