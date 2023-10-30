@@ -3041,17 +3041,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.globalconsumption'),
                                 url: '/report/globalConsumption',
@@ -3063,20 +3063,9 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-                              {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
                               // {
-                              //   name: 'Forecast Error (Monthly) (New)',
-                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
                               //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
@@ -3085,6 +3074,17 @@ class DefaultLayout extends Component {
                               //     }
                               //   }
                               // },
+                              {
+                                name: 'Forecast Error (Monthly)',
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                               {
                                 name: i18n.t('static.dashboard.forecastmetrics'),
                                 url: '/report/forecastMetrics',
@@ -4130,20 +4130,10 @@ class DefaultLayout extends Component {
                                     this.refreshPage();
                                   }
                                 }
-                              }, {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
                               },
-                              // {
-                              //   name: 'Forecast Error (Monthly) (New)',
-                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //  {
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
                               //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
@@ -4152,6 +4142,17 @@ class DefaultLayout extends Component {
                               //     }
                               //   }
                               // },
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                             ]
                           },
 
