@@ -13,10 +13,6 @@ class OrganisationService {
         return axios.put(`${API_URL}/api/organisation/`, json, {}
         );
     }
-    getRealmCountryList(json) {
-        return axios.get(`${API_URL}/api/realmCountry/realmId/${json}`, {}
-        );
-    }
     getOrganisationById(json) {
         return axios.get(`${API_URL}/api/organisation/${json}`, {}
         );

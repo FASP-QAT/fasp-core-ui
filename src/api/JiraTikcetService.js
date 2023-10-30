@@ -114,18 +114,5 @@ class JiraTicketService {
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
     }
-    getDataInFormat(json) {
-        json.createdDate = new Date();
-        var str = JSON.stringify(json);
-        var formatStr = "";
-        var dataKey;
-        var dataValue;
-        for (var key in json) {
-            dataKey = key;
-            dataValue = json[key];
-            formatStr = formatStr.concat(dataKey.charAt(0).toUpperCase()).concat(dataKey.slice(1)).concat(" = ").concat(dataValue).concat("\n");
-        }
-        return formatStr;
-    }
 }
 export default new JiraTicketService()

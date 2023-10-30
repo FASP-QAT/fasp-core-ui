@@ -21,10 +21,6 @@ class PipelineService {
         return axios.get(`${API_URL}/api/qatTemp/program/${json}`, {}
         );
     }
-    getPipelineProductListById(json) {
-        return axios.get(`${API_URL}/api/pipeline/product/${json}`, {}
-        );
-    }
     getShipmentDataById(json) {
         return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {}
         );
@@ -35,10 +31,6 @@ class PipelineService {
     }
     getQatTempPlanningUnitList(json) {
         return axios.get(`${API_URL}/api/qatTemp/planningUnitList/${json}`, {}
-        );
-    }
-    getPipelineProgramConsumption(json) {
-        return axios.get(`${API_URL}/api/pipeline/consumption/${json}`, {}
         );
     }
     getQatTempProgramregion(json) {

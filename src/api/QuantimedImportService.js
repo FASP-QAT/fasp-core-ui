@@ -10,9 +10,5 @@ class QuantimedImportService {
             );
         }
     }
-    addImportedForecastData(json) {
-        return axios.post(`${API_URL}/api/quantimed/addQuantimedImport`, json, {}
-        );
-    }
 }
 export default new QuantimedImportService()

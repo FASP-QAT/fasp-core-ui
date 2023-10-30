@@ -7,17 +7,6 @@ class DropdownService {
       {}
     );
   }
-  getProgramWithFilterForHealthAreaAndRealmCountryForDropdown(
-    realmId,
-    programTypeId,
-    json
-  ) {
-    return axios.post(
-      `${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}/filter/healthAreaAndRealmCountry/`,
-      json,
-      {}
-    );
-  }
   getProgramWithFilterForMultipleRealmCountryForDropdown(programTypeId, json) {
     return axios.post(
       `${API_URL}/api/dropdown/program/programType/${programTypeId}/filter/multipleRealmCountry/`,
@@ -25,53 +14,8 @@ class DropdownService {
       {}
     );
   }
-  getPlanningUnitByAutoComplete(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/planningUnit/autocomplete/`,
-      json,
-      {}
-    );
-  }
-  getPlanningUnitByAutoCompleteFilterForProductCategory(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/`,
-      json,
-      {}
-    );
-  }
   getPlanningUnitDropDownList() {
     return axios.get(`${API_URL}/api/dropdown/planningUnit/`, {});
-  }
-  getPlanningUnitFilterForProductCategory(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/planningUnit/filter/productCategory/`,
-      json,
-      {}
-    );
-  }
-  getForecastingUnitByAutoComplete(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/forecastingUnit/autocomplete/`,
-      json,
-      {}
-    );
-  }
-  getForecastingUnitByAutoCompleteWithFilterTracerCategory(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/forecastingUnit/autocomplete/filter/tracerCategory/`,
-      json,
-      {}
-    );
-  }
-  getForecastingUnitDropdownList() {
-    return axios.get(`${API_URL}/api/dropdown/forecastingUnit/`, {});
-  }
-  getForecastingUnitDropdownListWithFilterForPcAndTc(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/forecastingUnit/filter/pcAndTc/`,
-      json,
-      {}
-    );
   }
   getRealmCountryDropdownList(realmId) {
     return axios.get(
@@ -104,9 +48,6 @@ class DropdownService {
   getFundingSourceDropdownList() {
     return axios.get(`${API_URL}/api/dropdown/fundingSource/`, {});
   }
-  getProcurementAgentDropdownList() {
-    return axios.get(`${API_URL}/api/dropdown/procurementAgent/`, {});
-  }
   getProcurementAgentDropdownListForFilterMultiplePrograms(json) {
     return axios.post(
       `${API_URL}/api/dropdown/procurementAgent/filter/multiplePrograms/`,
@@ -114,22 +55,9 @@ class DropdownService {
       {}
     );
   }
-  getEquivalencyUnitDropdownList() {
-    return axios.get(`${API_URL}/api/dropdown/equivalencyUnit/`, {});
-  }
-  getUserDropdownList() {
-    return axios.get(`${API_URL}/api/dropdown/user/`, {});
-  }
   getProgramPlanningUnitDropdownList(json) {
     return axios.post(
       `${API_URL}/api/dropdown/planningUnit/program/filter/multipleProgramAndTracerCategory/`,
-      json,
-      {}
-    );
-  }
-  getDatasetPlanningUnitDropdownList(json) {
-    return axios.post(
-      `${API_URL}/api/dropdown/planningUnit/dataset/filter/programAndVersion/`,
       json,
       {}
     );

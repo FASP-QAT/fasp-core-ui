@@ -1,10 +1,6 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
 class UserService {
-    getLanguageList() {
-        return axios.get(`${API_URL}/api/getLanguageList`, {
-        });
-    }
     getRoleList() {
         return axios.get(`${API_URL}/api/role`, {
         });
@@ -33,20 +29,12 @@ class UserService {
         return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }
-    getUserDetailsByUserId(userId) {
-        return axios.get(`${API_URL}/api/user/${userId}`, {
-        });
-    }
     editUser(json) {
         return axios.put(`${API_URL}/api/user/`, json, {
         });
     }
     editRole(json) {
         return axios.put(`${API_URL}/api/role/`, json, {
-        });
-    }
-    unlockAccount(userId, emailId) {
-        return axios.put(`${API_URL}/api/unlockAccount/${userId}/${emailId}`, {
         });
     }
     updateExpiredPassword(emailId, oldPassword, newPassword) {
@@ -63,10 +51,6 @@ class UserService {
     }
     updatePassword(emailId, token, password) {
         return axios.post(`${API_URL}/api/updatePassword/`, { emailId, token, password }, {});
-    }
-    accessControls(json) {
-        return axios.put(`${API_URL}/api/accessControls/`, json, {
-        });
     }
     getRoleById(json) {
         return axios.get(`${API_URL}/api/role/${json}`, {}

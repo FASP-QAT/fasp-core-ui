@@ -13,13 +13,6 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/forecastMetricsComparision`, json, {}
         );
     }
-    getFunderExportData(programIds) {
-        return axios.post(`${API_URL}/api/budget/programIds`, programIds, {}
-        );
-    }
-    getProcurementAgentExportData(programIds) {
-        return axios.post(`${API_URL}/api/program/programIds`, programIds, {});
-    }
     getAnnualShipmentCost(json) {
         return axios.post(`${API_URL}/api/report/annualShipmentCost`, json, {}
         );

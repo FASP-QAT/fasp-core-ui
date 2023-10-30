@@ -1,10 +1,6 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DatasetService {
-    getDatasetList() {
-        return axios.get(`${API_URL}/api/dataset/`, {
-        });
-    }
     loadDataset() {
         return axios.get(`${API_URL}/api/loadDataset/`, {
         });
@@ -17,19 +13,12 @@ class DatasetService {
         return axios.post(`${API_URL}/api/datasetData`, json, {
         });
     }
-    getDataSetDataById(programId) {
-        return axios.get(`${API_URL}/api/dataset/${programId}`, {});
-    }
     getTreeTemplateList() {
         return axios.get(`${API_URL}/api/treeTemplate/`, {
         });
     }
     getTreeTemplateById(treeTemplateId) {
         return axios.get(`${API_URL}/api/treeTemplate/${treeTemplateId}`, {
-        });
-    }
-    getNodeTypeList() {
-        return axios.get(`${API_URL}/api/nodeType`, {
         });
     }
     getUsageTypeList() {

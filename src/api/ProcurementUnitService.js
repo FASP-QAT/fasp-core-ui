@@ -5,10 +5,6 @@ class ProcurementUnitService {
         return axios.get(`${API_URL}/api/procurementUnit/all`, {
         });
     }
-    getProcurementUnitListActive() {
-        return axios.get(`${API_URL}/api/procurementUnit/`, {
-        });
-    }
     addProcurementUnit(json) {
         return axios.post(`${API_URL}/api/procurementUnit/`, json, {}
         );
@@ -19,10 +15,6 @@ class ProcurementUnitService {
     }
     editProcurementUnit(json) {
         return axios.put(`${API_URL}/api/procurementUnit/`, json, {}
-        );
-    }
-    getProcurementUnitByRealmId(json) {
-        return axios.get(`${API_URL}/api/procurementUnit/realmId/${json}`, {}
         );
     }
 }

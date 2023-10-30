@@ -43,10 +43,6 @@ class DefaultHeaderDropdown extends Component {
       languageList: [],
       message: ""
     };
-    this.dashboard = this.dashboard.bind(this);
-  }
-  dashboard() {
-    this.props.history.push(`/ApplicationDashboard/`)
   }
   getLanguageList() {
     var db1;

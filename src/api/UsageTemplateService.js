@@ -5,10 +5,6 @@ class UsageTemplateService {
         return axios.get(`${API_URL}/api/usageTemplate/all`, {
         });
     }
-    getUsageTemplateList() {
-        return axios.get(`${API_URL}/api/usageTemplate`, {
-        });
-    }
     addUpdateUsageTemplateMapping(json) {
         return axios.post(`${API_URL}/api/usageTemplate`, json, {});
     }

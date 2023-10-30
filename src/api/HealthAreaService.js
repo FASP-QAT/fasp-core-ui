@@ -25,10 +25,6 @@ class HealthAreaService {
         return axios.get(`${API_URL}/api/healthArea/${json}`, {}
         );
     }
-    getHealthAreaListForProgram(json) {
-        return axios.get(`${API_URL}/api/healthArea/program/realmId/${json}`, {
-        });
-    }
     getHealthAreaDisplayName(json1, json2) {
         return axios.get(`${API_URL}/api/healthArea/getDisplayName/realmId/${json1}/name/${json2}`, {}
         );

@@ -17,24 +17,12 @@ class ProgramService {
         return axios.get(`${API_URL}/api/dataset/`, {
         });
     }
-    getProgramListAll() {
-        return axios.get(`${API_URL}/api/program/all`, {
-        });
-    }
-    getDataSetListAll() {
-        return axios.get(`${API_URL}/api/dataset/all`, {
-        });
-    }
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
     }
     loadMoreProgramList(programId, page) {
         return axios.get(`${API_URL}/api/loadProgram/programId/${programId}/page/${page}`, {
-        });
-    }
-    getProgramListForDropDown() {
-        return axios.get(`${API_URL}/api/getProgramList/`, {
         });
     }
     addProgram(json) {
@@ -61,16 +49,8 @@ class ProgramService {
         return axios.get(`${API_URL}/api/region/realmCountryId/${json}`, {}
         );
     }
-    getProgramProductListByProgramId(json) {
-        return axios.get(`${API_URL}/api/programProduct/${json}`, {}
-        );
-    }
     getProgramPlaningUnitListByProgramId(json) {
         return axios.get(`${API_URL}/api/program/${json}/planningUnit/all/`, {}
-        );
-    }
-    addProgramProductMapping(json) {
-        return axios.put(`${API_URL}/api/programProduct/`, json, {}
         );
     }
     addprogramPlanningUnitMapping(json) {
@@ -85,24 +65,12 @@ class ProgramService {
         return axios.get(`${API_URL}/api/user/realmId/${json}`, {}
         );
     }
-    getProgramByRealmId(json) {
-        return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
-        );
-    }
     saveProgramData(json, comparedVersionId) {
         return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
-    getProgramPlaningUnitListByProgramAndProductCategory(programId, ProductCategoryId) {
-        return axios.get(`${API_URL}/api/program/${programId}/${ProductCategoryId}/planningUnit/all/`, {}
-        );
-    }
     programInitialize(json) {
         return axios.post(`${API_URL}/api/program/initialize/`, json, {}
-        );
-    }
-    pipelineProgramDataImport() {
-        return axios.post(`${API_URL}/api/pipeline/programsetup`, {}
         );
     }
     getVersionStatusList() {
@@ -121,24 +89,12 @@ class ProgramService {
         return axios.get(`${API_URL}/api/versionType`, {}
         );
     }
-    checkOrderNumberAndLineNumber(orderNo, primeLineNo, realmCountryId, planningUnitId) {
-        return axios.get(`${API_URL}/api/programData/checkErpOrder/orderNo/${orderNo}/primeLineNo/${primeLineNo}/realmCountryId/${realmCountryId}/planningUnitId/${planningUnitId}`, {}
-        );
-    }
-    getProgramDisplayNameUniqueStatus(realmId, programId, programCode) {
-        return axios.get(`${API_URL}/api/program/validate/realmId/${realmId}/programId/${programId}/programCode/${programCode}`, {}
-        );
-    }
     checkNewerVersions(json) {
         return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
         );
     }
     getHealthAreaListByRealmCountryId(json) {
         return axios.get(`${API_URL}/api/healthArea/realmCountryId/${json}`, {}
-        );
-    }
-    getOrganisationListByRealmCountryId(json) {
-        return axios.get(`${API_URL}/api/organisation/realmCountryId/${json}`, {}
         );
     }
     getProblemStatusList() {
@@ -181,10 +137,6 @@ class ProgramService {
         return axios.post(`${API_URL}/api/program/actualConsumptionReport`, json, {}
         );
     }
-    checkIfCommitRequestExists(programId) {
-        return axios.get(`${API_URL}/api/programData/checkIfCommitRequestExistsForProgram/${programId}`, {}
-        );
-    }
     getCommitRequests(json, requestStatus) {
         return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
         );
@@ -204,19 +156,12 @@ class ProgramService {
     getProgramManagerListByProgramId(programId) {
         return axios.get(`${API_URL}/api/user/programId/${programId}`, {});
     }
-    checkIfLinkingExistsWithOtherProgram(json) {
-        return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
-        );
-    }
     createManualProblem(json) {
         return axios.post(`${API_URL}/api/problemReport/createManualProblem`, json, {}
         );
     }
     getDatasetVersions(json) {
         return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
-    }
-    getProgramForDropDown(realmId, programTypeId) {
-        return axios.get(`${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}`, {});
     }
     getProgramListByRealmCountryIdList(realmCountryIds) {
         return axios.post(`${API_URL}/api/program/realmCountryList`, realmCountryIds, {});

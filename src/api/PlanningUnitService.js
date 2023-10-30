@@ -25,24 +25,8 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/${json}`, {}
         );
     }
-    getPlanningUnitCapacityForId(planningUnitId) {
-        return axios.get(`${API_URL}/api/planningUnit/capacity/${planningUnitId}`, {}
-        );
-    }
-    editPlanningUnitCapacity(json) {
-        return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
-        );
-    }
-    getPlanningUnitByProductCategoryId(json) {
-        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/all`, {}
-        );
-    }
     getPlanningUnitByProgramIds(json) {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
-        );
-    }
-    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId, term) {
-        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
     getActivePlanningUnitByProductCategoryId(json) {
@@ -61,24 +45,8 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/forecastingUnit/${forecastingUnitId}`, {}
         );
     }
-    getPlanningUnitByProgramIdsAndTracerCategorieIds(json) {
-        return axios.post(`${API_URL}/api/planningUnit/tracerCategory/program/`, json, {}
-        );
-    }
-    getProcurementAgentPlanningUnitByPlanningUnitIds(json) {
-        return axios.post(`${API_URL}/api/procurementAgent/planningUnits`, json, {}
-        );
-    }
-    getPlanningUnitByTracerCategoryIds(json) {
-        return axios.post(`${API_URL}/api/planningUnit/tracerCategorys`, json, {}
-        );
-    }
     getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId) {
         return axios.get(`${API_URL}/api/planningUnit/programId/${programId}/versionId/${versionId}`, {}
-        );
-    }
-    getPlanningUnitForProductCategory(productCategoryId) {
-        return axios.get(`${API_URL}/api/planningUnit/withPricing/productCategory/${productCategoryId}`, {}
         );
     }
     getPlanningUnitListBasic() {

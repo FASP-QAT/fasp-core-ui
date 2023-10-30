@@ -9,8 +9,5 @@ class ModelingTypeService {
         return axios.get(`${API_URL}/api/modelingType`, {
         });
     }
-    addUpdateModelingType(json) {
-        return axios.post(`${API_URL}/api/modelingType`, json, {});
-    }
 }
 export default new ModelingTypeService();

@@ -5,10 +5,6 @@ class DataSourceService {
         return axios.post(`${API_URL}/api/dataSource/`, json, {}
         );
     }
-    getActiveDataSourceList() {
-        return axios.get(`${API_URL}/api/dataSource/`, {
-        });
-    }
     getAllDataSourceList() {
         return axios.get(`${API_URL}/api/dataSource/all`, {
         });
