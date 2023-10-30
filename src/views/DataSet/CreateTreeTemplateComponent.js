@@ -9546,7 +9546,7 @@ export default class CreateTreeTemplate extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
