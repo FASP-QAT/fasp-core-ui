@@ -30,12 +30,9 @@ const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
     constructor(props) {
         super(props);
-        this.toggle = this.toggle.bind(this);
-        this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.state = {
             loading: true,
             dropdownOpen: false,
@@ -138,11 +135,6 @@ class Program extends Component {
                     localStorage.setItem("sesLatestProgram", response.data);
                 })
         }
-    }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
@@ -433,22 +425,12 @@ class Program extends Component {
             this.setState({ loading: false });
         }
     }
-    toggle() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen,
-        });
-    }
     dataChange(event) {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
         this.getTree();
     };
-    onRadioBtnClick(radioSelected) {
-        this.setState({
-            radioSelected: radioSelected,
-        });
-    }
     getPrograms() {
         var db1;
         getDatabase();

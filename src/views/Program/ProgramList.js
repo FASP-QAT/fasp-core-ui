@@ -43,12 +43,8 @@ export default class ProgramList extends Component {
       lang: localStorage.getItem("lang"),
       loading: true,
     };
-    this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
-    this.addProductMapping = this.addProductMapping.bind(this);
     this.filterData = this.filterData.bind(this);
-    this.formatLabel = this.formatLabel.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
@@ -133,17 +129,6 @@ export default class ProgramList extends Component {
           this.buildJExcel();
         }
       );
-    }
-  }
-  editProgram(program) {
-    if (
-      AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
-        "ROLE_BF_EDIT_PROGRAM"
-      )
-    ) {
-      this.props.history.push({
-        pathname: `/program/editProgram/${program.programId}`,
-      });
     }
   }
   buildJExcel() {
@@ -451,33 +436,6 @@ export default class ProgramList extends Component {
     this.props.history.push({
       pathname: "/program/programOnboarding",
     });
-  }
-  buttonFormatter(cell, row) {
-    return (
-      <Button
-        type="button"
-        size="sm"
-        color="success"
-        onClick={(event) => this.addProductMapping(event, cell)}
-      >
-        <i className="fa fa-check"></i> {i18n.t("static.common.add")}
-      </Button>
-    );
-  }
-  addProductMapping(event, cell) {
-    if (
-      AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
-        "ROLE_BF_EDIT_PROGRAM"
-      )
-    ) {
-      event.stopPropagation();
-      this.props.history.push({
-        pathname: `/programProduct/addProgramProduct/${cell}`,
-      });
-    }
-  }
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
   }
   render() {
     jexcel.setDictionary({

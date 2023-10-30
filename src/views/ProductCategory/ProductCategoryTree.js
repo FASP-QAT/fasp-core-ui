@@ -85,11 +85,8 @@ export default class ProductCategoryTree extends Component {
         this.enableNode = this.enableNode.bind(this);
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
-        this.setTreeData = this.setTreeData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.handleSearchOnChange = this.handleSearchOnChange.bind(this);
-    }
-    setTreeData(treeData) {
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';

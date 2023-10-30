@@ -26,10 +26,8 @@ export default class ListProcurementUnit extends Component {
       lang: localStorage.getItem('lang'),
       loading: true
     }
-    this.editProcurementUnit = this.editProcurementUnit.bind(this);
     this.addNewProcurementUnit = this.addNewProcurementUnit.bind(this);
     this.filterData = this.filterData.bind(this);
-    this.formatLabel = this.formatLabel.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
@@ -61,13 +59,6 @@ export default class ListProcurementUnit extends Component {
         selProcurementUnit: this.state.procurementUnitList
       }, () => {
         this.buildJExcel();
-      });
-    }
-  }
-  editProcurementUnit(procurementUnit) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_UNIT')) {
-      this.props.history.push({
-        pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
       });
     }
   }
@@ -307,9 +298,6 @@ export default class ListProcurementUnit extends Component {
       pathname: "/procurementUnit/addProcurementUnit"
     });
   }
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -330,66 +318,6 @@ export default class ListProcurementUnit extends Component {
           </option>
         )
       }, this);
-    const columns = [
-      {
-        dataField: 'planningUnit.label',
-        text: i18n.t('static.procurementUnit.planningUnit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      },
-      {
-        dataField: 'label',
-        text: i18n.t('static.procurementUnit.procurementUnit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      },
-      {
-        dataField: 'multiplier',
-        text: i18n.t('static.procurementUnit.multiplier'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center'
-      },
-      {
-        dataField: 'unit.label',
-        text: i18n.t('static.procurementUnit.unit'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      },
-      {
-        dataField: 'supplier.label',
-        text: i18n.t('static.procurementUnit.supplier'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      },
-      {
-        dataField: 'labeling',
-        text: i18n.t('static.procurementUnit.labeling'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center'
-      },
-      {
-        dataField: 'active',
-        text: i18n.t('static.common.status'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: (cellContent, row) => {
-          return (
-            (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-          );
-        }
-      }
-    ];
     const options = {
       hidePageListOnlyOnePage: true,
       firstPageText: i18n.t('static.common.first'),
