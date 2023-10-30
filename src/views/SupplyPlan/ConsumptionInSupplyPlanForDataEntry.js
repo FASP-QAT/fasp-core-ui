@@ -24,7 +24,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.saveConsumptionBatchInfo = this.saveConsumptionBatchInfo.bind(this);
         this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
-        this.showOnlyErrors = this.showOnlyErrors.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this)
         this.onPaste = this.onPaste.bind(this);
@@ -83,8 +82,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
             }
         }
-    }
-    showOnlyErrors() {
     }
     componentDidMount() {
     }

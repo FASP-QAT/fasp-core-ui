@@ -206,8 +206,6 @@ export default class SupplyPlanComponent extends React.Component {
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
-        this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
-        this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.updateState = this.updateState.bind(this)
         this.updateFieldData = this.updateFieldData.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -399,32 +397,6 @@ export default class SupplyPlanComponent extends React.Component {
         fields = document.getElementsByClassName("erpShipments");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionManualShipments() {
-        this.setState({
-            showManualShipment: !this.state.showManualShipment
-        })
-        var fields = document.getElementsByClassName("manualShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showManualShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionErpShipments() {
-        this.setState({
-            showErpShipment: !this.state.showErpShipment
-        })
-        var fields = document.getElementsByClassName("erpShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showErpShipment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";

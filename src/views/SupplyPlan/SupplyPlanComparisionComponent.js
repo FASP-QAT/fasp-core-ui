@@ -111,11 +111,8 @@ export default class SupplyPlanComponent extends React.Component {
         this.leftClickedShipments = this.leftClickedShipments.bind(this);
         this.rightClickedShipments = this.rightClickedShipments.bind(this);
         this.actionCanceled = this.actionCanceled.bind(this);
-        this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
-        this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
-        this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.updateState = this.updateState.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
     }
@@ -178,32 +175,6 @@ export default class SupplyPlanComponent extends React.Component {
         fields = document.getElementsByClassName("erpShipments1");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionManualShipments() {
-        this.setState({
-            showManualShipment: !this.state.showManualShipment
-        })
-        var fields = document.getElementsByClassName("manualShipments1");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showManualShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionErpShipments() {
-        this.setState({
-            showErpShipment: !this.state.showErpShipment
-        })
-        var fields = document.getElementsByClassName("erpShipments1");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showErpShipment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";
@@ -1724,8 +1695,6 @@ export default class SupplyPlanComponent extends React.Component {
                 })
             }
         })
-    }
-    suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder) {
     }
     render() {
         const chartOptions1 = {

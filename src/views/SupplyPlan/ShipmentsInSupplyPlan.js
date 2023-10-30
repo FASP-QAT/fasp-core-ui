@@ -45,7 +45,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.calculateEmergencyOrder = this.calculateEmergencyOrder.bind(this);
         this.onPaste = this.onPaste.bind(this);
-        this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
         this.formulaChanged = this.formulaChanged.bind(this)
@@ -142,22 +141,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var dsList = this.state.budgetList.filter(c => (c.name == data[i].value) && c.active.toString() == "true");
                 if (dsList.length > 0) {
                     (instance).setValueFromCoords(23, data[i].y, dsList[0].id, true);
-                }
-            }
-        }
-    }
-    onPasteForBatchInfo(instance, data) {
-        var z = -1;
-        for (var i = 0; i < data.length; i++) {
-            if (z != data[i].y) {
-                var index = (instance).getValue(`F${parseInt(data[i].y) + 1}`, true);
-                if (index === "" || index == null || index == undefined) {
-                    var rowData = (instance).getRowData(0);
-                    (instance).setValueFromCoords(2, data[i].y, rowData[2], true);
-                    (instance).setValueFromCoords(5, data[i].y, 0, true);
-                    (instance).setValueFromCoords(6, data[i].y, rowData[6], true);
-                    (instance).setValueFromCoords(7, data[i].y, rowData[7], true);
-                    z = data[i].y;
                 }
             }
         }

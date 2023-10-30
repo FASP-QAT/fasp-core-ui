@@ -37,9 +37,6 @@ class SupplyPlanFormulas extends Component {
       showtermslogic: false,
     };
     this.toggle = this.toggle.bind(this);
-    this.toggleLarge = this.toggleLarge.bind(this);
-    this.toggleSmall = this.toggleSmall.bind(this);
-    this.toggleInfo = this.toggleInfo.bind(this);
     this.togglecostOfInventory = this.togglecostOfInventory.bind(this);
     this.toggleForecastMatrix = this.toggleForecastMatrix.bind(this);
     this.toggleForecastMatrix1 = this.toggleForecastMatrix1.bind(this);
@@ -61,21 +58,6 @@ class SupplyPlanFormulas extends Component {
   toggle() {
     this.setState({
       modal: !this.state.modal,
-    });
-  }
-  toggleLarge() {
-    this.setState({
-      large: !this.state.large,
-    });
-  }
-  toggleSmall() {
-    this.setState({
-      small: !this.state.small,
-    });
-  }
-  toggleInfo() {
-    this.setState({
-      info: !this.state.info,
     });
   }
   togglecostOfInventory() {

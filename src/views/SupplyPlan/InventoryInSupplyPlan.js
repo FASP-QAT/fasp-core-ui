@@ -24,7 +24,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
-        this.showOnlyErrors = this.showOnlyErrors.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
@@ -101,33 +100,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     (instance).setValueFromCoords(7, data[i].y, rowData[7], true);
                     z = data[i].y;
                 }
-            }
-        }
-    }
-    showOnlyErrors() {
-        var checkBoxValue = document.getElementById("showErrors");
-        var elInstance = this.state.inventoryEl;
-        var json = elInstance.getJson(null, false);
-        var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-        if (json.length < showOption) {
-            showOption = json.length;
-        }
-        if (checkBoxValue.checked == true) {
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var rowData = elInstance.getRowData(j);
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                if (rowData[16].toString() == 1) {
-                    tr.childNodes[j].style.display = "";
-                } else {
-                    tr.childNodes[j].style.display = "none";
-                }
-            }
-        } else {
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                tr.childNodes[j].style.display = "";
             }
         }
     }
