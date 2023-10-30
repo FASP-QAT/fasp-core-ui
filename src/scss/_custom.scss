@@ -10602,3 +10602,20 @@ border-top: 1px solid #c8ced3 !important;
   transform: scale(0.73);
   margin: 6px -11px 0px 2px;
 }
+
+
+.jss>tbody>tr>td.lowestError {
+  color: #118b70 !important;
+}
+
+.jss>tbody>tr>td.readonly.lowestError {
+  color: #118b70 !important;
+}
+
+.jss>tbody>tr>td.notLowestError {
+  color: #000000 !important;
+}
+
+.jss>tbody>tr>td.readonly.notLowestError {
+  color: #000000 !important;
+}
