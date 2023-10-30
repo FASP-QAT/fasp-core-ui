@@ -27,10 +27,8 @@ export default class OrganisationTypeListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editOrganisationType = this.editOrganisationType.bind(this);
         this.addOrganisationType = this.addOrganisationType.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -260,9 +258,6 @@ export default class OrganisationTypeListComponent extends Component {
                 }
             );
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -337,13 +332,6 @@ export default class OrganisationTypeListComponent extends Component {
                 </Card>
             </div>
         );
-    }
-    editOrganisationType(organisationType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION_TYPE')) {
-            this.props.history.push({
-                pathname: `/organisationType/editOrganisationType/${organisationType.organisationTypeId}`,
-            });
-        }
     }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {

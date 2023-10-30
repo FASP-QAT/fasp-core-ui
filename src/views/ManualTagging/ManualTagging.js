@@ -112,7 +112,6 @@ export default class ManualTagging extends Component {
         this.filterData = this.filterData.bind(this);
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
-        this.formatLabelHistory = this.formatLabelHistory.bind(this);
         this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -144,8 +143,6 @@ export default class ManualTagging extends Component {
         this.toggleDetailsModal = this.toggleDetailsModal.bind(this);
         this.toggle = this.toggle.bind(this);
         this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
-        this.viewBatchData = this.viewBatchData.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this.changeTab2 = this.changeTab2.bind(this);
         this.delink = this.delink.bind(this);
         this.loadedERP = this.loadedERP.bind(this)
@@ -177,23 +174,6 @@ export default class ManualTagging extends Component {
                 })
             }
         })
-    }
-    viewBatchData(event, row) {
-        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
-            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-            batchDetails.sort(function (a, b) {
-                var dateA = new Date(a.expiryDate).getTime();
-                var dateB = new Date(b.expiryDate).getTime();
-                return dateA > dateB ? 1 : -1;
-            })
-            this.setState({
-                batchDetails
-            });
-        } else {
-            this.setState({
-                batchDetails: []
-            });
-        }
     }
     toggleArtmisHistoryModal() {
         this.setState({
@@ -836,14 +816,6 @@ export default class ManualTagging extends Component {
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(10, y, 1, true);
     }.bind(this);
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance;
-        var rowData = elInstance.getRowData(y);
-        if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
-        }
-        elInstance.setValueFromCoords(10, y, 1, true);
-    }
     onPaste(instance, data) {
     }
     dataChangeCheckbox(event) {
@@ -1866,27 +1838,6 @@ export default class ManualTagging extends Component {
         this.setState({
             [parameterName]: value
         })
-    }
-    getConvertedQATShipmentQty = () => {
-        var conversionFactor = document.getElementById("conversionFactor").value;
-        conversionFactor = conversionFactor.replace("-", "")
-        var beforeDecimal = 10;
-        var afterDecimal = 4;
-        conversionFactor = conversionFactor.replace(/[^\d.]/g, '')
-            .replace(new RegExp("(^[\\d]{" + beforeDecimal + "})[\\d]", "g"), '$1')
-            .replace(/(\..*)\./g, '$1')
-            .replace(new RegExp("(\\.[\\d]{" + afterDecimal + "}).", "g"), '$1');
-        var erpShipmentQty = document.getElementById("erpShipmentQty").value;
-        if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
-            var result = erpShipmentQty * conversionFactor;
-            document.getElementById("convertedQATShipmentQty").value = result.toFixed(2);
-            this.setState({
-                conversionFactorEntered: true
-            })
-        } else {
-            this.setState({ conversionFactorEntered: false })
-        }
-        document.getElementById("conversionFactor").value = conversionFactor;
     }
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
@@ -4085,13 +4036,6 @@ export default class ManualTagging extends Component {
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
-        } else {
-            return "";
-        }
-    }
-    formatLabelHistory(cell, row) {
-        if (cell != null && cell != "") {
-            return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
         }

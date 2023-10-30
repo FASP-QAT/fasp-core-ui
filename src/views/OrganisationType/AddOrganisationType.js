@@ -65,7 +65,6 @@ export default class AddOrganisationTypeComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     dataChange(event) {
         let { organisationType } = this.state
@@ -165,11 +164,6 @@ export default class AddOrganisationTypeComponent extends Component {
                 () => {
                 })
         }
-    }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     Capitalize(str) {
         this.state.organisationType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)

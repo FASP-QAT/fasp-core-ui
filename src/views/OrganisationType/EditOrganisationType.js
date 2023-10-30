@@ -73,15 +73,7 @@ export default class EditOrganisationTypeComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-    }
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
     }
     hideSecondComponent() {
         setTimeout(function () {

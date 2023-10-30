@@ -47,8 +47,6 @@ export default class ShipmentLinkingNotifications extends Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.programChange = this.programChange.bind(this);
         this.changed = this.changed.bind(this);
-        this.onPaste = this.onPaste.bind(this);
-        this.checkValidation = this.checkValidation.bind(this);
         this.updateDetails = this.updateDetails.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.filterData1 = this.filterData1.bind(this);
@@ -56,29 +54,10 @@ export default class ShipmentLinkingNotifications extends Component {
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
         this.getNotificationSummary = this.getNotificationSummary.bind(this);
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
-        this.viewBatchData = this.viewBatchData.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
         this.selectedForNotification = this.selectedForNotification.bind(this)
         this.loaded = this.loaded.bind(this);
         this.loaded1 = this.loaded1.bind(this);
         this.selected = this.selected.bind(this);
-    }
-    viewBatchData(event, row) {
-        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
-            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-            batchDetails.sort(function (a, b) {
-                var dateA = new Date(a.expiryDate).getTime();
-                var dateB = new Date(b.expiryDate).getTime();
-                return dateA > dateB ? 1 : -1;
-            })
-            this.setState({
-                batchDetails
-            });
-        } else {
-            this.setState({
-                batchDetails: []
-            });
-        }
     }
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
@@ -199,42 +178,6 @@ export default class ShipmentLinkingNotifications extends Component {
                 );
         }
     }
-    checkValidation = function () {
-        var valid = true;
-        var json = this.el.getJson(null, false);
-        for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(13, y);
-            if (parseInt(value) == 1 && this.el.getValueFromCoords(0, y) == true) {
-                var col = ("K").concat(parseInt(y) + 1);
-                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                value = value.replace(/,/g, "");
-                var notificationType = this.el.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (notificationType == 2) {
-                    if (value == "") {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        if (!(reg.test(value))) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        return valid;
-    }
     changed = function (instance, cell, x, y, value) {
         if (x == 0) {
             this.el.setValueFromCoords(19, y, 1, true);
@@ -244,24 +187,6 @@ export default class ShipmentLinkingNotifications extends Component {
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance;
-        var rowData = elInstance.getRowData(y);
-        if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
-        }
-        elInstance.setValueFromCoords(13, y, 1, true);
-    }
-    onPaste(instance, data) {
-        if (data.length == 1 && Object.keys(data[0])[2] == "value") {
-            (instance).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
-        }
-        else {
-            for (var i = 0; i < data.length; i++) {
-                (instance).setValueFromCoords(13, data[i].y, 1, true);
-            }
-        }
-    }
     programChange(event) {
         if (event.target.value != -1) {
             localStorage.setItem("sesProgramId", event.target.value);
@@ -1200,42 +1125,6 @@ export default class ShipmentLinkingNotifications extends Component {
             })
         }
     }
-    formatDate(cell, row) {
-        if (cell != null && cell != "") {
-            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
-            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            return dateMonthAsWord.toUpperCase();
-        } else {
-            return "";
-        }
-    }
-    formatExpiryDate(cell, row) {
-        if (cell != null && cell != "") {
-            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
-            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP_WITHOUT_DATE}`);
-            return dateMonthAsWord;
-        } else {
-            return "";
-        }
-    }
-    addCommas(cell, row) {
-        cell += '';
-        var x = cell.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    formatLabel(cell, row) {
-        if (cell != null && cell != "") {
-            return getLabelText(cell.label, 'en');
-        } else {
-            return "";
-        }
-    }
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1273,123 +1162,6 @@ export default class ShipmentLinkingNotifications extends Component {
                 text: 'All', value: this.state.artmisHistory.length
             }]
         }
-        const columns1 = [
-            {
-                dataField: 'procurementAgentOrderNo',
-                text: i18n.t('static.mt.roNoAndRoLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'planningUnitName',
-                text: i18n.t('static.manualTagging.erpPlanningUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'expectedDeliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'status',
-                text: i18n.t('static.manualTagging.erpStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'qty',
-                text: i18n.t('static.manualTagging.erpShipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'cost',
-                text: i18n.t('static.shipment.totalCost'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'dataReceivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'changeCode',
-                text: i18n.t('static.manualTagging.changeCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-        ];
-        const columns2 = [
-            {
-                dataField: 'procurementAgentShipmentNo',
-                text: i18n.t('static.mt.roNoAndRoLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'deliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'batchNo',
-                text: i18n.t('static.supplyPlan.batchId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'expiryDate',
-                text: i18n.t('static.supplyPlan.expiryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatExpiryDate
-            },
-            {
-                dataField: 'qty',
-                text: i18n.t('static.supplyPlan.shipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'dataReceivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'changeCode',
-                text: i18n.t('static.manualTagging.changeCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-        ];
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (

@@ -95,7 +95,6 @@ export default class AddOrganisationComponent extends Component {
         this.getRealmCountryList = this.getRealmCountryList.bind(this);
         this.getOrganisationTypeByRealmId = this.getOrganisationTypeByRealmId.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
     getDisplayName() {
@@ -359,11 +358,6 @@ export default class AddOrganisationComponent extends Component {
                     this.getOrganisationTypeByRealmId();
                 })
         }
-    }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     updateFieldData(value) {
         var selectedArray = [];

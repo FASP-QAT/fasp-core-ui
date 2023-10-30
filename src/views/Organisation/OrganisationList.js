@@ -27,7 +27,6 @@ export default class OrganisationListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editOrganisation = this.editOrganisation.bind(this);
         this.addOrganisation = this.addOrganisation.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -269,9 +268,6 @@ export default class OrganisationListComponent extends Component {
                 }
             );
     }
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -346,13 +342,6 @@ export default class OrganisationListComponent extends Component {
                 </Card>
             </div>
         );
-    }
-    editOrganisation(organisation) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
-            this.props.history.push({
-                pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
-            });
-        }
     }
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
