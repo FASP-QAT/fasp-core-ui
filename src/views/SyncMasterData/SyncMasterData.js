@@ -15,7 +15,7 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
-import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero, decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { generateRandomAplhaNumericCode, paddingZero, decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 export default class SyncMasterData extends Component {
@@ -175,7 +175,7 @@ export default class SyncMasterData extends Component {
                     MasterSyncService.getNewShipmentSyncApi(jsonForNewShipmentSync).then(shipmentSyncResponse => {
                         for (var i = 0; i < programList.length; i++) {
                             AuthenticationService.setupAxiosInterceptors();
-                            if (isSiteOnline) {
+                            if (localStorage.getItem("sessionType") === 'Online') {
                                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                                     .then(response => {
                                         if (response.status == 200) {
@@ -752,7 +752,7 @@ export default class SyncMasterData extends Component {
     }
     syncMasters() {
         this.setState({ loading: false })
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             var db1;
             var storeOS;
             getDatabase();
@@ -848,7 +848,7 @@ export default class SyncMasterData extends Component {
                                         })
                                         if (validation) {
                                             AuthenticationService.setupAxiosInterceptors();
-                                            if (isSiteOnline() && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                                            if (localStorage.getItem("sessionType") === 'Online' && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
                                                 MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
                                                     .then(response => {
                                                         if (response.status == 200) {

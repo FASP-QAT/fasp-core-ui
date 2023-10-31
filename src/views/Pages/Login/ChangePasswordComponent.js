@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import { API_URL, SECRET_KEY } from '../../../Constants.js';
 import UserService from '../../../api/UserService';
 import i18n from '../../../i18n';
@@ -124,7 +123,7 @@ class ChangePasswordComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    if (isSiteOnline()) {
+                                    if (localStorage.getItem("sessionType") === 'Online') {
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
                                                 localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));

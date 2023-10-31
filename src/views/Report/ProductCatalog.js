@@ -17,7 +17,6 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -195,7 +194,7 @@ class ProductCatalog extends Component {
     getTracerCategoryList() {
         var programId = document.getElementById('programId').value;
         if (programId > 0) {
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 DropdownService.getTracerCategoryForMultipleProgramsDropdownList([programId]).then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -318,7 +317,7 @@ class ProductCatalog extends Component {
     }
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
                     var listArray = response.data;
@@ -463,7 +462,7 @@ class ProductCatalog extends Component {
         let programId = document.getElementById("programId").value
         if (programId > 0) {
             let realmId = AuthenticationService.getRealmId();
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
                         var list = response.data;
@@ -686,7 +685,7 @@ class ProductCatalog extends Component {
             this.setState({
                 programId: programId
             })
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 this.setState({ loading: true })
                 ReportService.programProductCatalog(json)
                     .then(response => {

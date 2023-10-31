@@ -19,7 +19,6 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -1512,7 +1511,7 @@ class ForecastSummary extends Component {
         })
     }
     getPrograms() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
                 .then(response => {
@@ -1837,7 +1836,7 @@ class ForecastSummary extends Component {
         if (programId != 0) {
             const program = this.state.programs.filter(c => c.id == programId)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
                         .then(response => {
                             this.setState({

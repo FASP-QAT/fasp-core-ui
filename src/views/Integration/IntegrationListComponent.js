@@ -5,7 +5,6 @@ import { Card, CardBody } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import IntegrationService from '../../api/IntegrationService.js';
@@ -181,7 +180,7 @@ export default class IntegrationListComponent extends Component {
         }
     }.bind(this);
     addNewIntegration() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/integration/addIntegration`)
         } else {
             alert("You must be Online.")

@@ -22,7 +22,6 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import {
   jExcelLoadedFunction
 } from "../../CommonComponent/JExcelCommonFunctions.js";
-import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import MonthBox from "../../CommonComponent/MonthBox.js";
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -120,7 +119,7 @@ class ProcurementAgentExport extends Component {
   };
   getPrograms = () => {
     this.setState({ loading: true });
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then((response) => {
@@ -281,7 +280,7 @@ class ProcurementAgentExport extends Component {
   getProcurementAgent = () => {
     let programId = document.getElementById("programId").value;
     this.setState({ loading: true });
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       var programJson = [programId];
       DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(
         programJson
@@ -441,7 +440,7 @@ class ProcurementAgentExport extends Component {
         (c) => c.programId == programId
       );
       if (program.length == 1) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
           this.setState(
             {
               versions: [],
@@ -2665,7 +2664,7 @@ class ProcurementAgentExport extends Component {
   }
   getFundingSource = () => {
     this.setState({ loading: true });
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       FundingSourceService.getFundingSourceListAll()
         .then((response) => {
           this.setState(

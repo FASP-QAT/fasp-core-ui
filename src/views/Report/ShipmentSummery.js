@@ -26,7 +26,6 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions.js";
-import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import MonthBox from "../../CommonComponent/MonthBox.js";
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -673,7 +672,7 @@ class ShipmentSummery extends Component {
   };
   getFundingSourceList() {
     const { fundingSources } = this.state;
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       DropdownService.getFundingSourceDropdownList()
         .then((response) => {
           var listArray = response.data;
@@ -768,7 +767,7 @@ class ShipmentSummery extends Component {
     const { budgets } = this.state;
     var programId = localStorage.getItem("sesProgramIdReport");
     if(this.state.programId!="" && this.state.programId!=0 && programId!=""){
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       DropdownService.getBudgetDropdownBasedOnProgram(programId)
         .then((response) => {
           var listArray = response.data;
@@ -1241,7 +1240,7 @@ class ShipmentSummery extends Component {
     }
   };
   getPrograms = () => {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then((response) => {
@@ -1406,7 +1405,7 @@ class ShipmentSummery extends Component {
         (c) => c.programId == programId
       );
       if (program.length == 1) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
           this.setState(
             {
               versions: [],

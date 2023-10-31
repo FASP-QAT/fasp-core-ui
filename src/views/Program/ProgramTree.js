@@ -16,7 +16,7 @@ import {
     Row
 } from 'reactstrap';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { decompressJson, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
@@ -128,7 +128,7 @@ class Program extends Component {
             );
     }
     checkNewerVersions(programs) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
                     localStorage.removeItem("sesLatestProgram");
@@ -813,7 +813,7 @@ class Program extends Component {
         }
         else {
             var programThenCount = 0;
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
                         response.data = decompressJson(response.data);

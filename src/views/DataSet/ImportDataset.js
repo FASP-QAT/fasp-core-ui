@@ -19,7 +19,6 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText.js';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
@@ -124,7 +123,7 @@ export default class ImportDataset extends Component {
         }.bind(this)
     }
     checkNewerVersions(programs) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
                     localStorage.removeItem("sesLatestDataset");

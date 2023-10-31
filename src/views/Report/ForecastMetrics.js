@@ -18,7 +18,6 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -689,7 +688,7 @@ class ForecastMetrics extends Component {
     }
   }
   getCountrys() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {

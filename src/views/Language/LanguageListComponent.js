@@ -8,7 +8,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
@@ -42,7 +41,7 @@ export default class LanguageListComponent extends Component {
         }, 30000);
     }
     addLanguage() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/language/addLanguage`)
         } else {
             alert(i18n.t('static.common.online'))

@@ -7,7 +7,6 @@ import { Card, CardBody } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import PipelineService from '../../api/PipelineService';
@@ -181,7 +180,7 @@ export default class PipelineProgramList extends Component {
         });
     }
     importNewProgram() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/pipeline/pipelineProgramImport`)
         } else {
             alert("You must be Online.")

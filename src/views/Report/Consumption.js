@@ -17,7 +17,6 @@ import {
   Table
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -82,7 +81,7 @@ class Consumption extends Component {
   storeProduct() {
     let productId = document.getElementById("planningUnitId").value;
     if (productId != 0) {
-      if (isSiteOnline()) {
+      if (localStorage.getItem("sessionType") === 'Online') {
         RealmService.getRealmListAll()
           .then(response => {
             if (response.status == 200) {
@@ -252,7 +251,7 @@ class Consumption extends Component {
     csvRow.push('')
     csvRow.push('')
     var re;
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       re = this.state.consumptions
     } else {
       re = this.state.offlineConsumptionList
@@ -262,7 +261,7 @@ class Consumption extends Component {
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -362,13 +361,13 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = isSiteOnline() ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = localStorage.getItem("sessionType") === 'Online' ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
     let head = [];
     let head1 = [];
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -605,7 +604,7 @@ class Consumption extends Component {
     }
   }
   getPrograms() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
@@ -848,7 +847,7 @@ class Consumption extends Component {
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       if (program.length == 1) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
           this.setState({
             versions: [],
             planningUnits: [],
@@ -1155,7 +1154,7 @@ class Consumption extends Component {
       }
     }
     let bar = "";
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       bar = {
         labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
@@ -1189,7 +1188,7 @@ class Consumption extends Component {
         ],
       }
     }
-    if (!isSiteOnline()) {
+    if (!localStorage.getItem("sessionType") === 'Online') {
       bar = {
         labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [

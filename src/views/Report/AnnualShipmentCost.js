@@ -14,7 +14,6 @@ import {
     Label
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -330,7 +329,7 @@ class AnnualShipmentCost extends Component {
         })
     }
     getPrograms() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
@@ -741,7 +740,7 @@ class AnnualShipmentCost extends Component {
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -976,7 +975,7 @@ class AnnualShipmentCost extends Component {
     }
     getFundingSourceList() {
         const { fundingSources } = this.state
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     var listArray = response.data;
@@ -1048,7 +1047,7 @@ class AnnualShipmentCost extends Component {
     getProcurementAgentList() {
         const { procurementAgents } = this.state
         let programId = document.getElementById("programId").value;
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             var programJson = [programId]
             DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
@@ -1122,7 +1121,7 @@ class AnnualShipmentCost extends Component {
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     var listArray = response.data;

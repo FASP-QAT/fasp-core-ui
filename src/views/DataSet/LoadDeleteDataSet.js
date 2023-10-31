@@ -16,7 +16,7 @@ import {
     Row
 } from 'reactstrap';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { decompressJson, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import DatasetService from "../../api/DatasetService";
@@ -146,7 +146,7 @@ class LoadDeleteDataSet extends Component {
             );
     }
     checkNewerVersions(programs) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
@@ -775,7 +775,7 @@ class LoadDeleteDataSet extends Component {
                 } else {
                     var programThenCount = 0;
                     var continueToLoad = 0;
-                    if (isSiteOnline()) {
+                    if (localStorage.getItem("sessionType") === 'Online') {
                         var checkboxesCheckedProgram = checkboxesChecked.filter(c => c.versionId == -1);
                         var checkboxesCheckedVersion = checkboxesChecked.filter(c => c.versionId != -1);
                         var versionsThatNeedsToBeDeleted = [];

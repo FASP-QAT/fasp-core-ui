@@ -19,7 +19,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants
 import MasterSyncService from '../../api/MasterSyncService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { decompressJson, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 export default class SyncMasterDataForTree extends Component {
     constructor(props) {
         super(props);
@@ -100,7 +100,7 @@ export default class SyncMasterDataForTree extends Component {
     }
     syncMasters() {
         this.setState({ loading: false })
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             var db1;
             var storeOS;
             getDatabase();
@@ -126,7 +126,7 @@ export default class SyncMasterDataForTree extends Component {
                         pIds.push(program.programId);
                     });
                     AuthenticationService.setupAxiosInterceptors();
-                    if (isSiteOnline() && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                    if (localStorage.getItem("sessionType") === 'Online' && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
                         MasterSyncService.getSyncAllMastersForProgram(updatedSyncDate, pIds)
                             .then(response => {
                                 if (response.status == 200) {
