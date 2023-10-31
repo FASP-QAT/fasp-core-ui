@@ -4130,17 +4130,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               //  {
                               //   name: i18n.t('static.report.forecasterrorovertime'),
                               //   url: '/report/forecastOverTheTime',
