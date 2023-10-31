@@ -19,7 +19,7 @@ import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listIm
 import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
 import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -276,6 +276,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        changed(instance, cell, x, y, value)
         if (x == 2) {
             let supplyPlanPlanningUnitId = this.el.getValueFromCoords(2, y);
             if (supplyPlanPlanningUnitId != -1 && supplyPlanPlanningUnitId != null && supplyPlanPlanningUnitId != '') {
@@ -288,24 +289,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             } else {
                 this.el.setValueFromCoords(3, y, '', true);
             }
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
         }
-        if (x == 3) {
+        else if (x == 3) {
             let supplyPlanUnitId = this.el.getValueFromCoords(2, y);
             var col = ("D").concat(parseInt(y) + 1);
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -684,7 +669,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
-                    filter: this.filterPlanningUnitBasedOnTracerCategory
+                    filter: this.filterPlanningUnitBasedOnTracerCategory,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 },
                 {
                     title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
@@ -963,23 +953,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(2, y);
             if (value != -1 && value != -2 && value != -3) {
-                var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                valid = checkValidation(this.el);
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 var reg = /^\d{1,6}(\.\d{1,6})?$/;

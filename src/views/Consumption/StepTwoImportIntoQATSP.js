@@ -13,7 +13,7 @@ import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listIm
 import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html';
 import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
 import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -76,27 +76,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        for (var y = 0; y < json.length; y++) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        valid = checkValidation(this.el);
         return valid;
     }
     changed = function (instance, cell, x, y, value) {
@@ -107,24 +87,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             } else {
                 this.el.setValueFromCoords(2, y, '', true);
             }
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
         }
-        if (x == 2) {
+        else if (x == 2) {
             let supplyPlanRegionId = this.el.getValueFromCoords(3, y);
             var col = ("C").concat(parseInt(y) + 1);
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -268,6 +232,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     title: i18n.t('static.QATForecastImport.SPRegion'),
                     type: 'autocomplete',
                     source: this.state.supplyPlanRegionListJExcel,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 }
             ],
             updateTable: function (el, cell, x, y, source, value, id) {

@@ -803,7 +803,10 @@ class usageTemplate extends Component {
                     textEditor: true, 
                     required: true,
                     number: true,
-                    minValue: 0,
+                    minValue: {
+                        value: 0,
+                        text: i18n.t('static.planningUnitSetting.negativeValueNotAllowed')
+                    },
                     regex: {
                         ex: INTEGER_NO_REGEX,
                         text: i18n.t('static.common.onlyIntegers'),
@@ -850,7 +853,10 @@ class usageTemplate extends Component {
                     textEditor: true, 
                     required: true,
                     number: true,
-                    minValue: 0,
+                    minValue: {
+                        value: 0,
+                        text: i18n.t('static.planningUnitSetting.negativeValueNotAllowed')
+                    },
                     regex: {
                         ex: DECIMAL_NO_REGEX,
                         text: i18n.t('static.common.onlyIntegers')
