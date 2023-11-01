@@ -400,8 +400,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             extrapolationMethodRequest.onsuccess = function (event) {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetTransaction = transaction.objectStore('datasetData');
+                let forecastProgramVersionId = this.props.items.forecastProgramVersionId;
+                let forecastProgramId = this.props.items.forecastProgramId;
+                var datasetId=this.props.items.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0].id;
                 // console.log("dataset", this.state.datasetId)
-                var datasetRequest = datasetTransaction.get(this.props.items.datasetList[0].id);
+                var datasetRequest = datasetTransaction.get(datasetId);
                 datasetRequest.onerror = function (event) {
                 }.bind(this);
                 datasetRequest.onsuccess = function (event) {
