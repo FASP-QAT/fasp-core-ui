@@ -2588,8 +2588,8 @@ class ForecastSummary extends Component {
                         forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                         // rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
                         rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
-                        startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                        endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                        startDateDisplay: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")),
+                        endDateDisplay: months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                         beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
                         freightPerc: Number(selectedForecastProgram.currentVersion.freightPerc)
                     }, () => {
@@ -2654,8 +2654,8 @@ class ForecastSummary extends Component {
                 this.setState({
                     forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                     rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
-                    startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                    endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    startDateDisplay: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")),
+                    endDateDisplay: months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
                 }, () => {
 
