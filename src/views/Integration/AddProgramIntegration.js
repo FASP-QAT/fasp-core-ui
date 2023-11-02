@@ -168,7 +168,6 @@ class ProgramIntegration extends Component {
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
                                                     jexcel.destroy(document.getElementById("paputableDiv"), true);
-                                                    var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
@@ -581,7 +580,6 @@ class ProgramIntegration extends Component {
             );
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.program.label.label_en;
         data[1] = "";

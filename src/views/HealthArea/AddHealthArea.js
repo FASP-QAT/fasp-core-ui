@@ -453,7 +453,6 @@ export default class AddHealthAreaComponent extends Component {
     this.state.healthArea.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
   }
   render() {
-    const { countries } = this.state;
     const { realms } = this.state;
     let realmList = realms.length > 0
       && realms.map((item, i) => {

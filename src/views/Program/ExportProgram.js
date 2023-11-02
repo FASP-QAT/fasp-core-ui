@@ -88,8 +88,6 @@ export default class ExportProgram extends Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < json.length; i++) {
-                    var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
-                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     var bytes1 = CryptoJS.AES.decrypt(json[i].programData.generalData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);

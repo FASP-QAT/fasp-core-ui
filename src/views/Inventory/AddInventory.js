@@ -398,7 +398,6 @@ export default class AddInventory extends Component {
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
                 var db1;
-                var storeOS;
                 var regionList = [];
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -436,7 +435,6 @@ export default class AddInventory extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),

@@ -108,7 +108,6 @@ export default class ConsumptionDetails extends React.Component {
             var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = [];
-            var shipStatusList = []
             getRequest.onerror = function (event) {
             };
             getRequest.onsuccess = function (event) {
@@ -199,7 +198,6 @@ export default class ConsumptionDetails extends React.Component {
                         this.setState({
                             problemCategoryList: procList
                         })
-                        var needToCalculate = this.props.match.params.calculate;
                         var programIdd = this.props.match.params.programId;
                         if (programIdd != '' && programIdd != undefined) {
                             this.setState({
@@ -329,7 +327,6 @@ export default class ConsumptionDetails extends React.Component {
             var isDataValid = this.checkValidation();
             if (isDataValid == true) {
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -500,7 +497,6 @@ export default class ConsumptionDetails extends React.Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = problemArray;
         var qplEditable = this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly;
         var options = {
@@ -780,10 +776,6 @@ export default class ConsumptionDetails extends React.Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        const title = i18n.t('static.report.qatProblemActionReport');
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
         const headers = [];
         headers.push(i18n.t('static.planningunit.planningunit'));
         headers.push(i18n.t('static.problemActionReport.problemCategory'));
@@ -858,7 +850,6 @@ export default class ConsumptionDetails extends React.Component {
             var colArr = ['U']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
-            var problemStatusId = rowData[12];
             if (criticalityId == 3) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
@@ -943,9 +934,6 @@ export default class ConsumptionDetails extends React.Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                var procurementAgentList = [];
-                var fundingSourceList = [];
-                var budgetList = [];
                 openRequest.onerror = function (event) {
                     this.setState({ loading: false });
                 };
@@ -1062,7 +1050,6 @@ export default class ConsumptionDetails extends React.Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
             && programList.map((item, i) => {
@@ -1082,32 +1069,7 @@ export default class ConsumptionDetails extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.data.length
-            }]
-        }
+        
         const columnsTrans = [
             {
                 dataField: 'problemStatus.label',

@@ -956,7 +956,6 @@ export default class syncPage extends Component {
   generateDataAfterResolveConflictsForQPL() {
     this.setState({ loading: true });
     var db1;
-    var storeOS;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
@@ -971,7 +970,6 @@ export default class syncPage extends Component {
       if (actionList == undefined) {
         actionList = []
       }
-      var planningUnitList = [];
       var consumptionData = (this.state.oldProgramDataConsumption).filter(c => c.consumptionId != 0);
       var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
       var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
@@ -1164,12 +1162,10 @@ export default class syncPage extends Component {
       programJson.actionList = actionList;
       programJson.shipmentLinkingList = linkedShipmentListLocal.filter(c => (c.shipmentLinkingId > 0) || (c.shipmentLinkingId == 0 && c.active == true));
       var planningUnitDataListFromState = this.state.planningUnitDataList;
-      var updatedJson = [];
       var consumptionList = programJson.consumptionList;
       var inventoryList = programJson.inventoryList;
       var shipmentList = programJson.shipmentList;
       var batchInfoList = programJson.batchInfoList;
-      var problemReportList = programJson.problemReportList;
       var supplyPlan = programJson.supplyPlan;
       var generalData = programJson;
       delete generalData.consumptionList;
@@ -1473,7 +1469,6 @@ export default class syncPage extends Component {
                 response.data = decompressJson(response.data);
                 AuthenticationService.setupAxiosInterceptors();
                 var db1;
-                var storeOS;
                 var realmCountryPlanningUnitList = []
                 var dataSourceList = []
                 var planningUnitList = []
@@ -1482,7 +1477,6 @@ export default class syncPage extends Component {
                 var fundingSourceList = []
                 var budgetList = []
                 var currencyList = []
-                var currencyListAll = []
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
@@ -2250,7 +2244,6 @@ export default class syncPage extends Component {
                                                 var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
                                                 var arr = [];
                                                 var arr1 = [];
-                                                var arr2 = [];
                                                 var arrDownloaded = [];
                                                 if (listFromAPIFiltered.length > 0) {
                                                 } else {
@@ -3815,7 +3808,6 @@ export default class syncPage extends Component {
         this.setState({ loading: false });
       } else {
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -3839,8 +3831,6 @@ export default class syncPage extends Component {
             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
             programQPLDetailsGetRequest.onsuccess = function (event) {
               var programQPLDetails = programQPLDetailsGetRequest.result;
-              var programIdForNotification = programQPLDetails.programId;
-              var versionIdForNotification = programQPLDetails.version;
               var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
               var generalJson = JSON.parse(generalData);
@@ -4105,7 +4095,6 @@ export default class syncPage extends Component {
           var inventoryList = json[r].inventoryList;
           var shipmentList = json[r].shipmentList;
           var batchInfoList = json[r].batchInfoList;
-          var problemReportList = json[r].problemReportList;
           var supplyPlan = json[r].supplyPlan;
           var generalData = json[r];
           delete generalData.consumptionList;
@@ -4168,7 +4157,7 @@ export default class syncPage extends Component {
               if (checkIfProgramExists.length > 0) {
                 programIdToDelete = checkIfProgramExists[0].id;
               }
-              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+              programDataOs1.delete(checkIfProgramExists[0].id);
             }
             programDataTransaction1.oncomplete = function (event) {
               var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
@@ -4179,7 +4168,7 @@ export default class syncPage extends Component {
                 if (checkIfProgramExists.length > 0) {
                   programIdToDelete = checkIfProgramExists[0].id;
                 }
-                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
+                programDataOs3.delete(checkIfProgramExists[0].id);
               }
               programDataTransaction3.oncomplete = function (event) {
                 var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -4190,7 +4179,7 @@ export default class syncPage extends Component {
                   if (checkIfProgramExists.length > 0) {
                     programIdToDelete = checkIfProgramExists[0].id;
                   }
-                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                  programDataOs2.delete(checkIfProgramExists[0].id);
                 }
                 programDataTransaction2.oncomplete = function (event) {
                   var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
@@ -4213,7 +4202,7 @@ export default class syncPage extends Component {
                       programCode: json[r].programCode,
                     };
                     programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
-                    var putRequest = programSaveData.put(item);
+                    programSaveData.put(item);
                   }
                   transactionForSavingData.oncomplete = function (event) {
                     var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -4233,7 +4222,7 @@ export default class syncPage extends Component {
                         programData: updatedJson[r],
                         userId: userId
                       };
-                      var putRequest = downloadedProgramSaveData.put(item);
+                      downloadedProgramSaveData.put(item);
                     }
                     transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                       var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
@@ -4252,7 +4241,7 @@ export default class syncPage extends Component {
                           readonly: 0
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                        programQPLDetailsOs.put(programQPLDetailsJson);
                       }
                       programQPLDetailsTransaction.oncomplete = function (event) {
                         this.setState({

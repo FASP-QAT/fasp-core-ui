@@ -648,7 +648,6 @@ class EditUserComponent extends Component {
     }
   }.bind(this);
   filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var mylist = [];
     var value = this.state.addUserEL.getJson(null, false)[r][1];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
     var proList = [];
@@ -809,7 +808,6 @@ class EditUserComponent extends Component {
     }
     this.el = jexcel(document.getElementById("paputableDiv"), "");
     jexcel.destroy(document.getElementById("paputableDiv"), true);
-    var json = [];
     var data = papuDataArr;
     var options = {
       data: data,
@@ -1310,17 +1308,7 @@ class EditUserComponent extends Component {
       Show: " ",
       entries: " ",
     });
-    const { realms } = this.state;
     const { languages } = this.state;
-    let realmList =
-      realms.length > 0 &&
-      realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        );
-      }, this);
     let languageList =
       languages.length > 0 &&
       languages.map((item, i) => {

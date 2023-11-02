@@ -1,12 +1,9 @@
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
 import {
-  Button,
   ButtonGroup,
   Card,
   CardBody,
@@ -447,7 +444,6 @@ class ApplicationDashboard extends Component {
     }
     const activeTab1 = defaultModuleId;
     const { activeIndex } = this.state;
-    const { activeIndexProgram } = this.state;
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">

@@ -203,7 +203,6 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedProgramList = () => {
-    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -226,11 +225,6 @@ class ProcurementAgentExport extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -247,7 +241,6 @@ class ProcurementAgentExport extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -372,7 +365,6 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedProcurementAgentList = () => {
-    const lan = "en";
     const { procurementAgents } = this.state;
     var proList = procurementAgents;
     let programId = document.getElementById("programId").value;
@@ -544,7 +536,6 @@ class ProcurementAgentExport extends Component {
     this.fetchData();
   };
   consolidatedVersionList = (programId) => {
-    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -570,11 +561,6 @@ class ProcurementAgentExport extends Component {
             myResult[i].userId == userId &&
             myResult[i].programId == programId
           ) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -652,9 +638,7 @@ class ProcurementAgentExport extends Component {
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
-            const lan = "en";
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -670,7 +654,6 @@ class ProcurementAgentExport extends Component {
                 "programPlanningUnit"
               );
               var planningunitRequest = planningunitOs.getAll();
-              var planningList = [];
               planningunitRequest.onerror = function (event) {
               };
               planningunitRequest.onsuccess = function (e) {
@@ -1327,7 +1310,6 @@ class ProcurementAgentExport extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
     jexcel.destroy(document.getElementById("tableDiv"), true);
-    var json = [];
     var data = shipmentCostArray;
     let obj1 = {};
     let obj2 = {};
@@ -1477,10 +1459,8 @@ class ProcurementAgentExport extends Component {
             (ele) => ele.value
           );
           var db1;
-          var storeOS;
           getDatabase();
           this.setState({ loading: true });
-          var regionList = [];
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
             this.setState({
@@ -1679,7 +1659,6 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
-                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -1872,9 +1851,7 @@ class ProcurementAgentExport extends Component {
             (ele) => ele.value
           );
           var db1;
-          var storeOS;
           getDatabase();
-          var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
@@ -2055,7 +2032,6 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
-                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -2248,9 +2224,7 @@ class ProcurementAgentExport extends Component {
             (ele) => ele.value
           );
           var db1;
-          var storeOS;
           getDatabase();
-          var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
@@ -2399,7 +2373,6 @@ class ProcurementAgentExport extends Component {
                   );
                   var qty = 0;
                   var productCost = 0;
-                  var freightPerc = 0;
                   var freightCost = 0;
                   var totalCost = 0;
                   for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
@@ -2738,7 +2711,6 @@ class ProcurementAgentExport extends Component {
     }
   };
   consolidatedFundingSourceList = () => {
-    const lan = "en";
     const { fundingSources } = this.state;
     var proList = fundingSources;
     var db1;
@@ -2758,7 +2730,6 @@ class ProcurementAgentExport extends Component {
           localStorage.getItem("curUser"),
           SECRET_KEY
         );
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           var f = 0;
           for (var k = 0; k < this.state.fundingSources.length; k++) {
@@ -2872,38 +2843,7 @@ class ProcurementAgentExport extends Component {
         text: i18n.t("static.report.totalCost"),
       },
     ];
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t("static.common.first"),
-      prePageText: i18n.t("static.common.back"),
-      nextPageText: i18n.t("static.common.next"),
-      lastPageText: i18n.t("static.common.last"),
-      nextPageTitle: i18n.t("static.common.firstPage"),
-      prePageTitle: i18n.t("static.common.prevPage"),
-      firstPageTitle: i18n.t("static.common.nextPage"),
-      lastPageTitle: i18n.t("static.common.lastPage"),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [
-        {
-          text: "10",
-          value: 10,
-        },
-        {
-          text: "30",
-          value: 30,
-        },
-        {
-          text: "50",
-          value: 50,
-        },
-        {
-          text: "All",
-          value: this.state.selRegion.length,
-        },
-      ],
-    };
+    
     const checkOnline = localStorage.getItem("sessionType");
     return (
       <div className="animated">

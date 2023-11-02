@@ -773,7 +773,6 @@ class LoadDeleteDataSet extends Component {
                             this.hideFirstComponent();
                         })
                 } else {
-                    var programThenCount = 0;
                     var continueToLoad = 0;
                     if (isSiteOnline()) {
                         var checkboxesCheckedProgram = checkboxesChecked.filter(c => c.versionId == -1);
@@ -862,7 +861,7 @@ class LoadDeleteDataSet extends Component {
                                                     userId: userId,
                                                     programCode: json[r].programCode,
                                                 };
-                                                var putRequest = programSaveData.put(item);
+                                                programSaveData.put(item);
                                             }
                                             transactionForSavingData.oncomplete = function (event) {
                                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
@@ -879,7 +878,7 @@ class LoadDeleteDataSet extends Component {
                                                         readonly: 0
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                    programQPLDetailsOs.put(programQPLDetailsJson);
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
                                                     this.setState({

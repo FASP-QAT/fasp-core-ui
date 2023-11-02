@@ -48,7 +48,6 @@ export default class QunatimedImportStepTwo extends Component {
             loading: true
         })
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -56,7 +55,6 @@ export default class QunatimedImportStepTwo extends Component {
             var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('planningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
             planningunitRequest.onerror = function (event) {
             };
             planningunitRequest.onsuccess = function (e) {
@@ -102,7 +100,6 @@ export default class QunatimedImportStepTwo extends Component {
                 }
             }
             var col = ("C").concat(parseInt(y) + 1);
-            var col_E = ("E").concat(parseInt(y) + 1);
             var cf = "";
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -182,7 +179,6 @@ export default class QunatimedImportStepTwo extends Component {
     }
     checkDuplicateCountry = function () {
         var tableJson = this.el.getJson(null, false);
-        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[2]]).sort().sort((a, b) => {
@@ -209,7 +205,6 @@ export default class QunatimedImportStepTwo extends Component {
                 loading: true
             })
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -217,7 +212,6 @@ export default class QunatimedImportStepTwo extends Component {
                 var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('planningUnit');
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
                 planningunitRequest.onerror = function (event) {
                 };
                 planningunitRequest.onsuccess = function (e) {
@@ -264,13 +258,8 @@ export default class QunatimedImportStepTwo extends Component {
             loading: true
         })
         var value = this.props.items.program.programId;
-        var programFile = this.props.items.program.filename;
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
-        var dataSourceList = [];
-        var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({

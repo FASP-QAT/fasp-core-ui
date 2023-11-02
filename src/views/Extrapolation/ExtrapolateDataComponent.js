@@ -1079,7 +1079,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 loading: true
             })
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
@@ -1108,21 +1107,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var datasetJson = JSON.parse(datasetData);
                         var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId || (c.planningUnit.id == this.state.planningUnitId && c.region.id != this.state.regionId));
-                        var consumptionExtrapolationData = -1
-                        var consumptionExtrapolationMovingData = -1
-                        var consumptionExtrapolationRegression = -1
-                        var consumptionExtrapolationTESL = -1
-                        var consumptionExtrapolationTESM = -1
-                        var consumptionExtrapolationTESH = -1
-                        var tesData = this.state.tesData;
-                        var arimaData = this.state.arimaData;
-                        var CI = this.state.CI;
                         var rangeValue = this.state.rangeValue1;
                         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                        var inputDataFilter = this.state.semiAvgData;
-                        var inputDataAverageFilter = this.state.movingAvgData;
-                        var inputDataRegressionFilter = this.state.linearRegressionData;
                         var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                         var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
                         var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
@@ -1392,12 +1379,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
-                var consumptionExtrapolationRegressionL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 10)
-                var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 1)
                 var consumptionExtrapolationTESM = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 2)
-                var consumptionExtrapolationTESH = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 3)
                 var consumptionExtrapolationArima = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 4)
-                var consumptionExtrapolationArimaL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 8)
                 if (consumptionExtrapolationMovingData.length > 0) {
                     if (consumptionExtrapolationMovingData[0].jsonProperties.startDate != undefined) {
                         startDate1 = consumptionExtrapolationMovingData[0].jsonProperties.startDate;

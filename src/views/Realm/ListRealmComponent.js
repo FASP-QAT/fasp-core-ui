@@ -78,7 +78,6 @@ export default class ReactListComponent extends Component {
                         }
                         this.el = jexcel(document.getElementById("tableDiv"), '');
                         jexcel.destroy(document.getElementById("tableDiv"), true);
-                        var json = [];
                         var data = realmArray;
                         var options = {
                             data: data,

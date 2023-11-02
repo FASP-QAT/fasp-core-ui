@@ -99,7 +99,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
@@ -1031,7 +1030,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
         var mylist = [];
         var json = this.state.consumptionBatchInfoTableEl.getJson(null, false)
-        var value = (json[r])[3];
         var date = (json[r])[5];
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
@@ -1351,7 +1349,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var planningUnitId = document.getElementById("planningUnitId").value;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {

@@ -492,7 +492,6 @@ class ForecastMetrics extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), '');
     jexcel.destroy(document.getElementById("tableDiv"), true);
-    var json = [];
     var data = consumptionArray;
     var options = {
       data: data,
@@ -903,15 +902,6 @@ class ForecastMetrics extends Component {
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
-        return (
-          <option key={i} value={item.payload.productCategoryId}>
-            {getLabelText(item.payload.label, this.state.lang)}
-          </option>
-        )
-      }, this);
     const { tracerCategories } = this.state;
     const options = {
       hidePageListOnlyOnePage: true,
@@ -949,7 +939,6 @@ class ForecastMetrics extends Component {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
     }
-    const { rangeValue } = this.state
     const { singleValue2 } = this.state
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)

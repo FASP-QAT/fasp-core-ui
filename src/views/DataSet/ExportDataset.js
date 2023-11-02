@@ -119,7 +119,6 @@ export default class ExportDataset extends Component {
                 selectProgramMessage: ""
             })
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {

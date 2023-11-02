@@ -117,7 +117,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     var calculatedValueForLag = [];
                     var countOfI = -1;
                     for (var i = curDate; i <= datasetJson.monthsInFuture; i++) {
-                        var test = 1;
                         if (i != 0) {
                             countOfI += 1;
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => i >= c.startDateNo && i <= c.stopDateNo);
@@ -144,7 +143,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                             }
                             var difference = 0;
                             var differenceWMC = 0;
-                            var transferNodeValue = 0;
                             var endValue = Number(startValue);
                             var endValueWMC = Number(startValue);
                             var transfer = 0;
@@ -425,7 +423,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                 var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                 if (parentNodeNodeData.fuNode.usageType.id == 2
                                 ) {
-                                    var daysPerMonth = 365 / 12;
                                     var grandParent = parentFiltered.parent;
                                     var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
                                     var patients = 0;
@@ -468,7 +465,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
                                     var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                     var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
-                                    var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
                                     var monthNo = countOfI;
                                     var cycle = Math.floor(monthNo / monthsPerVisit);
                                     var deltaPatients = 0;
@@ -502,7 +498,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             deltaPatients = val1 - val2;
                                         }
                                     }
-                                    var noOfPatientsNew = 0;
                                     var noOfPatients = 0;
                                     if (cycle == 0) {
                                         noOfPatients = (patients / monthsPerVisit) + deltaPatients;

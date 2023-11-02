@@ -412,10 +412,7 @@ export default class ProgramOnboarding extends Component {
             this.refs.countryChild.getRealmCountryList();
             this.refs.sixChild.getProgramManagerList();
         } if (event.target.name == 'realmCountryId') {
-            var index = event.nativeEvent.target.selectedIndex;
             var dname = this.state.program.programCode;
-            var email_array = dname.split('-');
-            var new_string = email_array[0];
             program.realmCountry.realmCountryId = event.target.value;
             this.refs.healthAreaChild.getHealthAreaList();
             this.refs.organisationChild.getOrganisationList();
@@ -424,10 +421,7 @@ export default class ProgramOnboarding extends Component {
             program.healthAreaArray = [];
             program.regionArray = [];
         } if (event.target.name == 'organisationId') {
-            var index = event.nativeEvent.target.selectedIndex;
             var dname = this.state.program.programCode;
-            var email_array = dname.split('-');
-            var new_string = email_array[2];
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
@@ -440,7 +434,6 @@ export default class ProgramOnboarding extends Component {
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
-            var new_string = email_array[3];
             program.uniqueCode = event.target.value.toUpperCase()
         }
         if (event.target.name == 'programCode1') {
@@ -457,10 +450,7 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            var index = event.nativeEvent.target.selectedIndex;
             var dname = this.state.program.programCode;
-            var email_array = dname.split('-');
-            var new_string = email_array[1];
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;

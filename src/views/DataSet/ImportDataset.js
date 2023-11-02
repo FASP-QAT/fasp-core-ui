@@ -108,7 +108,6 @@ export default class ImportDataset extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -185,8 +184,6 @@ export default class ImportDataset extends Component {
                                         for (var j = 0; j < selectedPrgArr.length; j++) {
                                             if (selectedPrgArr[j].value == filename) {
                                                 db1 = e.target.result;
-                                                var transaction2 = db1.transaction(['datasetData'], 'readwrite');
-                                                var program2 = transaction2.objectStore('datasetData');
                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                 var countryList = json.countryList;
                                                 delete json.countryList;
@@ -338,8 +335,6 @@ export default class ImportDataset extends Component {
                                                         for (var j = 0; j < selectedPrgArr.length; j++) {
                                                             if (selectedPrgArr[j].value == filename) {
                                                                 db1 = e.target.result;
-                                                                var transaction2 = db1.transaction(['datasetData'], 'readwrite');
-                                                                var program2 = transaction2.objectStore('datasetData');
                                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                                 var countryList = json.countryList;
                                                                 delete json.countryList;

@@ -34,8 +34,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
-                var realmCountryPlanningUnitList = []
                 planningunitRequest.onerror = function (event) {
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
@@ -154,7 +152,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var expiredStock = 0;
                                     var expiredStockWps = 0;
                                     var myArray = [];
-                                    var myArrayWps = [];
                                     for (var b = 0; b < batchDetails.length; b++) {
                                         if (moment(batchDetails[b].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                             var json = {

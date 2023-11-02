@@ -75,7 +75,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     }
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson(null, false);
         valid = checkValidation(this.el);
         return valid;
     }
@@ -197,7 +196,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
-        var json = [];
         var papuList11 = this.state.selSource2;
         var data;
         if (papuList11 != "") {
@@ -288,7 +286,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             Show: " ",
             entries: " ",
         });
-        const { rangeValue } = this.state
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />

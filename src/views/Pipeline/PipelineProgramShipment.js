@@ -251,7 +251,6 @@ export default class PipelineProgramShipment extends Component {
         var regexDecimal = /^[0-9]+.[0-9]+$/
         var shipmentStatusId = 0;
         if (x == 0) {
-            var json = this.el.getJson(null, false);
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -263,7 +262,6 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 1) {
-            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -286,7 +284,6 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 3) {
-            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");

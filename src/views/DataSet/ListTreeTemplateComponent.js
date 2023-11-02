@@ -203,7 +203,6 @@ export default class ListTreeTemplate extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -906,7 +905,6 @@ export default class ListTreeTemplate extends Component {
     getPlanningUnitWithPricesByIds() {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
-                var listArray = response.data;
                 this.setState({
                     planningUnitObjList: response.data
                 });
@@ -950,7 +948,6 @@ export default class ListTreeTemplate extends Component {
     procurementAgentList() {
         const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -958,7 +955,6 @@ export default class ListTreeTemplate extends Component {
             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
             var procurementAgentRequest = procurementAgentOs.getAll();
-            var planningList = []
             procurementAgentRequest.onerror = function (event) {
                 this.setState({
                     message: 'unknown error occured', loading: false
@@ -1165,7 +1161,6 @@ export default class ListTreeTemplate extends Component {
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             var planningUnitList = [];
-            var programs = [];
             var missingPUList = this.state.missingPUList;
             var updatedMissingPUList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -1434,7 +1429,6 @@ export default class ListTreeTemplate extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = treeTemplateArray;
         var options = {
             data: data,
@@ -1604,7 +1598,6 @@ export default class ListTreeTemplate extends Component {
         var program = this.state.datasetListJexcel;
         let tempProgram = JSON.parse(JSON.stringify(program))
         let treeList = program.treeList;
-        var treeTemplateId = '';
         var treeId = ""
         var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
         treeId = parseInt(maxTreeId) + 1;

@@ -329,15 +329,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
                             var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit.id != listOfPlanningUnits[pu] || (c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id != regionList[r]));
-                            var consumptionExtrapolationData = -1
-                            var consumptionExtrapolationMovingData = -1
-                            var consumptionExtrapolationRegression = -1
-                            var consumptionExtrapolationTESL = -1
-                            var consumptionExtrapolationTESM = -1
-                            var consumptionExtrapolationTESH = -1
-                            var inputDataFilter = this.state.jsonDataSemiAverage;
-                            var inputDataAverageFilter = this.state.movingAvgData;
-                            var inputDataRegressionFilter = this.state.linearRegressionData;
                             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                             var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
                             var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
@@ -637,10 +628,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['datasetData'], 'readwrite');
-                            var programTransaction = transaction.objectStore('datasetData');
-                            programs.forEach(program => {
-                                var programRequest = programTransaction.put(program);
-                            })
                             transaction.oncomplete = function (event) {
                                 db1 = e.target.result;
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');

@@ -151,7 +151,6 @@ class AddUserComponent extends Component {
     }, 30000);
   }
   realmChange() {
-    let { user } = this.state;
     let count = 0;
     let count1 = 0;
     for (var i = 0; i < this.state.user.roles.length; i++) {
@@ -676,7 +675,6 @@ class AddUserComponent extends Component {
     }
   }.bind(this);
   filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var mylist = [];
     var value = this.state.addUserEL.getJson(null, false)[r][1];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
     var proList = [];
@@ -809,7 +807,6 @@ class AddUserComponent extends Component {
       };
       healthAreaList.unshift(paJson);
     }
-    var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
     if (papuDataArr.length == 0) {
@@ -822,7 +819,6 @@ class AddUserComponent extends Component {
       papuDataArr[0] = data;
     }
     jexcel.destroy(document.getElementById("paputableDiv"), true);
-    var json = [];
     var data = papuDataArr;
     var options = {
       data: data,

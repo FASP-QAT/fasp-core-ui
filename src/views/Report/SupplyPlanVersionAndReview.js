@@ -740,44 +740,6 @@ class SupplyPlanVersionAndReview extends Component {
                     </option>
                 )
             }, this);
-        const bar = {
-            labels: this.state.matricsList.map((item, index) => (item.date)),
-            datasets: [
-                {
-                    type: "line",
-                    label: "MOS past 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_pass3))
-                },
-                {
-                    type: "line",
-                    label: "MOS P+F",
-                    backgroundColor: 'transparent',
-                    borderColor: '#4dbd74',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_PF))
-                },
-                {
-                    type: "line",
-                    label: "MOS Future 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ed5626',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    data: this.state.matricsList.map((item, index) => (item.MOS_Feature3))
-                }
-            ]
-        }
         const columns = [
             {
                 text: i18n.t('static.program.program'),

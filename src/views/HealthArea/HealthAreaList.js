@@ -50,7 +50,6 @@ export default class HealthAreaListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = healthAreasArray;
         var options = {
             data: data,

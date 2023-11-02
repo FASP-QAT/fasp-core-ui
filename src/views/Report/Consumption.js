@@ -184,9 +184,7 @@ class Consumption extends Component {
             }
           );
       } else {
-        const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -194,7 +192,6 @@ class Consumption extends Component {
           var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
           var planningunitOs = planningunitTransaction.objectStore('planningUnit');
           var planningunitRequest = planningunitOs.getAll();
-          var planningList = []
           planningunitRequest.onerror = function (event) {
           };
           planningunitRequest.onsuccess = function (e) {
@@ -258,10 +255,8 @@ class Consumption extends Component {
       re = this.state.offlineConsumptionList
     }
     let head = [];
-    let head1 = [];
     let row1 = [];
     let row2 = [];
-    let row3 = [];
     if (isSiteOnline()) {
       let consumptionArray = this.state.consumptions;
       head.push('');
@@ -354,10 +349,7 @@ class Consumption extends Component {
     doc.setFontSize(8);
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
-    var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
-    var h1 = 100;
-    var aspectwidth1 = (width - h1);
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
@@ -422,9 +414,7 @@ class Consumption extends Component {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
@@ -537,7 +527,6 @@ class Consumption extends Component {
           message: '',
           loading: true
         })
-        let realmId = AuthenticationService.getRealmId();
         var inputjson = {
           startDate: startDate,
           stopDate: endDate,
@@ -669,7 +658,6 @@ class Consumption extends Component {
     }
   }
   consolidatedProgramList = () => {
-    const lan = 'en';
     const { programs } = this.state
     var proList = programs;
     var db1;
@@ -689,8 +677,6 @@ class Consumption extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             var f = 0
@@ -704,7 +690,6 @@ class Consumption extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           this.setState({
             programs: proList.sort(function (a, b) {
@@ -742,9 +727,7 @@ class Consumption extends Component {
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
-          const lan = 'en';
           var db1;
-          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -752,7 +735,6 @@ class Consumption extends Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
             planningunitRequest.onerror = function (event) {
             };
             planningunitRequest.onsuccess = function (e) {
@@ -935,7 +917,6 @@ class Consumption extends Component {
     }
   }
   consolidatedVersionList = (programId) => {
-    const lan = 'en';
     const { versions } = this.state
     var verList = versions;
     var db1;
@@ -955,8 +936,6 @@ class Consumption extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
@@ -1129,7 +1108,6 @@ class Consumption extends Component {
         custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
-            let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
             cell1 += '';

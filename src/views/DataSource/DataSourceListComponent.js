@@ -124,7 +124,6 @@ export default class DataSourceListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = dataSourceArray;
         var options = {
             data: data,

@@ -412,7 +412,6 @@ export default class EditOrganisationComponent extends Component {
         this.state.organisation.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     render() {
-        const { selCountries } = this.state;
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {

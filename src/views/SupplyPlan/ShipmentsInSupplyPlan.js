@@ -164,10 +164,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
     }
     showShipmentData() {
-        var planningUnitId = document.getElementById("planningUnitId").value;
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
             actualProgramId: generalProgramJson.programId
@@ -781,7 +779,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             }
                                                         }
                                                         var expectedDeliveryDate = moment(rowData[5]).add(1, 'months').format("YYYY-MM-DD");
-                                                        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                         if (rowData[5] != "" && rowData[5] != null && rowData[5] != undefined && rowData[5] != "Invalid date" && obj.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                             items.push({
                                                                 title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
@@ -806,7 +803,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     }.bind(this);
                                                                     openRequest.onsuccess = function (e) {
                                                                         db1 = e.target.result;
-                                                                        var programJson = this.props.items.programJson;
                                                                         var generalProgramJson = this.props.items.generalProgramJson;
                                                                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                         var papuOs = papuTransaction.objectStore('procurementAgent');
@@ -833,7 +829,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             var json = [];
                                                                             var shipmentDates = rowData[30];
                                                                             var shipmentStatus = rowData[4];
-                                                                            var emergencyOrder = rowData[15];
                                                                             var erpFlag = rowData[1];
                                                                             var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
                                                                             var expectedPlannedDate = "";
@@ -1660,7 +1655,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedArrivedDate = "";
         var expectedDeliveryDate = rowData[5];
         var shipmentMode = rowData[6];
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
@@ -2550,10 +2544,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var procurementAgent = rowData[7];
         var shipmentDatesJson = rowData[30];
         var shipmentStatus = rowData[4];
-        var lastShipmentStatus = rowData[26];
         var addLeadTimes = 0;
         if (shipmentMode != "" && procurementAgent != "" && shipmentStatus != "") {
-            var programJson = this.props.items.programJson;
             var generalProgramJson = this.props.items.generalProgramJson;
             var papuResult = [];
             papuResult = this.state.procurementAgentListAll.filter(c => c.procurementAgentId == parseInt(procurementAgent))[0];
@@ -2562,7 +2554,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var approvedDate = shipmentDatesJson.approvedDate;
             var shippedDate = shipmentDatesJson.shippedDate;
             var arrivedDate = shipmentDatesJson.arrivedDate;
-            var receivedDate = shipmentDatesJson.receivedDate;
             var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
             if (rowData[8].toString() == "true") {
                 addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[3])[0].localProcurementLeadTime;
@@ -2636,7 +2627,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var procurementAgent = rowData[6];
                     var shipmentStatus = rowData[4];
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
@@ -3243,7 +3233,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var elInstance = this.state.shipmentsEl;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {

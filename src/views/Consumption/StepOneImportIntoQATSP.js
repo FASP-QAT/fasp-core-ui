@@ -144,7 +144,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
                     planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
@@ -620,7 +619,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].planningUnit.id)[0];
                 let totalForecast = 0;
                 let check = (Object.keys(papuList[j].selectedForecastMap).length == 0)
-                let check1 = (Object.keys(papuList[j].selectedForecastMap).map(c => totalForecast += papuList[j].selectedForecastMap[c].totalForecast))
                 let isForecastBlank = (!check && totalForecast == 0)
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
@@ -642,7 +640,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
-        var json = [];
         var papuList11 = this.state.selSource1;
         var data;
         if (papuList11 != "") {

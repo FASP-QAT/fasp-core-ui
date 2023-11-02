@@ -14,9 +14,7 @@ import { API_URL } from '../../Constants';
 import HealthAreaService from "../../api/HealthAreaService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValues = {
-    realmId: ''
-}
+
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()

@@ -107,9 +107,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
     showInventoryData() {
         var realmId = AuthenticationService.getRealmId();
-        var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
         var inventoryList = this.props.items.inventoryListForSelectedPlanningUnits;
-        var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
@@ -1033,7 +1031,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[5];
         var date = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[8]
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
@@ -1195,7 +1192,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
                 totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
             }
-            var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
             var allConfirm = true;
             if (allConfirm == true) {
                 if (map.get("2") == 1) {
@@ -1317,7 +1313,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     for (var c = 0; c < colArr.length; c++) {
                         positiveValidation(colArr[c], y, elInstance);
                     }
-                    var col = ("D").concat(parseInt(y) + 1);
                     var validation = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 0);
                     if (validation == false) {
                         valid = false;
@@ -1413,7 +1408,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var selectedPlanningUnits = this.props.items.planningUnit;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {

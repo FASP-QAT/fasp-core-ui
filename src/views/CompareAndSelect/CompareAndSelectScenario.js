@@ -289,7 +289,6 @@ class CompareAndSelectScenario extends Component {
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
         var totalArray = [];
-        var forecastError = [];
         let actualMax = moment.max(consumptionData.map(d => moment(d.month)));
         var monthArrayForError = [];
         if (consumptionData.length > 0) {
@@ -343,7 +342,6 @@ class CompareAndSelectScenario extends Component {
             data[0] = monthArrayListWithoutFormat[m];
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
-            var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
@@ -366,7 +364,6 @@ class CompareAndSelectScenario extends Component {
             var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
-        var actualCalculationDataType = selectedPlanningUnit[0].consumptionDataType;
         var actualMultiplier = 1;
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
@@ -498,7 +495,6 @@ class CompareAndSelectScenario extends Component {
                 jexcel.destroy(document.getElementById("table1"), true);
             } catch (error) {
             }
-            var json = [];
             var data = dataArray;
             var options = {
                 data: data,
@@ -897,10 +893,8 @@ class CompareAndSelectScenario extends Component {
         y = y + 5;
         var canvas = document.getElementById("cool-canvas");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -909,7 +903,6 @@ class CompareAndSelectScenario extends Component {
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
         let col1 = []
-        let dataArr2 = [];
         let dataArr3 = [];
         col1.push(i18n.t('static.common.display?'));
         col1.push(i18n.t('static.equivalancyUnit.type'));
@@ -1440,7 +1433,6 @@ class CompareAndSelectScenario extends Component {
         }
         var totalIndex = this.state.treeScenarioList.findIndex(c => c.id == this.state.selectedTreeScenarioId);
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -1633,7 +1625,6 @@ class CompareAndSelectScenario extends Component {
         let bar = {}
         if (this.state.showAllData) {
             var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
-            var monthArrayListWithoutFormat = [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY-MM-DD")))];
             var datasetsArr = [];
             datasetsArr.push(
                 {

@@ -411,7 +411,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     }
                                     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                     jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                    var json = [];
                                     var data = productDataArr;
                                     var options = {
                                         data: data,

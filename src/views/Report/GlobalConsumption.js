@@ -88,7 +88,6 @@ const options = {
     custom: CustomTooltips,
     callbacks: {
       label: function (tooltipItem, data) {
-        let label = data.labels[tooltipItem.index];
         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
         var cell1 = value
         cell1 += '';
@@ -294,10 +293,8 @@ class GlobalConsumption extends Component {
     const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
-    var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
     var h1 = 50;
-    var aspectwidth1 = (width - h1);
     let startY = y + 10
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
@@ -784,15 +781,6 @@ class GlobalConsumption extends Component {
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
-    const { realmList } = this.state;
-    let realms = realmList.length > 0
-      && realmList.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
     const backgroundColor = [
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
       '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -804,7 +792,6 @@ class GlobalConsumption extends Component {
     ]
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
     let consumptionSummerydata = [];
-    let data = [];
     var mainData = this.state.consumptions;
     mainData = mainData.sort(function (a, b) {
       return new Date(a.consumptionDate) - new Date(b.consumptionDate);

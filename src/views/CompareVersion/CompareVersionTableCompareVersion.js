@@ -184,8 +184,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
-        var columns = [];
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)];
@@ -296,13 +294,8 @@ export default class CompareVersionTableCompareVersion extends Component {
                 data = [];
                 var pu = datasetData.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                 var pu1 = datasetData1.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
-                var pu2 = datasetData2.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
                 var rg = regionList.filter(c => c.regionId == regionSet[k]);
                 var rg1 = regionList1.filter(c => c.regionId == regionSet[k]);
-                var rg2 = regionList2.filter(c => c.regionId == regionSet[k]);
-                var selectedForecastData = pu.length > 0 ? pu[0].selectedForecastMap : '';
-                var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
-                var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
                 var puFiltered = pu.filter(c => c.region.id == regionSet[k]);
                 var puFiltered1 = pu1.filter(c => c.region.id == regionSet[k]);
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;

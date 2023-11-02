@@ -448,11 +448,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
     resetClicked() {
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
-        var dataSourceList = [];
-        var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -535,11 +531,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
     saveSupplyPlan() {
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
-        var dataSourceList = [];
-        var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -668,7 +660,6 @@ export default class WhatIfReportComponent extends React.Component {
     saveScenario() {
         this.setState({ loading: true });
         var db1;
-        var storeOS;
         var programId = (document.getElementById("programId").value);
         var planningUnitId = (document.getElementById("planningUnitId").value);
         getDatabase();
@@ -854,12 +845,10 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                             for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                 var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                                var plannedDate = shipmentUnFundedList[i].plannedDate;
                                 var submittedDate = shipmentUnFundedList[i].submittedDate;
                                 var approvedDate = shipmentUnFundedList[i].approvedDate;
                                 var shippedDate = shipmentUnFundedList[i].shippedDate;
                                 var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                                var receivedDate = shipmentUnFundedList[i].receivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
                                     var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
@@ -1007,7 +996,6 @@ export default class WhatIfReportComponent extends React.Component {
                                 var approvedDate = shipmentUnFundedList[i].approvedDate;
                                 var shippedDate = shipmentUnFundedList[i].shippedDate;
                                 var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                                var receivedDate = shipmentUnFundedList[i].receivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
                                     var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
@@ -1136,7 +1124,6 @@ export default class WhatIfReportComponent extends React.Component {
     addRow() {
         this.setState({ loading: true });
         var db1;
-        var storeOS;
         var programId = (document.getElementById("programId").value);
         var planningUnitId = (document.getElementById("planningUnitId").value);
         getDatabase();
@@ -1431,12 +1418,10 @@ export default class WhatIfReportComponent extends React.Component {
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                        var plannedDate = shipmentUnFundedList[i].plannedDate;
                         var submittedDate = shipmentUnFundedList[i].submittedDate;
                         var approvedDate = shipmentUnFundedList[i].approvedDate;
                         var shippedDate = shipmentUnFundedList[i].shippedDate;
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                        var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
@@ -1545,7 +1530,6 @@ export default class WhatIfReportComponent extends React.Component {
                         var approvedDate = shipmentUnFundedList[i].approvedDate;
                         var shippedDate = shipmentUnFundedList[i].shippedDate;
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                        var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
@@ -1654,7 +1638,6 @@ export default class WhatIfReportComponent extends React.Component {
                         var approvedDate = shipmentUnFundedList[i].approvedDate;
                         var shippedDate = shipmentUnFundedList[i].shippedDate;
                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                        var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
@@ -2046,10 +2029,7 @@ export default class WhatIfReportComponent extends React.Component {
         doc.setFontSize(15);
         var canvas = document.getElementById("cool-canvas");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 100;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 150, 750, 340, 'CANVAS');
         const senHeaders = [];
         senHeaders.push(i18n.t('static.whatIf.scenario'));
@@ -2333,10 +2313,8 @@ export default class WhatIfReportComponent extends React.Component {
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
             var db1;
-            var storeOS;
             getDatabase();
             var regionList = [];
-            var dataSourceList = [];
             var dataSourceListAll = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
@@ -2589,9 +2567,7 @@ export default class WhatIfReportComponent extends React.Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -3614,7 +3590,6 @@ export default class WhatIfReportComponent extends React.Component {
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
             var programJson = this.state.programJson;
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
@@ -3665,13 +3640,10 @@ export default class WhatIfReportComponent extends React.Component {
     }
     suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate) {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
-        var shelfLife = programPlanningUnit.shelfLife;
-        var catalogPrice = programPlanningUnit.catalogPrice;
         if (month != "" && quantity != 0) {
             var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
         } else {
@@ -4108,7 +4080,6 @@ export default class WhatIfReportComponent extends React.Component {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
         }
-        const { rangeValue } = this.state
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'

@@ -745,7 +745,6 @@ export default class ManualTagging extends Component {
                 if (x == 9) {
                     var col = ("J").concat(parseInt(y) + 1);
                     value = this.state.instance.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    var qty = this.state.instance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.state.instance.setStyle(col, "background-color", "transparent");
                         this.state.instance.setStyle(col, "background-color", "yellow");
@@ -1120,9 +1119,7 @@ export default class ManualTagging extends Component {
         var versionList = [];
         var filteredProgramList = this.state.programs.filter(c => c.programId == selectedProgramId)[0];
         versionList.push({ versionId: filteredProgramList.currentVersionId })
-        var programQPLDetailsList = this.state.programQPLDetailsList
         for (var v = 0; v < filterList.length; v++) {
-            var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
             versionList.push({ versionId: filterList[v].version + "  (Local)" })
         }
         var onlineVersionList = versionList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
@@ -1275,7 +1272,6 @@ export default class ManualTagging extends Component {
             var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == false);
             var setOfPlanningUnitIds = [...new Set(selectedChangedShipment.map(ele => ele[17].planningUnit.id))];
             var db1;
-            var storeOS;
             getDatabase();
             var thisAsParameter = this;
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1464,7 +1460,6 @@ export default class ManualTagging extends Component {
     link() {
         this.setState({ loading1: true })
         var validation = this.checkValidation();
-        let linkedShipmentCount = 0;
         if (validation == true) {
             var selectedShipment = this.state.instance.getJson(null, false).filter(c => c[0] == true && c[14] == 0);
             var valid = true;
@@ -1492,7 +1487,6 @@ export default class ManualTagging extends Component {
                 this.setState({ loading1: false })
             } else {
                 var db1;
-                var storeOS;
                 getDatabase();
                 var thisAsParameter = this;
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -2642,8 +2636,6 @@ export default class ManualTagging extends Component {
             table1Loader: false
         },
             () => {
-                var realmCountryPlanningUnitList = [];
-                var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId)
                 var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
                 if (this.state.active1) {
                     var updatedList = [];
@@ -2688,7 +2680,6 @@ export default class ManualTagging extends Component {
                     }
                     this.el = jexcel(document.getElementById("tab1"), '');
                     jexcel.destroy(document.getElementById("tab1"), true);
-                    var json = [];
                     var options = {
                         data: dataArray1,
                         columnDrag: true,
@@ -2819,7 +2810,6 @@ export default class ManualTagging extends Component {
                     let erpDataArray = [];
                     let count = 0;
                     let qty = 0;
-                    let convertedQty = 0;
                     for (var j = 0; j < erpDataList.length; j++) {
                         data = [];
                         data[0] = this.state.active3 ? true : false;
@@ -2854,7 +2844,6 @@ export default class ManualTagging extends Component {
                         this.el = jexcel(document.getElementById("tableDiv1"), '');
                         jexcel.destroy(document.getElementById("tableDiv1"), true);
                     }
-                    var json = [];
                     var data = erpDataArray;
                     var options = {
                         data: data,
@@ -3066,7 +3055,6 @@ export default class ManualTagging extends Component {
             })
             let manualTaggingList = this.state.outputList;
             let manualTaggingArray = [];
-            let count = 0;
             if (this.state.active2) {
                 manualTaggingList = manualTaggingList.sort(function (a, b) {
                     a = a.parentShipmentId > 0 ? a.parentShipmentId : a.tempParentShipmentId;
@@ -3147,7 +3135,6 @@ export default class ManualTagging extends Component {
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
-            var json = [];
             var data = manualTaggingArray;
             if (this.state.active1) {
                 var options = {
@@ -3789,7 +3776,6 @@ export default class ManualTagging extends Component {
                 var datasetOs1 = datasetTransaction1.objectStore('program');
                 var getRequest1 = datasetOs1.getAll();
                 getRequest1.onsuccess = function (event) {
-                    var programList = getRequest1.result;
                     var datasetTransaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
                     var datasetOs2 = datasetTransaction2.objectStore('programQPLDetails');
                     var getRequest2 = datasetOs2.getAll();
@@ -4324,149 +4310,6 @@ export default class ManualTagging extends Component {
                 style: { width: '40px' }
             }
         ];
-        const columns1 = [
-            {
-                dataField: 'procurementAgentOrderNo',
-                text: i18n.t('static.mt.roNoAndRoLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'planningUnitName',
-                text: i18n.t('static.manualTagging.erpPlanningUnit'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'expectedDeliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'status',
-                text: i18n.t('static.manualTagging.erpStatus'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'qty',
-                text: i18n.t('static.manualTagging.erpShipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'cost',
-                text: i18n.t('static.shipment.totalCost'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'dataReceivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'changeCode',
-                text: "Change code",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-        ];
-        const columns2 = [
-            {
-                dataField: 'procurementAgentShipmentNo',
-                text: i18n.t('static.mt.roNoAndRoLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'deliveryDate',
-                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'batchNo',
-                text: i18n.t('static.supplyPlan.batchId'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'expiryDate',
-                text: i18n.t('static.supplyPlan.expiryDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatExpiryDate
-            },
-            {
-                dataField: 'qty',
-                text: i18n.t('static.supplyPlan.shipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'dataReceivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            },
-            {
-                dataField: 'changeCode',
-                text: "Change code",
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }
-        ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.outputList.length
-            }]
-        }
         const { countryList } = this.state;
         let countries = countryList.length > 0
             && countryList.map((item, i) => {

@@ -8,9 +8,6 @@ import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.region.region');
-let initialValues = {
-    region: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()

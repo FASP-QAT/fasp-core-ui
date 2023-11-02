@@ -118,9 +118,7 @@ class AnnualShipmentCost extends Component {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
-                    var storeOS;
                     getDatabase();
-                    var regionList = [];
                     this.setState({ loading: true })
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
@@ -376,7 +374,6 @@ class AnnualShipmentCost extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -396,8 +393,6 @@ class AnnualShipmentCost extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -411,7 +406,6 @@ class AnnualShipmentCost extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -819,7 +813,6 @@ class AnnualShipmentCost extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -839,8 +832,6 @@ class AnnualShipmentCost extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -891,9 +882,7 @@ class AnnualShipmentCost extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -901,7 +890,6 @@ class AnnualShipmentCost extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                         };
                         planningunitRequest.onsuccess = function (e) {
@@ -1046,7 +1034,6 @@ class AnnualShipmentCost extends Component {
         }
     }
     getProcurementAgentList() {
-        const { procurementAgents } = this.state
         let programId = document.getElementById("programId").value;
         if (isSiteOnline()) {
             var programJson = [programId]
@@ -1121,7 +1108,6 @@ class AnnualShipmentCost extends Component {
         }
     }
     getShipmentStatusList() {
-        const { shipmentStatuses } = this.state
         if (isSiteOnline()) {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
@@ -1278,29 +1264,11 @@ class AnnualShipmentCost extends Component {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { procurementAgents } = this.state;
-        let procurementAgentList = procurementAgents.length > 0 && procurementAgents.map((item, i) => {
-            return (
-                <option key={i} value={item.id}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+        
         const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
-            return (
-                <option key={i} value={item.fundingSourceId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+        
         const { shipmentStatuses } = this.state;
-        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
-            return (
-                <option key={i} value={item.shipmentStatusId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+        
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',

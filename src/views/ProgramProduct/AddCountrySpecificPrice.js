@@ -451,7 +451,6 @@ class CountrySpecificPrices extends Component {
         elInstance.setValueFromCoords(7, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.programPlanningUnit.program.label.label_en;
         data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;

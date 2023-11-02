@@ -15,12 +15,6 @@ import RealmCountryService from "../../api/RealmCountryService";
 import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    region: '',
-    capacityCBM: '',
-    label: '',
-    gln: '',
-}
 const entityname = i18n.t('static.dashboad.regioncountry')
 class RealmCountryRegion extends Component {
     constructor(props) {
@@ -116,7 +110,6 @@ class RealmCountryRegion extends Component {
                         }
                         this.el = jexcel(document.getElementById("paputableDiv"), '');
                         jexcel.destroy(document.getElementById("paputableDiv"), true);
-                        var json = [];
                         var data = papuDataArr;
                         var options = {
                             data: data,
@@ -376,7 +369,6 @@ class RealmCountryRegion extends Component {
         this.el.setValueFromCoords(7, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
         data[1] = "";
@@ -492,7 +484,6 @@ class RealmCountryRegion extends Component {
     }
     checkDuplicateRegion = function () {
         var tableJson = this.el.getJson(null, false);
-        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {

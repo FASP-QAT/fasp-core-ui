@@ -120,9 +120,7 @@ export default class StockStatusMatrix extends React.Component {
         if (programId > 0 && versionId != 0) {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
-            const lan = "en";
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -507,7 +505,6 @@ export default class StockStatusMatrix extends React.Component {
           planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
             myResult1 = e.target.result;
-            var plunit1 = [];
             planningUnitIds.map((planningUnitId) => {
               plunit = [
                 ...plunit,
@@ -572,12 +569,6 @@ export default class StockStatusMatrix extends React.Component {
                 for (var month = 1; month <= 12; month++) {
                   var dtstr =
                     from + "-" + String(month).padStart(2, "0") + "-01";
-                  var enddtStr =
-                    from +
-                    "-" +
-                    String(month).padStart(2, "0") +
-                    "-" +
-                    new Date(from, month, 0).getDate();
                   var dt = dtstr;
                   var list = programJson.supplyPlan.filter(
                     (c) =>
@@ -871,7 +862,6 @@ export default class StockStatusMatrix extends React.Component {
     }
   };
   consolidatedProgramList = () => {
-    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -894,11 +884,6 @@ export default class StockStatusMatrix extends React.Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -915,7 +900,6 @@ export default class StockStatusMatrix extends React.Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -1056,7 +1040,6 @@ export default class StockStatusMatrix extends React.Component {
     }
   };
   consolidatedVersionList = (programId) => {
-    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -1082,11 +1065,6 @@ export default class StockStatusMatrix extends React.Component {
             myResult[i].userId == userId &&
             myResult[i].programId == programId
           ) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1183,9 +1161,7 @@ export default class StockStatusMatrix extends React.Component {
           } else {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes("Local")) {
-              const lan = "en";
               var db1;
-              var storeOS;
               getDatabase();
               var openRequest = indexedDB.open(
                 INDEXED_DB_NAME,
@@ -1201,7 +1177,6 @@ export default class StockStatusMatrix extends React.Component {
                   "programPlanningUnit"
                 );
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = [];
                 planningunitRequest.onerror = function (event) {
                 };
                 planningunitRequest.onsuccess = function (e) {
@@ -1546,7 +1521,6 @@ export default class StockStatusMatrix extends React.Component {
       headers[idx] = item.text.replaceAll(" ", "%20").replaceAll("#", "%23");
     });
     var A = [this.addDoubleQuoteToRowContent(headers)];
-    var re = this.state.data;
     this.state.data.map((ele) =>
       A.push(
         this.addDoubleQuoteToRowContent([
@@ -2127,15 +2101,6 @@ export default class StockStatusMatrix extends React.Component {
             : this.formatter(ele.decStock)
           : i18n.t("static.supplyPlanFormula.na"),
     ]);
-    const roundN = (num) => {
-      if (num == null) {
-        return "";
-      } else {
-        return parseFloat(
-          Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)
-        ).toFixed(1);
-      }
-    };
     const cellStyle = (
       planBasedOn,
       min,
@@ -2324,56 +2289,7 @@ export default class StockStatusMatrix extends React.Component {
           value: item.planningUnit.id,
         };
       }, this);
-    const { productCategories } = this.state;
-    let productCategoryList =
-      productCategories.length > 0 &&
-      productCategories.map((item, i) => {
-        return (
-          <option
-            key={i}
-            value={item.payload.productCategoryId}
-            disabled={item.payload.active ? "" : "disabled"}
-          >
-            {Array(item.level).fill("   ").join("") +
-              getLabelText(item.payload.label, this.state.lang)}
-          </option>
-        );
-      }, this);
-    let productCategoryListcheck =
-      productCategories.length > 0 &&
-      productCategories
-        .filter((c) => c.payload.active == true)
-        .map((item, i) => {
-          return {
-            label: getLabelText(item.payload.label, this.state.lang),
-            value: item.payload.productCategoryId,
-          };
-        }, this);
-    const pickerLang = {
-      months: [
-        i18n.t("static.month.jan"),
-        i18n.t("static.month.feb"),
-        i18n.t("static.month.mar"),
-        i18n.t("static.month.apr"),
-        i18n.t("static.month.may"),
-        i18n.t("static.month.jun"),
-        i18n.t("static.month.jul"),
-        i18n.t("static.month.aug"),
-        i18n.t("static.month.sep"),
-        i18n.t("static.month.oct"),
-        i18n.t("static.month.nov"),
-        i18n.t("static.month.dec"),
-      ],
-      from: "From",
-      to: "To",
-    };
-    const { rangeValue } = this.state;
     const { SearchBar, ClearSearchButton } = Search;
-    const customTotal = (from, to, size) => (
-      <span className="react-bootstrap-table-pagination-total">
-        {i18n.t("static.common.result", { from, to, size })}
-      </span>
-    );
     const { programs } = this.state;
     let programList =
       programs.length > 0 &&

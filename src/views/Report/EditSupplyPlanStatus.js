@@ -318,7 +318,6 @@ class EditSupplyPlanStatus extends Component {
         })
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = "";
         data[1] = "";
@@ -364,7 +363,6 @@ class EditSupplyPlanStatus extends Component {
     };
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
         valid = checkValidation(this.el);
         return valid;
     }
@@ -614,7 +612,6 @@ class EditSupplyPlanStatus extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -640,8 +637,6 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var programJson = this.state.program;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var batchInfoList = programJson.batchInfoList;
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
@@ -752,8 +747,6 @@ class EditSupplyPlanStatus extends Component {
             programRequest.onsuccess = function (event) {
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
                     response.data.map(c => {
@@ -866,8 +859,6 @@ class EditSupplyPlanStatus extends Component {
             programRequest.onsuccess = function (event) {
                 var programJson = this.state.program;
                 var shipmentListUnFiltered = programJson.shipmentList;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered,
                 })
@@ -1207,14 +1198,11 @@ class EditSupplyPlanStatus extends Component {
             })
         }
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
-        var programId = document.getElementById("programId").value;
         var regionId = -1;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnit = document.getElementById("planningUnitId");
         var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
         var programPlanningUnit = ((this.state.planningUnits).filter(p => p.planningUnit.id == planningUnitId))[0];
-        var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
-        var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
         var regionListFiltered = [];
         if (regionId != -1) {
             regionListFiltered = (this.state.regionList).filter(r => r.id == regionId);
@@ -1244,9 +1232,7 @@ class EditSupplyPlanStatus extends Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -1936,7 +1922,6 @@ class EditSupplyPlanStatus extends Component {
             display: 'none'
         })
         var db1;
-        var storeOS;
         getDatabase();
         var dataSourceListAll = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3238,7 +3223,6 @@ class EditSupplyPlanStatus extends Component {
         }
         this.el = jexcel(document.getElementById("problemTransDiv"), '');
         jexcel.destroy(document.getElementById("problemTransDiv"), true);
-        var json = [];
         var data = dataArray;
         var options = {
             data: data,
@@ -3325,7 +3309,6 @@ class EditSupplyPlanStatus extends Component {
         }
         this.el = jexcel(document.getElementById("problemListDiv"), '');
         jexcel.destroy(document.getElementById("problemListDiv"), true);
-        var json = [];
         var data = problemArray;
         var options = {
             data: data,
@@ -3529,7 +3512,6 @@ class EditSupplyPlanStatus extends Component {
                 }
                 var rowData = elInstance.getRowData(y);
                 var criticalityId = rowData[17];
-                var problemStatusId = rowData[13];
                 if (criticalityId == 3) {
                     var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     cell.classList.add('highCriticality');

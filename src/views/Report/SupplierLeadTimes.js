@@ -28,12 +28,6 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const ref = React.createRef();
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
 class SupplierLeadTimes extends Component {
     constructor(props) {
         super(props);
@@ -91,7 +85,6 @@ class SupplierLeadTimes extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = outPutArray;
         var options = {
             data: data,
@@ -303,8 +296,6 @@ class SupplierLeadTimes extends Component {
             y = y + 10;
         }
         doc.setFontSize(8);
-        const title = i18n.t('static.dashboard.supplierLeadTimes');
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         let startY = y
@@ -434,7 +425,6 @@ class SupplierLeadTimes extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -454,8 +444,6 @@ class SupplierLeadTimes extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         var f = 0
@@ -469,7 +457,6 @@ class SupplierLeadTimes extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -505,9 +492,7 @@ class SupplierLeadTimes extends Component {
                 procurementAgenttValues: []
             }, () => {
                 if (!isSiteOnline()) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -515,7 +500,6 @@ class SupplierLeadTimes extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                         };
                         planningunitRequest.onsuccess = function (e) {
@@ -678,7 +662,6 @@ class SupplierLeadTimes extends Component {
         }
     }
     consolidatedProcurementAgentList = () => {
-        const lan = 'en';
         const { procurementAgents } = this.state
         var proList = procurementAgents;
         let programId = document.getElementById("programId").value;
@@ -695,8 +678,6 @@ class SupplierLeadTimes extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     var f = 0
                     for (var k = 0; k < this.state.procurementAgents.length; k++) {
@@ -806,9 +787,7 @@ class SupplierLeadTimes extends Component {
                 procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
                 this.setState({ loading: true })
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
@@ -884,7 +863,6 @@ class SupplierLeadTimes extends Component {
                                     var result3 = paRequest.result;
                                     var outPutList = [];
                                     for (var i = 0; i < result1.length; i++) {
-                                        var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
                                         var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
                                         var program = result1[i].program;
                                         for (var k = 0; k < procurementAgentIds.length; k++) {
@@ -1025,14 +1003,6 @@ class SupplierLeadTimes extends Component {
         );
         const { programs } = this.state;
         const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {item.versionId}
-                    </option>
-                )
-            }, this);
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {

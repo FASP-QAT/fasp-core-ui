@@ -448,7 +448,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
-        var minMonth = this.state.minMonth;
         var count = 1;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
@@ -520,11 +519,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         var json;
         for (let i = 0; i < filteredExtrapolationMethodList.length; i++) {
             if (filteredExtrapolationMethodList[i].id == 7) {
-                var extrapolationOptionDataList = [];
-                var optionDataJson = {
-                    month: '',
-                    amount: ''
-                };
                 json = {
                     extrapolationMethod: { id: 7 },
                     jsonProperties: {
@@ -969,7 +963,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
-                var interpolatedData = [];
                 var tableJson = this.state.dataExtrapolation.getJson(null, false);
                 var resultCount = 0;
                 for (var i = 0; i < tableJson.length; i++) {
@@ -1122,13 +1115,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                 var planningunitTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('extrapolationMethod');
                 var planningunitRequest = planningunitOs.getAll();
-                var planningList = []
                 planningunitRequest.onerror = function (event) {
                 };
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    var proList = []
                     this.setState({
                         extrapolationMethodList: myResult.filter(x => x.active == true),
                         changed: 1
@@ -1806,7 +1797,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.setState({ isChanged: true })
     }.bind(this);
     setMovingAvgId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var movingAvgId = e.target.checked;
@@ -1846,7 +1836,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setSemiAvgId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var semiAvgId = e.target.checked;
@@ -1883,7 +1872,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setLinearRegressionId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var linearRegressionId = e.target.checked;
@@ -1920,7 +1908,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setSmoothingId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var smoothingId = e.target.checked;
@@ -1958,7 +1945,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     setArimaId(e) {
-        var json;
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var arimaId = e.target.checked;
@@ -2218,25 +2204,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             yValueFormatString: "###,###,###,###",
             data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals > 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
         })
-        let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
-        let startDate = moment(this.props.items.forecastStartDate).format("YYYY-MM-DD");
-        var data = this.state.jexcelDataArr.map((item, index) =>
-        (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0
-            && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
-                || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM')
-                    && (item.amount == "" || item.amount == null)))
-            ? "Inside if data " : "Inside else data"));
-        var data1 = this.state.jexcelDataArr.map((item, index) =>
-        (this.state.movingAvgData.filter(x => x.month == item.monthNo).length > 0
-            ? "Inside if data " : "Inside else data"));
-        var data2 = this.state.jexcelDataArr.map((item, index) =>
-        (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM')
-            || (moment(this.state.minMonth).format('YYYY-MM') <= moment(item.month).format('YYYY-MM'))
-            ? "Inside if data " : "Inside else data"));
-        var data3 = this.state.jexcelDataArr.map((item, index) =>
-        (
-            (item.amount == "" || item.amount == null)
-                ? "Inside if data " : "Inside else data"));
         if (this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
             if (this.state.movingAvgId) {
                 datasets.push(

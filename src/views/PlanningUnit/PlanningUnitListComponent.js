@@ -335,7 +335,6 @@ export default class PlanningUnitListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = planningUnitArray;
         var options = {
             data: data,

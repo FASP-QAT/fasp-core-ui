@@ -8,9 +8,6 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.procurementagenttype');
-const initialValues = {
-    procurementAgentTypeName: "",
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeCode: Yup.string()

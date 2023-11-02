@@ -454,7 +454,6 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = manualTaggingArray;
         var options = {
             data: data,
@@ -673,7 +672,6 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         jexcel.destroy(document.getElementById("tableDiv1"), true);
-        var json = [];
         var data = notificationSummaryArray;
         var options = {
             data: data,
@@ -758,8 +756,6 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-        var tr = asterisk.firstChild;
     }
     getNotificationSummary(callGetProgram) {
         ManualTaggingService.getNotificationSummary()
@@ -1024,9 +1020,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     var db1;
-                    var storeOS;
                     getDatabase();
-                    var thisAsParameter = this;
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
@@ -1039,7 +1033,6 @@ export default class ShipmentLinkingNotifications extends Component {
                         var programTransaction;
                         transaction = db1.transaction(['programData'], 'readwrite');
                         programTransaction = transaction.objectStore('programData');
-                        var curUser = AuthenticationService.getLoggedInUserId();
                         var programId = (this.state.programId);
                         var programRequest = programTransaction.get(programId);
                         programRequest.onsuccess = function (event) {

@@ -25,8 +25,6 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const ref = React.createRef();
-const entityname = i18n.t('static.dashboard.budget');
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -220,7 +218,6 @@ class Budgets extends Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
-        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -287,7 +284,6 @@ class Budgets extends Component {
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
         const headers = columns.map((item, idx) => (item.text));
         const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);

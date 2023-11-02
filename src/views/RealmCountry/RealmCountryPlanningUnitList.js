@@ -123,7 +123,6 @@ export default class RealmCountryPlanningUnitList extends Component {
     }, 30000);
   }
   addRow = function () {
-    var json = this.el.getJson(null, false);
     var data = [];
     data[0] = "";
     data[1] = "";
@@ -358,7 +357,6 @@ export default class RealmCountryPlanningUnitList extends Component {
   };
   checkDuplicatePlanningUnit = function () {
     var tableJson = this.el.getJson(null, false);
-    let count = 0;
     let tempArray = tableJson;
     var hasDuplicate = false;
     tempArray
@@ -399,7 +397,6 @@ export default class RealmCountryPlanningUnitList extends Component {
                   this.hideSecondComponent();
               })
       }
-        var col = "F".concat(parseInt(y) + 1);
         var value = this.el
           .getValue(`F${parseInt(y) + 1}`, true)
           .toString()
@@ -502,7 +499,6 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
     jexcel.destroy(document.getElementById("tableDiv"), true);
-    var json = [];
     var data = papuDataArr;
     var options = {
       data: data,
@@ -1129,17 +1125,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       entries: " ",
     });
     const { realmCountrys } = this.state;
-    let realmCountryList =
-      realmCountrys.length > 0 &&
-      realmCountrys.map((item, i) => {
-        return (
-          <option key={i} value={item.realmCountryId}>
-            {getLabelText(item.realm.label, this.state.lang) +
-              " - " +
-              getLabelText(item.country.label, this.state.lang)}
-          </option>
-        );
-      }, this);
     const { programs } = this.state;
     let programList =
       programs.length > 0 &&
@@ -1152,38 +1137,6 @@ export default class RealmCountryPlanningUnitList extends Component {
         {i18n.t("static.common.result", { from, to, size })}
       </span>
     );
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t("static.common.first"),
-      prePageText: i18n.t("static.common.back"),
-      nextPageText: i18n.t("static.common.next"),
-      lastPageText: i18n.t("static.common.last"),
-      nextPageTitle: i18n.t("static.common.firstPage"),
-      prePageTitle: i18n.t("static.common.prevPage"),
-      firstPageTitle: i18n.t("static.common.nextPage"),
-      lastPageTitle: i18n.t("static.common.lastPage"),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [
-        {
-          text: "10",
-          value: 10,
-        },
-        {
-          text: "30",
-          value: 30,
-        },
-        {
-          text: "50",
-          value: 50,
-        },
-        {
-          text: "All",
-          value: this.state.selSource.length,
-        },
-      ],
-    };
     return (
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />

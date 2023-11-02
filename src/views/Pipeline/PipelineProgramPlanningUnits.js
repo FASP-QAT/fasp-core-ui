@@ -294,7 +294,6 @@ export default class PipelineProgramPlanningUnits extends Component {
     }
     checkValidation() {
         var reg = /^[0-9\b]+$/;
-        var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
