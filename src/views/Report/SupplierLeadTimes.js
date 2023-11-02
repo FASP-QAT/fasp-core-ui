@@ -17,7 +17,6 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -361,7 +360,7 @@ class SupplierLeadTimes extends Component {
         })
     }
     getPrograms() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
@@ -491,7 +490,7 @@ class SupplierLeadTimes extends Component {
                 procurementAgents: [],
                 procurementAgenttValues: []
             }, () => {
-                if (!isSiteOnline()) {
+                if (!localStorage.getItem("sessionType") === 'Online') {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -600,7 +599,7 @@ class SupplierLeadTimes extends Component {
     }
     getProcurementAgent = () => {
         let programId = document.getElementById("programId").value;
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             var programJson = [programId]
             DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
@@ -722,7 +721,7 @@ class SupplierLeadTimes extends Component {
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         let procurementAgentIds = this.state.procurementAgenttValues.map(ele => (ele.value).toString());
         if (programId > 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgenttValues.length > 0) {
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 this.setState({ loading: true })
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),

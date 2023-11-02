@@ -32,7 +32,6 @@ import ExtrapolationshowguidancePr from '../../../src/ShowGuidanceFiles/Extrapol
 import ExtrapolationshowguidanceSp from '../../../src/ShowGuidanceFiles/ExtrapolationSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from "../../CommonComponent/Logo";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -841,7 +840,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false);
                 }
                 if (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
-                    if (this.state.smoothingId && isSiteOnline()) {
+                    if (this.state.smoothingId && localStorage.getItem("sessionType") === 'Online') {
                         calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
                     } else {
                         this.setState({
@@ -850,7 +849,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                 }
                 if (this.state.arimaId && ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
-                    if (this.state.arimaId && isSiteOnline()) {
+                    if (this.state.arimaId && localStorage.getItem("sessionType") === 'Online') {
                         calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
                     } else {
                         this.setState({

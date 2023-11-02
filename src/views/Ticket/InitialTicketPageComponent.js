@@ -23,7 +23,6 @@ import UsagePeriodTicketComponent from './UsagePeriodTicketComponent';
 import UserTicketComponent from './UserTicketComponent';
 import { confirmAlert } from 'react-confirm-alert'; 
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -135,7 +134,7 @@ export default class InitialTicketPageComponent extends Component {
   componentDidMount() {
   }
   togglehelp() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       this.setState({
         help: !this.state.help,
         initialPage: 1,

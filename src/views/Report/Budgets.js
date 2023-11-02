@@ -13,7 +13,6 @@ import { MultiSelect } from 'react-multi-select-component';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -140,7 +139,7 @@ class Budgets extends Component {
         this.refs.pickRange.show()
     }
     getFundingSource = () => {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     var fundingSourceValues = [];
@@ -389,7 +388,7 @@ class Budgets extends Component {
         }
     }
     getPrograms = () => {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {

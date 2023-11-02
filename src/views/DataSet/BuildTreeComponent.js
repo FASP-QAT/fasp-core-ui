@@ -73,7 +73,6 @@ import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import ConsumptionInSupplyPlanComponent from '../SupplyPlan/ConsumptionInSupplyPlan';
 import PlanningUnitService from '../../api/PlanningUnitService';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const ref = React.createRef();
 const entityname = 'Tree';

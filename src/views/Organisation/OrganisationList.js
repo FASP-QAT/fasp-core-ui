@@ -7,7 +7,6 @@ import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reacts
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import OrganisationService from "../../api/OrganisationService.js";
@@ -357,7 +356,7 @@ export default class OrganisationListComponent extends Component {
         }
     }.bind(this);
     addOrganisation() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/organisation/addOrganisation`);
         } else {
             alert("You must be Online.")

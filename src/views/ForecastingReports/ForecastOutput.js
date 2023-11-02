@@ -27,7 +27,6 @@ import showguidanceforecastOutputFr from '../../../src/ShowGuidanceFiles/Forecas
 import showguidanceforecastOutputPr from '../../../src/ShowGuidanceFiles/ForecastOutputPr.html';
 import showguidanceforecastOutputSp from '../../../src/ShowGuidanceFiles/ForecastOutputSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1204,7 +1203,7 @@ class ForecastOutput extends Component {
         }
     }
     getPrograms() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
                 .then(response => {
@@ -1800,7 +1799,7 @@ class ForecastOutput extends Component {
         if (programId != 0) {
             const program = this.state.programs.filter(c => c.id == programId)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
                         .then(response => {
                             this.setState({

@@ -20,7 +20,6 @@ import {
   Table
 } from "reactstrap";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import getLabelText from "../../CommonComponent/getLabelText";
 import {
@@ -779,7 +778,7 @@ export default class StockStatusMatrix extends React.Component {
     }
   }
   getPrograms = () => {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then((response) => {
@@ -938,7 +937,7 @@ export default class StockStatusMatrix extends React.Component {
         (c) => c.programId == programId
       );
       if (program.length == 1) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
           this.setState(
             {
               versions: [],

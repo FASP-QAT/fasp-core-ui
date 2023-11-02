@@ -1,7 +1,6 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import React, { Component } from 'react';
-import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions.js';
 import { SECRET_KEY } from '../../../Constants.js';
 import LogoutService from "../../../api/LogoutService";
 import AuthenticationService from '../../Common/AuthenticationService.js';
@@ -16,7 +15,7 @@ class LogoutComponent extends Component {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sessionType"];
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (isSiteOnline() && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+            if (localStorage.getItem("sessionType") === 'Online' && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 LogoutService.logout()
                     .then(response => {
                         if (response.status == 200) {

@@ -21,7 +21,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import {
@@ -1006,7 +1005,7 @@ export default class PlanningUnitSetting extends Component {
                 var items = [];
                 if (y == null) {
                 } else {
-                    if (isSiteOnline()) {
+                    if (localStorage.getItem("sessionType") === 'Online') {
                         if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
@@ -1160,7 +1159,7 @@ export default class PlanningUnitSetting extends Component {
             for (let i = 0; i < tableJson.length; i++) {
                 planningUnitIds.push(parseInt(tableJson[i][1]));
             }
-            if (isSiteOnline()) {
+            if (localStorage.getItem("sessionType") === 'Online') {
                 PlanningUnitService.getPlanningUnitByIds(planningUnitIds).then(response => {
                     this.setState({
                         allPlanningUnitList: response.data,
@@ -1812,7 +1811,7 @@ export default class PlanningUnitSetting extends Component {
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                             <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
-                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {isSiteOnline() && <>{i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></>}</span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {localStorage.getItem("sessionType") === 'Online' && <>{i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></>}</span>
                         </div>
                     </div>
                     <CardBody className="pb-lg-3 pt-lg-0">
@@ -1879,7 +1878,7 @@ export default class PlanningUnitSetting extends Component {
                                 </Col>
                             </div>
                         </div>
-                        {!isSiteOnline() && <Col md="12" className="pl-lg-0">
+                        {!localStorage.getItem("sessionType") === 'Online' && <Col md="12" className="pl-lg-0">
                             <div>
                                 <p>{i18n.t("static.planningUnitSetting.offlineMsg")}</p>
                             </div>
@@ -1915,7 +1914,7 @@ export default class PlanningUnitSetting extends Component {
                                     {this.state.isChanged1 &&
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
-                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList(1)}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    {localStorage.getItem("sessionType") === 'Online' && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList(1)}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                     &nbsp;
                                 </FormGroup>
                             }

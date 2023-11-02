@@ -7,7 +7,6 @@ import IdleTimer from 'react-idle-timer';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Col, Container, Nav, NavItem, NavLink, Row } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import {
   INDEXED_DB_NAME,
   INDEXED_DB_VERSION,
@@ -623,7 +622,7 @@ class DefaultLayout extends Component {
   }
   goToCommitProgram(e) {
     e.preventDefault();
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       this.props.history.push(`/program/syncPage/`)
     } else {
       confirmAlert({
@@ -638,7 +637,7 @@ class DefaultLayout extends Component {
   }
   goToCommitProgramFC(e) {
     e.preventDefault();
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       this.props.history.push(`/dataset/commitTree`)
     } else {
       confirmAlert({
@@ -776,7 +775,7 @@ class DefaultLayout extends Component {
     }.bind(this)
   }
   toggle(tabPane, tab) {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       UserService.updateUserModule(tab).then(response => {
         if (response.status == 200) {
         } else {

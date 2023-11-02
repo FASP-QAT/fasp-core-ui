@@ -18,7 +18,7 @@ import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html
 import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { decompressJson, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService.js';

@@ -18,7 +18,6 @@ import {
     Table
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -257,7 +256,7 @@ class ShipmentGlobalDemandView extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -367,7 +366,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var len = 120
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
             len = len + countryLabelsText.length * 10
@@ -386,7 +385,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        let y = isSiteOnline() ? len : 150
+        let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         for (var i = 0; i < fundingSourceText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
@@ -464,7 +463,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.save(i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + ".pdf")
     }
     fetchData = () => {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -806,7 +805,7 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     componentDidMount() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
             this.getFundingSource();
             this.getShipmentStatusList();
@@ -898,7 +897,7 @@ class ShipmentGlobalDemandView extends Component {
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     var listArray = response.data;
@@ -972,7 +971,7 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     getFundingSource = () => {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     this.setState({
@@ -1066,7 +1065,7 @@ class ShipmentGlobalDemandView extends Component {
         }.bind(this);
     }
     getPrograms = () => {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
             DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
@@ -1167,7 +1166,7 @@ class ShipmentGlobalDemandView extends Component {
         if (programId != 0) {
             const program = this.state.programLst.filter(c => c.id == programId)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     this.setState({
                         versions: []
                     }, () => {
@@ -1235,7 +1234,8 @@ class ShipmentGlobalDemandView extends Component {
             planningUnits: [],
             planningUnitValues: []
         }, () => {
-            if (!isSiteOnline()) {
+            if (!localStorage.getItem("sessionType") === 'Online') {
+
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);

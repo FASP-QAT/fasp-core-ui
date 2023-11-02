@@ -15,7 +15,6 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -58,7 +57,7 @@ class warehouseCapacity extends Component {
         })
     }
     componentDidMount() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrylist();
         } else {
             this.getPrograms();
@@ -69,7 +68,7 @@ class warehouseCapacity extends Component {
     }
     exportCSV() {
         var csvRow = [];
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -129,7 +128,7 @@ class warehouseCapacity extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    if (isSiteOnline()) {
+                    if (localStorage.getItem("sessionType") === 'Online') {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
@@ -267,7 +266,7 @@ class warehouseCapacity extends Component {
         })
     }
     getPrograms() {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map(ele => ele.value);
             if (countryIds != "") {
                 let newCountryList = [... new Set(countryIds)];
@@ -391,7 +390,7 @@ class warehouseCapacity extends Component {
         }.bind(this);
     }
     fetchData(e) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             if (this.state.programValues.length > 0 && this.state.countryValues.length > 0) {
