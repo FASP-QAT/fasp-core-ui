@@ -83,7 +83,6 @@ class ListUserComponent extends Component {
         this.buildJExcel1 = this.buildJExcel1.bind(this);
         this.buildJExcel2 = this.buildJExcel2.bind(this);
         this.getUserDetails = this.getUserDetails.bind(this);
-        this.roleChange = this.roleChange.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
