@@ -48,10 +48,6 @@ const sortArray = (sourceArray) => {
     const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
     return sourceArray.sort(sortByName);
 };
-const sortArrayByName = (sourceArray) => {
-    const sortByName1 = (a, b) => a.name.localeCompare(b.name, 'en', { numeric: true });
-    return sourceArray.sort(sortByName1);
-};
 export default class PlanningUnitSetting extends Component {
     constructor(props) {
         super(props);
@@ -422,9 +418,7 @@ export default class PlanningUnitSetting extends Component {
             );
     }
     procurementAgentList() {
-        const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -513,8 +507,6 @@ export default class PlanningUnitSetting extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
-                    var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
-                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
@@ -646,9 +638,7 @@ export default class PlanningUnitSetting extends Component {
         }
     }
     productCategoryList() {
-        const lan = 'en';
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
@@ -711,8 +701,6 @@ export default class PlanningUnitSetting extends Component {
         }.bind(this)
     }
     filterData(addRowInJexcel) {
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var forecastProgramId = this.state.forecastProgramId;
         if (forecastProgramId > 0) {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
@@ -811,7 +799,6 @@ export default class PlanningUnitSetting extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = outPutListArray;
         this.setState({ dropdownList: dropdownList })
         var options = {
@@ -1080,7 +1067,6 @@ export default class PlanningUnitSetting extends Component {
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
-        var colArr = ['A', 'B'];
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -1125,7 +1111,6 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
-        var colArr = ['A', 'B'];
         var jsonLength;
         if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
             jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1163,7 +1148,6 @@ export default class PlanningUnitSetting extends Component {
             })
             var tableJson = this.el.getJson(null, false);
             var programs = [];
-            var count = 0;
             var planningUnitList = [];
             let indexVar = 0;
             var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
@@ -1171,7 +1155,6 @@ export default class PlanningUnitSetting extends Component {
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             let originalPlanningUnitList = programData.planningUnitList;
             let listOfDisablePuNode = [];
-            let listOfDisablePuNodeActiveInactive = [];
             let planningUnitIds = [];
             for (let i = 0; i < tableJson.length; i++) {
                 planningUnitIds.push(parseInt(tableJson[i][1]));
@@ -1645,7 +1628,7 @@ export default class PlanningUnitSetting extends Component {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var programTransaction = transaction.objectStore('datasetData');
                 programs.forEach(program => {
-                    var programRequest = programTransaction.put(program);
+                    programTransaction.put(program);
                 })
                 transaction.oncomplete = function (event) {
                     db1 = e.target.result;

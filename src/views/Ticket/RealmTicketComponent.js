@@ -7,15 +7,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Add Realm"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    realmCode: "",
-    minMosMinGaurdrail: "",
-    minMosMaxGaurdrail: "",
-    maxMosMaxGaurdrail: "",
-    notes: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()

@@ -38,11 +38,6 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const ref = React.createRef();
-const brandPrimary = getStyle("--primary");
-const brandSuccess = getStyle("--success");
-const brandInfo = getStyle("--info");
-const brandWarning = getStyle("--warning");
-const brandDanger = getStyle("--danger");
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -406,7 +401,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         ])
       )
     );
-    var height = doc.internal.pageSize.height;
     var startY =
       150 +
       this.state.countryValues.length * 2 +

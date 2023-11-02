@@ -994,7 +994,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[5];
         var date = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[7]
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
@@ -1155,7 +1154,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
             }
             var inventoryInstance = this.state.inventoryEl;
-            var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
             var allConfirm = true;
             if (allConfirm == true) {
                 if (map.get("2") == 1) {
@@ -1358,7 +1356,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var planningUnitId = document.getElementById("planningUnitId").value;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {

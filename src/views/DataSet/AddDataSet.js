@@ -34,18 +34,7 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 const entityname = i18n.t('static.program.programMaster');
-let initialValues = {
-    realmId: '',
-    realmCountryId: '',
-    healthAreaId: [],
-    organisationId: '',
-    programName: '',
-    programCode: '',
-    programCode1: '',
-    userId: '',
-    programNotes: '',
-    forecastProgramInMonth: ''
-}
+
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()

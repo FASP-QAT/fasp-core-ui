@@ -6,9 +6,6 @@ import { API_URL } from '../../Constants.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    label: ''
-}
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({

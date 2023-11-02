@@ -47,7 +47,6 @@ export default class PlanningUnitCapacityList extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = planningUnitCapacityArray;
         var options = {
             data: data,

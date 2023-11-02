@@ -163,7 +163,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
                                                     jexcel.destroy(document.getElementById("paputableDiv"), true);
-                                                    var json = [];
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
@@ -533,7 +532,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         elInstance.setValueFromCoords(12, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
@@ -655,7 +653,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
-        let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {

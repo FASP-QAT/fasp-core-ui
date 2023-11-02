@@ -32,13 +32,6 @@ import UsageTemplateService from "../../api/UsageTemplateService";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    number1: "",
-    number2: "",
-    picker1: [],
-    picker2: [],
-    textMessage: ''
-}
 const entityname = i18n.t('static.modelingType.modelingType')
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -723,7 +716,6 @@ class usageTemplate extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -965,7 +957,6 @@ class usageTemplate extends Component {
             onsearch: function (el) {
                 var elInstance = el;
                 var json = elInstance.getJson();
-                let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
                 for (var j = 0; j < jsonLength; j++) {
@@ -1009,8 +1000,6 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        var userId = rowData[22];
-                        var curUser = AuthenticationService.getLoggedInUserId();
                         if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1086,7 +1075,6 @@ class usageTemplate extends Component {
             onfilter: function (el) {
                 var elInstance = el;
                 var json = elInstance.getJson();
-                let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
                 for (var j = 0; j < jsonLength; j++) {
@@ -1130,8 +1118,6 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        var userId = rowData[22];
-                        var curUser = AuthenticationService.getLoggedInUserId();
                         if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1278,7 +1264,6 @@ class usageTemplate extends Component {
     }.bind(this)
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
         var mylist = this.state.tracerCategoryList.filter(c=>c.active);
-        var programList = this.state.typeList;
         var value = (this.state.dataEl.getJson(null, false)[r])[1];
         value = Number(value);
         if (value != -1 && value != 0) {
@@ -1407,11 +1392,9 @@ class usageTemplate extends Component {
     }
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
-        var rowData = elInstance.getRowData(y);
         elInstance.setValueFromCoords(17, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -1544,7 +1527,6 @@ class usageTemplate extends Component {
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
-        var colArr = ['A', 'B'];
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -1593,8 +1575,6 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            let roleArray = this.state.roleArray;
-            var userId = rowData[22];
             if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
@@ -1702,7 +1682,6 @@ class usageTemplate extends Component {
         tr.children[17].title = i18n.t('static.tooltip.UsageInWords');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
-        let roleArray = this.state.roleArray;
         var jsonLength;
         if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
             jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1753,8 +1732,6 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            var userId = rowData[22];
-            var curUser = AuthenticationService.getLoggedInUserId();
             if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
@@ -2339,7 +2316,6 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
         }
-        let roleArray = this.state.roleArray;
         if (x == 19) {
             if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
                 var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))

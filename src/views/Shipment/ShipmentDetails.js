@@ -629,7 +629,6 @@ export default class ShipmentDetails extends React.Component {
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
@@ -644,7 +643,6 @@ export default class ShipmentDetails extends React.Component {
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
                     planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
@@ -1495,7 +1493,6 @@ export default class ShipmentDetails extends React.Component {
                                                 }
                                             }
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
-                                            var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));

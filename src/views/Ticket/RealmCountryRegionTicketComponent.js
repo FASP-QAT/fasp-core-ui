@@ -13,15 +13,6 @@ import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboad.regioncountry"))
 let summaryText_2 = "Add Realm Country Region"
-const initialValues = {
-    summary: "",
-    realmId: "",
-    realmCountryId: "",
-    regionId: "",
-    capacity: "",
-    glnCode: "",
-    notes: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -333,14 +324,6 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 return (
                     <option key={i} value={item.realmId}>
                         {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-        let realmCountryList = realmCountries.length > 0
-            && realmCountries.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
                     </option>
                 )
             }, this);

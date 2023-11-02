@@ -204,11 +204,8 @@ class CompareScenario extends Component {
     }
     filterData() {
         let programId = document.getElementById("programId").value;
-        let viewById = document.getElementById("viewById").value;
         let versionId = document.getElementById("versionId").value;
         let planningUnitId = document.getElementById("planningUnitId").value;
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         if (planningUnitId > 0 && programId > 0 && versionId != 0) {
         }
     }

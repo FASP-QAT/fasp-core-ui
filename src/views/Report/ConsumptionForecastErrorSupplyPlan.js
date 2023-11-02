@@ -174,7 +174,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
     }
 
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -289,7 +288,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
     }
 
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -310,8 +308,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -400,7 +396,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
     }
 
     consolidatedRegionList = (programId) => {
-        const lan = 'en';
         const { regions } = this.state
         var regionList = regions;
         var db1;
@@ -479,9 +474,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -489,7 +482,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
                         };
@@ -739,9 +731,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             // if (programId > 0 && versionId != 0) {
             if (versionId.includes('Local') || !isSiteOnline()) {
                 // if (versionId.includes('Local')) {
-                const lan = 'en';
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -749,7 +739,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
                     planningunitRequest.onerror = function (event) {
                         // Handle errors!
                     };
@@ -1034,7 +1023,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                 var program = `${programId}_v${version}_uId_${userId}`
-                                var data = [];
                                 var programRequest = programTransaction.get(program);
                                 programRequest.onerror = function (event) {
                                 }.bind(this);
@@ -1079,7 +1067,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var actualQty = "";
                                             var forecastQty = "";
                                             var daysOfStockOut = "";
-                                            var consumptionQtyOutOfStockData = "";
                                             consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
                                             if (consumptionforecastQty.length > 0) {
                                                 for (var con = 0; con < consumptionforecastQty.length; con++) {
@@ -1150,7 +1137,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var program = `${programId}_v${version}_uId_${userId}`
-                        var data = [];
                         var programRequest = programTransaction.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
@@ -1195,7 +1181,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var actualQty = "";
                                     var forecastQty = "";
                                     var daysOfStockOut = "";
-                                    var consumptionQtyOutOfStockData = "";
                                     consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
                                     if (consumptionforecastQty.length > 0) {
                                         for (var con = 0; con < consumptionforecastQty.length; con++) {
@@ -1646,10 +1631,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         //creates image
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 100;
-        var aspectwidth1 = (width - h1);
 
         doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
 
@@ -1834,35 +1816,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let totalDaysOfStockOut = 0;
 
         const { forecastingUnits } = this.state;
-        let forcastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
 
         const { planningUnits } = this.state;
         console.log("planningUnits--------------->", planningUnits)
-        let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>
-                        {getLabelText(item.planningUnit.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
 
         const { programs } = this.state;
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
-                return (
-                    <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
 
         const { equivalencyUnitList } = this.state;
         let equivalencyUnitList1 = equivalencyUnitList.length > 0
@@ -2017,11 +1975,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
 
         var elInstance = this.state.dataList;
         if (elInstance != undefined) {
-            var colourCount = 0;
 
             var consumptionActualValue = [];
             var consumptionForecastValue = [];

@@ -444,7 +444,6 @@ class ListUserComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         jexcel.destroy(document.getElementById("tableDiv1"), true);
-        var json = [];
         var data = userArray;
         var options = {
             data: data,
@@ -557,7 +556,6 @@ class ListUserComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv2"), '');
         jexcel.destroy(document.getElementById("tableDiv2"), true);
-        var json = [];
         var data = userArray;
         var options = {
             data: data,
@@ -631,20 +629,11 @@ class ListUserComponent extends Component {
             entries: " ",
         });
         const { realms } = this.state;
-        const { languages } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
                         {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-        let languageList = languages.length > 0
-            && languages.map((item, i) => {
-                return (
-                    <option key={i} value={item.languageId}>
-                        {item.label.label_en}
                     </option>
                 )
             }, this);

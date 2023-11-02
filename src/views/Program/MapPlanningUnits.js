@@ -674,7 +674,6 @@ export default class MapPlanningUnits extends Component {
                                 productDataArr[0] = data;
                                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                 jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                var json = [];
                                 var data = productDataArr;
                                 var options = {
                                     data: data,

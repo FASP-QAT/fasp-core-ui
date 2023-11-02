@@ -106,7 +106,6 @@ class ListProcurementAgentComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = procurementAgentArray;
         var options = {
             data: data,

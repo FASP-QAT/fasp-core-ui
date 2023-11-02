@@ -737,7 +737,6 @@ class VersionSettingsComponent extends Component {
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -747,7 +746,6 @@ class VersionSettingsComponent extends Component {
         }
         var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var y = start; y < jsonLength; y++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
             if (rowData[10] == 1) {
                 var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
@@ -855,7 +853,6 @@ class VersionSettingsComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = versionSettingsArray;
         var options = {
             data: data,
@@ -1085,7 +1082,6 @@ class VersionSettingsComponent extends Component {
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
         for (var y = 0; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
             if (rowData[10] == 1) {
@@ -1229,7 +1225,6 @@ class VersionSettingsComponent extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'

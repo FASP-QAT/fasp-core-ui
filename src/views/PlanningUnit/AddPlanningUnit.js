@@ -9,12 +9,6 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-let initialValues = {
-    unitId: '',
-    label: '',
-    forecastingUnitId: '',
-    multiplier: ''
-}
 const entityname = i18n.t('static.planningunit.planningunit');
 const validationSchema = function (values) {
     return Yup.object().shape({

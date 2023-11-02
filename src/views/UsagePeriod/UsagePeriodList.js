@@ -79,7 +79,6 @@ class UsagePeriod extends Component {
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
         jexcel.destroy(document.getElementById("paputableDiv"), true);
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -290,7 +289,6 @@ class UsagePeriod extends Component {
         this.el.setValueFromCoords(6, y, 1, true);
     }
     addRow = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";

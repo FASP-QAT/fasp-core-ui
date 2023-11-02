@@ -257,7 +257,6 @@ class EquivalancyUnit extends Component {
         if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
             jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
         }
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,
@@ -565,7 +564,6 @@ class EquivalancyUnit extends Component {
         if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
             jexcel.destroy(document.getElementById("paputableDiv"), true);
         }
-        var json = [];
         var data = papuDataArr;
         var options = {
             data: data,

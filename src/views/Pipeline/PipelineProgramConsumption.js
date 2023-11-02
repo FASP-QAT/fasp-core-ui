@@ -348,7 +348,6 @@ export default class PipelineProgramConsumption extends Component {
                                     }
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
                                     jexcel.destroy(document.getElementById("consumptiontableDiv"), true);
-                                    var json = [];
                                     var data = consumptionDataArr;
                                     var options = {
                                         data: data,

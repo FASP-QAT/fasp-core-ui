@@ -159,7 +159,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var db1;
-                        var storeOS;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onerror = function (event) {
@@ -347,8 +346,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     filterData() {
         var realmId = AuthenticationService.getRealmId();
         var db1;
-        var storeOS;
-        var supplyPlanRegionList = [];
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -562,7 +559,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
-        var json = [];
         var data = papuDataArr;
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);

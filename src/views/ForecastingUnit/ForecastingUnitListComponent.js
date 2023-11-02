@@ -59,7 +59,6 @@ export default class ForecastingUnitListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = forecastingUnitListArray;
         var options = {
             data: data,

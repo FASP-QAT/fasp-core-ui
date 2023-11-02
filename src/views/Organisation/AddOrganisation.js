@@ -543,14 +543,6 @@ export default class AddOrganisationComponent extends Component {
                     </option>
                 )
             }, this);
-        let countryList = selCountries.length > 0
-            && selCountries.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {item.country.label.label_en}
-                    </option>
-                )
-            }, this);
         const { organisationTypeList } = this.state;
         let organisationTypes = organisationTypeList.length > 0
             && organisationTypeList.map((item, i) => {

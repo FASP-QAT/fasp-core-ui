@@ -291,8 +291,6 @@ class ShipmentGlobalView extends Component {
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 260, 300, 200, 'a', 'CANVAS');
         canvas = document.getElementById("cool-canvas2");
         canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -1439,7 +1437,6 @@ class ShipmentGlobalView extends Component {
             labels: [...new Set(this.state.dateSplitList.map(ele => (this.dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
         }
-        let viewby = this.state.viewby;
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />

@@ -7,12 +7,6 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.planningunit.planningunit');
-let initialValues = {
-    label: '',
-    forecastingUnitId: '',
-    forecastingUnitList: [],
-    multiplier: ''
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()

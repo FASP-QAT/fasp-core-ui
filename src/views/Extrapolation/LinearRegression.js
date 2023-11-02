@@ -103,14 +103,11 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     let varX = sumOfXMinusXBarSqr / data.length;
     let sqrtOfRegression = Math.pow(SSE / (data.length - 2), 0.5);
     let criticalTValue = getCriticalTValue(data.length, Number(confidenceLevel));
-    let sumYMinusY1Sqr = 0;
     let a = sqrtOfRegression / Math.pow(data.length, 0.5);
     var output = [];
     for (let x = 0; x < data.length + count; x++) {
         let y = (gradient * (x + 1)) + yIntercept;
         let ciString = "";
-        let yString;
-        let cLevel = "";
         if (x >= data.length) {
             let b1 = Math.pow(x + 1 - xBar, 2);
             let b2 = Math.pow((1 + (b1 / varX)), 0.5);

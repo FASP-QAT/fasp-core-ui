@@ -124,7 +124,7 @@ export default class SyncMasterData extends Component {
                                 prgQPLDetails.readonly = readonly;
                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                var programQPLDetailsRequest = programQPLDetailsOs.put(prgQPLDetails);
+                                programQPLDetailsOs.put(prgQPLDetails);
                             }
                         }
                         for (var i = 0; i < datasetList.length; i++) {
@@ -141,7 +141,6 @@ export default class SyncMasterData extends Component {
             var generalDataBytes = CryptoJS.AES.decrypt(programList[pl].programData.generalData, SECRET_KEY);
             var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
             var generalJson = JSON.parse(generalData);
-            var programQPLListFilter = programQPLDetailsList.filter(c => c.id == programList[pl].id);
             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList : [];
             var listOfRoNoAndRoPrimeLineNo = [];
             for (var lsl = 0; lsl < linkedShipmentsList.length; lsl++) {
@@ -201,7 +200,6 @@ export default class SyncMasterData extends Component {
                                                 rebuild = true;
                                             }
                                             var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
-                                            var batchArray = [];
                                             var roNoAndRoPrimeLineNoSetFromAPI = [...new Set(shipArray.map(ele => ele.roNo + "|" + ele.roPrimeLineNo))];
                                             var planningUnitList = [];
                                             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active == true) : [];
@@ -629,7 +627,6 @@ export default class SyncMasterData extends Component {
                                             prog.programData.planningUnitDataList = planningUnitDataList;
                                             prog.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalJson), SECRET_KEY)).toString();
                                             var db1;
-                                            var storeOS;
                                             getDatabase();
                                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                                             openRequest.onerror = function (event) {
@@ -717,7 +714,6 @@ export default class SyncMasterData extends Component {
         }
         if (this.state.syncedMasters === this.state.totalMasters) {
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -754,7 +750,6 @@ export default class SyncMasterData extends Component {
         this.setState({ loading: false })
         if (localStorage.getItem("sessionType") === 'Online') {
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
@@ -795,7 +790,6 @@ export default class SyncMasterData extends Component {
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var program = transaction.objectStore('programData');
                     var pGetRequest = program.getAll();
-                    var proList = []
                     pGetRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext')
@@ -809,7 +803,7 @@ export default class SyncMasterData extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var pIds = [];
                         var tm = this.state.totalMasters;
-                        var programIds = myResult.filter(c => c.userId == userId).map(program => {
+                        myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
                         });
                         var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');

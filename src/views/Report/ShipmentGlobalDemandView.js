@@ -418,13 +418,10 @@ class ShipmentGlobalDemandView extends Component {
             align: 'left'
         })
         doc.setTextColor("#fff");
-        const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
         var canvas = document.getElementById("cool-canvas11");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -606,9 +603,7 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
@@ -682,7 +677,6 @@ class ShipmentGlobalDemandView extends Component {
                                 }
                                 procurementAgentList[k] = procurementAgentObj
                             }
-                            let data = [];
                             let procurementAgentSplit = [];
                             for (let i = 0; i < planningUnitIds.length; i++) {
                                 let obj = {};
@@ -701,14 +695,12 @@ class ShipmentGlobalDemandView extends Component {
                                             return a;
                                         }, {}));
                                         if (data2.length > 0) {
-                                            let key = data2[0].procurementAgent.code;
                                             let value = data2[0].shipmentQty;
                                             let json = {}
                                             json[data2[0].procurementAgent.code] = data2[0].shipmentQty;
                                             buffer.push(json);
                                             total = total + value;
                                         } else {
-                                            let key = procurementAgentList[j].code;
                                             let value = 0;
                                             let json = {}
                                             json[procurementAgentList[j].code] = value;
@@ -1032,7 +1024,6 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedFundingSourceList = () => {
-        const lan = 'en';
         const { fundingSources } = this.state
         var proList = fundingSources;
         var db1;
@@ -1135,7 +1126,6 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programLst } = this.state
         var proList = programLst;
         var db1;
@@ -1155,8 +1145,6 @@ class ShipmentGlobalDemandView extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         proList.push(programData)
@@ -1205,7 +1193,6 @@ class ShipmentGlobalDemandView extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -1248,11 +1235,8 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitValues: []
         }, () => {
             if (!localStorage.getItem("sessionType") === 'Online') {
-                let programId = document.getElementById("programId").value;
-                let versionId = document.getElementById("versionId").value;
-                const lan = 'en';
+
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -1458,21 +1442,7 @@ class ShipmentGlobalDemandView extends Component {
                     </option>
                 )
             }, this);
-        const backgroundColor = [
-            '#4dbd74',
-            '#c8ced3',
-            '#000',
-            '#ffc107',
-            '#f86c6b',
-            '#20a8d8',
-            '#042e6a',
-            '#59cacc',
-            '#118b70',
-            '#EDB944',
-            '#F48521',
-            '#ED5626',
-            '#3fe488'
-        ]
+        
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
@@ -1512,10 +1482,7 @@ class ShipmentGlobalDemandView extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        const makeText = m => {
-            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-            return '?'
-        }
+        
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >

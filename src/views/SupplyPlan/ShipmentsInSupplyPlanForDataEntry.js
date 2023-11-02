@@ -2063,7 +2063,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             elInstance.setValueFromCoords(17, y, "", true);
             if (valid == true) {
                 var budgetList = this.state.budgetListAll;
-                var receiveDate = rowData[5]
                 var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && [...new Set(b.programs.map(ele => ele.id))].includes(parseInt(this.state.programIdForBudget)) && b.active.toString() == "true");
                 if (mylist.length == 1) {
                     elInstance.setValueFromCoords(17, y, mylist[0].id, true);
@@ -2469,15 +2468,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             mapArray.push(map);
-            var batchInfoList = this.state.batchInfoListAll;
-            var checkDuplicate = batchInfoList.filter(c =>
-                c.batchNo == map.get("0") &&
-                moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
-            )
-            var index = batchInfoList.findIndex(c =>
-                c.batchNo == map.get("0") &&
-                moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
-            );
             var checkDuplicateInMap = mapArray.filter(c =>
                 c.get("0") == map.get("0") &&
                 moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
@@ -2653,7 +2643,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var approvedDate = shipmentDatesJson.approvedDate;
             var shippedDate = shipmentDatesJson.shippedDate;
             var arrivedDate = shipmentDatesJson.arrivedDate;
-            var receivedDate = shipmentDatesJson.receivedDate;
             var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
             if (rowData[8].toString() == "true") {
                 addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[3])[0].localProcurementLeadTime;
@@ -2727,7 +2716,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     var procurementAgent = rowData[6];
                     var shipmentStatus = rowData[4];
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
@@ -3091,7 +3079,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                 usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
                             }
                         }
-                        var totalCost = Number(elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + Number(elInstance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                         var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                         if (availableBudgetAmount < 0) {
@@ -3341,7 +3328,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var elInstance = this.state.shipmentsEl;
             var json = elInstance.getJson(null, false);
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {

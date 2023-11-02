@@ -299,27 +299,7 @@ class StockStatus extends Component {
     const orientation = "landscape"; 
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(8);
-    var height = doc.internal.pageSize.height;
-    const header = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
-    { content: i18n.t("static.report.stock"), colSpan: 1 },
-    { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
-    { content: i18n.t("static.shipment.shipment"), colSpan: 2 },
-    { content: i18n.t("static.report.stock"), colSpan: 6 }
-    ],
-    [
-      i18n.t('static.supplyPlan.openingBalance'),
-      i18n.t('static.report.forecasted'),
-      i18n.t('static.report.actual'),
-      i18n.t('static.supplyPlan.qty'),
-      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
-      i18n.t('static.supplyPlan.adj'),
-      i18n.t('static.supplyplan.exipredStock'),
-      i18n.t('static.supplyPlan.endingBalance'),
-      i18n.t('static.report.amc'),
-      this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
-      i18n.t('static.supplyPlan.unmetDemandStr'),
-    ]];
+    doc.setFontSize(8);    
     var pageArray = [];
     var list = this.state.PlanningUnitDataForExport
     var count = 0;
@@ -574,7 +554,6 @@ class StockStatus extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
@@ -766,7 +745,6 @@ class StockStatus extends Component {
                     }
                     var monthstartfrom = this.state.rangeValue.from.month
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                      var monthlydata = [];
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
@@ -968,10 +946,8 @@ class StockStatus extends Component {
       exportModal: false
     })
     let programId = document.getElementById("programId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
     report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
     var PlanningUnitDataForExport = [];
     if (versionId.includes('Local')) {
@@ -1074,9 +1050,6 @@ class StockStatus extends Component {
                     }
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
-                    var fromYear = this.state.rangeValue.from.year
-                    var toYear = this.state.rangeValue.to.year
-                    var toMonth = this.state.rangeValue.to.month
                     var maxForMonths = 0;
                     var realm = realmRequest.result;
                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1143,7 +1116,6 @@ class StockStatus extends Component {
                       }
                     })
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                      var monthlydata = [];
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
@@ -2101,7 +2073,6 @@ class StockStatus extends Component {
     }
   }
   consolidatedProgramList = () => {
-    const lan = 'en';
     const { programs } = this.state
     var proList = programs;
     var db1;
@@ -2121,8 +2092,6 @@ class StockStatus extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             var f = 0
@@ -2136,7 +2105,6 @@ class StockStatus extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (proList.length == 1) {
           this.setState({
             programs: proList.sort(function (a, b) {
@@ -2254,7 +2222,6 @@ class StockStatus extends Component {
     }
   }
   consolidatedVersionList = (programId) => {
-    const lan = 'en';
     const { versions } = this.state
     var verList = versions;
     var db1;
@@ -2274,8 +2241,6 @@ class StockStatus extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
@@ -2334,9 +2299,7 @@ class StockStatus extends Component {
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
-          const lan = 'en';
           var db1;
-          var storeOS;
           getDatabase();
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onsuccess = function (e) {
@@ -2344,7 +2307,6 @@ class StockStatus extends Component {
             var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
             planningunitRequest.onerror = function (event) {
             };
             planningunitRequest.onsuccess = function (e) {
@@ -2681,146 +2643,7 @@ class StockStatus extends Component {
         }
       }
     }
-    const optionsWithoutHeader = {
-      title: {
-        display: false,
-        text: ""
-      },
-      scales: {
-        yAxes: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? [{
-          id: 'A',
-          position: 'left',
-          scaleLabel: {
-            labelString: i18n.t('static.shipment.qty'),
-            display: true,
-            fontSize: "12",
-            fontColor: 'black'
-          },
-          ticks: {
-            beginAtZero: true,
-            fontColor: 'black',
-            callback: function (value) {
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return x1 + x2;
-            }
-          }, gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
-          }
-        }, {
-          id: 'B',
-          position: 'right',
-          scaleLabel: {
-            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-            fontColor: 'black',
-            display: true,
-          },
-          ticks: {
-            beginAtZero: true,
-            fontColor: 'black',
-            callback: function (value) {
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return x1 + x2;
-            }
-          },
-          gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
-          }
-        }] : [{
-          id: 'A',
-          position: 'left',
-          scaleLabel: {
-            labelString: i18n.t('static.shipment.qty'),
-            display: true,
-            fontSize: "12",
-            fontColor: 'black'
-          },
-          ticks: {
-            beginAtZero: true,
-            fontColor: 'black',
-            callback: function (value) {
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-              }
-              return x1 + x2;
-            }
-          }, gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
-          }
-        }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
-            fontStyle: "normal",
-            fontSize: "12"
-          },
-          ticks: {
-            fontColor: 'black',
-            fontStyle: "normal",
-            fontSize: "12"
-          },
-          gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
-          }
-        }]
-      },
-      tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-          label: function (tooltipItem, data) {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
-        }
-      },
-      maintainAspectRatio: false,
-      legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-          usePointStyle: true,
-          fontColor: 'black'
-        }
-      }
-    }
+
     let datasets = [
       {
         label: i18n.t('static.supplyplan.exipredStock'),

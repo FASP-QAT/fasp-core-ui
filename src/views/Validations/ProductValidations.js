@@ -310,7 +310,6 @@ class ProductValidation extends Component {
                 var nodeDataMap = items[f].payload.nodeDataMap[this.state.scenarioId][0];
                 nodeDataList.push({ nodeDataMap: nodeDataMap, flatItem: items[f] });
             }
-            var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
             var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
             var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);

@@ -15,14 +15,6 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    countryName: "",
-    technicalAreaName: "",
-    technicalAreaCode: "",
-    notes: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()

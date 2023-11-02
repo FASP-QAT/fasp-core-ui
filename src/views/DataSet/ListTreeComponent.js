@@ -1079,8 +1079,6 @@ export default class ListTreeComponent extends Component {
     }
     updateMissingPUs() {
         var validation = this.checkValidation();
-        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-        var curUser = AuthenticationService.getLoggedInUserId();
         let indexVar = 0;
         if (validation == true) {
             var db1;
@@ -1228,7 +1226,6 @@ export default class ListTreeComponent extends Component {
             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
             var procurementAgentRequest = procurementAgentOs.getAll();
-            var planningList = []
             procurementAgentRequest.onerror = function (event) {
                 this.setState({
                     message: 'unknown error occured', loading: false
@@ -1420,7 +1417,6 @@ export default class ListTreeComponent extends Component {
             var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
             var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
             var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
             planningunitRequest.onerror = function (event) {
             };
             planningunitRequest.onsuccess = function (e) {
@@ -1463,8 +1459,6 @@ export default class ListTreeComponent extends Component {
         let treeList = program.treeList;
         var treeTemplateId = '';
         if (operationId == 1) {
-            const index = treeList.findIndex(c => c.treeId == treeId);
-            const result = treeList.splice(index, 1);
         } else if (operationId == 2) {
             let treeName = this.state.treeName;
             for (let i = 0; i < treeList.length; i++) {
@@ -2035,7 +2029,6 @@ export default class ListTreeComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -2235,10 +2228,6 @@ export default class ListTreeComponent extends Component {
                     }
                 }
             }
-            const sortArray = (sourceArray) => {
-                const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
-                return sourceArray.sort(sortByName);
-            };
             if (treeArray.length > 0) {
                 treeArray.sort(function (a, b) {
                     return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
@@ -2246,7 +2235,6 @@ export default class ListTreeComponent extends Component {
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
-            var json = [];
             var data = treeArray;
             var options = {
                 data: data,

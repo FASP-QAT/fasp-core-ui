@@ -104,7 +104,6 @@ class SupplierListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = supplierArray;
         var options = {
             data: data,

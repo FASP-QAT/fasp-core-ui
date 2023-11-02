@@ -674,7 +674,6 @@ class Program extends Component {
     }
     deleteProgramById(id, i, length) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -812,7 +811,6 @@ class Program extends Component {
                 })
         }
         else {
-            var programThenCount = 0;
             if (localStorage.getItem("sessionType") === 'Online') {
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
@@ -825,7 +823,6 @@ class Program extends Component {
                             var inventoryList = json[r].inventoryList;
                             var shipmentList = json[r].shipmentList;
                             var batchInfoList = json[r].batchInfoList;
-                            var problemReportList = json[r].problemReportList;
                             var supplyPlan = json[r].supplyPlan;
                             var generalData = json[r];
                             delete generalData.consumptionList;
@@ -869,7 +866,6 @@ class Program extends Component {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
                             var program = transaction.objectStore('programQPLDetails');
-                            var count = 0;
                             var getRequest = program.getAll();
                             getRequest.onerror = function (event) {
                             };
@@ -919,7 +915,7 @@ class Program extends Component {
                                                             userId: userId,
                                                             programCode: json[r].programCode,
                                                         };
-                                                        var putRequest = programSaveData.put(item);
+                                                        programSaveData.put(item);
                                                     }
                                                     transactionForSavingData.oncomplete = function (event) {
                                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -939,7 +935,7 @@ class Program extends Component {
                                                                 programData: updatedJson[r],
                                                                 userId: userId
                                                             };
-                                                            var putRequest = downloadedProgramSaveData.put(item);
+                                                            downloadedProgramSaveData.put(item);
                                                         }
                                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
@@ -958,7 +954,7 @@ class Program extends Component {
                                                                     readonly: 0
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                                programQPLDetailsOs.put(programQPLDetailsJson);
                                                             }
                                                             programQPLDetailsTransaction.oncomplete = function (event) {
                                                                 this.setState({
@@ -1013,7 +1009,7 @@ class Program extends Component {
                                             userId: userId,
                                             programCode: json[r].programCode,
                                         };
-                                        var putRequest = programSaveData.put(item);
+                                        programSaveData.put(item);
                                     }
                                     transactionForSavingData.oncomplete = function (event) {
                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -1033,7 +1029,7 @@ class Program extends Component {
                                                 programData: updatedJson[r],
                                                 userId: userId
                                             };
-                                            var putRequest = downloadedProgramSaveData.put(item);
+                                            downloadedProgramSaveData.put(item);
                                         }
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
@@ -1052,7 +1048,7 @@ class Program extends Component {
                                                     readonly: 0
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                programQPLDetailsOs.put(programQPLDetailsJson);
                                             }
                                             programQPLDetailsTransaction.oncomplete = function (event) {
                                                 this.setState({

@@ -607,7 +607,6 @@ export default class SupplyPlanComponent extends React.Component {
             deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
             inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
             var canv = document.getElementById("cool-canvas" + count)
-            var canvasImg1 = canv.toDataURL("image/png", 1.0);
             count++
             let content = {
                 margin: { top: 80, bottom: 70 },
@@ -2306,10 +2305,8 @@ export default class SupplyPlanComponent extends React.Component {
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
             var db1;
-            var storeOS;
             getDatabase();
             var regionList = [];
-            var dataSourceList = [];
             var dataSourceListAll = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
@@ -2592,9 +2589,7 @@ export default class SupplyPlanComponent extends React.Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -3478,7 +3473,6 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
             var programJson = this.state.programJson;
             var batchInfoList = programJson.batchInfoList;
             var consumptionListUnFiltered = (programJson.consumptionList);
@@ -3541,7 +3535,6 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
-            var programId = document.getElementById("programId").value;
             var programJson = this.state.programJson;
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
@@ -3594,7 +3587,6 @@ export default class SupplyPlanComponent extends React.Component {
     }
     suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate) {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var planningUnitId = document.getElementById("planningUnitId").value;
         var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
@@ -4103,9 +4095,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({ exportModal: false, loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
-            var storeOS;
             getDatabase();
-            var regionList = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
@@ -4131,7 +4121,6 @@ export default class SupplyPlanComponent extends React.Component {
                 programRequest.onsuccess = function (e) {
                     var programResult = programRequest.result.programData;
                     var planningUnitData = [];
-                    var selectedPlanningUnitdata = {};
                     var pcnt = 0;
                     var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
                         a = a.label.toLowerCase();
@@ -5165,7 +5154,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 }
                                             }
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
-                                            var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
@@ -5214,7 +5202,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
-                                                var spd0 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));

@@ -303,7 +303,6 @@ class AddprogramPlanningUnit extends Component {
                                                         }
                                                         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                                         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                                        var json = [];
                                                         var data = productDataArr;
                                                         var options = {
                                                             data: data,
@@ -836,7 +835,6 @@ class AddprogramPlanningUnit extends Component {
         }
     }
     addRowInJexcel = function () {
-        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = "-1";
         data[1] = "";

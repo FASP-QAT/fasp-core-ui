@@ -179,7 +179,6 @@ class ForecastOutput extends Component {
                         var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                         };
                         planningunitRequest.onsuccess = function (e) {
@@ -612,7 +611,6 @@ class ForecastOutput extends Component {
                 let index = uniquePlanningUnitIdList.findIndex(c => c == consumptionData1[i].objUnit.id);
                 index = index - count;
                 let jsonTemp = { objUnit: consumptionData1[i].objUnit, scenario: consumptionData1[i].scenario, display: consumptionData1[i].display, color: consumptionData1[i].color, consumptionList: consumptionData1[i].consumptionList, region: consumptionData1[i].region, graphId: (consumptionData1[i].display == false || consumptionData1[i].scenario.id == 0 ? -1 : index) }
-                let q = (consumptionData1[i].display == false || consumptionData1[i].scenario.id == 0 ? count = count + 1 : '');
                 tempConsumptionData.push(jsonTemp);
             }
             this.setState({
@@ -681,8 +679,6 @@ class ForecastOutput extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                         for (var i = 0; i < filteredGetRequestList.length; i++) {
-                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson1 = JSON.parse(programData);
@@ -755,7 +751,6 @@ class ForecastOutput extends Component {
                                                                 if (arrayOfNodeDataMap.length > 0) {
                                                                     nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
                                                                     if (yaxisEquUnitId != -1) {
-                                                                        let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUniObj.planningUnit.forecastingUnit.id)[0].convertToEu;
                                                                         let consumptionList = nodeDataMomList.map(m => {
                                                                             return {
                                                                                 consumptionDate: m.month,
@@ -1264,7 +1259,6 @@ class ForecastOutput extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -1285,8 +1279,6 @@ class ForecastOutput extends Component {
                 let downloadedProgramData = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         programData.code = programData.programCode;
@@ -1303,7 +1295,6 @@ class ForecastOutput extends Component {
                         downloadedProgramData.push(programData);
                     }
                 }
-                var lang = this.state.lang;
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -1714,8 +1705,6 @@ class ForecastOutput extends Component {
                     "Nov",
                     "Dec",
                 ]
-                let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-                let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
                 let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
                 forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
                 let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
@@ -1729,7 +1718,6 @@ class ForecastOutput extends Component {
                     forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                 }, () => { })
             } else {
-                let selectedForecastProgram = this.state.programs.filter(c => c.id == programId)[0];
                 let currentProgramVersion = this.state.versions.filter(c => c.versionId == versionId)[0];
                 let d1 = new Date(currentProgramVersion.forecastStartDate);
                 let d2 = new Date(currentProgramVersion.forecastStopDate);
@@ -1769,8 +1757,6 @@ class ForecastOutput extends Component {
     setVersionId(event) {
         var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
         versionId = parseInt(versionId);
-        var programId = this.state.programId;
-        var viewById = document.getElementById("viewById").value;
         if (versionId != '' || versionId != undefined) {
             this.setState({
                 versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
@@ -1884,7 +1870,6 @@ class ForecastOutput extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -1904,8 +1889,6 @@ class ForecastOutput extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -2248,13 +2231,10 @@ class ForecastOutput extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-        let countVar = 0;
-        let countVar1 = 0;
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />

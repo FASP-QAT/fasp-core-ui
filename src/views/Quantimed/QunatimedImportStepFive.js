@@ -100,7 +100,6 @@ export default class QunatimedImportStepFive extends Component {
                             let moments = dates.map(d => moment(d));
                             var minDate = moment.min(moments).format("YYYY-MM-DD");
                             var db1;
-                            var storeOS;
                             getDatabase();
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
@@ -293,7 +292,6 @@ export default class QunatimedImportStepFive extends Component {
         var dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
         var realmId = AuthenticationService.getRealmId();
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {

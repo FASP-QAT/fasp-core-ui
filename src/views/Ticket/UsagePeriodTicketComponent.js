@@ -8,12 +8,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.usagePeriod.usagePeriod"))
 let summaryText_2 = "Add Usage Period"
-const initialValues = {
-    summary: "",
-    UsagePeriodName: "",
-    ConversionFactor: "",
-    notes: ''
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()

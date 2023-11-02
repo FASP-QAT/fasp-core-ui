@@ -71,9 +71,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         if (programId > 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
-                const lan = 'en';
                 var db1;
-                var storeOS;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
@@ -282,9 +280,6 @@ class StockStatusAcrossPlanningUnits extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
         const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatterAMC(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
@@ -367,7 +362,6 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -402,7 +396,6 @@ class StockStatusAcrossPlanningUnits extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -503,7 +496,6 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -523,8 +515,6 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -705,7 +695,6 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = dataArray;
         var options = {
             data: data,
@@ -791,8 +780,6 @@ class StockStatusAcrossPlanningUnits extends Component {
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var colArrB = ['C', 'D', 'E'];
-        var colArrC = ['C', 'D'];
-        var colArrE = ['E'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var mos = rowData[1] == 1 ? parseFloat(rowData[4]) : rowData[3];

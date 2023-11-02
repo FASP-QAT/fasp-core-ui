@@ -28,7 +28,6 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
-const entityname = i18n.t('static.dashboard.inventoryTurns');
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
 const pickerLang = {
@@ -131,7 +130,6 @@ export default class InventoryTurns extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -139,7 +137,7 @@ export default class InventoryTurns extends Component {
             this.state.costOfCountry.map(item => {
                 let sortOrderList = [];
                 let sortOrder = this.state.puList.filter(e => e.value == item.id).length > 0 ? this.state.puList.filter(e => e.value == item.id)[0].sortOrder : "";
-                let updatedItems = this.state.puList.map(item1 => {
+                this.state.puList.map(item1 => {
                     if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
                         sortOrderList.push(item1.value);
                     }
@@ -260,16 +258,13 @@ export default class InventoryTurns extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
         const data = [];
         {
             this.state.costOfCountry.map(item => {
                 let sortOrderList = [];
                 let sortOrder = this.state.puList.filter(e => e.value == item.id).length > 0 ? this.state.puList.filter(e => e.value == item.id)[0].sortOrder : "";
-                let updatedItems = this.state.puList.map(item1 => {
+                this.state.puList.map(item1 => {
                     if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
                         sortOrderList.push(item1.value);
                     }
@@ -341,7 +336,6 @@ export default class InventoryTurns extends Component {
                 }
             }
         };
-        var maxSecondColumnWidth = 0;
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
@@ -606,7 +600,6 @@ export default class InventoryTurns extends Component {
             var transaction = db1.transaction(['realm'], 'readwrite');
             var program = transaction.objectStore('realm');
             var getRequest = program.getAll();
-            var proList = []
             getRequest.onerror = function (event) {
             };
             getRequest.onsuccess = function (event) {
@@ -825,7 +818,7 @@ export default class InventoryTurns extends Component {
                         for (let i = 0; i < this.state.CostOfInventoryInput.pu.length; i++) {
                             let sortOrderList = [];
                             let sortOrder = this.state.puList.filter(e => e.value == this.state.CostOfInventoryInput.pu[i])[0].sortOrder;
-                            let updatedItems = this.state.puList.map(item => {
+                            this.state.puList.map(item => {
                                 if (item.sortOrder.toString().startsWith(sortOrder.toString())) {
                                     sortOrderList.push(item.value);
                                 }
@@ -1170,32 +1163,7 @@ export default class InventoryTurns extends Component {
                 text: i18n.t('static.extrapolation.mse'),
             }
         ];
-        const options = {
-            hidePageListOnlyOnePage: true,
-            firstPageText: i18n.t('static.common.first'),
-            prePageText: i18n.t('static.common.back'),
-            nextPageText: i18n.t('static.common.next'),
-            lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage'),
-            prePageTitle: i18n.t('static.common.prevPage'),
-            firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage'),
-            showTotal: true,
-            paginationTotalRenderer: customTotal,
-            disablePageTitle: true,
-            sizePerPageList: [{
-                text: '10', value: 10
-            }, {
-                text: '30', value: 30
-            }
-                ,
-            {
-                text: '50', value: 50
-            },
-            {
-                text: 'All', value: this.state.costOfInventory.length
-            }]
-        }
+        
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />

@@ -368,10 +368,7 @@ export default class SupplyPlanComponent extends React.Component {
         doc.setFontSize(15);
         var canvas = document.getElementById("cool-canvas-compare");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 100;
-        var aspectwidth1 = (width - h1);
         doc.addImage(canvasImg, 'png', 50, 150, 750, 340, 'CANVAS');
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
@@ -590,10 +587,8 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         if (programId != 0) {
             var db1;
-            var storeOS;
             getDatabase();
             var regionList = [];
-            var dataSourceList = [];
             var dataSourceListAll = [];
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
@@ -783,9 +778,7 @@ export default class SupplyPlanComponent extends React.Component {
         var paColors = []
         var lastActualConsumptionDate = [];
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.setState({
@@ -1599,7 +1592,6 @@ export default class SupplyPlanComponent extends React.Component {
             jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var batchInfoList = programJson.batchInfoList;
         var batchList = [];
@@ -1648,7 +1640,6 @@ export default class SupplyPlanComponent extends React.Component {
             jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var batchInfoList = programJson.batchInfoList;
         var batchList = [];
@@ -1844,7 +1835,6 @@ export default class SupplyPlanComponent extends React.Component {
                 }
             }
         }
-        const { programList } = this.state;
         let bar1 = {}
         if (this.state.jsonArrForGraph.length > 0) {
             var datasets = [
@@ -2931,7 +2921,6 @@ export default class SupplyPlanComponent extends React.Component {
         })
     }
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {
-        var programId = document.getElementById("programId").value;
         var programJson = this.state.programJson;
         var shipmentListUnFiltered = programJson.shipmentList;
         this.setState({

@@ -108,7 +108,6 @@ const options = {
     custom: CustomTooltips,
     callbacks: {
       label: function (tooltipItem, data) {
-        let label = data.labels[tooltipItem.index];
         let value =
           data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
         var cell1 = value;
@@ -572,13 +571,9 @@ class ShipmentSummery extends Component {
     }
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
-    var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
-    var h1 = 100;
-    var aspectwidth1 = width - h1;
     let startY = y + 10;
     let pages = Math.ceil(startY / height)
-    let startYtable = startY - ((height - h1) * (pages - 1))
     for (var j = 1; j < pages; j++) {
       doc.addPage()
     }
@@ -671,7 +666,6 @@ class ShipmentSummery extends Component {
     doc.save(i18n.t("static.report.shipmentDetailReport") + ".pdf");
   };
   getFundingSourceList() {
-    const { fundingSources } = this.state;
     if (localStorage.getItem("sessionType") === 'Online') {
       DropdownService.getFundingSourceDropdownList()
         .then((response) => {
@@ -764,7 +758,6 @@ class ShipmentSummery extends Component {
     }
   }
   getBudgetList() {
-    const { budgets } = this.state;
     var programId = localStorage.getItem("sesProgramIdReport");
     if(this.state.programId!="" && this.state.programId!=0 && programId!=""){
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -1068,7 +1061,6 @@ class ShipmentSummery extends Component {
       document.getElementById("shipmentDetailsListTableDiv"),
       true
     );
-    var json = [];
     var data = shipmentDetailsListArray;
     var options = {
       data: data,
@@ -1323,7 +1315,6 @@ class ShipmentSummery extends Component {
     }
   };
   consolidatedProgramList = () => {
-    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
     var db1;
@@ -1346,11 +1337,6 @@ class ShipmentSummery extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
@@ -1367,7 +1353,6 @@ class ShipmentSummery extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -1528,7 +1513,6 @@ class ShipmentSummery extends Component {
     this.fetchData();
   };
   consolidatedVersionList = (programId) => {
-    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
     var db1;
@@ -1636,9 +1620,7 @@ class ShipmentSummery extends Component {
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
-            const lan = "en";
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -1654,7 +1636,6 @@ class ShipmentSummery extends Component {
                 "programPlanningUnit"
               );
               var planningunitRequest = planningunitOs.getAll();
-              var planningList = [];
               planningunitRequest.onerror = function (event) {
               };
               planningunitRequest.onsuccess = function (e) {
@@ -1873,9 +1854,7 @@ class ShipmentSummery extends Component {
         );
         myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
         var db1;
-        var storeOS;
         getDatabase();
-        var regionList = [];
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
           this.setState({
@@ -1986,7 +1965,6 @@ class ShipmentSummery extends Component {
               );
               var paOs = paTransaction.objectStore("procurementAgent");
               var paRequest = paOs.getAll();
-              var procurementAgentList = [];
               paRequest.onerror = function (event) {
                 this.setState({
                   loading: false,
@@ -2165,7 +2143,6 @@ class ShipmentSummery extends Component {
                     from <= to;
                     from++
                   ) {
-                    var monthlydata = [];
                     for (var month = monthstartfrom; month <= 12; month++) {
                       var dtstr =
                         from + "-" + String(month).padStart(2, "0") + "-01";
@@ -2508,14 +2485,7 @@ class ShipmentSummery extends Component {
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
-    var viewById = this.state.viewById;
-    const backgroundColor = [
-      "#002f6c",
-      "#20a8d8",
-      "#118b70",
-      "#EDB944",
-      "#d1e3f5",
-    ];
+
     const bar = {
       labels: this.state.shipmentDetailsMonthList.map((item, index) =>
         this.dateFormatterLanguage(item.dt)

@@ -14,16 +14,6 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
-const initialValues = {
-    summary: "",
-    realm: "",
-    name: "",
-    emailId: "",
-    orgAndCountry: "",
-    role: "",
-    language: "",
-    notes: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()

@@ -47,7 +47,6 @@ import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
-const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -82,7 +81,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   constructor(props) {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
-    var stopDate = moment(Date.now()).format("YYYY-MM-DD");
     this.state = {
       datasetList: [],
       datasetId: "",
@@ -584,7 +582,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       loading: true
     })
     var db1;
-    var storeOS;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
@@ -615,15 +612,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var regionList = this.state.regionList;
           for (var r = 0; r < regionList.length; r++) {
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
-            var consumptionExtrapolationData = -1
-            var consumptionExtrapolationMovingData = -1
-            var consumptionExtrapolationRegression = -1
-            var consumptionExtrapolationTESL = -1
-            var consumptionExtrapolationTESM = -1
-            var consumptionExtrapolationTESH = -1
-            var inputDataFilter = this.state.jsonDataSemiAverage;
-            var inputDataAverageFilter = this.state.movingAvgData;
-            var inputDataRegressionFilter = this.state.linearRegressionData;
             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
             var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
             var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];
@@ -1246,7 +1234,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var validation = this.checkValidationConsumption();
     if (validation) {
       var db1;
-      var storeOS;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
       openRequest.onerror = function (event) {
@@ -1267,7 +1254,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
           var datasetJson = JSON.parse(datasetData);
           var elInstance = this.state.dataEl;
-          var consumptionList = [];
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
@@ -1279,7 +1265,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
-            var columnData = elInstance.getColumnData([i + 1]);
             var actualConsumptionCount = 2;
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
@@ -1929,7 +1914,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var curDate = startDate;
               var planningUnitTotalList = [];
               var planningUnitTotalListRegion = [];
-              var totalPlanningUnitData = [];
               for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
                 curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                 var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
@@ -2400,7 +2384,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           borderColor: '#CFCDC9',
           showInLegend: true,
         })
-        var actualConsumptionCount = 6;
         this.state.regionList.map((item, count) => {
           if (colourCount > 7) {
             colourCount = 0;

@@ -8,21 +8,6 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.realm.realm');
-let initialValues = {
-    realmCode: '',
-    label: '',
-    minMosMinGaurdrail: '',
-    minMosMaxGaurdrail: '',
-    maxMosMaxGaurdrail: '',
-    minQplTolerance: '',
-    minQplToleranceCutOff: '',
-    maxQplTolerance: '',
-    actualConsumptionMonthsInPast: '',
-    forecastConsumptionMonthsInPast: '',
-    inventoryMonthsInPast: '',
-    minCountForMode: '',
-    minPercForMode: ''
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()

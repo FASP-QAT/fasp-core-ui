@@ -338,7 +338,6 @@ class warehouseCapacity extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -357,8 +356,6 @@ class warehouseCapacity extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var bytes1 = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = bytes1.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
@@ -550,7 +547,6 @@ class warehouseCapacity extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = regionListArray;
         var options = {
             data: data,

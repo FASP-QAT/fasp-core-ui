@@ -82,7 +82,6 @@ class ListRealmCountryComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = realmCountryArray;
         var options = {
             data: data,

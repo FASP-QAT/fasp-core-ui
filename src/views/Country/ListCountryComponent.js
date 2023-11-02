@@ -98,7 +98,6 @@ export default class CountryListComponent extends Component {
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = countryArray;
         var options = {
             data: data,

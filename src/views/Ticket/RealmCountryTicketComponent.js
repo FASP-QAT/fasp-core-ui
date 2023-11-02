@@ -14,13 +14,6 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
-const initialValues = {
-    summary: "",
-    realmId: "",
-    countryId: "",
-    currencyId: "",
-    notes: ""
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -371,20 +364,11 @@ export default class RealmCountryTicketComponent extends Component {
     }
     render() {
         const { realms } = this.state;
-        const { countries } = this.state;
         const { currencies } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-        let countryList = countries.length > 0
-            && countries.map((item, i) => {
-                return (
-                    <option key={i} value={item.countryId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )

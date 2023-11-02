@@ -806,7 +806,6 @@ class ForecastSummary extends Component {
                                                         isForecastSelected = true;
                                                         let flatlist = treeList[p].tree.flatList;
                                                         let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
-                                                        let myTempData = [];
                                                         for (let k = 0; k < listContainNodeType5.length; k++) {
                                                             let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
                                                             if (arrayOfNodeDataMap.length > 0) {
@@ -896,7 +895,6 @@ class ForecastSummary extends Component {
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                     let unitPrice = planningUnitList[j].price;
                                     let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * Number(unitPrice)).toFixed(2) : '');
-                                    let notes = planningUnitList[j].consumptionNotes;
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2.toFixed(2), isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2.toFixed(2), procurementGap: procurementGap.toFixed(2), isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
                                     tempData.push(obj);
                                     if (isProcurementGapRed == true) {
@@ -922,7 +920,6 @@ class ForecastSummary extends Component {
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                     let unitPrice = planningUnitList[j].price;
                                     let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
-                                    let notes = planningUnitList[j].consumptionNotes;
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2.toFixed(2), isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2.toFixed(2), procurementGap: procurementGap.toFixed(2), isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
                                     tempData.push(obj);
                                     if (isProcurementGapRed == true) {
@@ -1255,8 +1252,6 @@ class ForecastSummary extends Component {
                                 }
                             }
                             var data = [];
-                            let tempListArray = [];
-                            let count = 0;
                             let dataArray = [];
                             for (var j = 0; j < summeryData.length; j++) {
                                 data = [];
@@ -1567,7 +1562,6 @@ class ForecastSummary extends Component {
         }
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
         var db1;
@@ -1588,8 +1582,6 @@ class ForecastSummary extends Component {
                 let downloadedProgramData = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         programData.code = programData.programCode;
@@ -1606,7 +1598,6 @@ class ForecastSummary extends Component {
                         downloadedProgramData.push(programData);
                     }
                 }
-                var lang = this.state.lang;
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -1907,7 +1898,6 @@ class ForecastSummary extends Component {
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
         var db1;
@@ -1927,8 +1917,6 @@ class ForecastSummary extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
@@ -2037,7 +2025,6 @@ class ForecastSummary extends Component {
             }
         }
         var db1;
-        var storeOS;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -2150,7 +2137,6 @@ class ForecastSummary extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        const checkOnline = localStorage.getItem('sessionType');
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
