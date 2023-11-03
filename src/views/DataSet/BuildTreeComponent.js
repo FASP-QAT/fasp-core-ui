@@ -953,6 +953,9 @@ export default class BuildTree extends Component {
             firstMonthOfTarget: "",
             yearsOfTarget: "",
             actualOrTargetValueList: [],
+            firstMonthOfTargetOriginal: "",
+            yearsOfTargetOriginal: "",
+            actualOrTargetValueListOriginal: [],
             programDataListForPuCheck: [],
             toggleArray: [],
             collapseState: false,
@@ -1086,6 +1089,7 @@ export default class BuildTree extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.changed1 = this.changed1.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
@@ -2759,6 +2763,13 @@ export default class BuildTree extends Component {
         }, 30000);
     }
 
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
+    }
+
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
@@ -3197,7 +3208,7 @@ export default class BuildTree extends Component {
                     // console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         // console.log("node id for update state 4----", this.state.items);
-                        // this.saveTreeData(true, false);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
@@ -4796,7 +4807,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("this.state.isValidError---", this.state.isValidError)
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
@@ -5885,6 +5896,9 @@ export default class BuildTree extends Component {
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            actualOrTargetValueListOriginal: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
+                            yearsOfTargetOriginal: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            firstMonthOfTargetOriginal: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             targetSelect: rowData[14],
                             targetSelectDisable: true,
                             isCalculateClicked: 0
@@ -5932,6 +5946,9 @@ export default class BuildTree extends Component {
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
                                 yearsOfTarget: targetYears,
                                 firstMonthOfTarget: rowData[1],
+                                actualOrTargetValueListOriginal: this.state.actualOrTargetValueList,
+                                yearsOfTargetOriginal: targetYears,
+                                firstMonthOfTargetOriginal: rowData[1],
                                 modelingSource: rowData[14],
                                 targetSelectDisable: false,
                                 isCalculateClicked: 0
@@ -5957,10 +5974,10 @@ export default class BuildTree extends Component {
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
-            firstMonthOfTarget: this.state.firstMonthOfTarget,
-            yearsOfTarget: this.state.yearsOfTarget,
-            actualOrTargetValueList: this.state.actualOrTargetValueList,
-            // isCalculateClicked: 1
+            firstMonthOfTarget: this.state.firstMonthOfTargetOriginal,
+            yearsOfTarget: this.state.yearsOfTargetOriginal,
+            actualOrTargetValueList: this.state.actualOrTargetValueListOriginal,
+            isCalculateClicked: 0
         }, () => {
             this.buildModelingCalculatorJexcel();
         })
@@ -9348,7 +9365,7 @@ export default class BuildTree extends Component {
                 });
             }
             this.setState({ isCalculateClicked: 1 })
-            this.buildModelingCalculatorJexcel();
+            // this.buildModelingCalculatorJexcel();
         }
 
         if (event.target.name === "targetSelect") {
@@ -10379,7 +10396,7 @@ export default class BuildTree extends Component {
             var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
             if (this.state.actualOrTargetValueList.length > 0) {
-                this.changed3(0);
+                this.changed3(this.state.isCalculateClicked);
             }
         });
     }
@@ -10735,7 +10752,7 @@ export default class BuildTree extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -14641,6 +14658,12 @@ export default class BuildTree extends Component {
                                                     </div>
                                                     {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}
                                                 </div>
+                                                <h5 className="green" style={{ display: "none" }} id="div3">
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.addSuccessMessageSelected")}
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.addSuccessMessageAll")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.updateSuccessMessageSelected")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.updateSuccessMessageAll")}
+                                                </h5>
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

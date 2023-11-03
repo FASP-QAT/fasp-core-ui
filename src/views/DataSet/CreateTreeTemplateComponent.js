@@ -846,6 +846,9 @@ export default class CreateTreeTemplate extends Component {
             firstMonthOfTarget: "",
             yearsOfTarget: "",
             actualOrTargetValueList: [],
+            firstMonthOfTargetOriginal: "",
+            yearsOfTargetOriginal: "",
+            actualOrTargetValueListOriginal: [],
             monthListForModelingCalculator: [],
             editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? true : false,
             treeTemplateList: [],
@@ -3477,7 +3480,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     } else {
 
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
@@ -5559,6 +5562,9 @@ export default class CreateTreeTemplate extends Component {
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (parseInt((rowData[2] - rowData[1]) / 12) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            actualOrTargetValueListOriginal: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
+                            yearsOfTargetOriginal: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (parseInt((rowData[2] - rowData[1]) / 12) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            firstMonthOfTargetOriginal: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             targetSelect: rowData[14],
                             targetSelectDisable: true,
                             isCalculateClicked: 0
@@ -5604,6 +5610,9 @@ export default class CreateTreeTemplate extends Component {
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
                                 yearsOfTarget: (1 + parseInt((rowData[2] - rowData[1]) / 12)),
                                 firstMonthOfTarget: rowData[1],
+                                actualOrTargetValueListOriginal: this.state.actualOrTargetValueList,
+                                yearsOfTargetOriginal: (1 + parseInt((rowData[2] - rowData[1]) / 12)),
+                                firstMonthOfTargetOriginal: rowData[1],
                                 modelingSource: rowData[14],
                                 targetSelectDisable: false,
                                 isCalculateClicked: 0
@@ -5633,10 +5642,10 @@ export default class CreateTreeTemplate extends Component {
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
-            firstMonthOfTarget: this.state.firstMonthOfTarget,
-            yearsOfTarget: this.state.yearsOfTarget,
-            actualOrTargetValueList: this.state.actualOrTargetValueList,
-            // isCalculateClicked: 1
+            firstMonthOfTarget: this.state.firstMonthOfTargetOriginal,
+            yearsOfTarget: this.state.yearsOfTargetOriginal,
+            actualOrTargetValueList: this.state.actualOrTargetValueListOriginal,
+            isCalculateClicked: 0
 
         }, () => {
             this.buildModelingCalculatorJexcel();
@@ -8674,7 +8683,7 @@ export default class CreateTreeTemplate extends Component {
                 });
             }
             this.setState({ isCalculateClicked: 1 })
-            this.buildModelingCalculatorJexcel();
+            // this.buildModelingCalculatorJexcel();
         }
 
         if (event.target.name === "targetSelect") {
@@ -9698,7 +9707,7 @@ export default class CreateTreeTemplate extends Component {
             this.filterScalingDataByMonth(this.state.scalingMonth);
             if (this.state.actualOrTargetValueList.length > 0) {
                 console.log("this.state.actualOrTargetValueList", this.state.modelingCalculatorEl)
-                this.changed3(0);
+                this.changed3(this.state.isCalculateClicked);
             }
         });
     }
@@ -10050,7 +10059,7 @@ export default class CreateTreeTemplate extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
