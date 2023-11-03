@@ -945,7 +945,7 @@ export default class BuildTree extends Component {
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
             toggleArray: [],
-            programDataListForPuCheck:[],
+            programDataListForPuCheck: [],
             collapseState: false,
             programDataListForPuCheck: [],
             calculatedTotalForModelingCalculator: [],
@@ -953,12 +953,15 @@ export default class BuildTree extends Component {
             firstMonthOfTarget: "",
             yearsOfTarget: "",
             actualOrTargetValueList: [],
+            firstMonthOfTargetOriginal: "",
+            yearsOfTargetOriginal: "",
+            actualOrTargetValueListOriginal: [],
             programDataListForPuCheck: [],
             toggleArray: [],
             collapseState: false,
             isCalculateClicked: 0,
-            programDataListForPuCheck:[],
-            planningUnitObjList:[],
+            programDataListForPuCheck: [],
+            planningUnitObjList: [],
             allProcurementAgentList: [],
             modelingChangedOrAdded: false,
         }
@@ -1286,322 +1289,322 @@ export default class BuildTree extends Component {
 
     saveMissingPUs() {
         var validation = this.checkValidationForMissingPUs();
-       // console.log("validation",validation)
-       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-       var curUser = AuthenticationService.getLoggedInUserId();   
-       // console.log("validation curDate",curDate)
-       
-       // console.log("validation curUser",curUser)
-       
-       let indexVar = 0;
-       if (validation == true) {
-        // console.log("validation Inside if loop ");
-       
-        var tableJson = this.el.getJson(null, false);
-        var planningUnitList = [];
-        var programs = [];
-        var missingPUList = this.state.missingPUList;
-        var updatedMissingPUList=[];
-        var dataSetObj=this.state.dataSetObj;
-        for (var i = 0; i < tableJson.length; i++) {
-            if(tableJson[i][18].toString()=="true"){
-            // console.log("validation Inside for loop ");
-       
-            var map1 = new Map(Object.entries(tableJson[i]));
-            // console.log("validation map1 ",map1);
-            let procurementAgentObj = "";
-                if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "" ) {
-                    procurementAgentObj = null
+        // console.log("validation",validation)
+        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+        var curUser = AuthenticationService.getLoggedInUserId();
+        // console.log("validation curDate",curDate)
+
+        // console.log("validation curUser",curUser)
+
+        let indexVar = 0;
+        if (validation == true) {
+            // console.log("validation Inside if loop ");
+
+            var tableJson = this.el.getJson(null, false);
+            var planningUnitList = [];
+            var programs = [];
+            var missingPUList = this.state.missingPUList;
+            var updatedMissingPUList = [];
+            var dataSetObj = this.state.dataSetObj;
+            for (var i = 0; i < tableJson.length; i++) {
+                if (tableJson[i][18].toString() == "true") {
+                    // console.log("validation Inside for loop ");
+
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    // console.log("validation map1 ",map1);
+                    let procurementAgentObj = "";
+                    if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "") {
+                        procurementAgentObj = null
+                    } else {
+                        procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                    }
+                    var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUList[i].planningUnit.id)[0];
+                    let tempJson = {
+                        "programPlanningUnitId": map1.get("11"),
+                        "planningUnit": {
+                            "id": planningUnitObj.planningUnitId,
+                            "label": planningUnitObj.label,
+                            "unit": planningUnitObj.unit,
+                            "multiplier": planningUnitObj.multiplier,
+                            "forecastingUnit": {
+                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "label": planningUnitObj.forecastingUnit.label,
+                                "unit": planningUnitObj.forecastingUnit.unit,
+                                "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                            },
+                            "idString": "" + planningUnitObj.planningUnitId
+                        },
+                        "consuptionForecast": map1.get("2"),
+                        "treeForecast": map1.get("3"),
+                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "procurementAgent": (procurementAgentObj == null ? null : {
+                            "id": parseInt(map1.get("7")),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(map1.get("7"))
+                        }),
+                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "higherThenConsumptionThreshold": map1.get("12"),
+                        "lowerThenConsumptionThreshold": map1.get("13"),
+                        "planningUnitNotes": map1.get("9"),
+                        "consumptionDataType": 2,
+                        "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
+                        "selectedForecastMap": map1.get("14"),
+                        "createdBy":
+                        {
+                            "userId": map1.get("16") == "" ? curUser : map1.get("16"),
+                        },
+                        "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
+                        "active": true,
+                    }
+                    // console.log("validation tempJson ",tempJson);
+                    planningUnitList.push(tempJson);
                 } else {
-                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                    updatedMissingPUList.push(missingPUList[i])
                 }
-                var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUList[i].planningUnit.id)[0];         
-            let tempJson = {
-                "programPlanningUnitId": map1.get("11"),
-                "planningUnit": {
-                    "id": planningUnitObj.planningUnitId,
-                    "label":planningUnitObj.label,
-                    "unit": planningUnitObj.unit,
-                    "multiplier": planningUnitObj.multiplier,
-                    "forecastingUnit": {
-                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                        "label": planningUnitObj.forecastingUnit.label,
-                        "unit": planningUnitObj.forecastingUnit.unit,
-                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                    },
-                    "idString": "" + planningUnitObj.planningUnitId
-                },
-                "consuptionForecast": map1.get("2"),
-                "treeForecast": map1.get("3"),
-                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                "procurementAgent": (procurementAgentObj == null ? null : {
-                    "id": parseInt(map1.get("7")),
-                    "label": procurementAgentObj.label,
-                    "code": procurementAgentObj.code,
-                    "idString": "" + parseInt(map1.get("7"))
-                }),
-                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                "higherThenConsumptionThreshold": map1.get("12"),
-                "lowerThenConsumptionThreshold": map1.get("13"),
-                "planningUnitNotes": map1.get("9"),
-                "consumptionDataType": 2,
-                "otherUnit": map1.get("15")==""?null:map1.get("15"),
-                "selectedForecastMap":map1.get("14"),
-                "createdBy":
-                {
-                  "userId": map1.get("16")==""? curUser:map1.get("16"),
-                }, 
-                "createdDate": map1.get("17")==""? curDate:map1.get("17"),
-                "active": true,
             }
-            // console.log("validation tempJson ",tempJson);
-            planningUnitList.push(tempJson);
-        }else{
-            updatedMissingPUList.push(missingPUList[i])
-        }
-        }
-        // console.log("Updated Missing Pu List ",updatedMissingPUList)
-        // console.log("validation planningUnitList ",planningUnitList);
-           
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
+            // console.log("Updated Missing Pu List ",updatedMissingPUList)
+            // console.log("validation planningUnitList ",planningUnitList);
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var program = transaction.objectStore('datasetData');
+                var getRequest = program.getAll();
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
 
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
 
-                var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                // console.log("program------",program);
-                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                // console.log("programData------",programData);
-                var planningFullList=programData.planningUnitList;
-                // console.log("1Aug planningUnitList------",planningUnitList);
-                // console.log("1Aug programData------Before",programData.planningUnitList);
-                
-                planningUnitList.forEach(p => {
-                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==p.planningUnit.id)
+                    var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
+                    // console.log("program------",program);
+                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    // console.log("programData------",programData);
+                    var planningFullList = programData.planningUnitList;
+                    // console.log("1Aug planningUnitList------",planningUnitList);
+                    // console.log("1Aug programData------Before",programData.planningUnitList);
 
-                    // console.log("1Aug indexVar------",indexVar);
-                    if(indexVar!=-1){
-                        planningFullList[indexVar] = p;
-                    }else{
-                        planningFullList = planningFullList.concat(p);
-                    }
-                    // console.log("1Aug planningFullList------1",planningFullList);
-                })
-                // console.log("1Aug planningFullList------",planningFullList);
-                
-            programData.planningUnitList = planningFullList;
-            var programDataListForPuCheck=this.state.programDataListForPuCheck;
-            var indexForPuCheck=programDataListForPuCheck.findIndex(c=>c.id==dataSetObj.id);
-            programDataListForPuCheck[indexForPuCheck].programData=programData;
-            dataSetObj.programData=programData;
-            // var datasetListJexcel=programData;
-            // console.log("1Aug programData------after",programData.planningUnitList);
-            // let downloadedProgramData = this.state.downloadedProgramData;
-            // console.log("DPD Test@123",downloadedProgramData);
-            // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
-            // console.log("Index Test@123",index)
-            // downloadedProgramData[index]=programData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-            program.programData = programData;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            // programs.forEach(program => {
-                programTransaction.put(program);
-            // })
-            
-            transaction.oncomplete = function (event) {
-                db1 = e.target.result;
-                var id = this.state.dataSetObj.id;
-                
-                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                
-                datasetDetailsRequest.onsuccess = function (e) {
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
-            
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                        this.setState({
-                            // message: i18n.t('static.mt.dataUpdateSuccess'),
-                            // color: "green",
-                            missingPUList: updatedMissingPUList,
-                            dataSetObj:dataSetObj,
-                            fullPlanningUnitList:planningFullList,
-                            programDataListForPuCheck:programDataListForPuCheck
-                            // downloadedProgramData:downloadedProgramData,
-                            // datasetListJexcel:datasetListJexcel
-                        },()=>{
-                            this.hideThirdComponent()
-                            if(this.state.missingPUList.length>0){
-                                this.getMissingPuListBranchTemplate();
-                            }
-                        });
-                    }.bind(this)
-                }.bind(this)
-                }.bind(this);
-                transaction.onerror = function (event) {
+                    planningUnitList.forEach(p => {
+                        indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
+
+                        // console.log("1Aug indexVar------",indexVar);
+                        if (indexVar != -1) {
+                            planningFullList[indexVar] = p;
+                        } else {
+                            planningFullList = planningFullList.concat(p);
+                        }
+                        // console.log("1Aug planningFullList------1",planningFullList);
+                    })
+                    // console.log("1Aug planningFullList------",planningFullList);
+
+                    programData.planningUnitList = planningFullList;
+                    var programDataListForPuCheck = this.state.programDataListForPuCheck;
+                    var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
+                    programDataListForPuCheck[indexForPuCheck].programData = programData;
+                    dataSetObj.programData = programData;
+                    // var datasetListJexcel=programData;
+                    // console.log("1Aug programData------after",programData.planningUnitList);
+                    // let downloadedProgramData = this.state.downloadedProgramData;
+                    // console.log("DPD Test@123",downloadedProgramData);
+                    // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+                    // console.log("Index Test@123",index)
+                    // downloadedProgramData[index]=programData;
+                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    program.programData = programData;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('datasetData');
+                    // programs.forEach(program => {
+                    programTransaction.put(program);
+                    // })
+
+                    transaction.oncomplete = function (event) {
+                        db1 = e.target.result;
+                        var id = this.state.dataSetObj.id;
+
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+
+                            datasetDetailsRequest1.onsuccess = function (event) {
+                                this.setState({
+                                    // message: i18n.t('static.mt.dataUpdateSuccess'),
+                                    // color: "green",
+                                    missingPUList: updatedMissingPUList,
+                                    dataSetObj: dataSetObj,
+                                    fullPlanningUnitList: planningFullList,
+                                    programDataListForPuCheck: programDataListForPuCheck
+                                    // downloadedProgramData:downloadedProgramData,
+                                    // datasetListJexcel:datasetListJexcel
+                                }, () => {
+                                    this.hideThirdComponent()
+                                    if (this.state.missingPUList.length > 0) {
+                                        this.getMissingPuListBranchTemplate();
+                                    }
+                                });
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this);
+                    transaction.onerror = function (event) {
+                    }.bind(this);
                 }.bind(this);
             }.bind(this);
-        }.bind(this);
-    }
+        }
     }
 
     updateMissingPUs() {
         var validation = this.checkValidation();
-       // console.log("validation",validation)
-       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-       var curUser = AuthenticationService.getLoggedInUserId();   
-       // console.log("validation curDate",curDate)
-       
-       // console.log("validation curUser",curUser)
-       
-       let indexVar = 0;
-       if (validation == true) {
-        // console.log("validation Inside if loop ");
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var dataSetObj=this.state.dataSetObj;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        // console.log("validation",validation)
+        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+        var curUser = AuthenticationService.getLoggedInUserId();
+        // console.log("validation curDate",curDate)
 
-                var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                // console.log("program------",program);
-                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                // console.log("programData------",programData);
-                var planningFullList=programData.planningUnitList;
-                // console.log("1Aug planningUnitList------",planningUnitList);
-                // console.log("1Aug programData------Before",programData.planningUnitList);
-                var tableJson = this.el.getJson(null, false);
-                var updatedMissingPUList=[];
-                tableJson.forEach((p,index) => {
-                    if(p[19].toString()=="true" && p[18].toString()=="true"){
-                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==this.state.missingPUList[index].planningUnit.id)
+        // console.log("validation curUser",curUser)
 
-                    // console.log("1Aug indexVar------",indexVar);
-                    if(indexVar!=-1){
-                        let procurementAgentObj = "";
-                        if (parseInt(p[7]) === -1 || (p[7]) == "" ) {
-                            procurementAgentObj = null
-                        } else {
-                            procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(p[7]))[0];
-                        }
-                        planningFullList[indexVar].consuptionForecast = p[2];
-                        planningFullList[indexVar].treeForecast = p[3];
-                        planningFullList[indexVar].stock = this.el.getValue(`E${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
-                        planningFullList[indexVar].existingShipments = this.el.getValue(`F${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
-                        planningFullList[indexVar].monthsOfStock = this.el.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
-                        planningFullList[indexVar].procurementAgent=(procurementAgentObj == null ? null : {
-                            "id": parseInt(p[7]),
-                            "label": procurementAgentObj.label,
-                            "code": procurementAgentObj.code,
-                            "idString": "" + parseInt(p[7])
-                        });
-                        planningFullList[indexVar].price=this.el.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
-                        planningFullList[indexVar].planningUnitNotes=p[9];
-
-
-                    }
-            }else{
-                updatedMissingPUList.push(this.state.missingPUList[index])
-            }
-                    // console.log("1Aug planningFullList------1",planningFullList);
-                })
-                // console.log("1Aug planningFullList------",planningFullList);
-                
-            programData.planningUnitList = planningFullList;
-            dataSetObj.programData=programData;
-            var programDataListForPuCheck=this.state.programDataListForPuCheck;
-            var indexForPuCheck=programDataListForPuCheck.findIndex(c=>c.id==dataSetObj.id);
-            programDataListForPuCheck[indexForPuCheck].programData=programData;
-            var datasetListJexcel=programData;
-            // console.log("1Aug programData------after",programData.planningUnitList);
-            // let downloadedProgramData = this.state.downloadedProgramData;
-            // console.log("DPD Test@123",downloadedProgramData);
-            // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
-            // console.log("Index Test@123",index)
-            // downloadedProgramData[index]=programData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-            program.programData = programData;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            // programs.forEach(program => {
-                programTransaction.put(program);
-            // })
-            
-            transaction.oncomplete = function (event) {
+        let indexVar = 0;
+        if (validation == true) {
+            // console.log("validation Inside if loop ");
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var id = (this.state.datasetIdModal+"_uId_" + userId).replace("~","_");
-                
-                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                
-                datasetDetailsRequest.onsuccess = function (e) {
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
-            
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                        this.setState({
-                            // message: i18n.t('static.mt.dataUpdateSuccess'),
-                            color: "green",
-                            missingPUList: updatedMissingPUList,
-                            dataSetObj:dataSetObj,
-                            fullPlanningUnitList:planningFullList,
-                            programDataListForPuCheck:programDataListForPuCheck
-                            // downloadedProgramData:downloadedProgramData,
-                            // datasetListJexcel:datasetListJexcel
-                        },()=>{
-                            this.hideThirdComponent()
-                            if(this.state.missingPUList.length>0){
-                                this.getMissingPuListBranchTemplate();
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var program = transaction.objectStore('datasetData');
+                var getRequest = program.getAll();
+                getRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    var dataSetObj = this.state.dataSetObj;
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+
+                    var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
+                    // console.log("program------",program);
+                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    // console.log("programData------",programData);
+                    var planningFullList = programData.planningUnitList;
+                    // console.log("1Aug planningUnitList------",planningUnitList);
+                    // console.log("1Aug programData------Before",programData.planningUnitList);
+                    var tableJson = this.el.getJson(null, false);
+                    var updatedMissingPUList = [];
+                    tableJson.forEach((p, index) => {
+                        if (p[19].toString() == "true" && p[18].toString() == "true") {
+                            indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == this.state.missingPUList[index].planningUnit.id)
+
+                            // console.log("1Aug indexVar------",indexVar);
+                            if (indexVar != -1) {
+                                let procurementAgentObj = "";
+                                if (parseInt(p[7]) === -1 || (p[7]) == "") {
+                                    procurementAgentObj = null
+                                } else {
+                                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(p[7]))[0];
+                                }
+                                planningFullList[indexVar].consuptionForecast = p[2];
+                                planningFullList[indexVar].treeForecast = p[3];
+                                planningFullList[indexVar].stock = this.el.getValue(`E${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                                planningFullList[indexVar].existingShipments = this.el.getValue(`F${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                                planningFullList[indexVar].monthsOfStock = this.el.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                                planningFullList[indexVar].procurementAgent = (procurementAgentObj == null ? null : {
+                                    "id": parseInt(p[7]),
+                                    "label": procurementAgentObj.label,
+                                    "code": procurementAgentObj.code,
+                                    "idString": "" + parseInt(p[7])
+                                });
+                                planningFullList[indexVar].price = this.el.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll(",", "");
+                                planningFullList[indexVar].planningUnitNotes = p[9];
+
+
                             }
-                        });
-                    }.bind(this)
-                }.bind(this)
-                }.bind(this);
-                transaction.onerror = function (event) {
+                        } else {
+                            updatedMissingPUList.push(this.state.missingPUList[index])
+                        }
+                        // console.log("1Aug planningFullList------1",planningFullList);
+                    })
+                    // console.log("1Aug planningFullList------",planningFullList);
+
+                    programData.planningUnitList = planningFullList;
+                    dataSetObj.programData = programData;
+                    var programDataListForPuCheck = this.state.programDataListForPuCheck;
+                    var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
+                    programDataListForPuCheck[indexForPuCheck].programData = programData;
+                    var datasetListJexcel = programData;
+                    // console.log("1Aug programData------after",programData.planningUnitList);
+                    // let downloadedProgramData = this.state.downloadedProgramData;
+                    // console.log("DPD Test@123",downloadedProgramData);
+                    // var index=downloadedProgramData.findIndex(c=>c.programId==programData.programId && c.currentVersion.versionId==programData.currentVersion.versionId);
+                    // console.log("Index Test@123",index)
+                    // downloadedProgramData[index]=programData;
+                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    program.programData = programData;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('datasetData');
+                    // programs.forEach(program => {
+                    programTransaction.put(program);
+                    // })
+
+                    transaction.oncomplete = function (event) {
+                        db1 = e.target.result;
+                        var id = (this.state.datasetIdModal + "_uId_" + userId).replace("~", "_");
+
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            // console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+
+                            datasetDetailsRequest1.onsuccess = function (event) {
+                                this.setState({
+                                    // message: i18n.t('static.mt.dataUpdateSuccess'),
+                                    color: "green",
+                                    missingPUList: updatedMissingPUList,
+                                    dataSetObj: dataSetObj,
+                                    fullPlanningUnitList: planningFullList,
+                                    programDataListForPuCheck: programDataListForPuCheck
+                                    // downloadedProgramData:downloadedProgramData,
+                                    // datasetListJexcel:datasetListJexcel
+                                }, () => {
+                                    this.hideThirdComponent()
+                                    if (this.state.missingPUList.length > 0) {
+                                        this.getMissingPuListBranchTemplate();
+                                    }
+                                });
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this);
+                    transaction.onerror = function (event) {
+                    }.bind(this);
                 }.bind(this);
             }.bind(this);
-        }.bind(this);
-    }
+        }
     }
 
     procurementAgentList() {
@@ -1666,27 +1669,27 @@ export default class BuildTree extends Component {
 
     changedMissingPU = function (instance, cell, x, y, value) {
         // console.log("X Test@123",x)
-        if(x==18){
+        if (x == 18) {
             // console.log("Value Test@123",value)
-            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
-            if(value.toString()=="false"){
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+            if (value.toString() == "false") {
                 // console.log("In changed Test@123")
-                this.el.setValueFromCoords(2,y,this.state.missingPUList[y].consuptionForecast,true);
-                this.el.setValueFromCoords(3,y,this.state.missingPUList[y].treeForecast,true);
-                this.el.setValueFromCoords(4,y,this.state.missingPUList[y].stock,true);
-                this.el.setValueFromCoords(5,y,this.state.missingPUList[y].existingShipments,true);
-                this.el.setValueFromCoords(6,y,this.state.missingPUList[y].monthsOfStock,true);
-                this.el.setValueFromCoords(7,y,(this.state.missingPUList[y].price==="" || this.state.missingPUList[y].price==null || this.state.missingPUList[y].price==undefined)?"":(this.state.missingPUList[y].procurementAgent == null || this.state.missingPUList[y].procurementAgent == undefined ? -1 : this.state.missingPUList[y].procurementAgent.id),true);
-                this.el.setValueFromCoords(8,y,this.state.missingPUList[y].price,true);
-                this.el.setValueFromCoords(9,y,this.state.missingPUList[y].planningUnitNotes,true);
-                this.el.setValueFromCoords(10,y,this.state.missingPUList[y].planningUnit.id,true);
-                this.el.setValueFromCoords(11,y,this.state.missingPUList[y].programPlanningUnitId,true);
-                this.el.setValueFromCoords(12,y,this.state.missingPUList[y].higherThenConsumptionThreshold,true);
-                this.el.setValueFromCoords(13,y,this.state.missingPUList[y].lowerThenConsumptionThreshold,true);
-                this.el.setValueFromCoords(14,y,this.state.missingPUList[y].selectedForecastMap,true);
-                this.el.setValueFromCoords(15,y,this.state.missingPUList[y].otherUnit,true);
-                this.el.setValueFromCoords(16,y,this.state.missingPUList[y].createdBy,true);
-                this.el.setValueFromCoords(17,y,this.state.missingPUList[y].createdDate,true);
+                this.el.setValueFromCoords(2, y, this.state.missingPUList[y].consuptionForecast, true);
+                this.el.setValueFromCoords(3, y, this.state.missingPUList[y].treeForecast, true);
+                this.el.setValueFromCoords(4, y, this.state.missingPUList[y].stock, true);
+                this.el.setValueFromCoords(5, y, this.state.missingPUList[y].existingShipments, true);
+                this.el.setValueFromCoords(6, y, this.state.missingPUList[y].monthsOfStock, true);
+                this.el.setValueFromCoords(7, y, (this.state.missingPUList[y].price === "" || this.state.missingPUList[y].price == null || this.state.missingPUList[y].price == undefined) ? "" : (this.state.missingPUList[y].procurementAgent == null || this.state.missingPUList[y].procurementAgent == undefined ? -1 : this.state.missingPUList[y].procurementAgent.id), true);
+                this.el.setValueFromCoords(8, y, this.state.missingPUList[y].price, true);
+                this.el.setValueFromCoords(9, y, this.state.missingPUList[y].planningUnitNotes, true);
+                this.el.setValueFromCoords(10, y, this.state.missingPUList[y].planningUnit.id, true);
+                this.el.setValueFromCoords(11, y, this.state.missingPUList[y].programPlanningUnitId, true);
+                this.el.setValueFromCoords(12, y, this.state.missingPUList[y].higherThenConsumptionThreshold, true);
+                this.el.setValueFromCoords(13, y, this.state.missingPUList[y].lowerThenConsumptionThreshold, true);
+                this.el.setValueFromCoords(14, y, this.state.missingPUList[y].selectedForecastMap, true);
+                this.el.setValueFromCoords(15, y, this.state.missingPUList[y].otherUnit, true);
+                this.el.setValueFromCoords(16, y, this.state.missingPUList[y].createdBy, true);
+                this.el.setValueFromCoords(17, y, this.state.missingPUList[y].createdDate, true);
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('readonly');
@@ -1952,96 +1955,96 @@ export default class BuildTree extends Component {
     }
 
     onchangepageMissingPU(el, pageNo, oldPageNo) {
-        if(!localStorage.getItem('sessionType') === 'Online'){
-    var elInstance = el;
-    var json = elInstance.getJson(null, false);
-    var colArr=['C','D','E','F','G','H','I','J','S'];
-    var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-    if (jsonLength == undefined) {
-        jsonLength = 15
-    }
-    if (json.length < jsonLength) {
-        jsonLength = json.length;
-    }
-    var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-    for (var y = start; y < jsonLength; y++) {
-        var colArr=['C','D','E','F','G','H','I','J','S'];
-        if(json[y][19].toString()=="true"){
-            for (var c = 0; c < colArr.length; c++) {
-                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                cell.classList.remove('readonly');
+        if (!localStorage.getItem('sessionType') === 'Online') {
+            var elInstance = el;
+            var json = elInstance.getJson(null, false);
+            var colArr = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'S'];
+            var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+            if (jsonLength == undefined) {
+                jsonLength = 15
             }
-        }else{
-            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-            cell.classList.add('readonly');
-            var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-            cell.classList.add('readonly');
-            var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
-            cell.classList.add('readonly');
-            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
-            elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
-            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
-            elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
-            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
-            elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
+            if (json.length < jsonLength) {
+                jsonLength = json.length;
+            }
+            var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+            for (var y = start; y < jsonLength; y++) {
+                var colArr = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'S'];
+                if (json[y][19].toString() == "true") {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                    elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "");
+                    elInstance.setStyle(("C").concat(parseInt(y) + 1), "pointer-events", "none");
+                    elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "");
+                    elInstance.setStyle(("D").concat(parseInt(y) + 1), "pointer-events", "none");
+                    elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "");
+                    elInstance.setStyle(("S").concat(parseInt(y) + 1), "pointer-events", "none");
+                }
+            }
         }
     }
-    }
-}
 
-    getPlanningUnitWithPricesByIds(){
+    getPlanningUnitWithPricesByIds() {
         // console.log("semma----",this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()));
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
-          .then(response => {
-              // console.log("Output---",response.data)
-              var listArray = response.data;
-              this.setState({
-                  planningUnitObjList:response.data
-              });
-          }).catch(
-              error => {
-                  if (error.message === "Network Error") {
-                      this.setState({
-                          message: 'static.unkownError',
-                          loading: false
-                      });
-                  } else {
-                      switch (error.response ? error.response.status : "") {
-  
-                          // case 401:
-                          //     this.props.history.push(`/login/static.message.sessionExpired`)
-                          //     break;
-                          case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                          case 500:
-                          case 404:
-                          case 406:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          case 412:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          default:
-                              this.setState({
-                                  message: 'static.unkownError',
-                                  loading: false
-                              });
-                              break;
-                      }
-                  }
-              }
-          );
-      }
+            .then(response => {
+                // console.log("Output---",response.data)
+                var listArray = response.data;
+                this.setState({
+                    planningUnitObjList: response.data
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            // case 401:
+                            //     this.props.history.push(`/login/static.message.sessionExpired`)
+                            //     break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
 
     buildMissingPUJexcel() {
-        if(localStorage.getItem('sessionType') === 'Online'){
+        if (localStorage.getItem('sessionType') === 'Online') {
             this.getPlanningUnitWithPricesByIds();
         }
         var missingPUList = this.state.missingPUList;
@@ -2229,8 +2232,8 @@ export default class BuildTree extends Component {
                     readOnly: true //17P
                 },
                 {
-                    title:i18n.t("static.common.select"),
-                    type:'checkbox',
+                    title: i18n.t("static.common.select"),
+                    type: 'checkbox',
                     // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
@@ -2274,7 +2277,7 @@ export default class BuildTree extends Component {
         // console.log("pp instance",instance)
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         // console.log("pp asterisk",asterisk)
-        
+
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2290,10 +2293,10 @@ export default class BuildTree extends Component {
         tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
-        if(!localStorage.getItem('sessionType') === 'Online'){
-        var elInstance = instance.worksheets[0];
-        var json = elInstance.getJson(null, false);
-        var jsonLength;
+        if (!localStorage.getItem('sessionType') === 'Online') {
+            var elInstance = instance.worksheets[0];
+            var json = elInstance.getJson(null, false);
+            var jsonLength;
 
             if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
                 jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -2347,39 +2350,39 @@ export default class BuildTree extends Component {
             var planningUnitList = this.state.fullPlanningUnitList;
             for (let i = 0; i < puNodeList.length; i++) {
                 if (planningUnitList.filter(x => x.treeForecast == true && x.active == true && x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
-                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
-                // console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-                var productCategory="";
-                productCategory=parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
-                if(productCategory==undefined){
-                    var forecastingUnit=this.state.forecastingUnitList.filter(c=>c.forecastingUnitId==parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id);
-                    productCategory=forecastingUnit[0].productCategory;
-                }
-                let existingPU=planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-                if(existingPU.length > 0 ){
-                    json ={
-                        productCategory: productCategory,    
-                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
-                        consuptionForecast: existingPU[0].consuptionForecast,
-                        treeForecast: true,
-                        stock: existingPU[0].stock,
-                        existingShipments: existingPU[0].existingShipments,
-                        monthsOfStock: existingPU[0].monthsOfStock,
-                        procurementAgent: existingPU[0].procurementAgent,
-                        price: existingPU[0].price,
-                        higherThenConsumptionThreshold: existingPU[0].higherThenConsumptionThreshold,
-                        lowerThenConsumptionThreshold: existingPU[0].lowerThenConsumptionThreshold,
-                        planningUnitNotes: existingPU[0].planningUnitNotes,
-                        consumptionDataType: existingPU[0].consumptionDataType,
-                        otherUnit: existingPU[0].otherUnit,
-                        selectedForecastMap: existingPU[0].selectedForecastMap,
-                        programPlanningUnitId: existingPU[0].programPlanningUnitId,
-                        createdBy:existingPU[0].createdBy,
-                        createdDate:existingPU[0].createdDate,
-                        exists:true
+                    var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    // console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                    var productCategory = "";
+                    productCategory = parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
+                    if (productCategory == undefined) {
+                        var forecastingUnit = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id);
+                        productCategory = forecastingUnit[0].productCategory;
                     }
-                    missingPUList.push(json);    
-                    }else{
+                    let existingPU = planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                    if (existingPU.length > 0) {
+                        json = {
+                            productCategory: productCategory,
+                            planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                            consuptionForecast: existingPU[0].consuptionForecast,
+                            treeForecast: true,
+                            stock: existingPU[0].stock,
+                            existingShipments: existingPU[0].existingShipments,
+                            monthsOfStock: existingPU[0].monthsOfStock,
+                            procurementAgent: existingPU[0].procurementAgent,
+                            price: existingPU[0].price,
+                            higherThenConsumptionThreshold: existingPU[0].higherThenConsumptionThreshold,
+                            lowerThenConsumptionThreshold: existingPU[0].lowerThenConsumptionThreshold,
+                            planningUnitNotes: existingPU[0].planningUnitNotes,
+                            consumptionDataType: existingPU[0].consumptionDataType,
+                            otherUnit: existingPU[0].otherUnit,
+                            selectedForecastMap: existingPU[0].selectedForecastMap,
+                            programPlanningUnitId: existingPU[0].programPlanningUnitId,
+                            createdBy: existingPU[0].createdBy,
+                            createdDate: existingPU[0].createdDate,
+                            exists: true
+                        }
+                        missingPUList.push(json);
+                    } else {
                         json = {
                             productCategory: productCategory,
                             planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
@@ -2430,22 +2433,22 @@ export default class BuildTree extends Component {
         var startValue = 0;
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
-        if(item.length>0){
-        var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
-        // console.log("***MOM momList---", momList);
-        if (momList.length > 0) {
-            // console.log("***MOM inside if---");
-            var mom = momList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
-            // console.log("***MOM mom---", mom);
-            if (mom.length > 0) {
-                // console.log("***MOM mom inside if---");
-                startValue = mom[0].startValue;
-                // console.log("***MOM startValue---", startValue);
+        if (item.length > 0) {
+            var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
+            // console.log("***MOM momList---", momList);
+            if (momList.length > 0) {
+                // console.log("***MOM inside if---");
+                var mom = momList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
+                // console.log("***MOM mom---", mom);
+                if (mom.length > 0) {
+                    // console.log("***MOM mom inside if---");
+                    startValue = mom[0].startValue;
+                    // console.log("***MOM startValue---", startValue);
+                }
             }
-        }
-        // console.log("***MOM startValue---", startValue);
-        }else{
-            startValue=this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue
+            // console.log("***MOM startValue---", startValue);
+        } else {
+            startValue = this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue
         }
         return startValue;
 
@@ -2809,7 +2812,7 @@ export default class BuildTree extends Component {
             })
         })
         // console.log("forecastingUnitListNew---", forecastingUnitList);
-        programData.planningUnitList.map(item=>{
+        programData.planningUnitList.map(item => {
             fullPlanningUnitList.push(item)
         })
         planningUnitList.map(item => {
@@ -4431,7 +4434,7 @@ export default class BuildTree extends Component {
             var datasetEnc = dataSetObj;
             var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            programDataListForPuCheck.push({"programData":programData,"id":dataSetObj.id});
+            programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
             // console.log("programData---?????????", programData);
             dataSetObj.programData = programData;
             var treeList = programData.treeList;
@@ -4806,7 +4809,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("this.state.isValidError---", this.state.isValidError)
-                        if (this.state.isValidError.toString() == "false") {
+                        if (validation == true) {
                             // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
@@ -5895,6 +5898,9 @@ export default class BuildTree extends Component {
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            actualOrTargetValueListOriginal: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
+                            yearsOfTargetOriginal: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? targetYears : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            firstMonthOfTargetOriginal: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             targetSelect: rowData[14],
                             targetSelectDisable: true,
                             isCalculateClicked: 0
@@ -5942,6 +5948,9 @@ export default class BuildTree extends Component {
                                 actualOrTargetValueList: this.state.actualOrTargetValueList,
                                 yearsOfTarget: targetYears,
                                 firstMonthOfTarget: rowData[1],
+                                actualOrTargetValueListOriginal: this.state.actualOrTargetValueList,
+                                yearsOfTargetOriginal: targetYears,
+                                firstMonthOfTargetOriginal: rowData[1],
                                 modelingSource: rowData[14],
                                 targetSelectDisable: false,
                                 isCalculateClicked: 0
@@ -5967,10 +5976,10 @@ export default class BuildTree extends Component {
 
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
-            firstMonthOfTarget: this.state.firstMonthOfTarget,
-            yearsOfTarget: this.state.yearsOfTarget,
-            actualOrTargetValueList: this.state.actualOrTargetValueList,
-            // isCalculateClicked: 1
+            firstMonthOfTarget: this.state.firstMonthOfTargetOriginal,
+            yearsOfTarget: this.state.yearsOfTargetOriginal,
+            actualOrTargetValueList: this.state.actualOrTargetValueListOriginal,
+            isCalculateClicked: 0
         }, () => {
             this.buildModelingCalculatorJexcel();
         })
@@ -7324,7 +7333,7 @@ export default class BuildTree extends Component {
                             // console.log("inside if---");
                             var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                            programDataListForPuCheck.push({"programData":programData,"id":myResult[i].id});
+                            programDataListForPuCheck.push({ "programData": programData, "id": myResult[i].id });
                             // console.log("programData--->>>>>>>>>>>>>>>>>>>>>>", programData);
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {
@@ -7361,7 +7370,7 @@ export default class BuildTree extends Component {
                     realmCountryId,
                     treeData: proList,
                     toggleArray: tempToggleList,
-                    programDataListForPuCheck:programDataListForPuCheck
+                    programDataListForPuCheck: programDataListForPuCheck
                 }, () => {
                     // console.log("tree data --->", this.state.treeData);
                     if (this.state.treeId != "" && this.state.treeId != 0) {
@@ -7589,7 +7598,7 @@ export default class BuildTree extends Component {
                     // console.log("pl 4---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
                     // console.log("pl 5---");
-                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue=currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
                         // console.log("pl 6---");
                         currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
@@ -8872,7 +8881,7 @@ export default class BuildTree extends Component {
         }
     }
 
-    
+
     componentDidMount() {
         this.setState({
             treeId: this.props.match.params.treeId,
@@ -9358,7 +9367,7 @@ export default class BuildTree extends Component {
                 });
             }
             this.setState({ isCalculateClicked: 1 })
-            this.buildModelingCalculatorJexcel();
+            // this.buildModelingCalculatorJexcel();
         }
 
         if (event.target.name === "targetSelect") {
@@ -9599,25 +9608,25 @@ export default class BuildTree extends Component {
         // console.log("Seema currentItemConfig", currentItemConfig)
         // console.log("Seema [this.state.selectedScenario]", [this.state.selectedScenario])
         // console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]", currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
-        if(event.target.name != "treeId"){
-        this.setState({
-            currentItemConfig,
-            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
-            isChanged: true
-        }, () => {
-            // console.log("after state update---", this.state.currentItemConfig);
-            // console.log("after state update current scenario---", this.state.currentScenario);
-            if (flag) {
-                if (event.target.name === "planningUnitId") {
-                    this.calculatePUPerVisit(false);
-                } else if (event.target.name === "refillMonths") {
-                    this.calculatePUPerVisit(true);
-                    this.qatCalculatedPUPerVisit(0);
-                    this.getUsageText();
-                } else { }
-            }
-        });
-    }
+        if (event.target.name != "treeId") {
+            this.setState({
+                currentItemConfig,
+                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+                isChanged: true
+            }, () => {
+                // console.log("after state update---", this.state.currentItemConfig);
+                // console.log("after state update current scenario---", this.state.currentScenario);
+                if (flag) {
+                    if (event.target.name === "planningUnitId") {
+                        this.calculatePUPerVisit(false);
+                    } else if (event.target.name === "refillMonths") {
+                        this.calculatePUPerVisit(true);
+                        this.qatCalculatedPUPerVisit(0);
+                        this.getUsageText();
+                    } else { }
+                }
+            });
+        }
     }
     createPUNode(itemConfig, parent) {
         // console.log("create PU node---", itemConfig);
@@ -10197,22 +10206,22 @@ export default class BuildTree extends Component {
             for (var puN = 0; puN < puNodes.length; puN++) {
                 var refillMonths = "";
                 var puPerVisit = "";
-                if(puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode!=null){
-                var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
-                var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
-                var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
-                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    var refillMonths = 1;
-                    // console.log("AUTO refillMonths---", refillMonths);
-                    // console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
-                    puNode.refillMonths = refillMonths;
-                    puNode.puPerVisit = puPerVisit;
-                } else {
-                    // console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
-                    puNode.puPerVisit = puPerVisit;
-                }
+                if (puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode != null) {
+                    var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
+                    var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
+                    var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
+                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                        var refillMonths = 1;
+                        // console.log("AUTO refillMonths---", refillMonths);
+                        // console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                        puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
+                        puNode.refillMonths = refillMonths;
+                        puNode.puPerVisit = puPerVisit;
+                    } else {
+                        // console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                        puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
+                        puNode.puPerVisit = puPerVisit;
+                    }
 
                     nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
                 }
@@ -10389,7 +10398,7 @@ export default class BuildTree extends Component {
             var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
             if (this.state.actualOrTargetValueList.length > 0) {
-                this.changed3(0);
+                this.changed3(this.state.isCalculateClicked);
             }
         });
     }
@@ -13272,19 +13281,19 @@ export default class BuildTree extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-                (itemConfig.expanded ?                     
-                <div style={{background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed" , width: "8px", height: "8px", borderRadius: "8px"}}>
-                </div>
-                :
-                <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
-                    <div className={itemConfig.payload.nodeType.id == 5
-                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
-                        (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
-                    >
-                        <div className={itemConfig.payload.nodeType.id == 5 ||
-                            itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
-                            "ContactTitle TitleColor"}>
-                            {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
+                (itemConfig.expanded ?
+                    <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
+                    </div>
+                    :
+                    <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0 ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
+                        <div className={itemConfig.payload.nodeType.id == 5
+                            || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
+                            (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
+                        >
+                            <div className={itemConfig.payload.nodeType.id == 5 ||
+                                itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
+                                "ContactTitle TitleColor"}>
+                                {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
                                 {itemConfig.payload.label.label_en}</div> */}
                                 <div title={itemConfig.payload.label.label_en} className="NodeTitletext">
                                     {itemConfig.payload.label.label_en}</div>
@@ -14498,7 +14507,7 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup> */}
-                                            
+
                                         </div>
 
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
@@ -14650,9 +14659,9 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
+                                                    {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}
                                                 </div>
-                                                <h5 className="green" style={{display:"none"}} id="div3">
+                                                <h5 className="green" style={{ display: "none" }} id="div3">
                                                     {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.addSuccessMessageSelected")}
                                                     {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.addSuccessMessageAll")}
                                                     {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.updateSuccessMessageSelected")}
@@ -14661,15 +14670,15 @@ export default class BuildTree extends Component {
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
-                                                    {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
-                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
-                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
-                                                    {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId!=0 && this.state.branchTemplateId!=undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </div>
-                                        </Form>
+                                                {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
+                                                {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
+                                                {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
+                                                {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId != 0 && this.state.branchTemplateId != undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                &nbsp;
+                                            </FormGroup>
+                                        </div>
+                                    </Form>
 
                                 )} />
 
