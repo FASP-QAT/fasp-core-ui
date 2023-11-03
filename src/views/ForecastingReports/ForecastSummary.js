@@ -1625,9 +1625,9 @@ class ForecastSummary extends Component {
                                         columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
-                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'text', width: 100, readOnly: true });//G6
                                     columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
-                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//I8
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1724,7 +1724,7 @@ class ForecastSummary extends Component {
                                             var elInstance = instance.worksheets[0];
                                             var rowElement = elInstance.records;
                                             for (var r = 0; r < rowElement.length; r++) {
-                                                if (rowElement[r][6].v == 1) {
+                                                if (rowElement[r][rowElement[r].length - 3].v == 1) {
                                                     for (var j = 0; j < rowElement[r].length; j++) {
                                                         var ele = rowElement[r][j].element;
                                                         ele.classList.add('readonly');
