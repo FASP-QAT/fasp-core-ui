@@ -437,7 +437,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var inputDataRegressionFilter = this.state.linearRegressionData;
                             // console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                             // console.log("inputDataFilter", inputDataFilter);
-                            var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
+                            var id = a > b ? a : b;
                             var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
                             var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
                             // console.log("Planning Unit Obj****", planningUnitObj);
