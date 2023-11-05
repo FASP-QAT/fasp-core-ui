@@ -3960,7 +3960,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = parseFloat(momList[j].manualChange).toFixed()
+            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
