@@ -688,7 +688,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var tesJson = {
                         month: map1.get("0"),
                         amount: map1.get("7") != "" && map1.get("7") != null && map1.get("7") != 'NaN' ? map1.get("7").toString().replaceAll("%", "") : null,
-                        ci: this.state.tesData.length > 0 ? this.state.tesData.filter(x => x.month == count)[0].ci : ""
+                        ci: this.state.tesData.filter(x => x.month == count).length > 0 ? this.state.tesData.filter(x => x.month == count)[0].ci : ""
                     }
                     tesData.push(tesJson);
                 }
@@ -1167,21 +1167,21 @@ export default class TreeExtrapolationComponent extends React.Component {
 
 
                     for (let i = 0; i < jexcelDataArr.length; i++) {
-                        if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM") && jexcelDataArr[i].amount != "" && jexcelDataArr[i].amount != null) {
-                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                        if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM") && jexcelDataArr[i].amount !== "" && jexcelDataArr[i].amount !== null) {
+                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].adjustedActuals !== "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataSemiAverage 1--->>>", jexcelDataArr[i]);
                             // console.log("inputDataSemiAverage 2--->>>", inputDataSemiAverage.length);
-                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals !== "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // var json = { "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null };
                             // console.log("inputDataSemiAverage 4--->>>", json);
                             // console.log("inputDataSemiAverage 5 before--->>>", inputDataSemiAverage);
                             // inputDataSemiAverage.push(json);
                             // console.log("inputDataSemiAverage 6 after--->>>", inputDataSemiAverage);
-                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].adjustedActuals !== "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataSemiAverage 7--->>>", inputDataLinearRegression);
-                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].adjustedActuals !== "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataSemiAverage 8--->>>", inputDataTes)
-                            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": jexcelDataArr[i].adjustedActuals !== "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataArima 8--->>>", inputDataArima)
                         }
                     }
@@ -2948,7 +2948,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             // pointRadius: 1,
             pointHitRadius: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals >= 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
+            data: this.state.jexcelDataArr.map((item, index) => (item.adjustedActuals != '' && item.adjustedActuals >= 0 && this.state.monthArray.filter(x => moment(x).format('YYYY-MM') == moment(item.month).format('YYYY-MM')).length > 0 ? item.adjustedActuals : null))
         })
 
         let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
