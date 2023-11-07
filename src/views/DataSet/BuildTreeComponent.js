@@ -10400,7 +10400,7 @@ export default class BuildTree extends Component {
                             // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             if (!this.state.isSubmitClicked) {
                                 // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                // this.formSubmitLoader();
+                                this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")
@@ -10418,6 +10418,12 @@ export default class BuildTree extends Component {
                                         })
                                     }, 0);
                                 })
+                                try {
+                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                    this.setState({ modelingEl: "" })
+                                } catch (err) {
+
+                                }
                             }
 
                         }}
@@ -11808,17 +11814,29 @@ export default class BuildTree extends Component {
                                             if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
                                                 var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                                                 if (cf == true) {
+                                                    try {
+                                                        jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                                    } catch (err) {
+                    
+                                                    }
                                                     this.setState({
                                                         openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                                        highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                                        highlightItem: 0, activeTab1: new Array(3).fill('1'),
+                                                        modelingEl: ""
                                                     })
                                                 } else {
                     
                                                 }
                                             } else {
+                                                try {
+                                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                                } catch (err) {
+                
+                                                }
                                                 this.setState({
                                                     openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                                    highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                                    highlightItem: 0, activeTab1: new Array(3).fill('1'),
+                                                    modelingEl: ""
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -14701,17 +14719,29 @@ export default class BuildTree extends Component {
                         if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
                             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                             if (cf == true) {
+                                try {
+                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                } catch (err) {
+
+                                }
                                 this.setState({
                                     openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                    highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                    highlightItem: 0, activeTab1: new Array(3).fill('1'),
+                                    modelingEl: ""
                                 })
                             } else {
 
                             }
                         } else {
+                            try {
+                                jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                            } catch (err) {
+
+                            }
                             this.setState({
                                 openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                highlightItem: 0, activeTab1: new Array(3).fill('1')
+                                highlightItem: 0, activeTab1: new Array(3).fill('1'),
+                                modelingEl: ""
                             })
                         }
 
