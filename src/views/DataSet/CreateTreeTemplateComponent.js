@@ -3440,7 +3440,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("obj---", obj);
                     console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (validation == true) {
+                        if (this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -3480,7 +3480,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     } else {
 
-                        if (validation == true) {
+                        if (this.state.isValidError.toString() == "false") {
                             console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
