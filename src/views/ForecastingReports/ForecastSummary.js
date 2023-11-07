@@ -3659,7 +3659,7 @@ class ForecastSummary extends Component {
                                                 }
                                                 {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}
                                                 {this.state.displayId == 2 &&
-                                                    <div className='ForecastSummaryTable datdEntryRow'>
+                                                    <div className='ForecastSummaryTable datdEntryRow ForcastColumnFreeze'>
                                                         <div id="tableDiv" className="consumptionDataEntryTable custom-display">
                                                         </div>
                                                     </div>
