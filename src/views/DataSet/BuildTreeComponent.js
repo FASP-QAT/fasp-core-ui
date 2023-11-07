@@ -4684,7 +4684,7 @@ export default class BuildTree extends Component {
             // console.log("validation---", validation);
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
-                    console.log("entry ---", this.state.isValidError, "===validation---", validation)
+                    // console.log("entry ---", this.state.isValidError, "===validation---", validation)
 
                     // console.log("entered if ---", new Date());
                     var tableJson = this.state.modelingEl.getJson(null, false);
@@ -4751,7 +4751,7 @@ export default class BuildTree extends Component {
                     }
                     // console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
-                        if (validation == true) {
+                        if (this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
@@ -4809,7 +4809,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("this.state.isValidError---", this.state.isValidError)
-                        if (validation == true) {
+                        if (this.state.isValidError.toString() == "false") {
                             // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
