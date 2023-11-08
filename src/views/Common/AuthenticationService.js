@@ -179,8 +179,13 @@ class AuthenticationService {
     checkIfDifferentUserIsLoggedIn(newUsername) {
         let usernameStored = localStorage.getItem('username');
         if (usernameStored !== null && usernameStored !== "") {
-            var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
-            var originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
+            var originalText;
+            try{
+                var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
+                originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
+            }catch{
+                originalText = ""
+            }
             if (originalText !== newUsername) {
                 if (window.confirm("Are you sure you want to overrride already logged in user's details?")) {
                     return true;

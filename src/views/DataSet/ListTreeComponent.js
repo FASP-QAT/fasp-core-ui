@@ -196,7 +196,15 @@ export default class ListTreeComponent extends Component {
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.changed = this.changed.bind(this);  
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
       }
+
+      hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
+    }
     saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -365,7 +373,7 @@ export default class ListTreeComponent extends Component {
         }
     }
     buildMissingPUJexcel() {
-        if(isSiteOnline()){
+        if(localStorage.getItem('sessionType') === 'Online'){
             this.getPlanningUnitWithPricesByIds();
         }
         var missingPUList = this.state.missingPUList;
@@ -433,16 +441,16 @@ export default class ListTreeComponent extends Component {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    // editable: isSiteOnline() ? true : false,
-                    // readOnly: isSiteOnline() ? false : true 
+                    // editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true 
                 },
                 {
                     //3D
                     title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    // editable: isSiteOnline() ? true : false,
-                    // readOnly: isSiteOnline() ? false : true
+                    // editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //4E
@@ -452,8 +460,8 @@ export default class ListTreeComponent extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //5F
@@ -463,8 +471,8 @@ export default class ListTreeComponent extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //6G
@@ -474,8 +482,8 @@ export default class ListTreeComponent extends Component {
                     mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //7H
@@ -483,8 +491,8 @@ export default class ListTreeComponent extends Component {
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '120',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //8I
@@ -495,15 +503,15 @@ export default class ListTreeComponent extends Component {
                     mask: '#,##.00',
                     width: '120',
                     disabledMaskOnEdition: true,
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     //9J
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    editable: isSiteOnline() ? true : false,
-                    readOnly: isSiteOnline() ? false : true
+                    editable: localStorage.getItem('sessionType') === 'Online' ? true : false,
+                    readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     title: 'planningUnitId',
@@ -548,7 +556,7 @@ export default class ListTreeComponent extends Component {
                 {
                     title:i18n.t("static.common.select"),
                     type:'checkbox',
-                    // readOnly: isSiteOnline() ? false : true
+                    // readOnly: localStorage.getItem('sessionType') === 'Online' ? false : true
                 },
                 {
                     title:'exists',
@@ -586,7 +594,7 @@ export default class ListTreeComponent extends Component {
     }
 
     onchangepageMissingPU(el, pageNo, oldPageNo) {
-            if(!isSiteOnline()){
+            if(!localStorage.getItem('sessionType') === 'Online'){
         var elInstance = el;
         var json = elInstance.getJson(null, false);
         var colArr=['C','D','E','F','G','H','I','J','S'];
@@ -930,7 +938,7 @@ export default class ListTreeComponent extends Component {
         tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
-        if(!isSiteOnline()){
+        if(!localStorage.getItem('sessionType') === 'Online'){
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
@@ -1298,6 +1306,7 @@ export default class ListTreeComponent extends Component {
                             downloadedProgramData:downloadedProgramData,
                             datasetListJexcel:datasetListJexcel
                         },()=>{
+                            this.hideThirdComponent();
                             if(this.state.missingPUList.length>0){
                                 this.buildMissingPUJexcel();
                             }
@@ -1427,6 +1436,7 @@ export default class ListTreeComponent extends Component {
                             datasetListJexcel:datasetListJexcel
                         },()=>{
                             if(this.state.missingPUList.length>0){
+                                this.hideThirdComponent();
                                 this.buildMissingPUJexcel();
                             }
                         });
@@ -2142,7 +2152,7 @@ export default class ListTreeComponent extends Component {
 
     getPrograms() {
         this.setState({ loading: true })
-        if (isSiteOnline()) {
+        if (localStorage.getItem('sessionType') === 'Online') {
             // console.log("getDataSetListAll")
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
@@ -2354,7 +2364,7 @@ export default class ListTreeComponent extends Component {
             const program = this.state.datasetList.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem('sessionType') === 'Online') {
                     // this.setState({
                     //     versions: [],
                     // }, () => {
@@ -3120,7 +3130,7 @@ export default class ListTreeComponent extends Component {
     }.bind(this);
 
     // addNewDimension() {
-    //     if (isSiteOnline()) {
+    //     if (localStorage.getItem('sessionType') === 'Online') {
     //         this.props.history.push(`/diamension/addDiamension`)
     //     } else {
     //         alert("You must be Online.")
@@ -3705,13 +3715,19 @@ export default class ListTreeComponent extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
+                                                    {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
+                                                    <h5 className="green" style={{display:"none"}} id="div3">
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.listTree.addSuccessMessageSelected")}
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.listTree.addSuccessMessageAll")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.listTree.updateSuccessMessageSelected")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.listTree.updateSuccessMessageAll")}
+                                                    </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
                                                         {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
-                                                        {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
-                                                        {!isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
+                                                        {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
+                                                        {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
                                                         {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         &nbsp;
 

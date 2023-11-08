@@ -119,7 +119,7 @@ export default class AddInventory extends Component {
         //     prompt: 'Format (YYYY-MM-DD)',
         // });
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('B' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
@@ -133,7 +133,7 @@ export default class AddInventory extends Component {
         for (let i = 0; i < datasourceList.length; i++) {
             dataSourceVar.push(datasourceList[i].name);
         }
-        worksheet.dataValidations.add('D2:D100', {
+        worksheet.dataValidations.add('D2:D1000', {
             type: 'list',
             allowBlank: false,
             // formulae: ['"male,female,other"'],
@@ -152,7 +152,7 @@ export default class AddInventory extends Component {
             regionVar.push(regionList[i].name);
         }
 
-        worksheet.dataValidations.add('C2:C100', {
+        worksheet.dataValidations.add('C2:C1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${regionVar.join(",")}"`],
@@ -184,7 +184,7 @@ export default class AddInventory extends Component {
 
         // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('M2:M100', {
+        worksheet.dataValidations.add('M2:M1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
@@ -196,7 +196,7 @@ export default class AddInventory extends Component {
 
         //Validations
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.dataValidations.add('H2:H100', {
+            worksheet.dataValidations.add('H2:H1000', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
@@ -207,7 +207,7 @@ export default class AddInventory extends Component {
                 // error: 'Invalid Value'
             });
         } else {
-            worksheet.dataValidations.add('G2:G100', {
+            worksheet.dataValidations.add('G2:G1000', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
@@ -221,7 +221,7 @@ export default class AddInventory extends Component {
 
 
         //Gray color
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1000; i++) {
             worksheet.getCell('F' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',

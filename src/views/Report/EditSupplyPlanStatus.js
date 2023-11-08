@@ -411,53 +411,83 @@ class EditSupplyPlanStatus extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-
-            var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
+            var value = this.el.getValueFromCoords(0, y);
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
 
-            var col = ("J").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(9, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
 
-            var col = ("K").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(10, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+                var col = ("K").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(10, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
 
-            var col = ("U").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(20, y);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                var col = ("U").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(20, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
 
         }
@@ -489,25 +519,49 @@ class EditSupplyPlanStatus extends Component {
 
         if (x == 9) {
             var col = ("J").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
             if (rowData1[9] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (!reg.test(rowData1[9])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[9])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
         if (x == 10) {
             var col = ("K").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
             if (rowData1[10] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (!reg.test(rowData1[10])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[10])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
@@ -1346,7 +1400,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     toggleAccordionErpShipments = () => {
-        console.log(this.state.showErpShipment)
+        // console.log(this.state.showErpShipment)
         this.setState({
             showErpShipment: !this.state.showErpShipment
         })
@@ -4201,11 +4255,11 @@ class EditSupplyPlanStatus extends Component {
 
     buildProblemTransJexcel() {
         // console.log("In jexcel+++", this.state.problemTransList);
-        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+        var currentTrans = this.state.problemTransList.length > 0 ? this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
             b = b.createdDate
             return a > b ? -1 : a < b ? 1 : 0;
-        }));
+        })) : [];
 
         let dataArray = [];
         let count = 0;
@@ -4288,7 +4342,7 @@ class EditSupplyPlanStatus extends Component {
         // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
         problemList = problemList;
-        console.log("problemList---->", problemList);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
@@ -4360,6 +4414,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t("static.common.region"),
                     type: 'dropdown',
+                    visible: false,
                     width: 80,
                     source: this.state.regionList,
                     readOnly: true
@@ -4650,14 +4705,16 @@ class EditSupplyPlanStatus extends Component {
                 var items1 = [];
                 // console.log("y====",y);
                 if (y != null) {
-                    items1.push({
-                        title: i18n.t('static.problemContext.viewTrans'),
-                        onclick: function () {
-                            var myObj = obj.getRowData(y);
-                            // console.log("my obj===>", myObj);
-                            this.toggleTransView(myObj[23]);
-                        }.bind(this)
-                    });
+                    if (obj.getRowData(y)[0] != 0) {
+                        items1.push({
+                            title: i18n.t('static.problemContext.viewTrans'),
+                            onclick: function () {
+                                var myObj = obj.getRowData(y);
+                                // console.log("my obj===>", myObj);
+                                this.toggleTransView(myObj[24]);
+                            }.bind(this)
+                        });
+                    }
                     if (obj.options.allowDeleteRow == true) {
                         // region id
                         if (obj.getRowData(y)[0] == 0) {

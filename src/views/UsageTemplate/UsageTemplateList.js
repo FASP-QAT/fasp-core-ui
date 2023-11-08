@@ -1015,9 +1015,13 @@ class usageTemplate extends Component {
             columns: [
 
                 {
-                    title: 'usageTemplateId',
-                    type: 'hidden',
-                    readOnly: true //0 A
+                    // title: 'usageTemplateId',
+                    // type: 'hidden',
+                    // readOnly: true //0 A
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                    
                 },
                 {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
@@ -1031,6 +1035,7 @@ class usageTemplate extends Component {
                     type: 'text',
                     width: '180',
                     textEditor: true,//2 C
+                  
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
@@ -1161,21 +1166,39 @@ class usageTemplate extends Component {
                     textEditor: true, //16 Q
                 },
                 {
-                    title: 'isChange',
-                    type: 'hidden' //17 R
+                    // title: 'isChange',
+                    // visible: false,
+                    // type: 'hidden' //17 R
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                   
                 },
                 {
-                    title: 'addNewRow',
-                    type: 'hidden'//18 S
+                    // title: 'addNewRow',
+                    // visible: false,
+                    // type: 'hidden'//18 S
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                    
                 },
                 {
-                    title: 'typeId',
-                    type: 'hidden'//19 T
+                    // title: 'typeId',
+                    // visible: false,
+                    // type: 'hidden'//19 T
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                    
                 },
                 {
-                    title: i18n.t('static.program.notes'),
-                    type: 'hidden',
-                    // width: 400 //20 U
+                    // title: i18n.t('static.program.notes'),
+                    // type: 'hidden',
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                    
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -1185,9 +1208,12 @@ class usageTemplate extends Component {
                     // readOnly: true //21 V
                 },
                 {
-                    title: 'createdBy',
-                    type: 'hidden',
-                    // width: 400 //22 W
+                    // title: 'createdBy',
+                    // type: 'hidden',
+
+                    type: 'text',
+                    visible: false, autoCasting: false
+                   
                 },
 
             ],

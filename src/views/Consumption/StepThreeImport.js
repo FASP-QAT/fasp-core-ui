@@ -400,8 +400,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             extrapolationMethodRequest.onsuccess = function (event) {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetTransaction = transaction.objectStore('datasetData');
+                let forecastProgramVersionId = this.props.items.forecastProgramVersionId;
+                let forecastProgramId = this.props.items.forecastProgramId;
+                var datasetId=this.props.items.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0].id;
                 // console.log("dataset", this.state.datasetId)
-                var datasetRequest = datasetTransaction.get(this.props.items.datasetList[0].id);
+                var datasetRequest = datasetTransaction.get(datasetId);
                 datasetRequest.onerror = function (event) {
                 }.bind(this);
                 datasetRequest.onsuccess = function (event) {
@@ -437,7 +440,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var inputDataRegressionFilter = this.state.linearRegressionData;
                             // console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                             // console.log("inputDataFilter", inputDataFilter);
-                            var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
+                            var id = a > b ? a : b;
                             var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
                             var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
                             // console.log("Planning Unit Obj****", planningUnitObj);
@@ -1341,7 +1346,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5>
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
-                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapImport">
                     </div>

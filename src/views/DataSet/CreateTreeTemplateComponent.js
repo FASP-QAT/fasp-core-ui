@@ -977,6 +977,14 @@ export default class CreateTreeTemplate extends Component {
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.checkValidationForMissingPUList = this.checkValidationForMissingPUList.bind(this);
         this.changedMissingPUForCreateTree=this.changedMissingPUForCreateTree.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
     }
 
     cancelNodeDataClicked(){
@@ -2128,7 +2136,8 @@ export default class CreateTreeTemplate extends Component {
                             missingPUListForCreateTree: updatedMissingPUList,
                             datasetListJexcelForCreateTree:downloadedProgramData
                         },()=>{
-                            if(this.state.missingPUList.length>0){
+                            this.hideThirdComponent();
+                            if(this.state.missingPUListForCreateTree.length>0){
                                 this.buildMissingPUJexcelForCreateTree();
                             }
                         });
@@ -7666,13 +7675,9 @@ export default class CreateTreeTemplate extends Component {
             );
             DropdownService.getTreeTemplateListForDropdown().then(response => {
                 console.log("tree template list---", response.data)
-                var treeTemplateList = response.data.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                var treeTemplateList = response.data;
                 this.setState({
-                    treeTemplateList,
+                    treeTemplateList:treeTemplateList,
                 })
             })
                 .catch(
@@ -7834,12 +7839,20 @@ export default class CreateTreeTemplate extends Component {
                     }else{
                         this.setState({ collapseState: false })
                     }
+                    var treeTemplateList=this.state.treeTemplateList;
+                    if(response.data.active==false){
+                        treeTemplateList.push({
+                            treeTemplateId:response.data.treeTemplateId,
+                            label:response.data.label
+                        })
+                    }
                     this.setState({
                         treeTemplate: response.data,
                         items,
                         tempItems: items,
                         toggleArray: tempToggleList,
                         loading: true,
+                        treeTemplateList:treeTemplateList
                     }, () => {
                         // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                         console.log("Tree Template---", this.state.items);
@@ -9542,7 +9555,7 @@ export default class CreateTreeTemplate extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -12016,7 +12029,11 @@ export default class CreateTreeTemplate extends Component {
 
             const { treeTemplateList } = this.state;
         let treeTemplates = treeTemplateList.length > 0
-            && treeTemplateList.map((item, i) => {
+            && treeTemplateList.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            }).map((item, i) => {
                 return (
                     <option key={i} value={item.treeTemplateId}>
                         {getLabelText(item.label, this.state.lang)}
@@ -13556,6 +13573,10 @@ export default class CreateTreeTemplate extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <h5 className="green" style={{display:"none"}} id="div3">
+                                                    {this.state.missingPUListForCreateTree.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
+                                                    {this.state.missingPUListForCreateTree.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
+                                                </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
