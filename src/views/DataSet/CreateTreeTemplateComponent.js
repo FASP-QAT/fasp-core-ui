@@ -849,6 +849,7 @@ export default class CreateTreeTemplate extends Component {
             firstMonthOfTargetOriginal: "",
             yearsOfTargetOriginal: "",
             actualOrTargetValueListOriginal: [],
+            modelingTypeOriginal: "",
             monthListForModelingCalculator: [],
             editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? true : false,
             treeTemplateList: [],
@@ -5557,6 +5558,7 @@ export default class CreateTreeTemplate extends Component {
                             currentRowIndex: x,
                             showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
                             currentModelingType: rowData[4],
+                            modelingTypeOriginal: rowData[4],
                             currentTransferData: rowData[3],
                             currentCalculatorStartDate: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             currentCalculatorStopDate: rowData[2],
@@ -5605,6 +5607,7 @@ export default class CreateTreeTemplate extends Component {
                                 currentRowIndex: x,
                                 showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
                                 currentModelingType: 2,
+                                modelingTypeOriginal: 2,
                                 currentTransferData: rowData[3],
                                 currentCalculatorStartDate: rowData[1],
                                 currentCalculatorStopDate: rowData[2],
@@ -5654,6 +5657,7 @@ export default class CreateTreeTemplate extends Component {
             firstMonthOfTarget: this.state.firstMonthOfTargetOriginal,
             yearsOfTarget: this.state.yearsOfTargetOriginal,
             actualOrTargetValueList: this.state.actualOrTargetValueListOriginal,
+            currentModelingType: this.state.modelingTypeOriginal,
             isCalculateClicked: 0
 
         }, () => {
