@@ -1758,8 +1758,8 @@ class ModelingValidation extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.node')}</Label>
-                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                                <div className="controls ">
+                                                <span className="reportdown-box-icon fa fa-angle-down ml-1"></span>
+                                                <div className="controls svgdropdown">
                                                     <MultiSelect
                                                         name="nodeId"
                                                         id="nodeId"
@@ -1801,7 +1801,9 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3 pickerRangeBox">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                </Label>
                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
                                                     <div className="controls edit">
                                                         <Picker

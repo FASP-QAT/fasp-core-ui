@@ -363,7 +363,88 @@ class EditSupplyPlanStatus extends Component {
     };
     checkValidation() {
         var valid = true;
-        valid = checkValidation(this.el);
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("K").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(10, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("U").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(20, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+        }
         return valid;
     }
     rowChanged = function (instance, cell, x, y, value) {
@@ -374,7 +455,80 @@ class EditSupplyPlanStatus extends Component {
         let problemList = this.state.problemList;
         var rowData1 = elInstance.getRowData(y);
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
-        changed(instance, cell, x, y, value)
+        // console.log("problemList in changed method ***", problemList);
+
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (rowData1[6] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 9) {
+            var col = ("J").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
+            if (rowData1[9] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!reg.test(rowData1[9])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[9])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        if (x == 10) {
+            var col = ("K").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
+            if (rowData1[10] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!reg.test(rowData1[10])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[10])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        if (x == 20) {
+            var col = ("U").concat(parseInt(y) + 1);
+            if (rowData1[20] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
         if(problemList.length > 0){
             if (x == 11) {
                 if (problemList[0].problemStatus.id != value) {
@@ -1053,7 +1207,7 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     toggleAccordionErpShipments = () => {
-        console.log(this.state.showErpShipment)
+        // console.log(this.state.showErpShipment)
         this.setState({
             showErpShipment: !this.state.showErpShipment
         })
@@ -3205,11 +3359,12 @@ class EditSupplyPlanStatus extends Component {
         return mylist;
     }.bind(this)
     buildProblemTransJexcel() {
-        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+        var currentTrans = this.state.problemTransList.length > 0 ? this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
             b = b.createdDate
             return a > b ? -1 : a < b ? 1 : 0;
-        }));
+        })) : [];
+
         let dataArray = [];
         let count = 0;
         for (var j = 0; j < currentTrans.length; j++) {
@@ -3274,7 +3429,7 @@ class EditSupplyPlanStatus extends Component {
     buildJExcel() {
         let problemList = this.state.problemList;
         problemList = problemList;
-        console.log("problemList---->", problemList);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -3324,6 +3479,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t("static.common.region"),
                     type: 'dropdown',
+                    visible: false,
                     width: 80,
                     source: this.state.regionList,
                     readOnly: true
@@ -3547,13 +3703,15 @@ class EditSupplyPlanStatus extends Component {
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
-                    items1.push({
-                        title: i18n.t('static.problemContext.viewTrans'),
-                        onclick: function () {
-                            var myObj = obj.getRowData(y);
-                            this.toggleTransView(myObj[23]);
-                        }.bind(this)
-                    });
+                    if (obj.getRowData(y)[0] != 0) {
+                        items1.push({
+                            title: i18n.t('static.problemContext.viewTrans'),
+                            onclick: function () {
+                                var myObj = obj.getRowData(y);
+                                this.toggleTransView(myObj[24]);
+                            }.bind(this)
+                        });
+                    }
                     if (obj.options.allowDeleteRow == true) {
                         if (obj.getRowData(y)[0] == 0) {
                             items1.push({
