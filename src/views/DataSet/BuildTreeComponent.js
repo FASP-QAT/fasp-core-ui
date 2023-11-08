@@ -4651,7 +4651,6 @@ export default class BuildTree extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             // console.log("validation---", validation);
-            console.log("Hello",!validation)
             this.setState({ modelingTabError: !validation })
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
@@ -10413,30 +10412,29 @@ export default class BuildTree extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             this.formSubmitLoader();
-                            console.log("Hello",this.state.modelingTabError)
-                            if(!this.state.modelingTabError){
-                            if (!this.state.isSubmitClicked) {
-                                // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                    setTimeout(() => {
-                                        // console.log("inside set timeout on submit")
-                                        // console.log("Inside>>>>> this.state.addNodeFlag>>>", this.state.addNodeFlag);
+                            if(this.state.lastRowDeleted == true ? true : this.checkValidation()){
+                                if (!this.state.isSubmitClicked) {
+                                    // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                    
+                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                        setTimeout(() => {
+                                            // console.log("inside set timeout on submit")
+                                            // console.log("Inside>>>>> this.state.addNodeFlag>>>", this.state.addNodeFlag);
 
-                                        if (this.state.addNodeFlag) {
-                                            this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                                        } else {
-                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                        }
-                                        this.setState({
-                                            cursorItem: 0,
-                                            highlightItem: 0,
-                                            activeTab1: new Array(1).fill('1')
-                                        })
-                                    }, 0);
-                                })
-                                this.setState({ modelingTabChanged: false })
-                            }
+                                            if (this.state.addNodeFlag) {
+                                                this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                                            } else {
+                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                            }
+                                            this.setState({
+                                                cursorItem: 0,
+                                                highlightItem: 0,
+                                                activeTab1: new Array(1).fill('1')
+                                            })
+                                        }, 0);
+                                    })
+                                    this.setState({ modelingTabChanged: false })
+                                }
                             }else{
                                 this.setState({ activeTab1: new Array(1).fill('2') })
                             }
