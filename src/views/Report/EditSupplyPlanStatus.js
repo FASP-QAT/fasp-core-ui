@@ -543,7 +543,7 @@ class EditSupplyPlanStatus extends Component {
             // console.log("current problem status ***", rowData[20]);
             // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
             // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
-            if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes.toString() != rowData[22].toString())) {
+            if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes ? problemList[0].reviewNotes.toString() : "" != rowData[22].toString())) {
                 // console.log("in if***");
                 elInstance.setValueFromCoords(23, y, 1, true);
             } else {
@@ -5850,6 +5850,7 @@ class EditSupplyPlanStatus extends Component {
                                                 id: map.get("11")
                                             },
                                             reviewed: map.get("21"),
+                                            reviewedNotes: map.get("22"),
                                             notes: map.get("22")
                                         });
                                     }
@@ -5879,8 +5880,10 @@ class EditSupplyPlanStatus extends Component {
                                             planningUnit: {
                                                 id: map.get("6")
                                             },
+                                            reviewed: map.get("21"),
+                                            reviewedNotes: map.get("22"),
                                             data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
-                                            notes: ""
+                                            notes: map.get("22")
                                         })
                                     }
                                     // if (map.get("20") == 1) {
