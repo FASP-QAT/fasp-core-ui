@@ -964,6 +964,8 @@ export default class BuildTree extends Component {
             programDataListForPuCheck: [],
             planningUnitObjList: [],
             allProcurementAgentList: [],
+            modelingTabChanged: false,
+            modelingTabError: false,
             modelingChangedOrAdded: false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
@@ -4683,6 +4685,7 @@ export default class BuildTree extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             // console.log("validation---", validation);
+            this.setState({ modelingTabError: !validation })
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
                     // console.log("entry ---", this.state.isValidError, "===validation---", validation)
@@ -6314,6 +6317,11 @@ export default class BuildTree extends Component {
         if (x != 11 && x != 9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
+        }
+        if(!this.state.modelingTabChanged){
+            this.setState({
+                modelingTabChanged: true
+            })
         }
         // this.calculateScalingTotal();
     }.bind(this);
@@ -9172,7 +9180,8 @@ export default class BuildTree extends Component {
                             year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
-                        this.buildModelingJexcel();
+                        if(!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
 
                 }
@@ -9183,7 +9192,8 @@ export default class BuildTree extends Component {
                             year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
-                        this.buildModelingJexcel();
+                        if(!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
                 }
                 // console.log("get label method---",this.state.modelingEl.getLabel('3'))
@@ -10079,10 +10089,13 @@ export default class BuildTree extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
-
+                modelingEl: ""
             }, () => {
-
-                if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
+                try {
+                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                } catch (err) {    
+                }
+                if(data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false){
                     var itemConfig = data.context;
                     var items = this.state.items;
                     var updatedItems = items;
@@ -10905,36 +10918,33 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("Inside>>>>>   all ok>>>", this.state.addNodeFlag);
-                            if (!this.state.isSubmitClicked) {
-                                // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                this.formSubmitLoader();
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                    setTimeout(() => {
-                                        // console.log("inside set timeout on submit")
-                                        // console.log("Inside>>>>> this.state.addNodeFlag>>>", this.state.addNodeFlag);
+                            // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
+                            this.formSubmitLoader();
+                            if(this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true){
+                                if (!this.state.isSubmitClicked) {
+                                    // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                                    
+                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                        setTimeout(() => {
+                                            // console.log("inside set timeout on submit")
+                                            // console.log("Inside>>>>> this.state.addNodeFlag>>>", this.state.addNodeFlag);
 
-                                        if (this.state.addNodeFlag) {
-                                            this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                                        } else {
-                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                        }
-                                        if (this.state.modelingChangedOrAdded) {
-                                            this.formSubmitLoader();
-                                        }
-                                        this.setState({
-                                            cursorItem: 0,
-                                            highlightItem: 0,
-                                            activeTab1: new Array(1).fill('1')
-                                        })
-                                    }, 0);
-                                })
-                                try {
-                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
-                                    this.setState({ modelingEl: "" })
-                                } catch (err) {
-
+                                            if (this.state.addNodeFlag) {
+                                                this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                                            } else {
+                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                            }
+                                            this.setState({
+                                                cursorItem: 0,
+                                                highlightItem: 0,
+                                                activeTab1: new Array(1).fill('1')
+                                            })
+                                        }, 0);
+                                    })
+                                    this.setState({ modelingTabChanged: false })
                                 }
+                            }else{
+                                this.setState({ activeTab1: new Array(1).fill('2') })
                             }
 
                         }}
@@ -12325,34 +12335,22 @@ export default class BuildTree extends Component {
                                             if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
                                                 var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                                                 if (cf == true) {
-                                                    try {
-                                                        jexcel.destroy(document.getElementById('modelingJexcel'), true);
-                                                    } catch (err) {
-                    
-                                                    }
                                                     this.setState({
                                                         openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                                        highlightItem: 0, activeTab1: new Array(3).fill('1'),
-                                                        modelingEl: ""
+                                                        highlightItem: 0, activeTab1: new Array(3).fill('1')
                                                     })
                                                 } else {
 
                                                 }
                                             } else {
-                                                try {
-                                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
-                                                } catch (err) {
-                
-                                                }
                                                 this.setState({
                                                     openAddNodeModal: false, cursorItem: 0, isChanged: false,
-                                                    highlightItem: 0, activeTab1: new Array(3).fill('1'),
-                                                    modelingEl: ""
+                                                    highlightItem: 0, activeTab1: new Array(3).fill('1')
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -15333,29 +15331,19 @@ export default class BuildTree extends Component {
                         if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
                             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                             if (cf == true) {
-                                try {
-                                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
-                                } catch (err) {
-
-                                }
                                 this.setState({
                                     openAddNodeModal: false, cursorItem: 0, isChanged: false,
                                     highlightItem: 0, activeTab1: new Array(3).fill('1'),
-                                    modelingEl: ""
+                                    modelingTabChanged: false
                                 })
                             } else {
 
                             }
                         } else {
-                            try {
-                                jexcel.destroy(document.getElementById('modelingJexcel'), true);
-                            } catch (err) {
-
-                            }
                             this.setState({
                                 openAddNodeModal: false, cursorItem: 0, isChanged: false,
                                 highlightItem: 0, activeTab1: new Array(3).fill('1'),
-                                modelingEl: ""
+                                modelingTabChanged: false
                             })
                         }
 
