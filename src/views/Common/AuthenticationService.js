@@ -137,13 +137,17 @@ class AuthenticationService {
     }
 
     getRealmId() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
-        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        // console.log("get realm id decryptedUser---", decryptedUser);
-        // console.log(decryptedUser);
-        return decryptedUser.realm.realmId;
+        try{
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            // console.log("get realm id decryptedCurUser---", decryptedCurUser);
+            // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            // console.log("get realm id decryptedUser---", decryptedUser);
+            // console.log(decryptedUser);
+            return decryptedUser.realm.realmId;
+        }catch{
+            return "";
+        }
     }
     getLoggedInUserRealm() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
