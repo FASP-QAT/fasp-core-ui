@@ -10412,7 +10412,7 @@ export default class BuildTree extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             this.formSubmitLoader();
-                            if(this.state.lastRowDeleted == true ? true : this.checkValidation()){
+                            if(this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true){
                                 if (!this.state.isSubmitClicked) {
                                     // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
                                     
@@ -11842,7 +11842,7 @@ export default class BuildTree extends Component {
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
