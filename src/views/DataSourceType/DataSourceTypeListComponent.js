@@ -27,7 +27,6 @@ export default class DataSourceTypeListComponent extends Component {
         }
         this.addNewDataSourceType = this.addNewDataSourceType.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
