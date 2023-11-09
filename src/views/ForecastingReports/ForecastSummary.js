@@ -1667,7 +1667,7 @@ class ForecastSummary extends Component {
                                     nestedHeaders.push(
                                         {
                                             title: i18n.t('static.forecastReport.allRegions'),
-                                            colspan: '1'
+                                            colspan: '2'
                                         },
                                     );
                                     // if (langaugeList.length == 0) {
