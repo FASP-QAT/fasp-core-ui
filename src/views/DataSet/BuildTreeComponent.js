@@ -1357,10 +1357,7 @@ export default class BuildTree extends Component {
                         "consumptionDataType": 2,
                         "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
                         "selectedForecastMap": map1.get("14"),
-                        "createdBy":
-                        {
-                            "userId": map1.get("16") == "" ? curUser : map1.get("16"),
-                        },
+                        "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
                         "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
                         "active": true,
                     }
