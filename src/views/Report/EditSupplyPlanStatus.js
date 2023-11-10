@@ -427,20 +427,14 @@ class EditSupplyPlanStatus extends Component {
 
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(9, y);
-                var reg = /^[^'":\\]+$/;
-                var reg2 = /^\S+(?: \S+)*$/;
+                var reg = /^\S+(?: \S+)*$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (!reg.test(value)) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                        valid = false;
-                    } else if(!reg2.test(value)){
+                    if(!reg.test(value)){
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -453,20 +447,14 @@ class EditSupplyPlanStatus extends Component {
 
                 var col = ("K").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(10, y);
-                var reg = /^[^'":\\]+$/;
-                var reg2 = /^\S+(?: \S+)*$/;
+                var reg = /^\S+(?: \S+)*$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (!reg.test(value)) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                        valid = false;
-                    } else if(!reg2.test(value)){
+                    if(!reg.test(value)){
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -519,18 +507,13 @@ class EditSupplyPlanStatus extends Component {
 
         if (x == 9) {
             var col = ("J").concat(parseInt(y) + 1);
-            var reg = /^[^'":\\]+$/;
-            var reg2 = /^\S+(?: \S+)*$/;
+            var reg = /^\S+(?: \S+)*$/;
             if (rowData1[9] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (!reg.test(rowData1[9])) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                } else if(!reg2.test(rowData1[9])){
+                if(!reg.test(rowData1[9])){
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -543,18 +526,13 @@ class EditSupplyPlanStatus extends Component {
 
         if (x == 10) {
             var col = ("K").concat(parseInt(y) + 1);
-            var reg = /^[^'":\\]+$/;
-            var reg2 = /^\S+(?: \S+)*$/;
+            var reg = /^\S+(?: \S+)*$/;
             if (rowData1[10] == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (!reg.test(rowData1[10])) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                } else if(!reg2.test(rowData1[10])){
+                if(!reg.test(rowData1[10])){
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -5936,7 +5914,7 @@ class EditSupplyPlanStatus extends Component {
                                             planningUnit: {
                                                 id: map.get("6")
                                             },
-                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
+                                            data5: '{"problemDescription":"' + map.get("9").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '') + '", "suggession":"' + map.get("10").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '') + '"}',
                                             notes: ""
                                         })
                                     }
