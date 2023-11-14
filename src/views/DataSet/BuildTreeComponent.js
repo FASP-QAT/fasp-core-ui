@@ -1365,7 +1365,7 @@ export default class BuildTree extends Component {
                 // console.log("program------",program);
                 var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                 var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                // console.log("programData------",programData);
+                console.log("programData------ Test@123",programData);
                 var planningFullList=programData.planningUnitList;
                 // console.log("1Aug planningUnitList------",planningUnitList);
                 // console.log("1Aug programData------Before",programData.planningUnitList);
@@ -7123,6 +7123,7 @@ export default class BuildTree extends Component {
                     // console.log("dataSetObj tree>>>", dataSetObj);
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    console.log("Program Data Test@123",programData)
                     programDataListForPuCheck.push({"programData":programData,"id":dataSetObj.id});
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
@@ -7797,11 +7798,11 @@ export default class BuildTree extends Component {
                     }
                     if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
                         var sharePu;
-                        if (this.state.currentScenario.puNode.sharePlanningUnit != "true") {
+                        // if (this.state.currentScenario.puNode.sharePlanningUnit != "true") {
                             sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
-                        } else {
-                            sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
-                        }
+                        // } else {
+                            // sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                        // }
 
                         // } else {
                         //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
