@@ -28,26 +28,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validselectprogramtext')),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 const entityname = i18n.t('static.quantimed.quantimedImport')
 class QuantimedImportStepOne extends Component {
     constructor(props) {
@@ -176,7 +157,7 @@ class QuantimedImportStepOne extends Component {
                     enableReinitialize={true}
                     initialValues={{
                     }}
-                    validate={validate(validationSchema)}
+                    validationSchema={validationSchema}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         if (window.File && window.FileReader && window.FileList && window.Blob) {
                             if (document.querySelector('input[type=file]').files[0] == undefined) {

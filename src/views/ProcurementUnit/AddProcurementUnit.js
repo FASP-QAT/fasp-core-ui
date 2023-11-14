@@ -87,26 +87,6 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.procurementUnit.validValueText')),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class AddProcurementUnit extends Component {
     constructor(props) {
         super(props);
@@ -520,7 +500,7 @@ export default class AddProcurementUnit extends Component {
                                     unitsPerPalletEuro2: this.state.procurementUnit.unitsPerPalletEuro2,
                                     unitsPerContainer: this.state.procurementUnit.unitsPerContainer
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

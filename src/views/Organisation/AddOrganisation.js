@@ -40,26 +40,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisationType.organisationTypeValue'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class AddOrganisationComponent extends Component {
     constructor(props) {
         super(props);
@@ -566,7 +546,7 @@ export default class AddOrganisationComponent extends Component {
                                     realmCountryId: this.state.realmCountryId,
                                     organisationTypeId: this.state.organisation.organisationType.id,
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     if (this.state.organisation.organisationCode != '') {
                                         this.setState({

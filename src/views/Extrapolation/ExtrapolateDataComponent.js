@@ -153,26 +153,6 @@ const validationSchemaExtrapolation = function (values) {
                 })
     })
 }
-const validateExtrapolation = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaExtrapolation = getValidationSchema(values)
-        try {
-            validationSchemaExtrapolation.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorExtrapolation(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorExtrapolation = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -2813,7 +2793,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 dId: this.state.d,
                                 qId: this.state.q
                             }}
-                            validate={validateExtrapolation(validationSchemaExtrapolation)}
+                            validationSchema={validationSchemaExtrapolation}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var flag = this.state.buttonFalg;
                                 if (flag) {

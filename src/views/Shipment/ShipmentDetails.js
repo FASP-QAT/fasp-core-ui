@@ -37,26 +37,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlanForDataEntry";
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations.js";
 const entityname = i18n.t('static.dashboard.shipmentdetails');
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 const validationSchemaReplan = function (values) {
     return Yup.object().shape({
         procurementAgentId: Yup.string()
@@ -1214,7 +1195,7 @@ export default class ShipmentDetails extends React.Component {
                             procurementAgentId: this.state.procurementAgentId,
                             fundingSourceId: this.state.fundingSourceId
                         }}
-                        validate={validate(validationSchemaReplan)}
+                        validationSchema={validationSchemaReplan}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.planShipment();
                         }}

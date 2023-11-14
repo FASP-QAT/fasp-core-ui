@@ -24,26 +24,6 @@ const validationSchemaTwo = function (values) {
             .required(i18n.t('static.program.validcountrytext')),
     })
 }
-const validateTwo = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorTwo(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorTwo = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class PipelineProgramDataStepTwo extends Component {
     constructor(props) {
         super(props);
@@ -142,7 +122,7 @@ export default class PipelineProgramDataStepTwo extends Component {
                 <Formik
                     enableReinitialize={true}
                     initialValues={{ realmCountryId: this.props.items.program.realmCountry.realmCountryId }}
-                    validate={validateTwo(validationSchemaTwo)}
+                    validationSchema={validationSchemaTwo}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepOne && this.props.endProgramInfoStepOne();
                     }}

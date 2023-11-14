@@ -95,26 +95,6 @@ const validationSchemaSix = function (values) {
                 }),
     })
 }
-const validateSix = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorSix(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorSix = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class StepSix extends Component {
     constructor(props) {
         super(props);
@@ -192,7 +172,7 @@ export default class StepSix extends Component {
             <Formik
                 enableReinitialize={true}
                 initialValues={initialValuesSix}
-                validate={validateSix(validationSchemaSix)}
+                validationSchema={validationSchemaSix}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                     this.props.finishedStepSix && this.props.finishedStepSix();
                 }}

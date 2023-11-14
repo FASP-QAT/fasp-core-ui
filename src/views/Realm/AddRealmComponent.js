@@ -96,26 +96,6 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class AddRealmComponent extends Component {
     constructor(props) {
         super(props);
@@ -255,23 +235,24 @@ export default class AddRealmComponent extends Component {
                         <Card>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{
-                                    realmCode: this.state.realm.realmCode,
-                                    label: getLabelText(this.state.realm.label, this.state.lang),
-                                    minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
-                                    minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
-                                    maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
-                                    defaultRealm: this.state.realm.defaultRealm,
-                                    minQplTolerance: this.state.realm.minQplTolerance,
-                                    minQplToleranceCutOff: this.state.realm.minQplToleranceCutOff,
-                                    maxQplTolerance: this.state.realm.maxQplTolerance,
-                                    actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
-                                    forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
-                                    inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
-                                    minCountForMode: this.state.realm.minCountForMode,
-                                    minPercForMode: this.state.realm.minPercForMode,
-                                }}
-                                validate={validate(validationSchema)}
+                                initialValues={initialValues}
+                                // initialValues={{
+                                //     realmCode: this.state.realm.realmCode,
+                                //     label: getLabelText(this.state.realm.label, this.state.lang),
+                                //     minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
+                                //     minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
+                                //     maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
+                                //     defaultRealm: this.state.realm.defaultRealm,
+                                //     minQplTolerance: this.state.realm.minQplTolerance,
+                                //     minQplToleranceCutOff: this.state.realm.minQplToleranceCutOff,
+                                //     maxQplTolerance: this.state.realm.maxQplTolerance,
+                                //     actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
+                                //     forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
+                                //     inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
+                                //     minCountForMode: this.state.realm.minCountForMode,
+                                //     minPercForMode: this.state.realm.minPercForMode,
+                                // }}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

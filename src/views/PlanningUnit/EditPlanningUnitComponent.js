@@ -18,26 +18,6 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class EditPlanningUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -201,7 +181,7 @@ export default class EditPlanningUnitComponent extends Component {
                                     forecastingUnitId: this.state.planningUnit.forecastingUnit.forecastingUnitId,
                                     multiplier: this.state.planningUnit.multiplier
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

@@ -41,26 +41,6 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 class EditProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -489,7 +469,8 @@ class EditProcurementAgentComponent extends Component {
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
                                         programId: this.state.procurementAgent.programList
                                     }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
+
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

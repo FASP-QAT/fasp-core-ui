@@ -52,26 +52,7 @@ import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanComparisionComponent from "./SupplyPlanComparisionComponent";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
 const entityname = i18n.t('static.dashboard.supplyPlan')
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 const validationSchemaReplan = function (values) {
     return Yup.object().shape({
         procurementAgentId: Yup.string()
@@ -1883,7 +1864,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 procurementAgentId: this.state.procurementAgentId,
                                 fundingSourceId: this.state.fundingSourceId
                             }}
-                            validate={validate(validationSchemaReplan)}
+                            validationSchema={validationSchemaReplan}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.planShipment();
                             }}

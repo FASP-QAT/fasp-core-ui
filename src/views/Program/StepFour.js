@@ -23,26 +23,6 @@ const validationSchemaFour = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
     })
 }
-const validateFour = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorFour(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorFour = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class StepFour extends Component {
     constructor(props) {
         super(props);
@@ -151,7 +131,7 @@ export default class StepFour extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesFour}
-                    validate={validateFour(validationSchemaFour)}
+                    validationSchema={validationSchemaFour}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepFour && this.props.finishedStepFour();
                     }}

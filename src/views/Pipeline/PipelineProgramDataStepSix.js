@@ -106,26 +106,6 @@ const validationSchemaSix = function (values) {
                 }),
     })
 }
-const validateSix = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorSix(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorSix = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class PipelineProgramDataStepSix extends Component {
     constructor(props) {
         super(props);
@@ -272,7 +252,7 @@ export default class PipelineProgramDataStepSix extends Component {
                             programCode: this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode
                         }
                     }
-                    validate={validateSix(validationSchemaSix)}
+                    validationSchema={validationSchemaSix}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepFive && this.props.endProgramInfoStepFive();
                     }}

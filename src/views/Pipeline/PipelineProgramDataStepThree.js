@@ -25,26 +25,6 @@ const validationSchemaThree = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
     })
 }
-const validateThree = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorThree(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorThree = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class PipelineProgramDataStepThree extends Component {
     constructor(props) {
         super(props);
@@ -142,7 +122,7 @@ export default class PipelineProgramDataStepThree extends Component {
                     initialValues={{
                         healthAreaId: this.props.items.program.healthAreaArray
                     }}
-                    validate={validateThree(validationSchemaThree)}
+                    validationSchema={validationSchemaThree}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepTwo && this.props.endProgramInfoStepTwo();
                     }}

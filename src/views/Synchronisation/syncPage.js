@@ -47,26 +47,6 @@ const validationSchema = function (values, t) {
       .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
   })
 }
-const validate = (getValidationSchema) => {
-  return (values) => {
-    const validationSchema = getValidationSchema(values, i18n.t)
-    try {
-      validationSchema.validateSync(values, { abortEarly: false })
-      return {}
-    } catch (error) {
-      return getErrorsFromValidationError(error)
-    }
-  }
-}
-const getErrorsFromValidationError = (validationError) => {
-  const FIRST_ERROR = 0
-  return validationError.inner.reduce((errors, error) => {
-    return {
-      ...errors,
-      [error.path]: error.errors[FIRST_ERROR],
-    }
-  }, {})
-}
 export default class syncPage extends Component {
   constructor(props) {
     super(props);
@@ -3569,7 +3549,7 @@ export default class syncPage extends Component {
                   <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                       initialValues={initialValues}
-                      validate={validate(validationSchema)}
+                      validationSchema={validationSchema}
                       onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.synchronize()
                       }}

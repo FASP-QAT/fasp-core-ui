@@ -140,26 +140,7 @@ const validationSchemaExtrapolation = function (values) {
                 }),
     })
 }
-const validateExtrapolation = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaExtrapolation = getValidationSchema(values)
-        try {
-            validationSchemaExtrapolation.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorExtrapolation(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorExtrapolation = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 function addCommasExtrapolation(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -2888,7 +2869,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 dId: this.state.d,
                                 qId: this.state.q
                             }}
-                            validate={validateExtrapolation(validationSchemaExtrapolation)}
+                            validationSchema={validationSchemaExtrapolation}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 if (this.checkValidationExtrapolation()) {
                                     if (this.state.buttonFalg) {

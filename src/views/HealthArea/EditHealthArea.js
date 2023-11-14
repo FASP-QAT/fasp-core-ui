@@ -34,26 +34,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validcountrytext'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class EditHealthAreaComponent extends Component {
     constructor(props) {
         super(props);
@@ -361,7 +341,7 @@ export default class EditHealthAreaComponent extends Component {
                                     realmId: this.state.healthArea.realm.id,
                                     realmCountryId: this.state.healthArea.realmCountryArray
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

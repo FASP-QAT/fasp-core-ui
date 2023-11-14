@@ -79,26 +79,6 @@ const validationSchema = function (values) {
       .required(i18n.t("static.user.org&CountryText")),
   });
 };
-const validate = (getValidationSchema) => {
-  return (values) => {
-    const validationSchema = getValidationSchema(values);
-    try {
-      validationSchema.validateSync(values, { abortEarly: false });
-      return {};
-    } catch (error) {
-      return getErrorsFromValidationError(error);
-    }
-  };
-};
-const getErrorsFromValidationError = (validationError) => {
-  const FIRST_ERROR = 0;
-  return validationError.inner.reduce((errors, error) => {
-    return {
-      ...errors,
-      [error.path]: error.errors[FIRST_ERROR],
-    };
-  }, {});
-};
 class AddUserComponent extends Component {
   constructor(props) {
     super(props);
@@ -1307,7 +1287,7 @@ class AddUserComponent extends Component {
                             <Formik
                 enableReinitialize={true}
                 initialValues={initialValues}
-                validate={validate(validationSchema)}
+                validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   let isValid = this.checkValidation();
                   if (isValid) {

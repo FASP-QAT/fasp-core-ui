@@ -20,26 +20,6 @@ const validationSchema = function (values) {
             .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class EditForecastingUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -237,7 +217,7 @@ export default class EditForecastingUnitComponent extends Component {
                                     label: this.state.forecastingUnit.label.label_en,
                                     genericLabel: this.state.forecastingUnit.genericLabel.label_en
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

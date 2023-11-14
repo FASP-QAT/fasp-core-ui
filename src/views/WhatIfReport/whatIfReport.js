@@ -70,26 +70,6 @@ const validationSchema = function (values, t) {
             }),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class WhatIfReportComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -4145,7 +4125,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={initialValues}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                             this.addRow();
                             resetForm({

@@ -55,26 +55,6 @@ const validationSchema = function (values) {
             .required('Enter forecast period (months)'),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class AddForecastProgram extends Component {
     constructor(props) {
         super(props);
@@ -813,7 +793,7 @@ export default class AddForecastProgram extends Component {
                                     programNotes: this.state.program.programNotes,
                                     forecastProgramInMonth: this.state.forecastProgramInMonth
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

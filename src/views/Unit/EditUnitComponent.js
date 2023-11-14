@@ -22,26 +22,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.unit.unitcodetext'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class EditUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -190,7 +170,7 @@ export default class EditUnitComponent extends Component {
                                     unitName: this.state.unit.label.label_en,
                                     unitCode: this.state.unit.unitCode
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

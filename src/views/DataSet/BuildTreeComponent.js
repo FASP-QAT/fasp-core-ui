@@ -391,28 +391,6 @@ const validationSchemaNodeData = function (values) {
     })
 }
 
-const validateNodeData = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaNodeData = getValidationSchema(values)
-        try {
-            validationSchemaNodeData.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorNodeData(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorNodeData = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethodId: Yup.string()
@@ -426,28 +404,6 @@ const validationSchema = function (values) {
     })
 }
 
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 const validationSchemaScenario = function (values) {
     return Yup.object().shape({
         scenarioName: Yup.string()
@@ -455,28 +411,6 @@ const validationSchemaScenario = function (values) {
             .required('Please enter scenario name.'),
 
     })
-}
-
-const validateScenario = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaScenario = getValidationSchema(values)
-        try {
-            validationSchemaScenario.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorScenario(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorScenario = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 
 // Branch Validation
@@ -493,49 +427,6 @@ const validationSchemaLevel = function (values) {
             .required('Please enter level name.'),
 
     })
-}
-
-const validateBranch = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaBranch = getValidationSchema(values)
-        try {
-            validationSchemaBranch.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorBranch(error)
-        }
-    }
-}
-const validateLevel = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaLevel = getValidationSchema(values)
-        try {
-            validationSchemaLevel.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorLevel(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorBranch = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-const getErrorsFromValidationErrorLevel = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 
 function addCommasWith8Decimals(cell1, row) {
@@ -10379,7 +10270,7 @@ export default class BuildTree extends Component {
                             oneTimeUsage:"",
                             planningUnitId:this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
                         }}
-                        validate={validateNodeData(validationSchemaNodeData)}
+                        validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             if (!this.state.isSubmitClicked) {
@@ -13612,7 +13503,7 @@ export default class BuildTree extends Component {
                                                     regionArray: this.state.regionList,
                                                     regionId: this.state.regionValues,
                                                 }}
-                                                validate={validate(validationSchema)}
+                                                validationSchema={validationSchema}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                                     this.saveTreeData(false, false);
                                                     // this.createOrUpdateTree();
@@ -13968,7 +13859,7 @@ export default class BuildTree extends Component {
                             initialValues={{
                                 branchTemplateId: this.state.branchTemplateId
                             }}
-                            validate={validate(validationSchemaBranch)}
+                            validationSchema={validationSchemaBranch}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.generateBranchFromTemplate(this.state.branchTemplateId);
                             }}
@@ -14595,7 +14486,7 @@ export default class BuildTree extends Component {
                             initialValues={{
                                 scenarioName: this.state.scenario.label.label_en
                             }}
-                            validate={validate(validationSchemaScenario)}
+                            validationSchema={validationSchemaScenario}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.addScenario();
                             }}
@@ -14778,7 +14669,7 @@ export default class BuildTree extends Component {
                     initialValues={{
                         levelName: this.state.levelName
                     }}
-                    validate={validate(validationSchemaLevel)}
+                    validationSchema={validationSchemaLevel}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.levelDeatilsSaved()
                     }}

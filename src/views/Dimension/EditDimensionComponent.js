@@ -17,26 +17,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.dimension.dimensiontext'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 export default class UpdateDimensionComponent extends Component {
     constructor(props) {
         super(props);
@@ -167,7 +147,7 @@ export default class UpdateDimensionComponent extends Component {
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{ label: this.state.dimension.label.label_en }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

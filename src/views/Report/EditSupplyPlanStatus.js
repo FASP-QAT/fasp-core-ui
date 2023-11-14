@@ -53,17 +53,6 @@ const validationSchemaForAddingProblem = function (values) {
             .required(i18n.t('static.editStatus.validCriticality'))
     })
 }
-const validateForAddingProblem = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
@@ -80,26 +69,6 @@ const validationSchema = function (values) {
                 otherwise: Yup.string().notRequired()
             }),
     })
-}
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 class EditSupplyPlanStatus extends Component {
     constructor(props) {
@@ -4412,7 +4381,7 @@ class EditSupplyPlanStatus extends Component {
                                             modelCriticalityId: '',
                                             suggession: ''
                                         }}
-                                        validate={validateForAddingProblem(validationSchemaForAddingProblem)}
+                                        validationSchema={validationSchemaForAddingProblem}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             var criticalityId = (document.getElementById("modelCriticalityId").value)
                                             var regionId = (document.getElementById("modelRegionId").value);
@@ -4573,7 +4542,7 @@ class EditSupplyPlanStatus extends Component {
                                 versionStatusId: this.state.program.currentVersion.versionStatus.id,
                                 versionNotes: this.state.program.currentVersion.notes
                             }}
-                            validate={validate(validationSchema)}
+                            validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var validation = this.checkValidation();
                                 if (validation == true) {

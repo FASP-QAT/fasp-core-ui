@@ -56,48 +56,8 @@ const validationSchemaCreateTree = function (values) {
             .typeError(i18n.t('static.common.regiontext')),
     })
 }
-const validateCreateTree = (getValidationSchema) => {
-    return (values) => {
-        const validationSchemaCreateTree = getValidationSchema(values)
-        try {
-            validationSchemaCreateTree.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorCreateTree(error)
-        }
-    }
-}
-const getErrorsFromValidationErrorCreateTree = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 const initialValues = {
     treeTemplateName: "",
-}
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 export default class ListTreeTemplate extends Component {
@@ -1865,7 +1825,7 @@ export default class ListTreeTemplate extends Component {
                                     initialValues={{
                                         treeTemplateName: this.state.treeTemplateName
                                     }}
-                                    validate={validate(validationSchema)}
+                                    validationSchema={validationSchema}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (!this.state.isSubmitClicked) {
                                             this.setState({ loading: true, isSubmitClicked: true }, () => {
@@ -1936,7 +1896,7 @@ export default class ListTreeTemplate extends Component {
                                         regionId: this.state.regionValues
                                     }}
                                     enableReinitialize={true}
-                                    validate={validate(validationSchemaCreateTree)}
+                                    validationSchema={validationSchemaCreateTree}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         this.setState({ loading: true }, () => {
                                             this.createTree();

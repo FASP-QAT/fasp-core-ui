@@ -45,26 +45,6 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.budgetDisplayNameText')),
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values, i18n.t)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 class AddBudgetComponent extends Component {
     constructor(props) {
         super(props);
@@ -446,7 +426,7 @@ class AddBudgetComponent extends Component {
                         <Card>
                             <Formik
                                 initialValues={initialValues}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true

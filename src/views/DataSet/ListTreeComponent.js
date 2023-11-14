@@ -68,26 +68,7 @@ const validationSchema = function (values) {
 const initialValues = {
     treeName: "",
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 export default class ListTreeComponent extends Component {
     constructor(props) {
@@ -2806,7 +2787,7 @@ export default class ListTreeComponent extends Component {
                                         regionId: this.state.regionValues
                                     }}
                                     enableReinitialize={true}
-                                    validate={validate(validationSchema)}
+                                    validationSchema={validationSchema}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (!this.state.isSubmitClicked) {
                                             this.setState({ loading: true, isSubmitClicked: true }, () => {

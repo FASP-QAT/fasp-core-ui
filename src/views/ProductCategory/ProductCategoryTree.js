@@ -39,26 +39,7 @@ const validationSchema = function (values, t) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+
 export default class ProductCategoryTree extends Component {
     constructor(props) {
         super(props);
@@ -608,7 +589,7 @@ export default class ProductCategoryTree extends Component {
                                 <Formik
                                     enableReinitialize={true}
                                     initialValues={initialValues}
-                                    validate={validate(validationSchema)}
+                                    validationSchema={validationSchema}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addNewNode();
                                         if (this.state.duplicate == 1) {

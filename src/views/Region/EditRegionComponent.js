@@ -14,26 +14,6 @@ const validationSchema = function (values) {
             .required(i18n.t('static.region.validregion'))
     })
 }
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
 class EditRegionComponent extends Component {
     constructor(props) {
         super(props);
@@ -164,7 +144,7 @@ class EditRegionComponent extends Component {
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{ region: getLabelText(this.state.region.label, this.state.lang) }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
