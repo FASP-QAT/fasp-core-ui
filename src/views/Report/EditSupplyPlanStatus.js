@@ -5914,7 +5914,7 @@ class EditSupplyPlanStatus extends Component {
                                             planningUnit: {
                                                 id: map.get("6")
                                             },
-                                            data5: '{"problemDescription":"' + map.get("9").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '') + '", "suggession":"' + map.get("10").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '') + '"}',
+                                            data5: '{"problemDescription":"' + map.get("9").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '').trim() + '", "suggession":"' + map.get("10").toString().replace(/"/g, '').replace(/'/g, '').replace(/:/g, '').replace(/\\/g, '').trim() + '"}',
                                             notes: ""
                                         })
                                     }
