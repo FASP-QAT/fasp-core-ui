@@ -10086,7 +10086,8 @@ export default class BuildTree extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
-                modelingEl: ""
+                modelingEl: "",
+                modelingTabChanged: false
             }, () => {
                 try {
                     jexcel.destroy(document.getElementById('modelingJexcel'), true);
