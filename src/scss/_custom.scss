@@ -10621,9 +10621,9 @@ legend.scheduler-border {
   margin-left: 48px;
 }
 
-.chart-graph-report-forecastOutput {
-  min-height: 1000px !important;
-}
+// .chart-graph-report-forecastOutput {
+//   min-height: 1000px !important;
+// }
 
 // .fa-sort-down:before, .fa-sort-desc:before {
 //   content: "\f0dd";
@@ -10658,4 +10658,40 @@ legend.scheduler-border {
 
 .jss>tbody>tr>td.readonly.notLowestError {
   color: #000000 !important;
+}
+
+// .ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
+  .ForcastColumnFreeze .jss > thead> tr > td:nth-child(2),
+  .ForcastColumnFreeze .jss > thead > tr > td:nth-child(4)  {
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 2!important;
+}
+
+.ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  // top:65px!important;
+}
+@media screen and (min-width: 1025px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    top:83px!important;
+  }
+}
+@media screen and (min-width: 1441px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    top:83px!important;
+  }
 }
