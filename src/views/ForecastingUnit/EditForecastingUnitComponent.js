@@ -509,7 +509,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         invalid={touched.unitId && !!errors.unitId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
-                                                        readOnly={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_UNIT_FOR_FU')}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_UNIT_FOR_FU')}
                                                         required
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
