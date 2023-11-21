@@ -2301,6 +2301,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2310,13 +2311,16 @@ export default class SupplyPlanComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -2367,6 +2371,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2376,13 +2381,16 @@ export default class SupplyPlanComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }.bind(this)
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -2423,6 +2431,8 @@ export default class SupplyPlanComponent extends React.Component {
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#ba0c2f',
+                    pointBackgroundColor: '#ba0c2f',
+                    pointBorderColor: '#ba0c2f',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -2521,6 +2531,8 @@ export default class SupplyPlanComponent extends React.Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: '+1',
@@ -2542,6 +2554,8 @@ export default class SupplyPlanComponent extends React.Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'rgba(0,0,0,0)',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: true,
@@ -2565,6 +2579,8 @@ export default class SupplyPlanComponent extends React.Component {
                     yAxisID: 'B',
                     backgroundColor: 'transparent',
                     borderColor: '#118b70',
+                    pointBackgroundColor: '#118b70',
+                    pointBorderColor: '#118b70',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
