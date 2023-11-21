@@ -267,7 +267,8 @@ class EditSupplyPlanStatus extends Component {
             criticalitiesList: [],
             submitMessage: "",
             submitColor: "",
-            planningUnitDropdownList: []
+            planningUnitDropdownList: [],
+            temp_currentVersion_id: ''
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -2681,6 +2682,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     program,
                     programQPLDetails: programQPLDetails,
+                    temp_currentVersion_id: response.data.currentVersion.versionStatus.id,
                     programId: program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
@@ -5889,155 +5891,217 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
-                                var validation = this.checkValidation();
-                                if (validation == true) {
-                                document.getElementById("submitButton").disabled = true;
-                                var elInstance = this.state.problemEl;
-                                var json = elInstance.getJson();
-                                // console.log("problemList===>", json);
-                                // console.log("program===>", this.state.program);
-                                var reviewedProblemList = [];
-                                var isAllCheckForReviewed = true;
-                                for (var i = 0; i < json.length; i++) {
-                                    var map = new Map(Object.entries(json[i]));
-                                    if (map.get("23") == 1) {
-                                        reviewedProblemList.push({
-                                            problemReportId: map.get("0"),
-                                            problemStatus: {
-                                                id: map.get("11")
-                                            },
-                                            reviewed: map.get("21"),
-                                            notes: map.get("22")
-                                        });
-                                    }
-                                    if (map.get("21") == false && map.get("13") != 4) {
-                                        isAllCheckForReviewed = false
-                                    }
-                                    if(map.get("0") == 0){
-                                        reviewedProblemList.push({
-                                            problemReportId: 0,
-                                            realmProblem: {
-                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
-                                                problemType: {
-                                                    id: "2"
-                                                }
-                                            },
-                                            program: {
-                                                id: this.props.match.params.programId
-                                            },
-                                            versionId: this.props.match.params.versionId,
-                                            problemStatus: {
-                                                id: "1"
-                                            },
-                                            dt: moment(new Date()).format("YYYY-MM-DD"),
-                                            region: {
-                                                id: map.get("1")
-                                            },
-                                            planningUnit: {
-                                                id: map.get("6")
-                                            },
-                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
-                                            notes: ""
-                                        })
-                                    }
-                                    // if (map.get("20") == 1) {
-                                    //     reviewedProblemList.push({
-                                    //         problemReportId: map.get("0"),
-                                    //         problemStatus: {
-                                    //             id: map.get("10")
-                                    //         },
-                                    //         reviewed: map.get("18"),
-                                    //         notes: map.get("19")
-                                    //     });
-                                    // }
-                                    // if (map.get("18") == false && map.get("12") != 4) {
-                                    //     isAllCheckForReviewed = false
-                                    // }
-                                }
-                                // console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
-                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
-
-                                    // console.log("reviewedProblemList===>", reviewedProblemList);
-                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                        .then(response => {
-                                            if(this.state.program.currentVersion.versionStatus.id!=1){
-                                                // console.log("messageCode", response)
-                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                            }else{
-                                                document.getElementById("submitButton").disabled = false;
-                                            this.setState({
-                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                submitColor: "green",
-                                                problemReportChanged: 0,
-                                                remainingDataChanged:0
-
-                                                // isModalOpen: !this.state.isModalOpen,
-                                            }, () => {
-                                                this.hideMessageComponent()
-                                                this.componentDidMount();
-                                            })
-                                        }
-
-                                        })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({
-                                                        // message: 'static.unkownError',
-                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                        submitColor: "red",
-                                                        loading: false
-                                                    }, () => {
-                                                        this.hideMessageComponent()
-                                                    });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-
-                                                        case 401:
-                                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                                            break;
-                                                        case 403:
-                                                            this.props.history.push(`/accessDenied`)
-                                                            break;
-                                                        case 500:
-                                                        case 404:
-                                                        case 406:
-                                                            this.setState({
-                                                                submitMessage: error.response.data.messageCode,
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
-                                                        case 412:
-                                                            this.setState({
-                                                                submitMessage: error.response.data.messageCode,
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
-                                                        default:
-                                                            this.setState({
-                                                                submitMessage: 'static.unkownError',
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
+                                ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
+                                    .then(response => {
+                                        let temp_version_status = 0;
+                                        temp_version_status = response.data.currentVersion.versionStatus.id;
+                                        if(temp_version_status == this.state.temp_currentVersion_id){
+                                            var validation = this.checkValidation();
+                                            if (validation == true) {
+                                                document.getElementById("submitButton").disabled = true;
+                                                var elInstance = this.state.problemEl;
+                                                var json = elInstance.getJson();
+                                                // console.log("problemList===>", json);
+                                                // console.log("program===>", this.state.program);
+                                                var reviewedProblemList = [];
+                                                var isAllCheckForReviewed = true;
+                                                for (var i = 0; i < json.length; i++) {
+                                                    var map = new Map(Object.entries(json[i]));
+                                                    if (map.get("23") == 1) {
+                                                        reviewedProblemList.push({
+                                                            problemReportId: map.get("0"),
+                                                            problemStatus: {
+                                                                id: map.get("11")
+                                                            },
+                                                            reviewed: map.get("21"),
+                                                            notes: map.get("22")
+                                                        });
                                                     }
+                                                    if (map.get("21") == false && map.get("13") != 4) {
+                                                        isAllCheckForReviewed = false
+                                                    }
+                                                    if(map.get("0") == 0){
+                                                        reviewedProblemList.push({
+                                                            problemReportId: 0,
+                                                            realmProblem: {
+                                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
+                                                                problemType: {
+                                                                    id: "2"
+                                                                }
+                                                            },
+                                                            program: {
+                                                                id: this.props.match.params.programId
+                                                            },
+                                                            versionId: this.props.match.params.versionId,
+                                                            problemStatus: {
+                                                                id: "1"
+                                                            },
+                                                            dt: moment(new Date()).format("YYYY-MM-DD"),
+                                                            region: {
+                                                                id: map.get("1")
+                                                            },
+                                                            planningUnit: {
+                                                                id: map.get("6")
+                                                            },
+                                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
+                                                            notes: ""
+                                                        })
+                                                    }
+                                                    // if (map.get("20") == 1) {
+                                                    //     reviewedProblemList.push({
+                                                    //         problemReportId: map.get("0"),
+                                                    //         problemStatus: {
+                                                    //             id: map.get("10")
+                                                    //         },
+                                                    //         reviewed: map.get("18"),
+                                                    //         notes: map.get("19")
+                                                    //     });
+                                                    // }
+                                                    // if (map.get("18") == false && map.get("12") != 4) {
+                                                    //     isAllCheckForReviewed = false
+                                                    // }
+                                                }
+                                                // console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
+                                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
+
+                                                    // console.log("reviewedProblemList===>", reviewedProblemList);
+                                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                                        .then(response => {
+                                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                                                // console.log("messageCode", response)
+                                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                                            }else{
+                                                                document.getElementById("submitButton").disabled = false;
+                                                            this.setState({
+                                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                                submitColor: "green",
+                                                                problemReportChanged: 0,
+                                                                remainingDataChanged:0
+
+                                                                // isModalOpen: !this.state.isModalOpen,
+                                                            }, () => {
+                                                                this.hideMessageComponent()
+                                                                this.componentDidMount();
+                                                            })
+                                                        }
+
+                                                        })
+                                                        .catch(
+                                                            error => {
+                                                                if (error.message === "Network Error") {
+                                                                    this.setState({
+                                                                        // message: 'static.unkownError',
+                                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                        submitColor: "red",
+                                                                        loading: false
+                                                                    }, () => {
+                                                                        this.hideMessageComponent()
+                                                                    });
+                                                                } else {
+                                                                    switch (error.response ? error.response.status : "") {
+
+                                                                        case 401:
+                                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                            break;
+                                                                        case 403:
+                                                                            this.props.history.push(`/accessDenied`)
+                                                                            break;
+                                                                        case 500:
+                                                                        case 404:
+                                                                        case 406:
+                                                                            this.setState({
+                                                                                submitMessage: error.response.data.messageCode,
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                        case 412:
+                                                                            this.setState({
+                                                                                submitMessage: error.response.data.messageCode,
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                        default:
+                                                                            this.setState({
+                                                                                submitMessage: 'static.unkownError',
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        );
+                                                } else {
+                                                    document.getElementById("submitButton").disabled = false;
+                                                    alert("To approve a supply plan – Reviewed must all be checked.");
                                                 }
                                             }
-                                        );
-                                } else {
-                                    document.getElementById("submitButton").disabled = false;
-                                    alert("To approve a supply plan – Reviewed must all be checked.");
-                                }
-                                }
-
+                                        }else{
+                                            confirmAlert({
+                                                message: i18n.t("static.supplyplan.inconsistent"),
+                                                buttons: [
+                                                    {
+                                                        label: i18n.t("static.common.refreshPage"),
+                                                        onClick: () => {
+                                                            window.location.reload(true);
+                                                        }
+                                                    },
+                                                    {
+                                                        label: i18n.t('static.common.close')
+                                                    }
+                                                ]
+                                              });
+                                        }
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                        
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
                             }}
                             render={
                                 ({
