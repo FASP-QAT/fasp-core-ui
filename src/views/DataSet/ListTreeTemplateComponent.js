@@ -165,7 +165,15 @@ export default class ListTreeTemplate extends Component {
         this.saveMissingPUs = this.saveMissingPUs.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.hideThirdComponent=this.hideThirdComponent.bind(this);
        
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
     }
 
     modelOpenCloseCreateTree() {
@@ -1398,10 +1406,7 @@ export default class ListTreeTemplate extends Component {
                 "consumptionDataType": 2,
                 "otherUnit": map1.get("15")==""?null:map1.get("15"),
                 "selectedForecastMap":map1.get("14"),
-                "createdBy":
-                {
-                  "userId": map1.get("16")==""? curUser:map1.get("16"),
-                }, 
+                "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
                 "createdDate": map1.get("17")==""? curDate:map1.get("17"),
                 "active": true,
             }
@@ -1489,6 +1494,7 @@ export default class ListTreeTemplate extends Component {
                             downloadedProgramData:[downloadedProgramData],
                             datasetListJexcel:downloadedProgramData
                         },()=>{
+                            this.hideThirdComponent();
                             if(this.state.missingPUList.length>0){
                                 this.buildMissingPUJexcel();
                             }
@@ -2571,6 +2577,10 @@ export default class ListTreeTemplate extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <h5 className="green" style={{display:"none"}} id="div3">
+                                                    {this.state.missingPUList.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
+                                                    {this.state.missingPUList.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
+                                                    </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}

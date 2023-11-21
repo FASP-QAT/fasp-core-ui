@@ -3344,14 +3344,19 @@ class ForecastOutput extends Component {
                 intersect: false,
                 custom: CustomTooltips
             },
-            maintainAspectRatio: false,
-            responsive: true,
+            options: {
+                // other chart options
+                maintainAspectRatio: false, // to allow dynamic resizing
+                responsive: true,
+              },
+            // maintainAspectRatio: false,
+            // responsive: true,
             legend: {
                 display: true,
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: 'black',
                 }
             }
         }

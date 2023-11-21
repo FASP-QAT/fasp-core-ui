@@ -1068,6 +1068,7 @@ export default class BuildTree extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.changed1 = this.changed1.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
@@ -1325,10 +1326,7 @@ export default class BuildTree extends Component {
                 "consumptionDataType": 2,
                 "otherUnit": map1.get("15")==""?null:map1.get("15"),
                 "selectedForecastMap":map1.get("14"),
-                "createdBy":
-                {
-                  "userId": map1.get("16")==""? curUser:map1.get("16"),
-                }, 
+                "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
                 "createdDate": map1.get("17")==""? curDate:map1.get("17"),
                 "active": true,
             }
@@ -1427,6 +1425,7 @@ export default class BuildTree extends Component {
                             // downloadedProgramData:downloadedProgramData,
                             // datasetListJexcel:datasetListJexcel
                         },()=>{
+                            this.hideThirdComponent()
                             if(this.state.missingPUList.length>0){
                                 this.getMissingPuListBranchTemplate();
                             }
@@ -1562,6 +1561,7 @@ export default class BuildTree extends Component {
                             // downloadedProgramData:downloadedProgramData,
                             // datasetListJexcel:datasetListJexcel
                         },()=>{
+                            this.hideThirdComponent()
                             if(this.state.missingPUList.length>0){
                                 this.getMissingPuListBranchTemplate();
                             }
@@ -2734,6 +2734,13 @@ export default class BuildTree extends Component {
         }, 30000);
     }
 
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
+    }
+
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
@@ -3162,7 +3169,7 @@ export default class BuildTree extends Component {
                     // console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         // console.log("node id for update state 4----", this.state.items);
-                        // this.saveTreeData(true, false);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
@@ -3950,7 +3957,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = parseFloat(momList[j].manualChange).toFixed()
+            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
@@ -10240,7 +10247,7 @@ export default class BuildTree extends Component {
 
                             },
                             min: 0,
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -10390,7 +10397,7 @@ export default class BuildTree extends Component {
                             // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             if (!this.state.isSubmitClicked) {
                                 // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
-                                this.formSubmitLoader();
+                                // this.formSubmitLoader();
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         // console.log("inside set timeout on submit")
@@ -14041,6 +14048,12 @@ export default class BuildTree extends Component {
                                                     </div>
                                                     {(!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0) && <strong>{i18n.t("static.tree.youMustBeOnlineToCreatePU")}</strong>}                                                      
                                                 </div>
+                                                <h5 className="green" style={{display:"none"}} id="div3">
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.addSuccessMessageSelected")}
+                                                    {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.addSuccessMessageAll")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && i18n.t("static.tree.updateSuccessMessageSelected")}
+                                                    {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length == 0 && i18n.t("static.tree.updateSuccessMessageAll")}
+                                                </h5>
                                             </div>
                                                 <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
