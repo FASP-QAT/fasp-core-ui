@@ -3245,5 +3245,6 @@
     "static.listTree.updateSuccessMessageSelected":"Your selected planning units have been updated successfully. Please click create tree without adding planning unit to dupliacte the tree.",
     "static.forecastErrorReport.missingDataNote":"Current month does not contain forecasted consumption and/or actual consumption.",
     "static.forecastErrorReport.noData":"Current month does not contain forecasted consumption and actual consumption",
-    "static.forecastErrorReport.noActualData":"Current month does not contain actual consumption"
+    "static.forecastErrorReport.noActualData":"Current month does not contain actual consumption",
+    "static.supplyplan.inconsistent": "Found inconsistency. Please refresh the page."
 }
