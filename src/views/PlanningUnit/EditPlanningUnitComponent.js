@@ -8,13 +8,16 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { API_URL, SPACE_REGEX } from '../../Constants.js';
+import UnitService from '../../api/UnitService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const entityname = i18n.t('static.planningunit.planningunit');
 let initialValues = {
     label: '',
     forecastingUnitId: '',
     forecastingUnitList: [],
-    multiplier: ''
+    multiplier: '',
+    unitId: '',
 }
 
 const validationSchema = function (values) {
@@ -27,7 +30,9 @@ const validationSchema = function (values) {
             .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
             // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningUnit.multiplier'))
-            .min(0, i18n.t('static.program.validvaluetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        unitId: Yup.string()
+            .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
     })
 }
 
@@ -57,7 +62,8 @@ export default class EditPlanningUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            units: [],
+            lang: localStorage.getItem("lang"),
             planningUnit: {
                 message: '',
                 active: '',
@@ -137,7 +143,8 @@ export default class EditPlanningUnitComponent extends Component {
         setTouched({
             'label': true,
             'forecastingUnitId': true,
-            'multiplier': true
+            'multiplier': true,
+            'unitId': true,
         }
         )
         this.validateForm(errors)
@@ -169,67 +176,139 @@ export default class EditPlanningUnitComponent extends Component {
     }
     componentWillMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        // console.log(this.props.match.params.planningUnitId)
-        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    planningUnit: response.data, loading: false
-                });
-            } else {
-
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
+        console.log(this.props.match.params.planningUnitId)
+        UnitService.getUnitListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                } else {
-                    switch (error.response ? error.response.status : "") {
+                    this.setState({
+                        units: listArray, loading: false
+                    })
+                    PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+                        if (response.status == 200) {
+                            this.setState({
+                                planningUnit: response.data, loading: false
+                            });
+                        } else {
 
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
                             this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                                message: response.data.messageCode, loading: false
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
+                        }
+
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
-
+            );
     }
     render() {
+
+        const { units } = this.state;
+        let unitList = units.length > 0
+            && units.map((item, i) => {
+                return (
+                    <option key={i} value={item.unitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
 
         return (
             <div className="animated fadeIn">
@@ -246,7 +325,8 @@ export default class EditPlanningUnitComponent extends Component {
                                 initialValues={{
                                     label: this.state.planningUnit.label.label_en,
                                     forecastingUnitId: this.state.planningUnit.forecastingUnit.forecastingUnitId,
-                                    multiplier: this.state.planningUnit.multiplier
+                                    multiplier: this.state.planningUnit.multiplier,
+                                    unitId: this.state.planningUnit.unit.id,
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -370,6 +450,25 @@ export default class EditPlanningUnitComponent extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="unitId"
+                                                        id="unitId"
+                                                        bsSize="sm"
+                                                        valid={!errors.unitId && this.state.planningUnit.unit.id != ''}
+                                                        invalid={touched.unitId && !!errors.unitId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_UNIT_FOR_PU')}
+                                                        value={this.state.planningUnit.unit.id}
+                                                        required>
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {unitList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.unitId}</FormFeedback>
+                                                </FormGroup>
                                                     {/* <FormGroup>
                                                         <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
