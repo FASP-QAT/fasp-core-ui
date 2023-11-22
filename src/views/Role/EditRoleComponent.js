@@ -24,7 +24,6 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .max(25, i18n.t('static.common.max25digittext'))
             .required(i18n.t('static.role.roletext')),
         // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
@@ -492,7 +491,7 @@ class EditRoleComponent extends Component {
                                                         invalid={(touched.roleName && !!errors.roleName || !!errors.roleName)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        maxLength={25}
+                                                        maxLength={45}
                                                         required
                                                         value={this.Capitalize(this.state.role.label.label_en)}
                                                     />
