@@ -917,7 +917,7 @@ class AddRoleComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         required
-                                                        maxLength={25}
+                                                        maxLength={45}
                                                         value={this.Capitalize(this.state.role.label.label_en)}
                                                     /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                 </FormGroup>
