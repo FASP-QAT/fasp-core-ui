@@ -642,7 +642,7 @@ class RealmCountryRegion extends Component {
         // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
-        tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
+        tempArray.filter(c=>c[1]!=="").map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
         // console.log('hasDuplicate', hasDuplicate);
