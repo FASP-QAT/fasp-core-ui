@@ -10412,7 +10412,7 @@ export default class BuildTree extends Component {
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             // console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
-                            this.formSubmitLoader();
+                            // this.formSubmitLoader();
                             if(this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true){
                                 if (!this.state.isSubmitClicked) {
                                     // console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
