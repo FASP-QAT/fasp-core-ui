@@ -910,7 +910,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             })
                         }
                         if (this.state.smoothingId) {
-                            if(isSiteOnline()){
+                            if(localStorage.getItem('sessionType') === 'Online'){
                                 calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);    
                             }else{
                                 this.setState({
@@ -926,7 +926,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             })
                         }
                         if (this.state.arimaId) {
-                            if(isSiteOnline()){
+                            if(localStorage.getItem('sessionType') === 'Online'){
                                 try {
                                     calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
                                 } catch (error) {
