@@ -971,8 +971,19 @@ class AddUserComponent extends Component {
             items.push({
               title: i18n.t("static.common.deleterow"),
               onclick: function () {
-                obj.deleteRow(parseInt(y));
-              },
+                if (obj.getJson(null, false).length == 1) {
+                  obj.deleteRow(parseInt(y));
+                  var data = [];
+                  data[0] = this.state.user.username;
+                  data[1] = "";
+                  data[2] = "";
+                  data[3] = "";
+                  data[4] = "";
+                  obj.insertRow(data, parseInt(y));
+                }else{
+                  obj.deleteRow(parseInt(y));
+                }
+              }.bind(this),
             });
           }
           if (x) {
