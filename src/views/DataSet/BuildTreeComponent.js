@@ -967,6 +967,7 @@ export default class BuildTree extends Component {
             modelingTabChanged: false,
             modelingTabError: false,
             modelingChangedOrAdded: false,
+            addNodeError: false
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -4810,7 +4811,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("this.state.isValidError---", this.state.isValidError)
-                        if (this.state.isValidError.toString() == "false") {
+                        if ((this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
                             // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
@@ -9268,7 +9269,7 @@ export default class BuildTree extends Component {
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
         var scenarioId = this.state.selectedScenario;
-
+        this.setState({ addNodeError: false })
         if (event.target.name === "branchTemplateId") {
             this.setState({ branchTemplateId: event.target.value }, () => {
                 // console.log("In data change Test@@@@@@@")
@@ -13749,6 +13750,7 @@ export default class BuildTree extends Component {
                                         // console.log("level unit id on add button click---", levelUnitId);
                                         // tempArray.push(nodeDataMap);
                                         this.setState({
+                                            addNodeError: true,
                                             isValidError: true,
                                             showMomDataPercent: false,
                                             showMomData: false,
