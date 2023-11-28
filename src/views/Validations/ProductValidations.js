@@ -535,11 +535,11 @@ class ProductValidation extends Component {
                     }
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                         var sharePu;
-                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit != "true") {
+                        // if (finalData[i].nodeDataMap.puNode.sharePlanningUnit != "true") {
                             sharePu = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
-                        } else {
-                            sharePu = parseFloat(noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier).toFixed(8);
-                        }
+                        // } else {
+                            // sharePu = parseFloat(noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier).toFixed(8);
+                        // }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
                         // console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
