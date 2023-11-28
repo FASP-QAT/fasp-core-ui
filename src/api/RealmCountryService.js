@@ -25,5 +25,9 @@ class RealmCountryService {
         return axios.get(`${API_URL}/api/realmCountry/program/realmId/${json}`, {
         });
     }
+    getRealmCountryrealmIdById(realmId) {
+        return axios.get(`${API_URL}/api/realmCountry/realmId/${realmId}`, {
+        });
+    }
 }
 export default new RealmCountryService();
