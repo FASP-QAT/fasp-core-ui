@@ -4944,7 +4944,12 @@ export default class WhatIfReportComponent extends React.Component {
                 <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                     <Formik
                         enableReinitialize={true}
-                        initialValues={initialValues}
+                        initialValues={{
+                            scenarioId: '',
+                            percentage: '',
+                            procurementAgentIdSingle:this.state.procurementAgentIdSingle,
+                            fundingSourceIdSingle:this.state.fundingSourceIdSingle
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                             this.addRow();

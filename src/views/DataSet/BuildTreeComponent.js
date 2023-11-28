@@ -13684,6 +13684,15 @@ export default class BuildTree extends Component {
                         {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
+                                    this.setState({
+                                        modelingEl: "",
+                                        modelingTabChanged: false
+                                    }, () => {
+                                        try {
+                                            jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                        } catch (err) {    
+                                        }
+                                    })
                                     // console.log("add button called---------");
                                     event.stopPropagation();
                                     // console.log("add node----", itemConfig);
