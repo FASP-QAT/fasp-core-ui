@@ -4945,8 +4945,8 @@ export default class WhatIfReportComponent extends React.Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            scenarioId: '',
-                            percentage: '',
+                            scenarioId: this.state.scenarioId,
+                            percentage: this.state.percentage,
                             procurementAgentIdSingle:this.state.procurementAgentIdSingle,
                             fundingSourceIdSingle:this.state.fundingSourceIdSingle
                         }}
