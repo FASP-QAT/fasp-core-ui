@@ -50,7 +50,9 @@ import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 const entityname = i18n.t('static.dashboard.whatIf')
 let initialValues = {
     scenarioId: '',
-    percentage: ''
+    percentage: '',
+    procurementAgentIdSingle:'',
+    fundingSourceIdSingle:''
 }
 const validationSchema = function (values, t) {
     return Yup.object().shape({
@@ -65,6 +67,30 @@ const validationSchema = function (values, t) {
                 then: Yup.string()
                     .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
                     .required(i18n.t('static.whatIf.validpercentage'))
+                ,
+                otherwise: Yup.string().notRequired()
+            }),
+        needProcurementValidation: Yup.boolean(),
+        procurementAgentIdSingle: Yup.string()
+            .when("needProcurementValidation", {
+                is: val => {
+                    return document.getElementById("needProcurementValidation").value === "true";
+
+                },
+                then: Yup.string()
+                    .required(i18n.t('static.label.fieldRequired'))
+                ,
+                otherwise: Yup.string().notRequired()
+            }),
+        needProcurementValidation: Yup.boolean(),
+        fundingSourceIdSingle: Yup.string()
+            .when("needProcurementValidation", {
+                is: val => {
+                    return document.getElementById("needProcurementValidation").value === "true";
+
+                },
+                then: Yup.string()
+                    .required(i18n.t('static.label.fieldRequired'))
                 ,
                 otherwise: Yup.string().notRequired()
             }),
@@ -625,11 +651,11 @@ export default class WhatIfReportComponent extends React.Component {
                 var budgetList = this.state.budgetListForWhatIf.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE)
                 this.setState({
                     rangeValue1: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
-                    procurementAgents: procurementAgentTBD != undefined ? [{ label: procurementAgentTBD.procurementAgentCode, value: procurementAgentTBD.procurementAgentId }] : [],
-                    fundingSources: fundingSourceTBD != undefined ? [{ label: fundingSourceTBD.fundingSourceCode, value: fundingSourceTBD.fundingSourceId }] : [],
-                    procurementAgentIdSingle: TBD_PROCUREMENT_AGENT_ID,
-                    fundingSourceIdSingle: TBD_FUNDING_SOURCE,
-                    budgetIdSingle: budgetList.length == 1 ? budgetList[0].budgetId : "",
+                    procurementAgents: procurementAgentTBD!=undefined?[{ label: procurementAgentTBD.procurementAgentCode, value: procurementAgentTBD.procurementAgentId }]:[],
+                    fundingSources: fundingSourceTBD!=undefined?[{ label: fundingSourceTBD.fundingSourceCode, value: fundingSourceTBD.fundingSourceId }]:[],
+                    procurementAgentIdSingle: procurementAgentTBD!=undefined?TBD_PROCUREMENT_AGENT_ID:"",
+                    fundingSourceIdSingle: fundingSourceTBD!=undefined?TBD_FUNDING_SOURCE:"",
+                    budgetIdSingle: fundingSourceTBD!=undefined?budgetList.length == 1 ? budgetList[0].budgetId : "":"",
                     budgetListForWhatIfFiltered: budgetList
                 })
             } else {
@@ -3799,6 +3825,7 @@ export default class WhatIfReportComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -3808,13 +3835,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -3864,6 +3894,7 @@ export default class WhatIfReportComponent extends React.Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -3873,13 +3904,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }.bind(this)
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -3917,6 +3951,8 @@ export default class WhatIfReportComponent extends React.Component {
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#ba0c2f',
+                    pointBackgroundColor: '#ba0c2f',
+                    pointBorderColor: '#ba0c2f',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4015,6 +4051,8 @@ export default class WhatIfReportComponent extends React.Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: '+1',
@@ -4036,6 +4074,8 @@ export default class WhatIfReportComponent extends React.Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'rgba(0,0,0,0)',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: true,
@@ -4059,6 +4099,8 @@ export default class WhatIfReportComponent extends React.Component {
                     yAxisID: 'B',
                     backgroundColor: 'transparent',
                     borderColor: '#118b70',
+                    pointBackgroundColor: '#118b70',
+                    pointBorderColor: '#118b70',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4144,7 +4186,12 @@ export default class WhatIfReportComponent extends React.Component {
                 <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                     <Formik
                         enableReinitialize={true}
-                        initialValues={initialValues}
+                        initialValues={{
+                            scenarioId: '',
+                            percentage: '',
+                            procurementAgentIdSingle:this.state.procurementAgentIdSingle,
+                            fundingSourceIdSingle:this.state.fundingSourceIdSingle
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                             this.addRow();
@@ -4197,6 +4244,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                 name="needPercentageValidation"
                                                 id="needPercentageValidation"
                                                 value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
+                                            />
+                                            <Input
+                                                type="hidden"
+                                                name="needProcurementValidation"
+                                                id="needProcurementValidation"
+                                                value={(this.state.scenarioId == 7 ? true : false)}
                                             />
                                             <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
                                                 <FormGroup className="col-md-3">
@@ -4295,11 +4348,17 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 name="procurementAgentIdSingle"
                                                                 id="procurementAgentIdSingle"
                                                                 bsSize="sm"
-                                                                onChange={(e) => { this.setProcurementAgent(e) }}
+                                                                onChange={(e) => { handleChange(e);this.setProcurementAgent(e) }}
                                                                 value={this.state.procurementAgentIdSingle}
+                                                                valid={!errors.procurementAgentIdSingle && this.state.procurementAgentIdSingle != ''}
+                                                                invalid={touched.procurementAgentIdSingle && !!errors.procurementAgentIdSingle}
+                                                                onBlur={handleBlur}
+
                                                             >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
                                                                 {procurementAgentListSingleSelect}
                                                             </Input>
+                                                            <FormFeedback className="red">{errors.procurementAgentIdSingle}</FormFeedback>
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
@@ -4314,10 +4373,16 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 id="fundingSourceIdSingle"
                                                                 bsSize="sm"
                                                                 value={this.state.fundingSourceIdSingle}
-                                                                onChange={(e) => { this.setFundingSource(e) }}
+                                                                valid={!errors.fundingSourceIdSingle && this.state.fundingSourceIdSingle != ''}
+                                                                invalid={touched.fundingSourceIdSingle && !!errors.fundingSourceIdSingle}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setFundingSource(e) }}
+
                                                             >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
                                                                 {fundingSourceListSingleSelect}
                                                             </Input>
+                                                            <FormFeedback className="red">{errors.fundingSourceIdSingle}</FormFeedback>
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>

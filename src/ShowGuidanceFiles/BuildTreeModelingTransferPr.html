@@ -61,10 +61,27 @@ a {
 										</p>
 										<p>
 											<p style="font-size: 13px;">
-												<span  style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta guia :</span><br>modelagem e a transferência podem ter quatro tipos diferentes de modelagem
+												<span  style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta guia :</span><br>
+												Os usuários podem <b>manualmente</b> insira quaisquer alterações desejadas ao longo do tempo (crescimento/perda/transferência) no topo 
+												tabela, ou eles podem utilizar o <br><b><i class="fa fa-calculator" aria-hidden="true"></i> Calculadora de Modelagem</b> para calcular a taxa mensal de
+												alteração (consulte a seção 'Calculadora de modelagem' abaixo para obter mais informações). Cada entrada deve ser adicionada como linhas separadas por alteração na tabela superior
+												(ou seja, um nó não pode crescer e ser transferido em uma linha de entrada de dados - devem ser duas linhas separadas).
 											</p>
 										</p>
-
+										<p style="font-size: 13px;">
+											<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;" >Regras para nós de transferência:
+											</span>
+											<ul style="font-size: 13px;">
+												<li>Os nós numéricos só podem ser transferidos para outros nós numéricos e devem pertencer ao mesmo nível. </li>
+												<li>Os nós percentuais só podem ser transferidos para outros nós percentuais e devem pertencer ao mesmo pai.  </li>
+												<li>A ordem das operações para cálculo de uma transferência ocorre a partir do
+													da esquerda para a direita na árvore de previsão. Não é possível fazer uma transferência de
+													da direita para a esquerda, portanto, o usuário deve ter cuidado ao projetar sua árvore
+													e determinar onde cada nó deve ser colocado. </li>
+												<li>As transferências são sempre negativas do nó de origem e positivas para o nó de destino.  </li>
+												<li>A extrapolação não é permitida em um nó que também tenha uma transferência, seja de/para outro nó.  </li>
+											</ul>
+										</p>
 										<p>
 											<div class="pl-lg-4 pr-lg-4 table1">
 												<table  style="border-collapse: collapse;">
@@ -100,12 +117,31 @@ a {
 												</table>
 											</div>
 										</p>
-										<p style="font-size: 13px;"><b><i class="fa fa-calculator" aria-hidden="true"></i></b> A QAT tem uma ferramenta de cálculo de modelagem para os usuários que precisam de ajuda para calcular a mudança mensal ao longo do tempo com base em uma data final e porcentagem ou alteração percentual
-											total ao longo do tempo. A calculadora de modelagem está disponível apenas para um nó # e um nó %.<br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a
-											graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for # nodes), as needed. If a user checks “Manual Change affects future month,” the manual
-											amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &amp;) manual change” to hide these columns.
+										<p>
+											<ul style="font-size: 13px;">
+												<li>Clique em <b>"Mostrar dados mensais"</b> para mostrar uma tabela e gráfico com o nó
+													valor ao longo do tempo
+													<ul>
+														<li>
+															Este recurso é útil para ver como modelar e transferir
+															as entradas afetam os dados mensais em forma gráfica e tabular.  
+														</li>
+														<li>
+															Nos dados tabulares, os usuários podem adicionar uma alteração manual para um 
+															mês específico ou inserir uma porcentagem do índice de sazonalidade
+(disponível apenas para # nós), conforme necessário.
+														</li>
+														<li>
+															Se um usuário marcar “A alteração manual afeta o mês futuro”, o valor manual adicionado ao final do
+mês será transferido para o início do mês seguinte. Se nenhum destes
+campos são relevantes, os usuários podem desmarcar “Mostrar (sazonalidade e) alteração manual” para
+ocultar essas colunas.
+														</li>
+													</ul>
+												</li>	
+											</ul>
 										</p>
-										<p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Regras para nós de transferência:</span>
+										<!-- <p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Regras para nós de transferência:</span>
 											<ul style="font-size: 13px;">
 												<li>Nós de número só podem ser transferidos para outros nós de número e devem pertencer ao mesmo nível.</li>
 												<li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
@@ -114,14 +150,14 @@ a {
 												<li>Transfers are always negative from the source node and positive to the destination node. </li>
 												<li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
 											</ul>
-										</p>
+										</p> -->
 										<p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Exemplos :</span>
 											<ul style="font-size: 13px;">
 												<li><b>Crescimento Simples</b> (linear #) - o exemplo abaixo mostra um crescimento populacional a cada mês em 500/mês de janeiro de 2022 a dezembro de 2024.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
 												<li><b>Perda Simples</b> (linear #) - o exemplo abaixo mostra o atrito a cada mês em 100/mês de janeiro de 2022 a dezembro de 2024. QAT utiliza um número negativo para denotar uma diminuição ou perda.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
-												<li><b>Crescimento Simples</b> (linear %) – o exemplo abaixo mostra um crescimento populacional constante de 2% a cada mês de janeiro de 2022 a dezembro de 2024. A QAT calculou que essa mudança está aumentando a população em 108,64 a cada mês.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+												<li><b>Crescimento Simples</b> (linear %) - o exemplo abaixo mostra um crescimento populacional constante de 2% a cada mês de janeiro de 2022 a dezembro de 2024. A QAT calculou que essa mudança está aumentando a população em 108,64 a cada mês.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
 												<li><b>Crescimento Simples</b> (exponencial %) - o exemplo abaixo mostra um crescimento populacional de 1% a cada mês de janeiro de 2022 a dezembro de 2024. Como o crescimento é exponencial, a mudança é diferente a cada mês.<span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
@@ -138,7 +174,192 @@ a {
 													no outro nó (adultos 2ª linha) em cinza para significar uma alteração não editável.</p><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
 											</ul>
-										</p>	
+										</p>
+										
+										
+									<p>
+										<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">
+											<i class="fa fa-calculator" aria-hidden="true"></i> Calculadora de Modelagem:</span>
+											<p>Clique no ícone da calculadora de modelagem se precisar de ajuda para calcular a taxa de variação mensal. A calculadora de modelagem Ending Value/Change está disponível para todos os nós, exceto Aggregation Nodes, e a calculadora de modelagem Annual Target está disponível apenas para Number Nodes. Comece selecionando um tipo de modelagem (Linear #, Linear% ou Exponencial%),
+												e, em seguida, um tipo de meta (valor final/mudança ou meta anual): </p>
+										<ul style="font-size: 13px;">
+											<li><b>Valor final/mudança:</b> Use isto se você tiver um valor alvo (não cumulativo) ou uma mudança total desejada durante um período específico, em vez de uma taxa de mudança mensal conhecida.  
+												<ol>
+													<li>
+														Com base nos dados ou suposições disponíveis, insira os dados em um dos seguintes campos:
+Valor Final Alvo, Alteração Alvo (%) ou Alteração (#) 
+													</li>
+													<li>
+														Após a entrada ser fornecida, os demais campos serão preenchidos automaticamente, bem como o final
+'Alteração mensal calculada', que é equivalente ao Linear (#) abaixo. 
+													</li>
+													<li>
+														Quando o usuário clica em 'Aceitar', a taxa de alteração (% ou #) será
+preenchido novamente na tabela de modelagem principal, com base nas fórmulas abaixo:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table  style="border-collapse: collapse;">
+																
+																<tbody>
+																	<tr>
+																		<td>Campo inserido pelo usuário </td>
+																		<td>Linear (%) </td>
+																		<td>Linear (#) </td>
+																		<td>Exponencial (%)</td>
+																	</tr>
+																	<tr>
+																		<td>Valor Final Alvo </td>
+																		<td>Valor final na data prevista. O usuário precisa inserir esse valor manualmente. </td>
+																		<td>Valor final na data prevista. O usuário precisa inserir esse valor manualmente. </td>
+																		<td>Valor final na data prevista. O usuário precisa inserir esse valor manualmente. </td>
+																	</tr>
+																	<tr>
+																		<td>Mudança de meta (%)  </td>
+																		<td>(Valor Final Alvo - Valor Inicial) / Valor Inicial </td>
+																		<td>(Valor Final Alvo - Valor Inicial) / Valor Inicial </td>
+																		<td>(Valor Final Alvo - Valor Inicial) / Valor Inicial</td>
+																	</tr>
+																	<tr>
+																		<td>Mudar (#) </td>
+																		<td>-</td>
+																		<td>Valor Final Alvo - Valor Inicial </td>
+																		<td>-</td>
+																	</tr>
+																	</tbody>
+																</table>
+															</div>
+														</li>
+													</ol>
+											</li>
+											<li>
+												<b>Meta Anual:</b> Use isto se você tiver valores-alvo (acumulados ao longo de um ano). Em vez de
+												simplesmente dividindo as metas anuais por 12, o que cria um padrão escalonado, ou seja, a calculadora
+												ajudará a fornecer uma previsão suave.
+												<span><img  src="../ShowGuidanceFiles/img/anualtargetimg.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;">
+													</span>
+												<ol>
+													<li>Selecione o primeiro mês da sua meta e o número de anos
+														de metas disponíveis.
+														<ul>
+														<li>
+															O QAT preencherá automaticamente as linhas anuais da tabela com base no primeiro mês de meta escolhido,
+assumindo que as metas são para períodos de 12 meses. 
+														</li>
+														</ul>
+													</li>
+													<li>
+														Na tabela, insira os números do ano anterior à meta (o real) e de cada ano da meta. 
+													</li>
+													<li>
+														Após a entrada dos dados, clique em “Calcular” (veja abaixo a abordagem de cálculo e as fórmulas). 
+													</li>
+													<li>
+														Revise as diferenças entre as metas desejadas e os números calculados do QAT.
+Se as diferenças forem grandes, considere se a taxa de mudança segue uma linha linear ou
+padrão exponencial e mudança
+o <b>Tipo de modelagem</b> (Linear #, Linear% ou Exponencial%) e recalcular se necessário.  
+													</li>
+													<li>
+														Quando o usuário clica em “Aceitar”, o QAT preenche os valores calculados em dois locais:
+														<ul>
+														<li>Guia Valor do nó - Mês inicial e Valor inicial  </li>
+														<li>Guia Modelagem/Transferência - uma linha é criada por período de 12 meses
+															após o valor inicial. <b>Observe que estes não são os mesmos períodos que
+																os anos-alvo</b> (veja abaixo).
+
+														</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+
+										</ul>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table  style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Campo </th>
+														<th>Explicação / Fórmula </th>
+														
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Mudança Anual (%)   </td>
+														<td>Alteração em relação ao ano anterior. Calculado para cada
+															ano após o primeiro ano. 
+															= (Valor do ano atual - Valor do ano anterior) / (Valor do ano anterior)  </td>
+														
+													</tr>
+													<tr>
+														<td>Variação Mensal (%) / Variação Mensal (#)* </td>
+														<td>Taxa exponencial = (valor do ano 2/valor do ano 1) ^ (1/12) -1
+
+															Taxa Linear = Variação Anual / 12 </td>
+														
+													</tr>
+													<tr>
+														<td>Mês do Nó**  </td>
+														<td>= n-7, onde n é o primeiro mês da meta. </td>
+														
+													</tr>
+													<tr>
+														<td>Valor do nó** </td>
+														<td>Assumido como o primeiro valor (o valor real) fornecido pelo usuário dividido por 12, pois este é considerado o ponto médio do ano.
+
+															= Valor do Ano/12
+															
+															 </td>
+														
+													</tr>
+													<tr>
+														<td>Total calculado</td>
+														<td>Começando com o Mês do Nó e o Valor do Nó e aplicando a Alteração Mensal (% ou #), o QAT calcula cada valor mensal e, em seguida, fornece somas dos valores em períodos de 12 meses. 
+															
+															 </td>
+														
+													</tr>
+
+													<tr>
+														<td>Diferença (alvo versus calculado, #) </td>
+														<td>Calculado para cada ano após o primeiro ano real. Esta diferença será grande se a variação anual variar significativamente entre os anos.
+
+															= Total Calculado - Meta 
+															 </td>
+														
+													</tr>
+													<tr>
+														<td>Diferença (alvo versus calculado,%)</td>
+														<td>Calculado para cada ano após o primeiro ano real. Esta diferença será grande se a variação anual variar significativamente entre os anos.
+
+															= (Total Calculado - Meta) / Meta.  
+															 </td>
+														
+													</tr>
+													</tbody>
+												</table>
+											</div>
+											<p>
+											<p>@Abordagem de cálculo de meta anual: QAT assume que 1/12 do
+												o valor real anual foi alcançado no meio do ano real,
+												e 1/12 das metas anuais serão alcançadas no ponto médio de cada
+												ano alvo. QAT então interpola efetivamente entre esses pontos médios
+												calculando uma taxa de mudança mensal linear ou exponencial. Este mês
+												taxa de variação é então aplicada a ambos os anos - a segunda metade do
+												primeiro ano e o primeiro semestre do segundo ano. Para conseguir isso, QAT
+												calcula os seguintes campos:
+												</p>  
+												<p>
+													* Esses valores não aparecem na seção 'Calculadora de modelagem', mas são preenchidos no nó de modelagem/transferência superior
+													tabela depois que o usuário clica em "aceitar". <br>
+													**Esses valores não aparecem na seção 'Calculadora de Modelagem', mas preenchem
+													nos campos do nó principal após o uso, clique em "aceitar".
+												</p>
+</p>
+
+ 
+									</p>
 
 									</li>
 								</ol>

@@ -1,11 +1,14 @@
-import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
-import * as Yup from 'yup';
-import { API_URL } from '../../Constants.js';
+import { Row, Col, Card, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Formik } from 'formik';
+import * as Yup from 'yup'
 import PlanningUnitService from '../../api/PlanningUnitService';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { API_URL } from '../../Constants.js';
+import UnitService from '../../api/UnitService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.planningunit.planningunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -15,7 +18,9 @@ const validationSchema = function (values) {
         multiplier: Yup.string()
             .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
             .required(i18n.t('static.planningUnit.multiplier'))
-            .min(0, i18n.t('static.program.validvaluetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        unitId: Yup.string()
+            .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
     })
 }
 const validate = (getValidationSchema) => {
@@ -42,6 +47,8 @@ export default class EditPlanningUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            units: [],
+            lang: localStorage.getItem("lang"),
             planningUnit: {
                 message: '',
                 active: '',
@@ -71,12 +78,20 @@ export default class EditPlanningUnitComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeLoading = this.changeLoading.bind(this);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
+    }
+    changeLoading(loading) {
+        this.setState({ loading: loading })
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
     dataChange(event) {
         let { planningUnit } = this.state
@@ -104,7 +119,8 @@ export default class EditPlanningUnitComponent extends Component {
         setTouched({
             'label': true,
             'forecastingUnitId': true,
-            'multiplier': true
+            'multiplier': true,
+            'unitId': true,
         }
         )
         this.validateForm(errors)
@@ -133,60 +149,129 @@ export default class EditPlanningUnitComponent extends Component {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     componentWillMount() {
-        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    planningUnit: response.data, loading: false
-                });
-            } else {
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
+        UnitService.getUnitListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
+                    this.setState({
+                        units: listArray, loading: false
+                    })
+                    PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+                        if (response.status == 200) {
                             this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
+                                planningUnit: response.data, loading: false
                             });
-                            break;
-                        case 412:
+                        } else {
                             this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                                message: response.data.messageCode, loading: false
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
     }
     render() {
+        const { units } = this.state;
+        let unitList = units.length > 0
+            && units.map((item, i) => {
+                return (
+                    <option key={i} value={item.unitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -199,7 +284,8 @@ export default class EditPlanningUnitComponent extends Component {
                                 initialValues={{
                                     label: this.state.planningUnit.label.label_en,
                                     forecastingUnitId: this.state.planningUnit.forecastingUnit.forecastingUnitId,
-                                    multiplier: this.state.planningUnit.multiplier
+                                    multiplier: this.state.planningUnit.multiplier,
+                                    unitId: this.state.planningUnit.unit.id,
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -299,21 +385,40 @@ export default class EditPlanningUnitComponent extends Component {
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.planningUnit.label.label_en}
+                                                            required
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
-                                                        type="text"
-                                                        name="label"
-                                                        id="label"
+                                                        type="select"
+                                                        name="unitId"
+                                                        id="unitId"
                                                         bsSize="sm"
-                                                        valid={!errors.label}
-                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        valid={!errors.unitId && this.state.planningUnit.unit.id != ''}
+                                                        invalid={touched.unitId && !!errors.unitId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        value={this.state.planningUnit.label.label_en}
-                                                        required
-                                                    >
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_UNIT_FOR_PU')}
+                                                        value={this.state.planningUnit.unit.id}
+                                                        required>
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {unitList}
                                                     </Input>
-                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
@@ -377,6 +482,8 @@ export default class EditPlanningUnitComponent extends Component {
                     </Col>
                 </Row>
                 <div>
+                    {/* <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6> */}
                 </div>
             </div>
         );
