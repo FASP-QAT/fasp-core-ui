@@ -13913,7 +13913,7 @@ export default class CreateTreeTemplate extends Component {
                                 regionIdForCreateTree: this.state.regionValuesForCreateTree
                             }}
                             enableReinitialize={true}
-                            validate={validate(validationSchemaCreateTree)}
+                            validationSchema={validationSchemaCreateTree}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.setState({ loading: true }, () => {
                                     this.createTreeForCreateTree();
