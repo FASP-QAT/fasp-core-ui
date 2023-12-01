@@ -40,13 +40,13 @@ const entityname = i18n.t('static.report.problem');
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
-            .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
+            // .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemDescText')),
         modelPlanningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
-            .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
+            // .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemSuggestionText')),
         modelCriticalityId: Yup.string()
@@ -194,7 +194,7 @@ class EditSupplyPlanStatus extends Component {
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
             problemReportChanged: 0,
-            remainingDataChanged:0,
+            remainingDataChanged: 0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
             problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
             isModalOpen: false,
@@ -205,7 +205,8 @@ class EditSupplyPlanStatus extends Component {
             criticalitiesList: [],
             submitMessage: "",
             submitColor: "",
-            planningUnitDropdownList: []
+            planningUnitDropdownList: [],
+            temp_currentVersion_id: ''
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -332,7 +333,88 @@ class EditSupplyPlanStatus extends Component {
     };
     checkValidation() {
         var valid = true;
-        valid = checkValidation(this.el);
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "") {
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(6, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("K").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(10, y);
+                var reg = /^[^'":\\]+$/;
+                var reg2 = /^\S+(?: \S+)*$/;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!reg.test(value)) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                        valid = false;
+                    } else if(!reg2.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("U").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(20, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+        }
         return valid;
     }
     rowChanged = function (instance, cell, x, y, value) {
@@ -343,7 +425,78 @@ class EditSupplyPlanStatus extends Component {
         let problemList = this.state.problemList;
         var rowData1 = elInstance.getRowData(y);
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
-        changed(instance, cell, x, y, value)
+        // console.log("problemList in changed method ***", problemList);
+
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (rowData1[6] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        if (x == 9) {
+            var col = ("J").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
+            if (rowData1[9] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!reg.test(rowData1[9])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[9])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        if (x == 10) {
+            var col = ("K").concat(parseInt(y) + 1);
+            var reg = /^[^'":\\]+$/;
+            var reg2 = /^\S+(?: \S+)*$/;
+            if (rowData1[10] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!reg.test(rowData1[10])) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+                } else if(!reg2.test(rowData1[10])){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 20) {
+            var col = ("U").concat(parseInt(y) + 1);
+            if (rowData1[20] == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
         if(problemList.length > 0){
             if (x == 11) {
                 if (problemList[0].problemStatus.id != value) {
@@ -355,7 +508,7 @@ class EditSupplyPlanStatus extends Component {
             }
             if (x == 11 || x == 21 || x == 22) {
                 var rowData = elInstance.getRowData(y);
-                if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes.toString() != rowData[22].toString())) {
+                if ((problemList[0].problemStatus.id != rowData[11]) || (problemList[0].reviewed.toString() != rowData[21].toString()) || (problemList[0].reviewNotes ? problemList[0].reviewNotes.toString() : "" != rowData[22].toString())) {
                     elInstance.setValueFromCoords(23, y, 1, true);
                 } else {
                     elInstance.setValueFromCoords(23, y, 0, true);
@@ -366,7 +519,7 @@ class EditSupplyPlanStatus extends Component {
                     elInstance.setValueFromCoords(22, y, "", true);
                 }
             }
-        }
+            }
     }
     hideFirstComponent() {
     }
@@ -942,7 +1095,7 @@ class EditSupplyPlanStatus extends Component {
                                             } else if (supplyPlanType == 'plannedErpShipments') {
                                                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'allShipments') {
-                                                shipmentList = shipmentList.filter(c => 
+                                                shipmentList = shipmentList.filter(c =>
                                                     (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                                                     && c.planningUnit.id == document.getElementById("planningUnitId").value
                                                 );
@@ -1022,7 +1175,7 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     toggleAccordionErpShipments = () => {
-        console.log(this.state.showErpShipment)
+        // console.log(this.state.showErpShipment)
         this.setState({
             showErpShipment: !this.state.showErpShipment
         })
@@ -1826,7 +1979,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState(
             {
                 program,
-                remainingDataChanged:1
+                remainingDataChanged: 1
             }
         )
     };
@@ -1963,6 +2116,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     program,
                     programQPLDetails: programQPLDetails,
+                    temp_currentVersion_id: response.data.currentVersion.versionStatus.id,
                     programId: program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
@@ -2261,6 +2415,7 @@ class EditSupplyPlanStatus extends Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2270,13 +2425,16 @@ class EditSupplyPlanStatus extends Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -2326,6 +2484,7 @@ class EditSupplyPlanStatus extends Component {
                 }]
             },
             tooltips: {
+                mode:'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2335,13 +2494,16 @@ class EditSupplyPlanStatus extends Component {
                                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
                             return (infoToShow.join(' | '));
+                        } else if (tooltipItems.datasetIndex == 2) {
+                            return "";
                         } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
                         }
                     }.bind(this)
                 },
-                enabled: false,
-                custom: CustomTooltips
+                intersect: false,
+                // enabled: false,
+                // custom: CustomTooltips
             },
             maintainAspectRatio: false
             ,
@@ -2398,6 +2560,8 @@ class EditSupplyPlanStatus extends Component {
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#ba0c2f',
+                    pointBackgroundColor: '#ba0c2f',
+                    pointBorderColor: '#ba0c2f',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -2496,6 +2660,8 @@ class EditSupplyPlanStatus extends Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'transparent',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: '+1',
@@ -2517,6 +2683,8 @@ class EditSupplyPlanStatus extends Component {
                     yAxisID: this.state.planBasedOn == 1 ? 'B' : 'A',
                     backgroundColor: 'rgba(0,0,0,0)',
                     borderColor: '#59cacc',
+                    pointBackgroundColor: '#59cacc',
+                    pointBorderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: true,
@@ -2540,6 +2708,8 @@ class EditSupplyPlanStatus extends Component {
                     yAxisID: 'B',
                     backgroundColor: 'transparent',
                     borderColor: '#118b70',
+                    pointBackgroundColor: '#118b70',
+                    pointBorderColor: '#118b70',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -2697,10 +2867,10 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                                             {
                                                                 this.state.shipmentsTotalData.map((item1, index) => {
-                                                                    if(item1.toString()!=""){
-                                                                        return(<td align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, ``, 'allShipments', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                                    }else{
-                                                                        return(<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    if (item1.toString() != "") {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, ``, 'allShipments', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
                                                                     }
                                                                 })
                                                             }
@@ -3174,11 +3344,12 @@ class EditSupplyPlanStatus extends Component {
         return mylist;
     }.bind(this)
     buildProblemTransJexcel() {
-        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+        var currentTrans = this.state.problemTransList.length > 0 ? this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
             b = b.createdDate
             return a > b ? -1 : a < b ? 1 : 0;
-        }));
+        })) : [];
+
         let dataArray = [];
         let count = 0;
         for (var j = 0; j < currentTrans.length; j++) {
@@ -3243,7 +3414,7 @@ class EditSupplyPlanStatus extends Component {
     buildJExcel() {
         let problemList = this.state.problemList;
         problemList = problemList;
-        console.log("problemList---->", problemList);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -3293,6 +3464,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t("static.common.region"),
                     type: 'dropdown',
+                    visible: false,
                     width: 80,
                     source: this.state.regionList,
                     readOnly: true
@@ -3454,6 +3626,9 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: 'transList',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     width: 0
                 },
             ],
@@ -3516,13 +3691,15 @@ class EditSupplyPlanStatus extends Component {
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
-                    items1.push({
-                        title: i18n.t('static.problemContext.viewTrans'),
-                        onclick: function () {
-                            var myObj = obj.getRowData(y);
-                            this.toggleTransView(myObj[23]);
-                        }.bind(this)
-                    });
+                    if (obj.getRowData(y)[0] != 0) {
+                        items1.push({
+                            title: i18n.t('static.problemContext.viewTrans'),
+                            onclick: function () {
+                                var myObj = obj.getRowData(y);
+                                this.toggleTransView(myObj[24]);
+                            }.bind(this)
+                        });
+                    }
                     if (obj.options.allowDeleteRow == true) {
                         if (obj.getRowData(y)[0] == 0) {
                             items1.push({
@@ -4179,9 +4356,9 @@ class EditSupplyPlanStatus extends Component {
                                                     {
                                                         this.state.monthsArray.map((item, count) => {
                                                             if (count < 7) {
-                                                                if(this.state.shipmentsTotalData[count]!=undefined && this.state.shipmentsTotalData[count].toString()!=''){
+                                                                if (this.state.shipmentsTotalData[count] != undefined && this.state.shipmentsTotalData[count].toString() != '') {
                                                                     return (<th onClick={() => this.shipmentsDetailsClicked('allShipments', `${item.startDate}`, `${item.endDate}`)} className={moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(item.startDate).format("YYYY-MM-DD") ? "supplyplan-Thead supplyplanTdWidthForMonths hoverTd" : "supplyplanTdWidthForMonths hoverTd"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
-                                                                }else{
+                                                                } else {
                                                                     return (<th className={moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(item.startDate).format("YYYY-MM-DD") ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                                 }
                                                             }
@@ -4544,130 +4721,220 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
-                                var validation = this.checkValidation();
-                                if (validation == true) {
-                                document.getElementById("submitButton").disabled = true;
-                                var elInstance = this.state.problemEl;
-                                var json = elInstance.getJson();
-                                var reviewedProblemList = [];
-                                var isAllCheckForReviewed = true;
-                                for (var i = 0; i < json.length; i++) {
-                                    var map = new Map(Object.entries(json[i]));
-                                    if (map.get("23") == 1) {
-                                        reviewedProblemList.push({
-                                            problemReportId: map.get("0"),
-                                            problemStatus: {
-                                                id: map.get("11")
-                                            },
-                                            reviewed: map.get("21"),
-                                            notes: map.get("22")
-                                        });
-                                    }
-                                    if (map.get("21") == false && map.get("13") != 4) {
-                                        isAllCheckForReviewed = false
-                                    }
-                                    if(map.get("0") == 0){
-                                        reviewedProblemList.push({
-                                            problemReportId: 0,
-                                            realmProblem: {
-                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
-                                                problemType: {
-                                                    id: "2"
-                                                }
-                                            },
-                                            program: {
-                                                id: this.props.match.params.programId
-                                            },
-                                            versionId: this.props.match.params.versionId,
-                                            problemStatus: {
-                                                id: "1"
-                                            },
-                                            dt: moment(new Date()).format("YYYY-MM-DD"),
-                                            region: {
-                                                id: map.get("1")
-                                            },
-                                            planningUnit: {
-                                                id: map.get("6")
-                                            },
-                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
-                                            notes: ""
-                                        })
-                                    }
-                                }
-                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
-                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                        .then(response => {
-                                            if(this.state.program.currentVersion.versionStatus.id!=1){
-                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                            }else{
-                                                document.getElementById("submitButton").disabled = false;
-                                            this.setState({
-                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                submitColor: "green",
-                                                problemReportChanged: 0,
-                                                remainingDataChanged:0
-                                            }, () => {
-                                                this.hideMessageComponent()
-                                                this.componentDidMount();
-                                            })
-                                        }
-                                        })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({
-                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                        submitColor: "red",
-                                                        loading: false
-                                                    }, () => {
-                                                        this.hideMessageComponent()
-                                                    });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 401:
-                                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                                            break;
-                                                        case 403:
-                                                            this.props.history.push(`/accessDenied`)
-                                                            break;
-                                                        case 500:
-                                                        case 404:
-                                                        case 406:
-                                                            this.setState({
-                                                                submitMessage: error.response.data.messageCode,
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
-                                                        case 412:
-                                                            this.setState({
-                                                                submitMessage: error.response.data.messageCode,
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
-                                                        default:
-                                                            this.setState({
-                                                                submitMessage: 'static.unkownError',
-                                                                submitColor: "red",
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                            });
-                                                            break;
+                                ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
+                                    .then(response => {
+                                        let temp_version_status = 0;
+                                        temp_version_status = response.data.currentVersion.versionStatus.id;
+                                        if(temp_version_status == this.state.temp_currentVersion_id){
+                                            var validation = this.checkValidation();
+                                            if (validation == true) {
+                                                document.getElementById("submitButton").disabled = true;
+                                                var elInstance = this.state.problemEl;
+                                                var json = elInstance.getJson();
+                                                // console.log("problemList===>", json);
+                                                // console.log("program===>", this.state.program);
+                                                var reviewedProblemList = [];
+                                                var isAllCheckForReviewed = true;
+                                                for (var i = 0; i < json.length; i++) {
+                                                    var map = new Map(Object.entries(json[i]));
+                                                    if (map.get("23") == 1) {
+                                                        reviewedProblemList.push({
+                                                            problemReportId: map.get("0"),
+                                                            problemStatus: {
+                                                                id: map.get("11")
+                                                            },
+                                                            reviewed: map.get("21"),
+                                                            reviewedNotes: map.get("22"),
+                                                            notes: map.get("22")
+                                                        });
                                                     }
+                                                    if (map.get("21") == false && map.get("13") != 4) {
+                                                        isAllCheckForReviewed = false
+                                                    }
+                                                    if(map.get("0") == 0){
+                                                        reviewedProblemList.push({
+                                                            problemReportId: 0,
+                                                            realmProblem: {
+                                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
+                                                                problemType: {
+                                                                    id: "2"
+                                                                }
+                                                            },
+                                                            program: {
+                                                                id: this.props.match.params.programId
+                                                            },
+                                                            versionId: this.props.match.params.versionId,
+                                                            problemStatus: {
+                                                                id: "1"
+                                                            },
+                                                            dt: moment(new Date()).format("YYYY-MM-DD"),
+                                                            region: {
+                                                                id: map.get("1")
+                                                            },
+                                                            planningUnit: {
+                                                                id: map.get("6")
+                                                            },
+                                                            reviewed: map.get("21"),
+                                                            reviewedNotes: map.get("22"),
+                                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
+                                                            notes: map.get("22")
+                                                        })
+                                                    }
+                                                    // if (map.get("20") == 1) {
+                                                    //     reviewedProblemList.push({
+                                                    //         problemReportId: map.get("0"),
+                                                    //         problemStatus: {
+                                                    //             id: map.get("10")
+                                                    //         },
+                                                    //         reviewed: map.get("18"),
+                                                    //         notes: map.get("19")
+                                                    //     });
+                                                    // }
+                                                    // if (map.get("18") == false && map.get("12") != 4) {
+                                                    //     isAllCheckForReviewed = false
+                                                    // }
+                                                }
+                                                // console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
+                                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
+
+                                                    // console.log("reviewedProblemList===>", reviewedProblemList);
+                                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                                        .then(response => {
+                                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                                                // console.log("messageCode", response)
+                                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                                            } else {
+                                                                document.getElementById("submitButton").disabled = false;
+                                                            this.setState({
+                                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                                submitColor: "green",
+                                                                problemReportChanged: 0,
+                                                                remainingDataChanged: 0
+
+                                                                // isModalOpen: !this.state.isModalOpen,
+                                                            }, () => {
+                                                                this.hideMessageComponent()
+                                                                this.componentDidMount();
+                                                            })
+                                                        }
+
+                                                        })
+                                                        .catch(
+                                                            error => {
+                                                                if (error.message === "Network Error") {
+                                                                    this.setState({
+                                                                        // message: 'static.unkownError',
+                                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                        submitColor: "red",
+                                                                        loading: false
+                                                                    }, () => {
+                                                                        this.hideMessageComponent()
+                                                                    });
+                                                                } else {
+                                                                    switch (error.response ? error.response.status : "") {
+
+                                                                        case 401:
+                                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                            break;
+                                                                        case 403:
+                                                                            this.props.history.push(`/accessDenied`)
+                                                                            break;
+                                                                        case 500:
+                                                                        case 404:
+                                                                        case 406:
+                                                                            this.setState({
+                                                                                submitMessage: error.response.data.messageCode,
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                        case 412:
+                                                                            this.setState({
+                                                                                submitMessage: error.response.data.messageCode,
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                        default:
+                                                                            this.setState({
+                                                                                submitMessage: 'static.unkownError',
+                                                                                submitColor: "red",
+                                                                                loading: false
+                                                                            }, () => {
+                                                                                this.hideMessageComponent()
+                                                                            });
+                                                                            break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        );
+                                                } else {
+                                                    document.getElementById("submitButton").disabled = false;
+                                                    alert("To approve a supply plan – Reviewed must all be checked.");
                                                 }
                                             }
-                                        );
-                                } else {
-                                    document.getElementById("submitButton").disabled = false;
-                                    alert("To approve a supply plan – Reviewed must all be checked.");
-                                }
-                                }
+                                        }else{
+                                            confirmAlert({
+                                                message: i18n.t("static.supplyplan.inconsistent"),
+                                                buttons: [
+                                                    {
+                                                        label: i18n.t("static.common.refreshPage"),
+                                                        onClick: () => {
+                                                            window.location.reload(true);
+                                                        }
+                                                    },
+                                                    {
+                                                        label: i18n.t('static.common.close')
+                                                    }
+                                                ]
+                                              });
+                                        }
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                        
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
                             }}
                             render={
                                 ({
@@ -4792,7 +5059,7 @@ class EditSupplyPlanStatus extends Component {
     }
     cancelClicked = () => {
         var cont = false;
-        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
                 cont = true;
@@ -4807,7 +5074,7 @@ class EditSupplyPlanStatus extends Component {
     }
     resetClicked = () => {
         var cont = false;
-        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
                 cont = true;
@@ -4818,9 +5085,9 @@ class EditSupplyPlanStatus extends Component {
         }
         if (cont == true) {
             this.setState({
-                problemReportChanged:0,
-                remainingDataChanged:0
-            },()=>{
+                problemReportChanged: 0,
+                remainingDataChanged: 0
+            }, () => {
                 this.componentDidMount();
             })
         }

@@ -56,6 +56,7 @@ const AddRegion = React.lazy(() => import('../../views/Region/AddRegionComponent
 const ListRegion = React.lazy(() => import('../../views/Region/ListRegionComponent'));
 const EditRegion = React.lazy(() => import('../../views/Region/EditRegionComponent'));
 const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListRealmCountryComponent'));
+const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
 const MapProcurementAgent = React.lazy(() => import('../../views/Program/MapProcurementAgent'));
 const ManualJsonTrigger = React.lazy(() => import('../../views/Integration/ManualJsonTrigger'));
@@ -291,6 +292,7 @@ const routes = [
   { path: '/region/listRegion/:message', component: ListRegion },
   { path: '/realmCountry/listRealmCountry/:color/:message', name: 'static.dashboard.realmcountry', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'static.dashboard.realmcountry', component: ListRealmCountry },
+  { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
   { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
@@ -1798,17 +1800,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.globalconsumption'),
                                 url: '/report/globalConsumption',
@@ -1820,9 +1822,20 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
+                              // {
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
+                                name: 'Forecast Error (Monthly)',
+                                url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
                                   hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
@@ -2387,19 +2400,31 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                             children: [
+                              // {
+                              //   name: i18n.t('static.dashboard.consumption'),
+                              //   url: '/report/consumption',
+                              //   icon: 'fa fa-bar-chart',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
+                              //  {
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
+                              //   icon: 'fa fa-line-chart',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
-                                name: i18n.t('static.dashboard.consumption'),
-                                url: '/report/consumption',
-                                icon: 'fa fa-bar-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              }, {
                                 name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
+                                url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),

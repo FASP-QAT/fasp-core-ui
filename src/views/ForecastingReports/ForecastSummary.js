@@ -1049,9 +1049,9 @@ class ForecastSummary extends Component {
                                         columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });
                                     }
-                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });
-                                    columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
-                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
+                                    columns.push({ title: i18n.t('static.forecastOutput.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//I8
                                     let nestedHeaders = [];
                                     nestedHeaders.push(
                                         {
@@ -1070,7 +1070,7 @@ class ForecastSummary extends Component {
                                     nestedHeaders.push(
                                         {
                                             title: i18n.t('static.forecastReport.allRegions'),
-                                            colspan: '1'
+                                            colspan: '2'
                                         },
                                     );
                                     try {
@@ -1123,7 +1123,7 @@ class ForecastSummary extends Component {
                                             var elInstance = instance.worksheets[0];
                                             var rowElement = elInstance.records;
                                             for (var r = 0; r < rowElement.length; r++) {
-                                                if (rowElement[r][6].v == 1) {
+                                                if (rowElement[r][rowElement[r].length - 3].v == 1) {
                                                     for (var j = 0; j < rowElement[r].length; j++) {
                                                         var ele = rowElement[r][j].element;
                                                         ele.classList.add('readonly');
@@ -1735,8 +1735,8 @@ class ForecastSummary extends Component {
                     this.setState({
                         forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                         rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
-                        startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                        endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                        startDateDisplay: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")),
+                        endDateDisplay: months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                         beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
                         freightPerc: Number(selectedForecastProgram.currentVersion.freightPerc)
                     }, () => {
@@ -1784,8 +1784,8 @@ class ForecastSummary extends Component {
                 this.setState({
                     forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                     rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
-                    startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                    endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    startDateDisplay: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")),
+                    endDateDisplay: months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
                 }, () => {
                 })
@@ -2522,7 +2522,7 @@ class ForecastSummary extends Component {
                                                     </div>
                                                 }
                                                 {this.state.displayId == 2 &&
-                                                    <div className='ForecastSummaryTable datdEntryRow'>
+                                                    <div className='ForecastSummaryTable datdEntryRow ForcastColumnFreeze'>
                                                         <div id="tableDiv" className="consumptionDataEntryTable custom-display">
                                                         </div>
                                                     </div>

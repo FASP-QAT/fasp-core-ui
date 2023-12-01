@@ -2533,6 +2533,9 @@ class StockStatus extends Component {
         mode: 'nearest',
         callbacks: {
           label: function (tooltipItem, data) {
+            if (tooltipItem.datasetIndex == 2) {
+              return "";
+          } else {
             let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
@@ -2545,6 +2548,7 @@ class StockStatus extends Component {
               x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
           }
         }
         , intersect: false
@@ -2614,10 +2618,15 @@ class StockStatus extends Component {
         }]
       },
       tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
+        mode:'nearest',
+        intersect: false,
+        // enabled: false,
+        // custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
+            if (tooltipItem.datasetIndex == 2) {
+              return "";
+          } else {
             let label = data.labels[tooltipItem.index];
             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
             var cell1 = value
@@ -2630,6 +2639,7 @@ class StockStatus extends Component {
               x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
           }
         }
       },
@@ -2666,6 +2676,8 @@ class StockStatus extends Component {
         label: i18n.t('static.supplyPlan.consumption'),
         backgroundColor: 'transparent',
         borderColor: '#ba0c2f',
+        pointBackgroundColor: '#ba0c2f',
+        pointBorderColor: '#ba0c2f',
         ticks: {
           fontSize: 2,
           fontColor: 'transparent',
@@ -2785,6 +2797,8 @@ class StockStatus extends Component {
         label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
         backgroundColor: 'rgba(255,193,8,0.2)',
         borderColor: '#59cacc',
+        pointBackgroundColor: '#59cacc',
+        pointBorderColor: '#59cacc',
         borderStyle: 'dotted',
         borderDash: [10, 10],
         fill: '+1',
@@ -2806,6 +2820,8 @@ class StockStatus extends Component {
         label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
         backgroundColor: 'rgba(0,0,0,0)',
         borderColor: '#59cacc',
+        pointBackgroundColor: '#59cacc',
+        pointBorderColor: '#59cacc',
         borderStyle: 'dotted',
         backgroundColor: 'transparent',
         borderDash: [10, 10],
@@ -2828,6 +2844,8 @@ class StockStatus extends Component {
         yAxisID: 'B',
         label: i18n.t('static.report.mos'),
         borderColor: '#118b70',
+        pointBackgroundColor: '#118b70',
+        pointBorderColor: '#118b70',
         backgroundColor: 'transparent',
         ticks: {
           fontSize: 2,

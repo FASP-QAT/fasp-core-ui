@@ -106,7 +106,10 @@ class ReportService {
     forecastError(inputjson) {
         return axios.post(`${API_URL}/api/report/forecastError`, inputjson, {});
     }
-    getUpdateProgramInfoDetailsBasedRealmCountryId(programTypeId, realmCountryId, statusId) {
+    forecastErrorNew(inputjson) {
+        return axios.post(`${API_URL}/api/report/forecastErrorNew`, inputjson, {});
+    }
+    getUpdateProgramInfoDetailsBasedRealmCountryId(programTypeId, realmCountryId,statusId) {
         return axios.get(`${API_URL}/api/report/updateProgramInfo/programTypeId/${programTypeId}/realmCountryId/${realmCountryId}/active/${statusId}`, {}
         );
     }

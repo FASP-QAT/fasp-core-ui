@@ -26,21 +26,23 @@ import {
   Table
 } from 'reactstrap';
 import * as Yup from 'yup';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE } from '../../Constants.js'
+import getLabelText from '../../CommonComponent/getLabelText'
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import 'react-select/dist/react-select.min.css';
+import AuthenticationService from "../Common/AuthenticationService.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from "../../CommonComponent/Logo";
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, TITLE_FONT } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
 import pdfIcon from '../../assets/img/pdf.png';
-import i18n from '../../i18n';
-import AuthenticationService from "../Common/AuthenticationService.js";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { calculateArima } from '../Extrapolation/Arima';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
@@ -148,6 +150,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.updateArimaData = this.updateArimaData.bind(this);
     this.formulaChanged = this.formulaChanged.bind(this);
     this.pickAMonth2 = React.createRef();
+    this.roundingForPuQty=this.roundingForPuQty.bind(this);
+  }
+
+  roundingForPuQty(puQty){
+    if(puQty<1){
+      puQty=Number(puQty).toFixed(4);
+    }else{
+      puQty=Math.round(puQty);
+    }
+    return puQty;
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -283,7 +295,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         data[0] = i18n.t('static.program.noOfDaysInMonth');
         for (var j = 0; j < monthArray.length; j++) {
           data[j + 1] = monthArray[j].noOfDays;
-          columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 100 })
+          columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'numeric', textEditor: true, mask: '#,##.0000', decimal: '.', disabledMaskOnEdition: true, width: 100 })
         }
         data[monthArray.length + 1] = multiplier;
         columns.push({ type: 'hidden', title: 'Multiplier' })
@@ -331,14 +343,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 3)}),'',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 3)}),'',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,4))`;
+
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
           data = [];
           data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 4)}),'',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
+            data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 4)}),'',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},4))`;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -791,7 +804,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var reportRateStart = 3;
     var stockDayStart = 4;
     var adjustedConsumption = 6;
-    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
+    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
     for (var i = 0; i < regionList.length; i++) {
@@ -906,7 +919,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stockDayStart = 4;
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
-    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
+    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
     for (var i = 0; i < regionList.length; i++) {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
       possibleReportRateY.push(reportRateStart.toString());
@@ -963,7 +976,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stockDayStart = 4;
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
-    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
+    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
     for (var i = 0; i < regionList.length; i++) {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
       possibleReportRateY.push(reportRateStart.toString());
@@ -1528,9 +1541,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
         total += Number(data[0].qty);
         totalPU += Number(data[0].qtyInPU);
-        datacsv.push(this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty)
+        datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
       })
-      datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
+      datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(totalPU) : this.roundingForPuQty(total));
       datacsv.push("100 %");
       A.push(this.addDoubleQuoteToRowContent(datacsv))
       this.state.regionList.map(r => {
@@ -1543,7 +1556,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
             totalRegion += Number(data[0].qty);
             totalRegionPU += Number(data[0].qtyInPU);
-            datacsv.push(this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty)
+            datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
           })
         }
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1916,8 +1929,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
                       actualConsumption = c.amount;
                       daysOfStockOut = c.daysOfStockOut;
-                      qty = Math.round((Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100);
-                      qty = qty.toFixed(2)
+                      qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100;
+                      qty = qty.toFixed(4)
                       var multiplier = 0;
                       if (planningUnitList[cul].consumptionDataType == 1) {
                         multiplier = 1
@@ -1927,11 +1940,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         multiplier = planningUnitList[cul].otherUnit.multiplier
                       }
                       if (planningUnitList[cul].consumptionDataType == 1) {
-                        qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(2)
+                        qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
                       } else if (planningUnitList[cul].consumptionDataType == 2) {
                         qtyInPU = (Number(qty));
                       } else if (planningUnitList[cul].consumptionDataType == 3) {
-                        qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(2)
+                        qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
                       }
                     } else {
                       qty = "";
@@ -1939,13 +1952,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       daysOfStockOut = 0;
                       qtyInPU = ""
                     }
-                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qty !== "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Number(qty).toFixed(4) : "", qtyInPU: qty !== "" ? Number(qtyInPU).toFixed(4) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
                     if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
                       totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                     }
                   }
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU !== "" ? Math.round(totalQtyPU) : "" })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Number(totalQty).toFixed(4) : "", qtyInPU: totalQtyPU !== "" ? Number(totalQtyPU).toFixed(4) : "" })
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
                 }
@@ -2219,9 +2232,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                   total += Number(data[0].qty);
                   totalPU += Number(data[0].qtyInPU);
-                  return (<td style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }} onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                  return (<td style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }} onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty)} /></td>)
                 })}
-                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(totalPU) : "" : this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(total) : ""} /></td>
+                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? this.roundingForPuQty(totalPU) : "" : this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? this.roundingForPuQty(total) : ""} /></td>
                 <td>{this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? 100 : ""}</td>
               </tr>
               {this.state.regionList.map(r => {
@@ -2234,9 +2247,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                     totalRegion += Number(data[0].qty);
                     totalRegionPU += Number(data[0].qtyInPU);
-                    return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }} style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                    return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }} style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty)} /></td>)
                   })}
-                  <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegionPU) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegion) : "")} /></td>
+                  <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? this.roundingForPuQty(totalRegionPU) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? this.roundingForPuQty(totalRegion) : "")} /></td>
                   <td>{this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (totalPU == 0 ? 100 : Math.round((totalRegionPU / totalPU) * 100)) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (total == 0 ? 100 : Math.round((totalRegion / total) * 100)) : "")}</td>
                 </tr>)
               })}
@@ -2351,7 +2364,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var colourCount = 0;
         datasetListForGraph.push({
           label: "Total",
-          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qtyInPU !== "" ? item.qtyInPU : null)),
+          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qtyInPU !== "" ? this.roundingForPuQty(item.qtyInPU) : null)),
           type: 'line',
           backgroundColor: 'transparent',
           borderStyle: 'dotted',
@@ -2370,7 +2383,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           datasetListForGraph.push({
             label: getLabelText(item.label, this.state.lang),
-            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qtyInPU > 0 ? item.qtyInPU : null)),
+            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qtyInPU > 0 ? this.roundingForPuQty(item.qtyInPU) : null)),
             stack: 1,
             backgroundColor: colourArray[colourCount],
             borderStyle: 'dotted',

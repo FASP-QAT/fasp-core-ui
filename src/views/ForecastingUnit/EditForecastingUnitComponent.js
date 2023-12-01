@@ -6,9 +6,15 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants.js';
 import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import UnitService from '../../api/UnitService.js';
+import AuthenticationService from '../Common/AuthenticationService';
 let initialValues = {
-    label: ''
+    message: '',
+    label: '',
+    genericLabel: '',
+    unitId: []
+
 }
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
@@ -17,7 +23,9 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         genericLabel: Yup.string()
-            .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
+        unitId: Yup.string()
+            .required(i18n.t('static.unit.unittext'))
     })
 }
 export default class EditForecastingUnitComponent extends Component {
@@ -79,7 +87,8 @@ export default class EditForecastingUnitComponent extends Component {
                 },
             },
             lang: localStorage.getItem('lang'),
-            loading: true
+            loading: true,
+            units: []
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -109,6 +118,9 @@ export default class EditForecastingUnitComponent extends Component {
         if (event.target.name == "genericLabel") {
             forecastingUnit.genericLabel.label_en = event.target.value;
         }
+        if (event.target.name == "unitId") {
+            forecastingUnit.unit.id = event.target.value;
+        }
         else if (event.target.name === "active") {
             forecastingUnit.active = event.target.id === "active2" ? false : true
         }
@@ -120,7 +132,8 @@ export default class EditForecastingUnitComponent extends Component {
     };
     touchAll(setTouched, errors) {
         setTouched({
-            'label': true
+            'label': true,
+            'unitId': true
         }
         )
         this.validateForm(errors)
@@ -140,8 +153,64 @@ export default class EditForecastingUnitComponent extends Component {
         }
     }
     componentDidMount() {
+        UnitService.getUnitListAll().then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+                units: listArray
+            })
+        })
+        .catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
+                initialValues = {
+                    message: '',
+                    label: response.data.label.label_en,
+                    genericLabel: response.data.genericLabel.label_en,
+                    unitId: response.data.unit.id
+                }
                 this.setState({
                     forecastingUnit: response.data, loading: false
                 });
@@ -203,6 +272,15 @@ export default class EditForecastingUnitComponent extends Component {
         }
     }
     render() {
+        const { units } = this.state;
+        let unitList = units.length > 0
+            && units.map((item, i) => {
+                return (
+                    <option key={i} value={item.unitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -212,11 +290,7 @@ export default class EditForecastingUnitComponent extends Component {
                         <Card>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{
-                                    message: '',
-                                    label: this.state.forecastingUnit.label.label_en,
-                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en
-                                }}
+                                initialValues={initialValues}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
@@ -356,14 +430,22 @@ export default class EditForecastingUnitComponent extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
-                                                        type="text"
+                                                        type="select"
                                                         name="unitId"
                                                         id="unitId"
                                                         bsSize="sm"
-                                                        readOnly
-                                                        value={getLabelText(this.state.forecastingUnit.unit.label, this.state.lang)}
+                                                        value={this.state.forecastingUnit.unit.id}
+                                                        valid={!errors.unitId && this.state.forecastingUnit.unit.id != ''}
+                                                        invalid={touched.unitId && !!errors.unitId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_UNIT_FOR_FU')}
+                                                        required
                                                     >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {unitList}
                                                     </Input>
+                                                    <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.common.status')}  </Label>

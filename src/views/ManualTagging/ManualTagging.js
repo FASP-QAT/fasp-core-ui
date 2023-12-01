@@ -448,8 +448,8 @@ export default class ManualTagging extends Component {
         })
     }
     displayShipmentData() {
-        let selectedShipmentId = (this.state.checkboxValue ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
-        let selectedPlanningUnitId = (!this.state.checkboxValue ? parseInt(document.getElementById("planningUnitId1").value) : 0);
+        let selectedShipmentId = (this.state.checkboxValue && document.getElementById("notLinkedShipmentId")!=null ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
+        let selectedPlanningUnitId = (!this.state.checkboxValue && document.getElementById("planningUnitId1")!=null ? parseInt(document.getElementById("planningUnitId1").value) : 0);
         let selectedShipment;
         if (selectedShipmentId != null && selectedShipmentId != 0 && this.state.checkboxValue) {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
@@ -3834,7 +3834,7 @@ export default class ManualTagging extends Component {
                                     planningUnit: c.planningUnit
                                 })
                             })
-                            if (listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
+                            if (document.getElementById("planningUnitId1")!=null && listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
                                 document.getElementById("planningUnitId1").value = -1;
                             }
                             this.setState({

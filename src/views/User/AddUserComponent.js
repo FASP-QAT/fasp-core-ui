@@ -414,6 +414,8 @@ class AddUserComponent extends Component {
                                     "static.common.prodNetworkErrorMessage"
                                   ),
                               loading: false,
+                            },()=>{
+                              this.hideSecondComponent();
                             });
                           } else {
                             switch (
@@ -433,18 +435,24 @@ class AddUserComponent extends Component {
                                 this.setState({
                                   message: error.response.data.messageCode,
                                   loading: false,
+                                },()=>{
+                                  this.hideSecondComponent();
                                 });
                                 break;
                               case 412:
                                 this.setState({
                                   message: error.response.data.messageCode,
                                   loading: false,
+                                },()=>{
+                                  this.hideSecondComponent();
                                 });
                                 break;
                               default:
                                 this.setState({
                                   message: "static.unkownError",
                                   loading: false,
+                                },()=>{
+                                  this.hideSecondComponent();
                                 });
                                 break;
                             }
@@ -470,6 +478,8 @@ class AddUserComponent extends Component {
                           ? i18n.t("static.common.demoNetworkErrorMessage")
                           : i18n.t("static.common.prodNetworkErrorMessage"),
                         loading: false,
+                      },()=>{
+                        this.hideSecondComponent();
                       });
                     } else {
                       switch (error.response ? error.response.status : "") {
@@ -487,18 +497,24 @@ class AddUserComponent extends Component {
                           this.setState({
                             message: error.response.data.messageCode,
                             loading: false,
+                          },()=>{
+                            this.hideSecondComponent();
                           });
                           break;
                         case 412:
                           this.setState({
                             message: error.response.data.messageCode,
                             loading: false,
+                          },()=>{
+                            this.hideSecondComponent();
                           });
                           break;
                         default:
                           this.setState({
                             message: "static.unkownError",
                             loading: false,
+                          },()=>{
+                            this.hideSecondComponent();
                           });
                           break;
                       }
@@ -507,6 +523,8 @@ class AddUserComponent extends Component {
               } else {
                 this.setState({
                   message: response.data.message,
+                },()=>{
+                  this.hideSecondComponent();
                 });
               }
             })
@@ -519,6 +537,8 @@ class AddUserComponent extends Component {
                     ? i18n.t("static.common.demoNetworkErrorMessage")
                     : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
+                },()=>{
+                  this.hideSecondComponent();
                 });
               } else {
                 switch (error.response ? error.response.status : "") {
@@ -536,18 +556,24 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
+                    },()=>{
+                      this.hideSecondComponent();
                     });
                     break;
                   case 412:
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
+                    },()=>{
+                      this.hideSecondComponent();
                     });
                     break;
                   default:
                     this.setState({
                       message: "static.unkownError",
                       loading: false,
+                    },()=>{
+                      this.hideSecondComponent();
                     });
                     break;
                 }
@@ -573,6 +599,8 @@ class AddUserComponent extends Component {
               ? i18n.t("static.common.demoNetworkErrorMessage")
               : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
+          },()=>{
+            this.hideSecondComponent();
           });
         } else {
           switch (error.response ? error.response.status : "") {
@@ -588,18 +616,24 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             default:
               this.setState({
                 message: "static.unkownError",
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
           }
@@ -917,8 +951,19 @@ class AddUserComponent extends Component {
             items.push({
               title: i18n.t("static.common.deleterow"),
               onclick: function () {
-                obj.deleteRow(parseInt(y));
-              },
+                if (obj.getJson(null, false).length == 1) {
+                  obj.deleteRow(parseInt(y));
+                  var data = [];
+                  data[0] = this.state.user.username;
+                  data[1] = "";
+                  data[2] = "";
+                  data[3] = "";
+                  data[4] = "";
+                  obj.insertRow(data, parseInt(y));
+                }else{
+                  obj.deleteRow(parseInt(y));
+                }
+              }.bind(this),
             });
           }
           if (x) {
@@ -1009,6 +1054,8 @@ class AddUserComponent extends Component {
               ? i18n.t("static.common.demoNetworkErrorMessage")
               : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
+          },()=>{
+            this.hideSecondComponent();
           });
         } else {
           switch (error.response ? error.response.status : "") {
@@ -1024,18 +1071,24 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             default:
               this.setState({
                 message: "static.unkownError",
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
           }
@@ -1081,6 +1134,8 @@ class AddUserComponent extends Component {
               ? i18n.t("static.common.demoNetworkErrorMessage")
               : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
+          },()=>{
+            this.hideSecondComponent();
           });
         } else {
           switch (error.response ? error.response.status : "") {
@@ -1096,18 +1151,24 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             default:
               this.setState({
                 message: "static.unkownError",
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
           }
@@ -1154,6 +1215,8 @@ class AddUserComponent extends Component {
               ? i18n.t("static.common.demoNetworkErrorMessage")
               : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
+          },()=>{
+            this.hideSecondComponent();
           });
         } else {
           switch (error.response ? error.response.status : "") {
@@ -1169,18 +1232,24 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
             default:
               this.setState({
                 message: "static.unkownError",
                 loading: false,
+              },()=>{
+                this.hideSecondComponent();
               });
               break;
           }
@@ -1360,6 +1429,8 @@ class AddUserComponent extends Component {
                     });
                     this.setState({
                       message: "",
+                    },()=>{
+                      this.hideSecondComponent();
                     });
                     UserService.addNewUser(user)
                       .then((response) => {
@@ -1390,6 +1461,8 @@ class AddUserComponent extends Component {
                               ? i18n.t("static.common.demoNetworkErrorMessage")
                               : i18n.t("static.common.prodNetworkErrorMessage"),
                             loading: false,
+                          },()=>{
+                            this.hideSecondComponent();
                           });
                         } else {
                           switch (error.response ? error.response.status : "") {
@@ -1409,18 +1482,24 @@ class AddUserComponent extends Component {
                                   "static.accesscontrol.duplicateAccessControl"
                                 ),
                                 loading: false,
+                              },()=>{
+                                this.hideSecondComponent();
                               });
                               break;
                             case 412:
                               this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
+                              },()=>{
+                                this.hideSecondComponent();
                               });
                               break;
                             default:
                               this.setState({
                                 message: "static.unkownError",
                                 loading: false,
+                              },()=>{
+                                this.hideSecondComponent();
                               });
                               break;
                           }
@@ -1430,6 +1509,8 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: "validation fail",
                       loading: false,
+                    },()=>{
+                      this.hideSecondComponent();
                     });
                   }
                 }}
