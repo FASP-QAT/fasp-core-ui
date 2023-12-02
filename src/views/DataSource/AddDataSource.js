@@ -224,7 +224,7 @@ export default class AddDataSource extends Component {
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          var listArray = response.data;
+          var listArray = response.data.filter(c=>c.active==true);
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
