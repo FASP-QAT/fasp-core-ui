@@ -72,6 +72,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitValues: [],
             planningUnitLabels: [],
             forecastingUnits: [],
+            allForecastingUnits:[],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
             // isEquUnitChecked:false,
@@ -115,6 +116,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnits: [],
             planningUnitIds: [],
             forecastingUnits: [],
+            allForecastingUnits:[],
             forecastingUnitIds: [],
             matricsList: [],
             regions: [],
@@ -281,6 +283,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
+                        allForecastingUnits:[],
                         show: false,
                         loading: false
                     }, () => {
@@ -295,6 +298,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
+                        allForecastingUnits:[],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedVersionList(programId) })
@@ -314,6 +318,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 versions: [],
                 planningUnits: [],
                 forecastingUnits: [],
+                allForecastingUnits:[],
                 show: false,
                 loading: false
             })
@@ -400,6 +405,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
+                        allForecastingUnits:[],
                         show: false,
                         loading: false
                     }, () => {
@@ -416,6 +422,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
+                        allForecastingUnits:[],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedRegionList(programId) })
@@ -550,6 +557,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             planningUnits: [],
             forecastingUnits: [],
+            allForecastingUnits:[],
             show: false,
             loading: true
         }, () => {
@@ -629,6 +637,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: newPlanningUnitList,
                                     forecastingUnits: newForecastingUnitList,
+                                    allForecastingUnits:forecastingUnitList1,
                                     planningUnitValues: newPlanningUnitList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -665,6 +674,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: proList,
                                     forecastingUnits: forecastingUnitList1,
+                                    allForecastingUnits:forecastingUnitList1,
                                     planningUnitValues: proList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                     }, this),
@@ -751,6 +761,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
+                                allForecastingUnits:forecastingUnitList,
                                 planningUnitValues: newPlanningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -785,6 +796,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
+                                allForecastingUnits:forecastingUnitList,
                                 planningUnitValues: planningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                 }, this),
@@ -861,6 +873,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             dataList: [],
             planningUnits: [],
             forecastingUnits: [],
+            allForecastingUnits:[],
             loading: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", this.state.versionId);
@@ -1047,7 +1060,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     filteredEquList.push(myResult[i]);
                                 }
                             }
-                            let fuList = this.state.forecastingUnits;
+                            let fuList = this.state.allForecastingUnits;
 
 
                             let newList = [];
@@ -1103,7 +1116,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                             }
 
-                            let fuList = this.state.forecastingUnits;
+                            let fuList = this.state.allForecastingUnits;
                             let newList = [];
                             for (var i = 0; i < filteredEquList.length; i++) {
                                 let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
