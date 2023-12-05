@@ -499,23 +499,7 @@ export default class ProductCategoryTree extends Component {
         this.setState({ nodename: '' });
         this.getProductCategoryListByRealmId();
     }
-    touchAll(errors) {
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('productCategoryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     handleSearchOnChange = e => {
         this.setState({
             searchQuery: e.target.value,
@@ -628,7 +612,7 @@ export default class ProductCategoryTree extends Component {
                                                                 <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                             </Col>
                                                             <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
+                                                                <Button className="text-white" type="submit" size="sm" color="success" ><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
                                                             </Col>
                                                         </Row>}
                                                 </FormGroup>

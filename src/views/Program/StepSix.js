@@ -102,40 +102,7 @@ export default class StepSix extends Component {
             programManagerList: []
         }
     }
-    touchAllSix(setTouched, errors) {
-        setTouched({
-            programName: true,
-            userId: true,
-            airFreightPerc: true,
-            seaFreightPerc: true,
-            roadFreightPerc: true,
-            plannedToSubmittedLeadTime: true,
-            submittedToApprovedLeadTime: true,
-            approvedToShippedLeadTime: true,
-            shippedToArrivedByAirLeadTime: true,
-            shippedToArrivedBySeaLeadTime: true,
-            shippedToArrivedByRoadLeadTime: true,
-            arrivedToDeliveredLeadTime: true,
-            programCode1: true,
-            message: ''
-        }
-        )
-        this.validateFormSix(errors)
-    }
-    validateFormSix(errors) {
-        this.findFirstErrorSix('programDataForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorSix(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
     }
     getProgramManagerList() {
@@ -426,7 +393,7 @@ export default class StepSix extends Component {
                                 <FormGroup className="col-md-12">
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                 </FormGroup>
                             </Row>
                         </Form>

@@ -253,31 +253,7 @@ class AddUserComponent extends Component {
       () => {}
     );
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      username: true,
-      realmId: true,
-      emailId: true,
-      orgAndCountry: true,
-      languageId: true,
-      roleId: true,
-    });
-    this.validateForm(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError("userForm", (fieldName) => {
-      return Boolean(errors[fieldName]);
-    });
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName];
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus();
-        break;
-      }
-    }
-  }
+  
   filterProgram() {
     let realmId = this.state.user.realm.realmId;
     if (realmId != 0 && realmId != null) {
@@ -1843,7 +1819,6 @@ class AddUserComponent extends Component {
                           size="md"
                           color="success"
                           className="float-right mr-1"
-                          onClick={() => this.touchAll(setTouched, errors)}
                           disabled={!isValid}
                         >
                           <i className="fa fa-check"></i>

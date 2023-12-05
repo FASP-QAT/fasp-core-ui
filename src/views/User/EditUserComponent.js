@@ -160,31 +160,7 @@ class EditUserComponent extends Component {
       () => {}
     );
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      username: true,
-      realmId: true,
-      emailId: true,
-      orgAndCountry: true,
-      languageId: true,
-      roleId: true,
-    });
-    this.validateForm(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError("userForm", (fieldName) => {
-      return Boolean(errors[fieldName]);
-    });
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName];
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus();
-        break;
-      }
-    }
-  }
+ 
   roleChange(roleId) {
     var selectedArray = [];
     for (var p = 0; p < roleId.length; p++) {
@@ -1803,7 +1779,6 @@ class EditUserComponent extends Component {
                           size="md"
                           color="success"
                           className="float-right mr-1"
-                          onClick={() => this.touchAll(setTouched, errors)}
                         >
                           <i className="fa fa-check"></i>
                           {i18n.t("static.common.update")}

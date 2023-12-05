@@ -29,27 +29,7 @@ export default class StepOne extends Component {
             realmId: '',
         }
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('realmForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         HealthAreaService.getRealmList()
             .then(response => {
@@ -161,7 +141,7 @@ export default class StepOne extends Component {
                                     <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                 </FormGroup>
                                 <FormGroup className="pb-3">
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit">{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                 </FormGroup>
                             </Form>
                         )} />

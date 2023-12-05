@@ -2018,7 +2018,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </ModalBody>
                                         <ModalFooter>
-                                            {this.state.showPlanningUnitAndQty == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAllPlan(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t("static.supplyPlan.plan")}</Button>}
+                                            {this.state.showPlanningUnitAndQty == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t("static.supplyPlan.plan")}</Button>}
                                         </ModalFooter>
                                     </Form>
                                 )} />
@@ -5406,28 +5406,5 @@ export default class SupplyPlanComponent extends React.Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
-    }
-    touchAllPlan(setTouched, errors) {
-        setTouched({
-            procurementAgentId: true,
-            fundingSourceId: true,
-            budgetId: true,
-        }
-        )
-        this.validateFormPlan(errors)
-    }
-    validateFormPlan(errors) {
-        this.findFirstErrorPlan('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorPlan(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
     }
 }

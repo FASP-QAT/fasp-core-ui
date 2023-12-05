@@ -54,27 +54,7 @@ export default class BugReportTicketComponent extends Component {
             bugReport
         }, () => { })
     };
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            description: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+   
     componentDidMount() {
     }
     hideSecondComponent() {
@@ -231,7 +211,7 @@ export default class BugReportTicketComponent extends Component {
                                         <ModalFooter className="pr-0 pb-0">
                                             <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
                                     </Form>
                                 )} />

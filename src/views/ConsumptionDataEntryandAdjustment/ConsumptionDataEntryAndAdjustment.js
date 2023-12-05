@@ -165,37 +165,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      otherUnitName: true,
-      otherUnitMultiplier: true,
-      consumptionNotes: true
-    }
-    );
-    this.validateForm(errors);
-    this.validateTable(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError('dataEnteredInForm', (fieldName) => {
-      return Boolean(errors[fieldName])
-    })
-  }
-  validateTable(errors) {
-    this.findFirstError('dataEnteredInTable', (fieldName) => {
-      return Boolean(errors[fieldName])
-    })
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName]
-    if (form) {
-      for (let i = 0; i < form.length; i++) {
-        if (hasError(form[i].name)) {
-          form[i].focus()
-          break
-        }
-      }
-    }
-  }
+
   cancelClicked() {
     var cont = false;
     if (this.state.consumptionChanged) {
@@ -2606,7 +2576,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <FormGroup>
                       <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                       <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                      {this.state.consumptionChanged && <><Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
+                      {this.state.consumptionChanged && <><Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
                       {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                       &nbsp;
                     </FormGroup>
@@ -2729,7 +2699,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     </Label>
                   </ModalBody>
                   <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                   </ModalFooter>
                 </Form>

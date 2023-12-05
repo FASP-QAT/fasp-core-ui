@@ -284,27 +284,7 @@ export default class ExportDataset extends Component {
             this.setState({ loading: false });
         }
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            programId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     updateFieldData(value) {
         if (value != "" && value != undefined) {
             this.setState({

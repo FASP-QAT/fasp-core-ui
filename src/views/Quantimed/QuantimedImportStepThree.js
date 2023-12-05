@@ -123,28 +123,7 @@ class QuantimedImportStepThree extends Component {
             }.bind(this);
         }.bind(this);
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            regionId: true,
-            regionConversionFactor: true
-        }
-        )
-        this.validateFormThree(errors)
-    }
-    validateFormThree(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorThree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         this.state.region.regionConversionFactor = '100'
         initialValuesThree = {
@@ -226,7 +205,7 @@ class QuantimedImportStepThree extends Component {
                                             </FormGroup>
                                             <br></br>
                                             <FormGroup>
-                                                <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                                <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                                 &nbsp;

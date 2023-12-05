@@ -60,30 +60,7 @@ class UpdateExpiredPasswordComponent extends Component {
     logoutClicked() {
         this.props.history.push(`/login/` + i18n.t('static.logoutSuccess'))
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            oldPassword: true,
-            newPassword: true,
-            confirmNewPassword: true,
-            emailId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('updatePasswordForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     render() {
         return (
             <div className="app flex-row align-items-center">
@@ -236,7 +213,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     <CardFooter>
                                                         <FormGroup>
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
                                                         </FormGroup>
                                                     </CardFooter>

@@ -29,27 +29,7 @@ export default class PipelineProgramImport extends Component {
     }
     componentDidMount() {
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            fileTypeId: true,
-        }
-        );
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('budgetForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     toggleModalView() {
         this.setState({ toggelView: !this.state.toggelView });
     }

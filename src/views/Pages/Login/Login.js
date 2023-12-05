@@ -129,28 +129,7 @@ class Login extends Component {
     i18n.changeLanguage(lang)
     window.location.reload();
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      emailId: true,
-      password: true
-    }
-    )
-    this.validateForm(errors)
-  }
-  validateForm(errors) {
-    this.findFirstError('loginForm', (fieldName) => {
-      return Boolean(errors[fieldName])
-    })
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName]
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus()
-        break
-      }
-    }
-  }
+  
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
@@ -475,7 +454,7 @@ class Login extends Component {
                               </Row>}
                               <Row>
                                 <Col xs="6">
-                                  <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                  <Button type="submit" color="primary" className="px-4" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
                                 <Col xs="6" className="text-right">
                                   <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>

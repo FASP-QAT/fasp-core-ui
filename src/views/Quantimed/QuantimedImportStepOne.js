@@ -50,27 +50,7 @@ class QuantimedImportStepOne extends Component {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            programId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('programForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programId") {
@@ -281,7 +261,7 @@ class QuantimedImportStepOne extends Component {
                                             </FormGroup>
                                             <br></br>
                                             <FormGroup className="">
-                                                <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
+                                                <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid}>Import </Button>
                                             </FormGroup>
                                         </CardBody>
                                     </Form>

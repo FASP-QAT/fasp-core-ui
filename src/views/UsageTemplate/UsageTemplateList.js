@@ -101,29 +101,7 @@ class usageTemplate extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getDimensionList = this.getDimensionList.bind(this);
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            'picker1': true,
-            'picker2': true,
-            'number1': true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('modalForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
@@ -2782,7 +2760,7 @@ class usageTemplate extends Component {
                                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                                                             <FormGroup>
                                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                                                             </FormGroup>
                                                         }

@@ -1811,23 +1811,7 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-    touchAll(errors) {
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('whatIfForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     toggleAccordionScenarioList() {
         this.setState({
             showScenarioList: !this.state.showScenarioList
@@ -4387,7 +4371,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 </FormGroup>
                                             </div>
                                             <FormGroup className="col-md-2 mt-4">
-                                                <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                 &nbsp;
                                             </FormGroup>
                                         </div>

@@ -31,27 +31,7 @@ export default class PipelineProgramDataStepTwo extends Component {
             realmCountryList: []
         }
     }
-    touchAllTwo(setTouched, errors) {
-        setTouched({
-            realmCountryId: true
-        }
-        )
-        this.validateFormTwo(errors)
-    }
-    validateFormTwo(errors) {
-        this.findFirstErrorTwo('realmCountryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorTwo(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getRealmCountryList(realmId)
@@ -157,7 +137,7 @@ export default class PipelineProgramDataStepTwo extends Component {
                                     <span className="red">{this.props.items.validationFailedMessage}</span>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                 </FormGroup>
                             </Form>
                         )} />

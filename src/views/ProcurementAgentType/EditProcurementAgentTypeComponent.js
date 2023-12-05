@@ -80,27 +80,7 @@ class EditProcurementAgentTypeComponent extends Component {
         },
             () => { });
     };
-    touchAll(setTouched, errors) {
-        setTouched({
-            procurementAgentTypeName: true,
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('procurementAgentTypeForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         ProcurementAgentService.getProcurementAgentTypeById(this.props.match.params.procurementAgentTypeId).then(response => {
             if (response.status == 200) {
@@ -332,7 +312,7 @@ class EditProcurementAgentTypeComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

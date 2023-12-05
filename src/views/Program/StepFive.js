@@ -32,27 +32,7 @@ export default class StepFive extends Component {
             regionId: ''
         }
     }
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            regionId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('regionForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
     }
     getRegionList() {
@@ -170,7 +150,7 @@ export default class StepFive extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

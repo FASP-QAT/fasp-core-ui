@@ -30,27 +30,7 @@ export default class PipelineProgramDataStepOne extends Component {
             realmList: [],
         }
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('realmForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         HealthAreaService.getRealmList()
             .then(response => {

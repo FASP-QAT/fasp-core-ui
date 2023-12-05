@@ -138,30 +138,7 @@ export default class ListTreeTemplate extends Component {
             treeTemplate: {}
         })
     }
-    touchAllCreateTree(setTouched, errors) {
-        setTouched({
-            treeName: true,
-            forecastMethodId: true,
-            regionId: true,
-            datasetIdModal: true
-        }
-        )
-        this.validateFormCreateTree(errors)
-    }
-    validateFormCreateTree(errors) {
-        this.findFirstErrorCreateTree('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorCreateTree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+   
     getTreeTemplateList() {
         DatasetService.getTreeTemplateList().then(response => {
             var treeTemplateList = response.data.sort((a, b) => {
@@ -1270,27 +1247,7 @@ export default class ListTreeTemplate extends Component {
             this.setState({ regionList });
         })
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            treeTemplateName: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('modalForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+   
     copyDeleteTree(treeTemplateId) {
         var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
         treeTemplate.label.label_en = this.state.treeTemplateName;
@@ -1875,7 +1832,7 @@ export default class ListTreeTemplate extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </div>
@@ -2075,8 +2032,8 @@ export default class ListTreeTemplate extends Component {
                                                     </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
-                                                        {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                        {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                        {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
                                                         {this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
                                                         {this.state.missingPUList.length == 0 && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         &nbsp;

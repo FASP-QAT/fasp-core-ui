@@ -31,27 +31,7 @@ export default class Steptwo extends Component {
         }
         this.generateCountryCode = this.generateCountryCode.bind(this);
     }
-    touchAllTwo(setTouched, errors) {
-        setTouched({
-            realmCountryId: true
-        }
-        )
-        this.validateFormTwo(errors)
-    }
-    validateFormTwo(errors) {
-        this.findFirstErrorTwo('realmCountryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorTwo(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     generateCountryCode(event) {
         let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateCountryCode(realmCountryCode);
@@ -166,7 +146,7 @@ export default class Steptwo extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

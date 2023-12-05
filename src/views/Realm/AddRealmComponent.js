@@ -17,9 +17,9 @@ const initialValues = {
     minQplTolerance: '',
     minQplToleranceCutOff: '',
     maxQplTolerance: '',
-    actualConsumptionMonthsInPast: '',
-    forecastConsumptionMonthsInPast: '',
-    inventoryMonthsInPast: '',
+    actualConsumptionMonthsInPast: Number(ACTUAL_CONSUMPTION_MONTHS_IN_PAST),
+    forecastConsumptionMonthsInPast: Number(FORECASTED_CONSUMPTION_MONTHS_IN_PAST),
+    inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
     minCountForMode: '',
     minPercForMode: ''
 }
@@ -180,39 +180,7 @@ export default class AddRealmComponent extends Component {
             }
         )
     };
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmCode: true,
-            label: true,
-            minMosMinGaurdrail: true,
-            minMosMaxGaurdrail: true,
-            maxMosMaxGaurdrail: true,
-            minQplTolerance: true,
-            minQplToleranceCutOff: true,
-            maxQplTolerance: true,
-            actualConsumptionMonthsInPast: true,
-            forecastConsumptionMonthsInPast: true,
-            inventoryMonthsInPast: true,
-            minCountForMode: true,
-            minPercForMode: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('realmForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         this.setState({ loading: false })
     }
@@ -556,7 +524,7 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

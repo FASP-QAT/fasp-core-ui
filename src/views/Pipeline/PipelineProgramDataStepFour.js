@@ -27,27 +27,7 @@ export default class PipelineProgramDataStepFour extends Component {
             organisationList: []
         }
     }
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            organisationId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('organisationForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getOrganisationList(realmId)
@@ -157,7 +137,7 @@ export default class PipelineProgramDataStepFour extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)}  >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

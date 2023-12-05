@@ -112,27 +112,7 @@ export default class syncPage extends Component {
       notes: event.target.value
     })
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      notes: true
-    }
-    );
-    this.validateForm(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError('budgetForm', (fieldName) => {
-      return Boolean(errors[fieldName])
-    })
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName]
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus()
-        break
-      }
-    }
-  }
+  
   versionTypeChanged(event) {
     this.setState({
       versionType: event.target.value
@@ -3604,7 +3584,7 @@ export default class syncPage extends Component {
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-4">
                                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                                   &nbsp;
                                 </FormGroup>
                               </div>

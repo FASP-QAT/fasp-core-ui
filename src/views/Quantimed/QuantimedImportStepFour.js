@@ -59,26 +59,7 @@ class QuantimedImportStepFour extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorThree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
     }
     show() {

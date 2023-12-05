@@ -33,27 +33,7 @@ export default class StepThree extends Component {
         }
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
-    touchAllThree(setTouched, errors) {
-        setTouched({
-            healthAreaId: true
-        }
-        )
-        this.validateFormThree(errors)
-    }
-    validateFormThree(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorThree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+   
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -179,7 +159,7 @@ export default class StepThree extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

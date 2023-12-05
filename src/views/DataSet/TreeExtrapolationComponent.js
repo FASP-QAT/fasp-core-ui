@@ -575,39 +575,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         });
     }
-    touchAllExtrapolation(setTouched, errors, buttonFalg) {
-        this.setState({ buttonFalg }, () => {
-        })
-        setTouched({
-            extrapolationMethodId: true,
-            noOfMonthsId: true,
-            confidenceLevelId: true,
-            gammaId: true,
-            betaId: true,
-            alphaId: true,
-            pId: true,
-            dId: true,
-            qId: true,
-            confidenceLevelIdLinearRegression: true,
-            confidenceLevelIdArima: true
-        }
-        )
-        this.validateFormExtrapolation(errors)
-    }
-    validateFormExtrapolation(errors) {
-        this.findFirstErrorExtrapolation('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorExtrapolation(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     checkValidationExtrapolation() {
         var valid = true;
         var json = this.state.dataExtrapolation.getJson(null, false);
@@ -3322,7 +3290,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                                     {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <>
                                                         <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
-                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button>
+                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" ><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-left mr-1" onClick={() => { this.resetExtrapolation() }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     </>}
                                                 </div>
@@ -3537,7 +3505,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     </InputGroup>
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
+                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
                                                 </FormGroup>
                                             </Row>
                                             {!this.state.dataChanged || !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}

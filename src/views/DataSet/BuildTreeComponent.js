@@ -8140,152 +8140,152 @@ export default class BuildTree extends Component {
         this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
     }
 
-    touchAllScenario(setTouched, errors) {
-        setTouched({
-            scenarioName: true
-        }
-        )
-        this.validateFormScenario(errors)
-    }
+    // touchAllScenario(setTouched, errors) {
+    //     setTouched({
+    //         scenarioName: true
+    //     }
+    //     )
+    //     this.validateFormScenario(errors)
+    // }
 
-    touchAllBranch(setTouched, errors) {
-        setTouched({
-            branchTemplateId: true
-        }
-        )
-        this.validateFormBranch(errors)
-    }
+    // touchAllBranch(setTouched, errors) {
+    //     setTouched({
+    //         branchTemplateId: true
+    //     }
+    //     )
+    //     this.validateFormBranch(errors)
+    // }
 
-    validateFormScenario(errors) {
-        this.findFirstErrorScenario('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorScenario(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-
-    validateFormBranch(errors) {
-        this.findFirstErrorBranch('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorBranch(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-    touchAllLevel(setTouched, errors) {
-        setTouched({
-            levelName: true
-        }
-        )
-        this.validateFormLevel(errors)
-    }
-
-    validateFormLevel(errors) {
-        this.findFirstErrorLevel('levelForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorLevel(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            forecastMethodId: true,
-            treeName: true,
-            regionId: true
-        }
-        )
-        this.validateForm(errors)
-    }
+    // validateFormScenario(errors) {
+    //     this.findFirstErrorScenario('userForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorScenario(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
 
-    validateForm(errors) {
-        this.findFirstError('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-    touchAllNodeData(setTouched, errors) {
-        // console.log("Inside>>>>> touchAllNodeData")
-        setTouched({
-            nodeTypeId: true,
-            nodeTitle: true,
-            nodeUnitId: true,
-            percentageOfParent: true,
-            nodeValue: true,
-            tracerCategoryId: true,
-            usageTypeIdFU: true,
-            lagInMonths: true,
-            noOfPersons: true,
-            forecastingUnitPerPersonsFC: true,
-            usageFrequencyCon: true,
-            usageFrequencyDis: true,
-            oneTimeUsage: true,
-            // repeatCount: true,
-            // repeatUsagePeriodId: true,
-            planningUnitId: true,
-            refillMonths: true,
-            sharePlanningUnit: true,
-            forecastingUnitId: true,
-            usagePeriodIdCon: true,
-            usagePeriodIdDis: true,
-            puPerVisit: true,
-            planningUnitIdFU: true
-            // usagePeriodId:true
-        }
-        )
-        this.validateFormNodeData(errors)
-    }
-    validateFormNodeData(errors) {
-        // console.log("Inside>>>>> validateFormNodeData")
-        this.findFirstErrorNodeData('nodeDataForm', (fieldName) => {
-            // console.log("Inside>>>>> Boolean(errors[fieldName])  ", Boolean(errors[fieldName]))
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorNodeData(formName, hasError) {
-        // console.log("Inside>>>>> findFirstErrorNodeData>>> formName", formName, " hasError>>>>", hasError)
+    // validateFormBranch(errors) {
+    //     this.findFirstErrorBranch('userForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorBranch(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
+    // touchAllLevel(setTouched, errors) {
+    //     setTouched({
+    //         levelName: true
+    //     }
+    //     )
+    //     this.validateFormLevel(errors)
+    // }
 
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            // console.log("Inside>>>>> form[i].name", form[i].name)
-            if (hasError(form[i].name)) {
+    // validateFormLevel(errors) {
+    //     this.findFirstErrorLevel('levelForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorLevel(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
-                // console.log("Inside>>>>> hasError(form[i].name)", hasError(form[i].name))
-                form[i].focus()
-                break
-            }
-        }
-    }
+    // touchAll(setTouched, errors) {
+    //     setTouched({
+    //         forecastMethodId: true,
+    //         treeName: true,
+    //         regionId: true
+    //     }
+    //     )
+    //     this.validateForm(errors)
+    // }
+
+
+    // validateForm(errors) {
+    //     this.findFirstError('userForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstError(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
+    // touchAllNodeData(setTouched, errors) {
+    //     // console.log("Inside>>>>> touchAllNodeData")
+    //     setTouched({
+    //         nodeTypeId: true,
+    //         nodeTitle: true,
+    //         nodeUnitId: true,
+    //         percentageOfParent: true,
+    //         nodeValue: true,
+    //         tracerCategoryId: true,
+    //         usageTypeIdFU: true,
+    //         lagInMonths: true,
+    //         noOfPersons: true,
+    //         forecastingUnitPerPersonsFC: true,
+    //         usageFrequencyCon: true,
+    //         usageFrequencyDis: true,
+    //         oneTimeUsage: true,
+    //         // repeatCount: true,
+    //         // repeatUsagePeriodId: true,
+    //         planningUnitId: true,
+    //         refillMonths: true,
+    //         sharePlanningUnit: true,
+    //         forecastingUnitId: true,
+    //         usagePeriodIdCon: true,
+    //         usagePeriodIdDis: true,
+    //         puPerVisit: true,
+    //         planningUnitIdFU: true
+    //         // usagePeriodId:true
+    //     }
+    //     )
+    //     this.validateFormNodeData(errors)
+    // }
+    // validateFormNodeData(errors) {
+    //     // console.log("Inside>>>>> validateFormNodeData")
+    //     this.findFirstErrorNodeData('nodeDataForm', (fieldName) => {
+    //         // console.log("Inside>>>>> Boolean(errors[fieldName])  ", Boolean(errors[fieldName]))
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorNodeData(formName, hasError) {
+    //     // console.log("Inside>>>>> findFirstErrorNodeData>>> formName", formName, " hasError>>>>", hasError)
+
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         // console.log("Inside>>>>> form[i].name", form[i].name)
+    //         if (hasError(form[i].name)) {
+
+    //             // console.log("Inside>>>>> hasError(form[i].name)", hasError(form[i].name))
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
     getNodeValue(nodeTypeId) {
         // console.log("get node value---------------------");
@@ -12238,7 +12238,7 @@ export default class BuildTree extends Component {
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -14296,7 +14296,7 @@ export default class BuildTree extends Component {
                                                                 <FormGroup className="col-md-3 pt-lg-4">
 
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
@@ -14588,8 +14588,8 @@ export default class BuildTree extends Component {
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
-                                                {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
+                                                {this.state.missingPUList.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.addBranch")}</Button>}
+                                                {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.addBranchWithoutPU")}</Button>}
                                                 {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
                                                 {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
                                                 {this.state.missingPUList.length == 0 && (this.state.branchTemplateId != "" && this.state.branchTemplateId != 0 && this.state.branchTemplateId != undefined) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
@@ -15189,7 +15189,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-6 pt-lg-4 float-right">
                                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                            <Button type="submit" size="md" onClick={() => this.touchAllScenario(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                         </FormGroup>
                                     </Form>
                                 )} />
@@ -15394,7 +15394,7 @@ export default class BuildTree extends Component {
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
-                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={() => this.touchAllLevel(setTouched, errors)}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>

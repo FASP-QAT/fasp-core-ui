@@ -534,41 +534,7 @@ export default class AddProgram extends Component {
         }
         this.setState({ program }, () => { })
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            programName: true,
-            realmId: true,
-            realmCountryId: true,
-            organisationId: true,
-            userId: true,
-            airFreightPerc: true,
-            seaFreightPerc: true,
-            plannedToSubmittedLeadTime: true,
-            submittedToApprovedLeadTime: true,
-            approvedToShippedLeadTime: true,
-            shippedToArrivedByAirLeadTime: true,
-            shippedToArrivedBySeaLeadTime: true,
-            arrivedToDeliveredLeadTime: true,
-            healthAreaId: true,
-            regionId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('programForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     render() {
         const { realmList } = this.state;
         const { programManagerList } = this.state;
@@ -933,7 +899,7 @@ export default class AddProgram extends Component {
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

@@ -32,27 +32,7 @@ export default class PipelineProgramDataStepThree extends Component {
             healthAreaList: []
         }
     }
-    touchAllThree(setTouched, errors) {
-        setTouched({
-            healthAreaId: true
-        }
-        )
-        this.validateFormThree(errors)
-    }
-    validateFormThree(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorThree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getHealthAreaList(realmId)
@@ -165,7 +145,7 @@ export default class PipelineProgramDataStepThree extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllThree(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

@@ -31,27 +31,7 @@ export default class StepFour extends Component {
         }
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            organisationId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('organisationForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     generateOrganisationCode(event) {
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateOrganisationCode(organisationCode);
@@ -170,7 +150,7 @@ export default class StepFour extends Component {
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>

@@ -941,31 +941,31 @@ export default class CreateTreeTemplate extends Component {
         })
     }
 
-    touchAllCreateTree(setTouched, errors) {
-        setTouched({
-            treeNameForCreateTree: true,
-            forecastMethodIdForCreateTree: true,
-            regionIdForCreateTree: true,
-            datasetIdModalForCreateTree: true
-        }
-        )
-        this.validateFormCreateTree(errors)
-    }
+    // touchAllCreateTree(setTouched, errors) {
+    //     setTouched({
+    //         treeNameForCreateTree: true,
+    //         forecastMethodIdForCreateTree: true,
+    //         regionIdForCreateTree: true,
+    //         datasetIdModalForCreateTree: true
+    //     }
+    //     )
+    //     this.validateFormCreateTree(errors)
+    // }
 
-    validateFormCreateTree(errors) {
-        this.findFirstErrorCreateTree('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorCreateTree(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    // validateFormCreateTree(errors) {
+    //     this.findFirstErrorCreateTree('userForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorCreateTree(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
     getRegionListForCreateTree(datasetId) {
         console.log("datasetId details---", datasetId);
@@ -7086,86 +7086,86 @@ export default class CreateTreeTemplate extends Component {
         this.setState({ items: updatedItems })
     }
 
-    touchAllBranch(setTouched, errors) {
-        setTouched({
-            branchTemplateId: true
-        }
-        )
-        this.validateFormBranch(errors)
-    }
+    // touchAllBranch(setTouched, errors) {
+    //     setTouched({
+    //         branchTemplateId: true
+    //     }
+    //     )
+    //     this.validateFormBranch(errors)
+    // }
 
-    validateFormBranch(errors) {
-        this.findFirstErrorBranch('userForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorBranch(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    // validateFormBranch(errors) {
+    //     this.findFirstErrorBranch('userForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorBranch(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
-    touchAll(setTouched, errors) {
-        setTouched({
-            'forecastMethodId': true,
-            'treeName': true,
-            'monthsInPast': true,
-            'monthsInFuture': true
-        }
-        )
-        this.validateForm(errors)
-    }
+    // touchAll(setTouched, errors) {
+    //     setTouched({
+    //         'forecastMethodId': true,
+    //         'treeName': true,
+    //         'monthsInPast': true,
+    //         'monthsInFuture': true
+    //     }
+    //     )
+    //     this.validateForm(errors)
+    // }
 
-    validateForm(errors) {
-        this.findFirstError('dataSourceForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        console.log("Form@@@#####", form)
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-    touchAllNodeData(setTouched, errors) {
-        setTouched({
-            nodeTypeId: true,
-            nodeTitle: true,
-            nodeUnitId: true,
-            percentageOfParent: true,
-            forecastingUnitId: true,
-            puPerVisit: true,
-            usageFrequencyCon: true,
-            usageFrequencyDis: true,
-            usagePeriodIdCon: true,
-            usagePeriodIdDis: true,
-            // nodeValue: true
-        }
-        )
-        this.validateFormNodeData(errors)
-    }
-    validateFormNodeData(errors) {
-        this.findFirstErrorNodeData('nodeDataForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorNodeData(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    // validateForm(errors) {
+    //     this.findFirstError('dataSourceForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstError(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     console.log("Form@@@#####", form)
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
+    // touchAllNodeData(setTouched, errors) {
+    //     setTouched({
+    //         nodeTypeId: true,
+    //         nodeTitle: true,
+    //         nodeUnitId: true,
+    //         percentageOfParent: true,
+    //         forecastingUnitId: true,
+    //         puPerVisit: true,
+    //         usageFrequencyCon: true,
+    //         usageFrequencyDis: true,
+    //         usagePeriodIdCon: true,
+    //         usagePeriodIdDis: true,
+    //         // nodeValue: true
+    //     }
+    //     )
+    //     this.validateFormNodeData(errors)
+    // }
+    // validateFormNodeData(errors) {
+    //     this.findFirstErrorNodeData('nodeDataForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorNodeData(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
     getBranchTemplateList(itemConfig) {
         var nodeTypeId = itemConfig.payload.nodeType.id;
@@ -7338,28 +7338,28 @@ export default class CreateTreeTemplate extends Component {
             this.calculateMOMData(0, 2);
         });
     }
-    touchAllLevel(setTouched, errors) {
-        setTouched({
-            levelName: true
-        }
-        )
-        this.validateFormLevel(errors)
-    }
+    // touchAllLevel(setTouched, errors) {
+    //     setTouched({
+    //         levelName: true
+    //     }
+    //     )
+    //     this.validateFormLevel(errors)
+    // }
 
-    validateFormLevel(errors) {
-        this.findFirstErrorLevel('levelForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorLevel(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    // validateFormLevel(errors) {
+    //     this.findFirstErrorLevel('levelForm', (fieldName) => {
+    //         return Boolean(errors[fieldName])
+    //     })
+    // }
+    // findFirstErrorLevel(formName, hasError) {
+    //     const form = document.forms[formName]
+    //     for (let i = 0; i < form.length; i++) {
+    //         if (hasError(form[i].name)) {
+    //             form[i].focus()
+    //             break
+    //         }
+    //     }
+    // }
 
     getNodeValue(nodeTypeId) {
         console.log("get node value---------------------");
@@ -11524,7 +11524,7 @@ export default class CreateTreeTemplate extends Component {
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelNodeDataClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {this.state.editable && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -13602,7 +13602,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 {/* ---hehehe */}
                                                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                 <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                                {(this.state.isChanged || this.state.isTemplateChanged) && <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>}
+                                                                {(this.state.isChanged || this.state.isTemplateChanged) && <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md"><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>}
                                                             </CardFooter>}
 
                                                     </CardBody>
@@ -13722,7 +13722,7 @@ export default class CreateTreeTemplate extends Component {
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 &nbsp;
 
                                             </FormGroup>
@@ -13886,7 +13886,7 @@ export default class CreateTreeTemplate extends Component {
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
-                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={() => this.touchAllLevel(setTouched, errors)}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
@@ -14115,8 +14115,8 @@ export default class CreateTreeTemplate extends Component {
                                             </h5>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
-                                                {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
+                                                {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTree")}</Button>}
+                                                {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
                                                 {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
                                                 {this.state.missingPUListForCreateTree.length == 0 && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
 

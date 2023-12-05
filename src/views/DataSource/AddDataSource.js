@@ -100,27 +100,7 @@ export default class AddDataSource extends Component {
       dataSource,
     });
   }
-  touchAll(setTouched, errors) {
-    setTouched({
-      label: true,
-      dataSourceTypeId: true,
-    });
-    this.validateForm(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError("dataSourceForm", (fieldName) => {
-      return Boolean(errors[fieldName]);
-    });
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName];
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus();
-        break;
-      }
-    }
-  }
+  
   componentDidMount() {
     RealmService.getRealmListAll()
       .then((response) => {
@@ -658,7 +638,6 @@ export default class AddDataSource extends Component {
                           color="success"
                           className="mr-1 float-right"
                           size="md"
-                          onClick={() => this.touchAll(setTouched, errors)}
                           disabled={!isValid}
                         >
                           <i className="fa fa-check"></i>

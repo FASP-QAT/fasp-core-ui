@@ -127,39 +127,7 @@ export default class PipelineProgramDataStepSix extends Component {
     setErrorMessage(message) {
         this.setState({ message: message });
     }
-    touchAllSix(setTouched, errors) {
-        setTouched({
-            programName: true,
-            userId: true,
-            airFreightPerc: true,
-            seaFreightPerc: true,
-            roadFreightPerc: true,
-            plannedToSubmittedLeadTime: true,
-            submittedToApprovedLeadTime: true,
-            approvedToShippedLeadTime: true,
-            arrivedToDeliveredLeadTime: '',
-            shippedToArrivedBySeaLeadTime: '',
-            shippedToArrivedByAirLeadTime: '',
-            shippedToArrivedByRoadLeadTime: '',
-            programCode1: true
-        }
-        )
-        this.validateFormSix(errors)
-    }
-    validateFormSix(errors) {
-        this.findFirstErrorSix('programDataForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorSix(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getProgramManagerList(realmId)
@@ -556,7 +524,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                     <FormGroup className="col-md-12">
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)}>{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub">{i18n.t('static.pipeline.save')} <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
                                 </Row>
                             </Form>

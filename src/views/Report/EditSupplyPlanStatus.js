@@ -3736,43 +3736,7 @@ class EditSupplyPlanStatus extends Component {
             program: program,
         });
     }
-    touchAll(setTouched, errors) {
-        setTouched({
-            versionStatusId: true,
-            versionNotes: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('supplyplanForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-    touchAllForAddingProblem(setTouched, errors) {
-        setTouched({
-            problemDescription: true,
-            modelPlanningUnitId: true,
-            modelCriticalityId: true,
-            suggession: true
-        }
-        )
-        this.validateFormForAddingProblem(errors)
-    }
-    validateFormForAddingProblem(errors) {
-        this.findFirstError('addProblemForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
+   
     addMannualProblem() {
         this.getProblemCriticality();
         this.setState({
@@ -4701,7 +4665,7 @@ class EditSupplyPlanStatus extends Component {
                                                         <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClickedModal}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
                                                         </FormGroup>
                                                     </div>
@@ -5001,7 +4965,7 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                 {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 &nbsp;
