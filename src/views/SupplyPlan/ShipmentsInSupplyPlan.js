@@ -2769,8 +2769,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
             var batchInfoList = elInstance.getJson(null, false);
             var batchQtyTotalForPopup = 0;
-            batchInfoList.map(item => {
-                batchQtyTotalForPopup += Number(item[2])
+            batchInfoList.map((item,count) => {
+                var qty=elInstance.getValue(`C${parseInt(count) + 1}`, true).toString().replaceAll("\,", "");
+                batchQtyTotalForPopup += Number(qty)
             })
             this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
