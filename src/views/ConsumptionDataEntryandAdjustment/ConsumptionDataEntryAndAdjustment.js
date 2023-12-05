@@ -174,10 +174,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   roundingForPuQty(puQty){
-    if(puQty<1){
-      puQty=Number(puQty).toFixed(4);
-    }else{
-      puQty=Math.round(puQty);
+    if(puQty!==""){
+      if(puQty<1){
+        puQty=Number(puQty).toFixed(4);
+      }else{
+        puQty=Math.round(puQty);
+      }
     }
     return puQty;
   }
