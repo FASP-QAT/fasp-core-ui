@@ -1330,7 +1330,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     validation = checkValidtion("text", "A", y, rowData[0], elInstance);
                     if (validation == false) {
                         valid = false;
-                        elInstance.setValueFromCoords(15, y, 1, true);
+                        elInstance.setValueFromCoords(17, y, 1, true);
                     }
                     var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                     if (validation == false) {

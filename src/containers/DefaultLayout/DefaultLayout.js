@@ -2507,17 +2507,18 @@ class DefaultLayout extends Component {
                                     this.refreshPage();
                                   }
                                 }
-                              }, {
-                                name: i18n.t('static.dashboard.inventoryTurns'),
-                                url: '/report/inventoryTurns',
-                                icon: 'fa fa-refresh',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              }, 
+                              // {
+                              //   name: i18n.t('static.dashboard.inventoryTurns'),
+                              //   url: '/report/inventoryTurns',
+                              //   icon: 'fa fa-refresh',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',

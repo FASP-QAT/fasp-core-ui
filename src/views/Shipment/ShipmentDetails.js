@@ -1165,7 +1165,7 @@ export default class ShipmentDetails extends React.Component {
                     </CardFooter>
                 </Card>
                 <Modal isOpen={this.state.batchInfo}
-                    className={'modal-lg modalWidth' + this.props.className}>
+                    className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
                         <strong>{this.state.shipmentModalTitle}</strong>
                     </ModalHeader>
@@ -1451,6 +1451,7 @@ export default class ShipmentDetails extends React.Component {
                                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         var curUser = AuthenticationService.getLoggedInUserId();
                                         var username = AuthenticationService.getLoggedInUsername();
+                                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                                         for (var pu = 0; pu < planningUnitsIds.length; pu++) {
                                             var programPlanningUnit = this.state.planningUnitListAll.filter(p => p.program.id == generalProgramJson.programId && p.planningUnit.id == planningUnitsIds[pu].value)[0];
                                             var maxForMonths = 0;
@@ -1474,7 +1475,6 @@ export default class ShipmentDetails extends React.Component {
                                             if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                                                 maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                                             }
-                                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                                             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitsIds[pu].value);
                                             var planningUnitDataIndex = planningUnitDataList.findIndex(c => c.planningUnitId == planningUnitsIds[pu].value);
                                             var programJson = {};

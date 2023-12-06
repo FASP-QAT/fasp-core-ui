@@ -214,6 +214,7 @@ export default class PlanningUnitSetting extends Component {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
+                if(localStorage.getItem('sessionType') === 'Online'){
                 PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
                     .then(response => {
                         if (response.status == 200) {
@@ -266,6 +267,9 @@ export default class PlanningUnitSetting extends Component {
                             }
                         }
                     );
+                }else{
+                    this.el.setValueFromCoords(8, y, '', true);   
+                }
             } else {
             }
         }

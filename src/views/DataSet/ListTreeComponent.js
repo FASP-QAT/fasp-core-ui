@@ -1466,6 +1466,8 @@ export default class ListTreeComponent extends Component {
         let treeList = program.treeList;
         var treeTemplateId = '';
         if (operationId == 1) {
+            const index = treeList.findIndex(c => c.treeId == treeId);
+            treeList.splice(index, 1);
         } else if (operationId == 2) {
             let treeName = this.state.treeName;
             for (let i = 0; i < treeList.length; i++) {
