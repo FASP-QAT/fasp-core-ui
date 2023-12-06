@@ -2678,7 +2678,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
             shipmentInstance.setValueFromCoords(12, rowNumber, shipmentQty, true);
-            shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            }else{
+                shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
+            }
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
@@ -2765,8 +2769,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
             var batchInfoList = elInstance.getJson(null, false);
             var batchQtyTotalForPopup = 0;
-            batchInfoList.map(item => {
-                batchQtyTotalForPopup += Number(item[2])
+            batchInfoList.map((item,count) => {
+                var qty=elInstance.getValue(`C${parseInt(count) + 1}`, true).toString().replaceAll("\,", "");
+                batchQtyTotalForPopup += Number(qty)
             })
             this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
