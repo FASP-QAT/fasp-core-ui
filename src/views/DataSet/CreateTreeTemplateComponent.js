@@ -2071,7 +2071,7 @@ export default class CreateTreeTemplate extends Component {
                         "consumptionDataType": 2,
                         "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
                         "selectedForecastMap": map1.get("14"),
-                        "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
+                        "createdBy": map1.get("16") == "" ? { "userId": curUser } : map1.get("16"),
                         "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
                         "active": true
                     }
@@ -5584,7 +5584,7 @@ export default class CreateTreeTemplate extends Component {
                             // this.calculateMOMData(0, 3);
                             if (this.state.showCalculatorFields) {
                                 treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
-                                treeTemplate.monthsInFuture = (12 + Number(this.state.treeTemplate.monthsInFuture));
+                                treeTemplate.monthsInFuture = (24 + Number(this.state.treeTemplate.monthsInFuture));
                                 this.generateMonthList();
                             }
                         });
@@ -5634,7 +5634,7 @@ export default class CreateTreeTemplate extends Component {
 
                                 if (this.state.showCalculatorFields) {
                                     treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
-                                    treeTemplate.monthsInFuture = (12 + Number(this.state.currentCalculatorStopDate));
+                                    treeTemplate.monthsInFuture = (24 + Number(this.state.currentCalculatorStopDate));
                                     this.generateMonthList();
                                 }
                             });
@@ -6971,9 +6971,9 @@ export default class CreateTreeTemplate extends Component {
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
                     // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit != "true") {
-                        sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? parseFloat((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit).toFixed(8) : "";
+                    sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? parseFloat((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit).toFixed(8) : "";
                     // } else {
-                        // sharePu = parseFloat(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor).toFixed(8);
+                    // sharePu = parseFloat(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor).toFixed(8);
                     // }
                     // (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
                     // } else {
@@ -9604,13 +9604,14 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j <= count; j++) {
             var startdate = monthListForModelingCalculator[j * 12].name;
             var stopDate = monthListForModelingCalculator[Number(j * 12 + 11)];
+            var stopDate1 = monthListForModelingCalculator[Number(j * 12 + 22)].id;
             var modifyStartDate1 = monthListForModelingCalculator[Number(j * 12 + 5)].id;
             var modifyStopDate1 = monthListForModelingCalculator[Number(j * 12 + 16)].id;
             var data = [];
             data[0] = startdate + " to " + stopDate.name//year
             data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
             data[7] = j == 0 ? "" : modifyStartDate1//H
-            data[8] = modifyStopDate1
+            data[8] = j == count ? stopDate1 : modifyStopDate1
             dataArray[j] = data;
         }
 
