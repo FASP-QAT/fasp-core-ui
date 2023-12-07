@@ -266,6 +266,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
         this.getDateDifference = this.getDateDifference.bind(this);
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
+        this.setButtonFlag = this.setButtonFlag.bind(this);
     }
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
@@ -2005,6 +2006,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenChooseMethod: !this.state.popoverOpenChooseMethod,
         });
     }
+    setButtonFlag(buttonFalg) {
+        this.setState({ buttonFalg: buttonFalg })
+    }
+    
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -3290,7 +3295,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                                     {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <>
                                                         <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
-                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" ><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button>
+                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-left mr-1" onClick={() => { this.resetExtrapolation() }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     </>}
                                                 </div>
@@ -3505,7 +3510,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     </InputGroup>
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
+                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.setButtonFlag(1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
                                                 </FormGroup>
                                             </Row>
                                             {!this.state.dataChanged || !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}
