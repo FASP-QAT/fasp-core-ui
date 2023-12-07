@@ -471,11 +471,9 @@ class DefaultLayout extends Component {
   _onIdle(e) {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      console.log("Test Logout @@@ Logged Out",this.state.timeout)
       localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
-      console.log("Test Logout @@@ Logged In",this.state.timeout)
       this.setState({ showModal: true })
       this.idleTimer.reset();
       this.setState({ isTimedOut: true })
