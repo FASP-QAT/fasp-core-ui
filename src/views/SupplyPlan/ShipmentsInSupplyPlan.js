@@ -3194,7 +3194,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                         this.props.hideSecondComponent();
                     } else {
-                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "") {
+                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != ""  && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != 0) {
                             positiveValidation("M", y, elInstance);
                         } else {
                             if (rowData[1].toString() == "false" && rowData[0].toString() == "true"){

@@ -66,7 +66,6 @@ const legendcolor = [
 class StockStatusAccrossPlanningUnitGlobalView extends Component {
   constructor(props) {
     super(props);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.filterTracerCategory = this.filterTracerCategory.bind(this);
     this.filterProgram = this.filterProgram.bind(this);
     this.handleChange = this.handleChange.bind(this);

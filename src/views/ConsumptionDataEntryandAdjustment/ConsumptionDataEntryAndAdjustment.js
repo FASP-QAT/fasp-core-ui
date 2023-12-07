@@ -154,10 +154,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   roundingForPuQty(puQty){
-    if(puQty<1){
-      puQty=Number(puQty).toFixed(4);
-    }else{
-      puQty=Math.round(puQty);
+    if(puQty!==""){
+      if(puQty<1){
+        puQty=Number(puQty).toFixed(4);
+      }else{
+        puQty=Math.round(puQty);
+      }
     }
     return puQty;
   }
@@ -1805,7 +1807,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             showSmallTable: false,
             showDetailTable: false,
             dataEl: "",
-            isTableLoaded: ""
+            isTableLoaded: "",
+            loading:false
           })
         }
       })
@@ -2401,9 +2404,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         <Card>
           <div className="card-header-actions">
             <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>}
               <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className="supplyplanformulas">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+              {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className="supplyplanformulas">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>}
               <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/extrapolation/extrapolateData" className="supplyplanformulas">{i18n.t('static.dashboard.extrapolation')}</a></span><br />
             </div>
           </div>
@@ -2412,7 +2415,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
-              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              {this.state.datasetId!=="" && <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
             </div>
           </div>
           <Formik

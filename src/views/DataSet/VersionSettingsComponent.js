@@ -996,7 +996,9 @@ class VersionSettingsComponent extends Component {
                                     version: rowData[2],
                                     pageName: i18n.t('static.versionSettings.versionSettings'),
                                     programNameOriginal: getLabelText(rowData[18].label, this.state.lang),
-                                    programId: rowData[11]
+                                    programId: rowData[11],
+                                    forecastStartDate:rowData[7],
+                                    forecastStopDate:rowData[9]
                                 })
                                 this.openModalPopup(rowData[18]);
                             }.bind(this)
@@ -1015,7 +1017,9 @@ class VersionSettingsComponent extends Component {
                                             version: rowData[2],
                                             pageName: i18n.t('static.versionSettings.versionSettings'),
                                             programNameOriginal: getLabelText(responseData.label, this.state.lang),
-                                            programId: rowData[0]
+                                            programId: rowData[0],
+                                            forecastStartDate:rowData[7],
+                                            forecastStopDate:rowData[9]
                                         })
                                         this.openModalPopup(responseData);
                                     }
@@ -1364,9 +1368,9 @@ class VersionSettingsComponent extends Component {
                 <Card>
                     <div className="card-header-actions">
                         <div className="Card-header-reporticon">
-                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>}
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
+                            {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>}
                             <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
                         </div>
                     </div>

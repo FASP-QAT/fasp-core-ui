@@ -362,7 +362,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         });
                                     }
                                 }
-                                if (consumptionEditable && obj.options.allowDeleteRow == true) {
+                                if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
                                     if (obj.getRowData(y)[12] == -1) {
                                         items.push({
                                             title: i18n.t("static.common.deleterow"),

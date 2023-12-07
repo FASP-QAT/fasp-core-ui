@@ -127,7 +127,7 @@ class RealmCountryRegion extends Component {
                                 },
                                 {
                                     title: i18n.t('static.region.capacitycbm'),
-                                    type: 'numeric',
+                                    type: 'text',
                                     textEditor: true,
                                     decimal: '.',
                                     mask: '#,##.00',

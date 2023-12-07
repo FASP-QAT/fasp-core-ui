@@ -2124,7 +2124,7 @@ class EquivalancyUnit extends Component {
                         </div>
                     </Modal>
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-lg modalWidth' + this.props.className}>
+                        className={'modal-lg modalWidth ' + this.props.className}>
                         <ModalHeader>
                             <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>

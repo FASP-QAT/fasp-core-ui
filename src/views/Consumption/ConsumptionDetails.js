@@ -894,7 +894,7 @@ export default class ConsumptionDetails extends React.Component {
                     </CardFooter>
                 </Card>
                 <Modal isOpen={this.state.consumptionBatchInfo}
-                    className={'modal-lg modalWidth' + this.props.className}>
+                    className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
                     </ModalHeader>

@@ -425,7 +425,6 @@ class EditSupplyPlanStatus extends Component {
         let problemList = this.state.problemList;
         var rowData1 = elInstance.getRowData(y);
         problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
-        // console.log("problemList in changed method ***", problemList);
 
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
@@ -1175,7 +1174,6 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     toggleAccordionErpShipments = () => {
-        // console.log(this.state.showErpShipment)
         this.setState({
             showErpShipment: !this.state.showErpShipment
         })
@@ -3414,7 +3412,6 @@ class EditSupplyPlanStatus extends Component {
     buildJExcel() {
         let problemList = this.state.problemList;
         problemList = problemList;
-        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -3993,7 +3990,7 @@ class EditSupplyPlanStatus extends Component {
                             </Row>
                         </CardBody>
                         <Modal isOpen={this.state.consumption}
-                            className={'modal-lg modalWidth' + this.props.className} >
+                            className={'modal-lg modalWidth ' + this.props.className} >
                             <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.dashboard.consumptiondetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
@@ -4093,7 +4090,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.adjustments}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.adjustmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <div className="card-header-actions" style={{ marginTop: '0px' }}>
@@ -4291,7 +4288,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.shipments}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion">
@@ -4495,7 +4492,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.transView}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>
@@ -4695,8 +4692,6 @@ class EditSupplyPlanStatus extends Component {
                                                 document.getElementById("submitButton").disabled = true;
                                                 var elInstance = this.state.problemEl;
                                                 var json = elInstance.getJson();
-                                                // console.log("problemList===>", json);
-                                                // console.log("program===>", this.state.program);
                                                 var reviewedProblemList = [];
                                                 var isAllCheckForReviewed = true;
                                                 for (var i = 0; i < json.length; i++) {
@@ -4744,28 +4739,12 @@ class EditSupplyPlanStatus extends Component {
                                                             notes: map.get("22")
                                                         })
                                                     }
-                                                    // if (map.get("20") == 1) {
-                                                    //     reviewedProblemList.push({
-                                                    //         problemReportId: map.get("0"),
-                                                    //         problemStatus: {
-                                                    //             id: map.get("10")
-                                                    //         },
-                                                    //         reviewed: map.get("18"),
-                                                    //         notes: map.get("19")
-                                                    //     });
-                                                    // }
-                                                    // if (map.get("18") == false && map.get("12") != 4) {
-                                                    //     isAllCheckForReviewed = false
-                                                    // }
                                                 }
-                                                // console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
                                                 if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                                    // console.log("reviewedProblemList===>", reviewedProblemList);
                                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                                         .then(response => {
                                                             if(this.state.program.currentVersion.versionStatus.id!=1){
-                                                                // console.log("messageCode", response)
                                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                                             } else {
                                                                 document.getElementById("submitButton").disabled = false;

@@ -3662,7 +3662,7 @@ export default class syncPage extends Component {
           </Col>
         </Row>
         <Modal isOpen={this.state.conflicts}
-          className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -3682,7 +3682,7 @@ export default class syncPage extends Component {
           </ModalFooter>
         </Modal>
         <Modal isOpen={this.state.conflictsInventory}
-          className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeInventory()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -3702,7 +3702,7 @@ export default class syncPage extends Component {
           </ModalFooter>
         </Modal>
         <Modal isOpen={this.state.conflictsShipment}
-          className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeShipment()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -3722,7 +3722,7 @@ export default class syncPage extends Component {
           </ModalFooter>
         </Modal>
         <Modal isOpen={this.state.conflictsProblem}
-          className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeProblem()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">

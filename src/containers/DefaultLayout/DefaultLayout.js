@@ -471,11 +471,9 @@ class DefaultLayout extends Component {
   _onIdle(e) {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      console.log("Test Logout @@@ Logged Out",this.state.timeout)
       localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
-      console.log("Test Logout @@@ Logged In",this.state.timeout)
       this.setState({ showModal: true })
       this.idleTimer.reset();
       this.setState({ isTimedOut: true })
@@ -2507,17 +2505,18 @@ class DefaultLayout extends Component {
                                     this.refreshPage();
                                   }
                                 }
-                              }, {
-                                name: i18n.t('static.dashboard.inventoryTurns'),
-                                url: '/report/inventoryTurns',
-                                icon: 'fa fa-refresh',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              }, 
+                              // {
+                              //   name: i18n.t('static.dashboard.inventoryTurns'),
+                              //   url: '/report/inventoryTurns',
+                              //   icon: 'fa fa-refresh',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',

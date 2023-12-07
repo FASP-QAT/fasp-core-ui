@@ -56,7 +56,7 @@ export default class DataSourceListComponent extends Component {
             realmId = document.getElementById("realmId").value;
         }
         if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && c.program.id == programId)
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && (c.program == null || c.program.id == programId || c.program.id==0))
             this.setState({
                 selSource
             },
@@ -68,13 +68,13 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (realmId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.program.id == programId)
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && (c.program == null || c.program.id == programId || c.program.id==0))
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.program.id == programId && c.dataSourceType.id == dataSourceTypeId)
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0) && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
@@ -92,7 +92,7 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.program.id == programId)
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0))
             this.setState({
                 selSource
             },

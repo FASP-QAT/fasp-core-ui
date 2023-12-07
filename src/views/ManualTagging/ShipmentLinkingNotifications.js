@@ -1177,7 +1177,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 <Card>
                     <CardBody className="pb-lg-5">
                         <Modal isOpen={this.state.manualTag}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <div>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
