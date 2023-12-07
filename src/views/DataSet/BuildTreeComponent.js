@@ -3642,7 +3642,7 @@ export default class BuildTree extends Component {
                                 yearsOfTarget: "",
                                 actualOrTargetValueList: []
                             }, () => {
-                                this.calculateMOMData(0, 0);
+                                this.calculateMOMData(this.state.currentItemConfig.context.id, 0);
                             });
                         } else {
                             this.setState({
@@ -5860,7 +5860,7 @@ export default class BuildTree extends Component {
             items,
             cursorItem: nodeId
         }, () => {
-            this.calculateMOMData(0, 2);
+            this.calculateMOMData(itemConfig.parent, 2);
         });
     }
     cancelClicked() {
@@ -6257,7 +6257,7 @@ export default class BuildTree extends Component {
         treeData[findTreeIndex] = curTreeObj;
         programData.treeList = treeData;
         dataSetObj.programData = programData;
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false, true);
+        calculateModelingData(dataSetObj, this, '', 0, this.state.selectedScenario, type, this.state.treeId, false, false, true);
     }
     hideActionButtons(e) {
         this.setState({
@@ -6581,7 +6581,7 @@ export default class BuildTree extends Component {
             branchTemplateId: "",
             missingPUList: []
         }, () => {
-            this.calculateMOMData(0, 2);
+            this.calculateMOMData(this.state.parentNodeIdForBranch, 2);
         });
     }
     getUsagePeriodList() {
@@ -7524,7 +7524,7 @@ export default class BuildTree extends Component {
         items = filtered;
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
-                this.calculateMOMData(0, 2);
+                this.calculateMOMData(itemConfig.id, 2);
             }, 0);
         });
     }
@@ -7783,7 +7783,7 @@ export default class BuildTree extends Component {
             isSubmitClicked: false,
             curTreeObj
         }, () => {
-            this.calculateMOMData(0, 0);
+            this.calculateMOMData(currentItemConfig.context.id, 0);
         });
     }
     buildModelingCalculatorJexcel() {
