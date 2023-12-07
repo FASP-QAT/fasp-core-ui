@@ -3993,7 +3993,7 @@ class EditSupplyPlanStatus extends Component {
                             </Row>
                         </CardBody>
                         <Modal isOpen={this.state.consumption}
-                            className={'modal-lg modalWidth' + this.props.className} >
+                            className={'modal-lg modalWidth ' + this.props.className} >
                             <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.dashboard.consumptiondetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
@@ -4093,7 +4093,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.adjustments}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.adjustmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <div className="card-header-actions" style={{ marginTop: '0px' }}>
@@ -4291,7 +4291,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.shipments}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion">
@@ -4495,7 +4495,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </Modal>
                         <Modal isOpen={this.state.transView}
-                            className={'modal-lg modalWidth' + this.props.className}>
+                            className={'modal-lg modalWidth ' + this.props.className}>
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>

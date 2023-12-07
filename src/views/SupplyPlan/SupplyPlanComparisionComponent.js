@@ -2389,7 +2389,7 @@ export default class SupplyPlanComponent extends React.Component {
                     </div>
                 </div>
                 <Modal isOpen={this.state.consumption}
-                    className={'modal-lg modalWidth' + this.props.className} >
+                    className={'modal-lg modalWidth ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dashboard.consumptiondetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.props.items.planningUnitName} </strong>
                         <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
@@ -2489,7 +2489,7 @@ export default class SupplyPlanComponent extends React.Component {
                     </div>
                 </Modal>
                 <Modal isOpen={this.state.adjustments}
-                    className={'modal-lg modalWidth' + this.props.className}>
+                    className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.supplyPlan.adjustmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.props.items.planningUnitName} </strong>
                         <div className="card-header-actions" style={{ marginTop: '0px' }}>
@@ -2687,7 +2687,7 @@ export default class SupplyPlanComponent extends React.Component {
                     </div>
                 </Modal>
                 <Modal isOpen={this.state.shipments}
-                    className={'modal-lg modalWidth' + this.props.className}>
+                    className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.props.items.planningUnitName} </strong>
                         <ul className="legendcommitversion">

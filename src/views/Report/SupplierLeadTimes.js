@@ -490,7 +490,7 @@ class SupplierLeadTimes extends Component {
                 procurementAgents: [],
                 procurementAgenttValues: []
             }, () => {
-                if (!localStorage.getItem("sessionType") === 'Online') {
+                if (!(localStorage.getItem("sessionType") === 'Online')) {
                     var db1;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);

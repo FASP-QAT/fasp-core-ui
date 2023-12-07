@@ -4508,7 +4508,7 @@ export default class ManualTagging extends Component {
                                 </div>
                             </div>
                             <Modal isOpen={this.state.manualTag}
-                                className={'modal-lg modalWidth' + this.props.className}>
+                                className={'modal-lg modalWidth ' + this.props.className}>
                                 <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                         <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
@@ -4941,7 +4941,7 @@ export default class ManualTagging extends Component {
                                 </ModalBody>
                             </Modal>
                             <Modal isOpen={this.state.artmisHistoryModal}
-                                className={'modal-lg modalWidth' + this.props.className}>
+                                className={'modal-lg modalWidth ' + this.props.className}>
                                 <div>
                                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                         <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>

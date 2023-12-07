@@ -3318,7 +3318,7 @@ export default class CommitTreeComponent extends React.Component {
                     </div>
                 </Modal >
                 <Modal isOpen={this.state.versionSettingsConflictsModal}
-                    className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+                    className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
                     <ModalHeader toggle={() => this.toggleVersionSettingsConflictModal()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
                         <ul className="legendcommitversion">
@@ -3338,7 +3338,7 @@ export default class CommitTreeComponent extends React.Component {
                     </ModalFooter>
                 </Modal>
                 <Modal isOpen={this.state.planningUnitsConflictsModal}
-                    className={'modal-lg modalWidth' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
+                    className={'modal-lg modalWidth ' + this.props.className} style={{ display: this.state.loading ? "none" : "block" }}>
                     <ModalHeader toggle={() => this.togglePlanningUnitsConflictModal()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
                         <ul className="legendcommitversion">

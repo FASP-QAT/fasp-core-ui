@@ -926,7 +926,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     setForecastProgramId(e) {
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
         var programListFilter = [];
-        if (e.target.value != "") {
+        if (e.target.value != 0) {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
         let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
