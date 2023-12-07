@@ -124,7 +124,6 @@ export default class PlanningUnitSetting extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         valid = checkValidation(this.el)
-        // console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
             //planning unit
             var col = ("B").concat(parseInt(y) + 1);
@@ -291,15 +290,10 @@ export default class PlanningUnitSetting extends Component {
             var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             
-            // console.log("json.length", json.length);
             var jsonLength = parseInt(json.length) - 1;
-            // console.log("jsonLength", jsonLength);
             for (var i = jsonLength; i >= 0; i--) {
-                // console.log("i=---------->", i, "y----------->", y);
                 var map = new Map(Object.entries(json[i]));
                 var planningUnitValue = map.get("1");
-                // console.log("Planning Unit value in change", map.get("1"));
-                // console.log("Value----->", value);
                 if (planningUnitValue == value && y != i) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
