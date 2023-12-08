@@ -255,7 +255,6 @@ class AuthenticationService {
             let decryptedToken;
             if(temp_time_token > 21000000){
                 axios.get(`${API_URL}/refresh`, {}).then(response => {
-                    console.log("Hello",response)
                     var decoded = jwt_decode(response.data.token);
                     localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                     localStorage.setItem("tokenSetTime", new Date());
