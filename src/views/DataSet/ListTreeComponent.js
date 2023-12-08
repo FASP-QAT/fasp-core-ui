@@ -2008,7 +2008,8 @@ export default class ListTreeComponent extends Component {
             this.setState({
                 versions: [],
                 treeData: [],
-                datasetListJexcel: []
+                datasetListJexcel: [],
+                loading:false
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -2439,6 +2440,8 @@ export default class ListTreeComponent extends Component {
             }
             this.setState({
                 datasetIdModal: event.target.value,
+                regionList:[],
+                regionValues:[]
             }, () => {
                 if (this.state.datasetIdModal != "") {
                     let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == this.state.datasetIdModal.split("~v")[0] && c.currentVersion.versionId == this.state.datasetIdModal.split("~v")[1].toString().split(" ")[0])[0];
@@ -2683,7 +2686,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && this.state.versionId.toString().includes("(Local)") &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && this.state.datasetId!=0 && this.state.versionId.toString().includes("(Local)") &&
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                 <div className="controls SelectGo">
                                                     <InputGroup>

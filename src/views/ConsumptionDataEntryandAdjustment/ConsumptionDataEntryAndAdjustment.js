@@ -2203,6 +2203,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.pickAMonth2.current.show()
   }
   handleAMonthDissmis2 = (value) => {
+    if(this.state.datasetId!=""){
     var cont = false;
     if (this.state.consumptionChanged) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -2223,6 +2224,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         })
       })
     }
+  }
   }
   getTableDiv() {
     return (
@@ -2882,7 +2884,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
   }
   resetClicked() {
-    this.buildDataJexcel(this.state.selectedConsumptionUnitId, 0)
+    if(this.state.datasetId!=""){
+      this.buildDataJexcel(this.state.selectedConsumptionUnitId, 0)
+    }
   }
   changed = function (instance, cell, x, y, value) {
     var elInstance = instance;

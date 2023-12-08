@@ -607,7 +607,7 @@ export function changed(worksheets, cell, x, y, value) {
             validFlag = false;
         }
     }
-    if (columnInfo.number === true && validFlag != false) {
+    if (columnInfo.number === true && value!=="" && validFlag != false) {
         if (isNaN(parseInt(value))) {
             worksheets.setStyle(col, "background-color", "transparent");
             worksheets.setStyle(col, "background-color", "yellow");
