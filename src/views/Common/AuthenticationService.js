@@ -253,7 +253,7 @@ class AuthenticationService {
             
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken;
-            if(temp_time_token > 60000){ //21000000
+            if(temp_time_token > 21000000){
                 axios.get(`${API_URL}/refresh`, {}).then(response => {
                     console.log("Hello",response)
                     var decoded = jwt_decode(response.data.token);
