@@ -248,8 +248,24 @@ class AuthenticationService {
         // console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             // console.log("Inside set up axios");
+            var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
+            var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
+            
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken;
+            if(temp_time_token > 60000){ //21000000
+                axios.get(`${API_URL}/refresh`, {}).then(response => {
+                    console.log("Hello",response)
+                    var decoded = jwt_decode(response.data.token);
+                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
+                    localStorage.setItem("tokenSetTime", new Date());
+                    decryptedToken = CryptoJS.AES.decrypt(response.data.token, `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                }).catch(error => {
+                    console.log("Error ",error);
+                })
+            }else{
+                decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            }
             let basicAuthHeader = 'Bearer ' + decryptedToken
             axios.defaults.headers.common['Authorization'] = basicAuthHeader;
             // axios.interceptors.request.use(
