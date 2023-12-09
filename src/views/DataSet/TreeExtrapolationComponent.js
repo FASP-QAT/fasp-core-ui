@@ -265,10 +265,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             forecastNestedHeader: '5',
             filteredExtrapolationMethodList: [],
             minMonth: '',
-            monthsForMovingAverage: 5,
-            confidenceLevelId: 0.95,
-            confidenceLevelIdLinearRegression: 0.95,
-            confidenceLevelIdArima: 0.95,
+            monthsForMovingAverage: 6,
+            confidenceLevelId: 0.85,
+            confidenceLevelIdLinearRegression: 0.85,
+            confidenceLevelIdArima: 0.85,
             // noOfMonthsForASeason: 12,
             movingAvgData: [],
             alpha: 0.2,
@@ -1458,10 +1458,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             forecastNestedHeader: '5',
             filteredExtrapolationMethodList: [],
             minMonth: '',
-            monthsForMovingAverage: 5,
-            confidenceLevelId: 0.95,
-            confidenceLevelIdLinearRegression: 0.95,
-            confidenceLevelIdArima: 0.95,
+            monthsForMovingAverage: 6,
+            confidenceLevelId: 0.85,
+            confidenceLevelIdLinearRegression: 0.85,
+            confidenceLevelIdArima: 0.85,
             alpha: 0.2,
             beta: 0.2,
             gamma: 0.2,
@@ -4036,7 +4036,6 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                                         >
                                                                             {/* <option value="">Please select confidence level</option> */}
-                                                                            <option value="0.80">80%</option>
                                                                             <option value="0.85">85%</option>
                                                                             <option value="0.90">90%</option>
                                                                             <option value="0.95">95%</option>
