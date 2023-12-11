@@ -95,6 +95,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
+                                                        localStorage.setItem("tokenSetTime", new Date());
                                                         localStorage.setItem('typeOfSession', "Online");
                                                         localStorage.setItem('sessionType', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));

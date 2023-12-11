@@ -5731,7 +5731,6 @@ export default class CreateTreeTemplate extends Component {
             if (flatList[i].level == 0) {
                 flatList[i].parent = this.state.parentNodeIdForBranch;
                 flatList[i].payload.parentNodeId = flatList[i].parent;
-                console.log("Branch parent ===", this.state.parentNodeIdForBranch);
             }
             var nodeId = parseInt(maxNodeId + 1);
             maxNodeId++;

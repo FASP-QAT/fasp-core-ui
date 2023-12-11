@@ -438,6 +438,7 @@ class DefaultLayout extends Component {
       notificationCount: 0,
       activeTab: 1,
       timeout: 1000 * 1800 * 1,
+      timeout_token: 1000 * 21600 * 1,
       showModal: false,
       userLoggedIn: false,
       isTimedOut: false,
@@ -573,15 +574,23 @@ class DefaultLayout extends Component {
   }
   handleBlur = () => {
     var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
-    if(temp_time > this.state.timeout){
+    var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
+    if((temp_time > this.state.timeout) || (temp_time_token > this.state.timeout_token)){
+      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
+      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')
     }
   };
   handleFocus = () => {
     var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
+    var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
-    if(temp_time > this.state.timeout){
+    var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
+    if((temp_time > this.state.timeout) || (temp_time_token > this.state.timeout_token)){
+      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
+      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')
     }
     localStorage.setItem("lastFocus", new Date())
