@@ -166,6 +166,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
                                                         // decoded.user.syncExpiresOn = moment("2020-05-12 15:13:19").format("YYYY-MM-DD HH:mm:ss");
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
+                                                        localStorage.setItem("tokenSetTime", new Date());
                                                         // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
                                                         localStorage.setItem('sessionType', "Online");
