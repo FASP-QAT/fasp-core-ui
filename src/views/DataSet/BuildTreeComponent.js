@@ -5818,6 +5818,7 @@ export default class BuildTree extends Component {
                 var oldSortOrder = child.sortOrder;
                 child.id = nodeId;
                 child.parent = parentNode.newId;
+                child.payload.parentNodeId = child.parent;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6528,6 +6529,7 @@ export default class BuildTree extends Component {
             tempArray = [];
             if (flatList[i].level == 0) {
                 flatList[i].parent = this.state.parentNodeIdForBranch;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
             }
             var nodeId = parseInt(maxNodeId + 1);
             maxNodeId++;
@@ -6541,6 +6543,7 @@ export default class BuildTree extends Component {
             flatList[i].payload.nodeId = nodeId;
             if (flatList[i].level != 0) {
                 flatList[i].parent = nodeData.newId;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
             }
             var parentSortOrder = items.filter(c => c.id == flatList[i].parent)[0].sortOrder;
             var childList1 = items.filter(c => c.parent == flatList[i].parent);
