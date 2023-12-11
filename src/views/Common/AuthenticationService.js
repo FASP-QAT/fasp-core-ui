@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import i18n from '../../i18n';
 let myDt;
 class AuthenticationService {
@@ -149,8 +149,22 @@ class AuthenticationService {
     }
     setupAxiosInterceptors() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
+            var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken;
+            if(temp_time_token > 21000000){
+                axios.get(`${API_URL}/refresh`, {}).then(response => {
+                    var decoded = jwt_decode(response.data.token.toString().replaceAll("Bearer ",""));
+                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token.toString().replaceAll("Bearer ","")).toString(), `${SECRET_KEY}`));
+                    localStorage.setItem("tokenSetTime", new Date());
+                    decryptedToken = CryptoJS.AES.decrypt(response.data.token.toString().replaceAll("Bearer ",""), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                }).catch(error => {
+                    console.log("Error ",error);
+                })
+            }else{
+                decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            }
             let basicAuthHeader = 'Bearer ' + decryptedToken
             axios.defaults.headers.common['Authorization'] = basicAuthHeader;
         }
