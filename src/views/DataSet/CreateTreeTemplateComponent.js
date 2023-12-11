@@ -6198,6 +6198,7 @@ export default class CreateTreeTemplate extends Component {
                 var oldSortOrder = child.sortOrder;
                 child.id = nodeId;
                 child.parent = parentNode.newId;
+                child.payload.parentNodeId = child.parent;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7366,6 +7367,7 @@ export default class CreateTreeTemplate extends Component {
 
             if (flatList[i].level == 0) {
                 flatList[i].parent = this.state.parentNodeIdForBranch;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
                 console.log("Branch parent ===", this.state.parentNodeIdForBranch);
             }
             var nodeId = parseInt(maxNodeId + 1);
@@ -7388,6 +7390,7 @@ export default class CreateTreeTemplate extends Component {
 
             if (flatList[i].level != 0) {
                 flatList[i].parent = nodeData.newId;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
             }
 
             console.log("Branch parent filter 1 ===", flatList[i].parent);
