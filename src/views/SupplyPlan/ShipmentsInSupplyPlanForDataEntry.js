@@ -2348,7 +2348,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
             shipmentInstance.setValueFromCoords(12, rowNumber, shipmentQty, true);
-            shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            }else{
+                shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
+            }
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
