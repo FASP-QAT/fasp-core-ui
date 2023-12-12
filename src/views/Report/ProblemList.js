@@ -1845,7 +1845,7 @@ export default class ConsumptionDetails extends React.Component {
                             </ul>
                         </FormGroup>
                         <div className="" >
-                            {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
+                            {this.state.showProblemDashboard == 1 && this.state.programId!=0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
                             <div className='ProblemListTableBorder'>
