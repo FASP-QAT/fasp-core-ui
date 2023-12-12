@@ -2939,7 +2939,7 @@
     "static.currency.currency": "Currency (English)",
     "static.message.invaliddate": "Invalid Date",
     "static.report.planningUOM": "Planning Unit (UoM)",
-    "static.programPU.monthsInPastTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the future if the forecast data is better basis for stock calculations, such as in the case of seasonal products.",
+    "static.programPU.monthsInPastTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the forecast data is better basis for stock calculations, such as in the case of seasonal products.",
     "static.supplyPlan.v": "v",
     "static.extrapolation.LeastFourteenMonths": "At least 14 months of actual consumption data",
     "static.listTreeTemp.templateDetails": "Template Details",

@@ -2938,7 +2938,7 @@
     "static.currency.currency": "Moeda (inglês)",
     "static.message.invaliddate": "Data inválida",
     "static.report.planningUOM": "Unidade de medida da unidade de planeamento",
-    "static.programPU.monthsInPastTooltip": "Quantos meses devem ser usados ​​para calcular o consumo médio mensal (AMC)? Inclua mais meses no futuro se os dados de previsão forem uma melhor base para cálculos de estoque, como no caso de produtos sazonais.",
+    "static.programPU.monthsInPastTooltip": "Quantos meses devem ser utilizados para o cálculo do consumo médio mensal (AMC)? Inclua mais meses no passado se os dados de previsão servirem de base melhor para cálculos de estoque, como no caso de produtos sazonais.",
     "static.supplyPlan.v": "v",
     "static.extrapolation.LeastFourteenMonths": "Pelo menos 14 meses de dados de consumo reais",
     "static.listTreeTemp.templateDetails": "Detalhes do modelo",
