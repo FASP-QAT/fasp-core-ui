@@ -762,6 +762,7 @@
     "static.report.procurementAgent": "Relatório de Custos de Embarques",
     "static.country.countrycodetext": "Insira o nome de exibição do país",
     "static.message.tooltipMultiplier": "Quantas Unidades de Previsão corresponde a 1 Unidade de planeamento? Ex.:  Unidade de Previsão = 1 comprimido; Unidade de planeamento = 1 frasco de 30 comprimidos. 1 Unidade de planeamento corresponde a 30 Unidades de Previsão, ou seja, existem 30 Unidades de Previsão em 1 Unidade de planeamento. Factor de Conversão=30. ",
+    "static.tooltip.conversionfactorARU": "Quantas unidades de relatórios alternativos existem em 1 unidade de planejamento? por exemplo. Unidade de Relatório Alternativo = 1 comprimido, Unidade de Planejamento = frasco de 30 comprimidos. Existem 30 comprimidos em 1 frasco. Existem 30 unidades de relatórios alternativos em 1 unidade de planejamento. Fator de conversão = 30.",
     "static.report.Criticality": "Criticidade",
     "static.tree.differenceTargetVsCalculatedNumber": "Diferença (Meta x Calculada, #)",
     "static.validation.selectForecastMethod": "Selecione o método de previsão",

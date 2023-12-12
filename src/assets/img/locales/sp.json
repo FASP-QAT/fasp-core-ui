@@ -763,6 +763,7 @@
     "static.report.procurementAgent": "Informe: Costos de los Pedidos",
     "static.country.countrycodetext": "Ingresar el nombre de visualización del país",
     "static.message.tooltipMultiplier": "Factor de conversión [Producto (estimación) x factor de conversión = Producto] p. Ej. Producto (estimación)  = tabletas; Factor de conversión = 30; Producto = frasco de 30 tabletas",
+    "static.tooltip.conversionfactorARU": "¿Cuántas unidades de informes alternativas hay en 1 unidad de planificación? p.ej. Unidad de informe alternativa = 1 tableta, Unidad de planificación = frasco de 30 tabletas. Hay 30 comprimidos en 1 frasco. Hay 30 unidades de informes alternativas en 1 unidad de planificación. Factor de conversión = 30.",
     "static.report.Criticality": "Criticidad",
     "static.tree.differenceTargetVsCalculatedNumber": "Diferencia (Objetivo vs Calculado, #)",
     "static.validation.selectForecastMethod": "Seleccione el método de estimación",
