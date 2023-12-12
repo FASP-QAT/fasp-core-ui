@@ -762,7 +762,7 @@
     "static.tooltip.ExistingShipments": "Saisir la quantité totale des commandes en cours pendant votre période de prévision. Ceci est utilisé pour déterminer le gap du plan d'approvisionnement dans l'écran Résumé des prévisions . Laissez ce champ vide si pas de commandes en cours.",
     "static.report.procurementAgent": "Rapport sur les coûts des envois",
     "static.country.countrycodetext": "Désignation pays ",
-    "static.message.tooltipMultiplier": "Facteur de conversion [Produit (prévision) x facteur de conversion = Produit] p. Par exemple, produit (estimation) = comprimés; Facteur de conversion = 30; Produit = flacon de 30 comprimés",
+    "static.message.tooltipMultiplier": "Combien y a-t-il d'unités de reporting alternatives dans 1 unité de planification ? par exemple. Unité de reporting alternative = 1 comprimé, Unité de planification = flacon de 30 comprimés. Il y a 30 comprimés dans 1 flacon. Il existe 30 unités de reporting alternatives dans 1 unité de planification. Facteur de conversion = 30.",
     "static.report.Criticality": "Criticité",
     "static.tree.differenceTargetVsCalculatedNumber": "Différence (cible vs calculée, #)",
     "static.validation.selectForecastMethod": "Veuillez sélectionner une méthode de prévision",

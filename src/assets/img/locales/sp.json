@@ -762,7 +762,7 @@
     "static.tooltip.ExistingShipments": "Ingrese la cantidad total de pedidos existentes durante el período de estimación. Esto se usa para calcular la brecha de adquisición en la pantalla Resumen de Estimación. Deje esto en blanco para asumir que no hay pedidos existentes.",
     "static.report.procurementAgent": "Informe: Costos de los Pedidos",
     "static.country.countrycodetext": "Ingresar el nombre de visualización del país",
-    "static.message.tooltipMultiplier": "Factor de conversión [Producto (estimación) x factor de conversión = Producto] p. Ej. Producto (estimación)  = tabletas; Factor de conversión = 30; Producto = frasco de 30 tabletas",
+    "static.message.tooltipMultiplier": "Quantas unidades de relatórios alternativos existem em 1 unidade de planejamento? por exemplo. Unidade de Relatório Alternativo = 1 comprimido, Unidade de Planejamento = frasco de 30 comprimidos. Existem 30 comprimidos em 1 frasco. Existem 30 unidades de relatórios alternativos em 1 unidade de planejamento. Fator de conversão = 30.",
     "static.report.Criticality": "Criticidad",
     "static.tree.differenceTargetVsCalculatedNumber": "Diferencia (Objetivo vs Calculado, #)",
     "static.validation.selectForecastMethod": "Seleccione el método de estimación",
