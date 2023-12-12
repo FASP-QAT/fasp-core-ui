@@ -10965,6 +10965,7 @@ label.arrow_label:before {
   left: 90px !important;
   z-index: 4 !important;
   position: sticky !important;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px!important;
 
 }
 
@@ -10974,6 +10975,7 @@ label.arrow_label:before {
   z-index: 3 !important;
   position: sticky !important;
   background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px!important;
 }
 
 // .usageTemplateDataEntryTable .jss>thead>tr>td:nth-child(3)
