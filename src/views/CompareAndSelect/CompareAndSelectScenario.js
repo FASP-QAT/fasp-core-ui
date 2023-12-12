@@ -1565,21 +1565,21 @@ class CompareAndSelectScenario extends Component {
     }
 
     setDatasetId(event) {
+        var datasetId=event.target.value;
         this.setState({ loading: true })
-        var datasetId = event.target.value;
-        localStorage.setItem("sesDatasetId", datasetId);
-        localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
-        let versionIdSes = (event.target.value.split('_')[1]).replace('v', '') + ' (Local)';
-        localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
-
-        localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
-        localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
-        localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
             changed: false
         }, () => {
             if (datasetId != "") {
+                localStorage.setItem("sesDatasetId", datasetId);
+                localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
+                let versionIdSes = (datasetId.split('_')[1]).replace('v', '') + ' (Local)';
+                localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
+
+                localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
+                localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
+                localStorage.setItem("sesDatasetVersionId", versionIdSes);
                 var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
                 var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1704,7 +1704,8 @@ class CompareAndSelectScenario extends Component {
                     equivalencyUnitId: "",
                     equivalencyUnitList: [],
                     loading: false,
-                    showAllData: false
+                    showAllData: false,
+                    datasetId:""
                 })
             }
             // localStorage.setItem("sesVersionIdReport", '');
