@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
 let myDt;
 class AuthenticationService {
