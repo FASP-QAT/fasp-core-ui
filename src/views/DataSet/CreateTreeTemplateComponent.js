@@ -1705,7 +1705,7 @@ export default class CreateTreeTemplate extends Component {
                         "consumptionDataType": 2,
                         "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
                         "selectedForecastMap": map1.get("14"),
-                        "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
+                        "createdBy": map1.get("16") == "" ? { "userId": curUser } : map1.get("16"),
                         "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
                         "active": true
                     }
@@ -4419,7 +4419,7 @@ export default class CreateTreeTemplate extends Component {
                             currentModelingType: rowData[4],
                             modelingTypeOriginal: rowData[4],
                             currentTransferData: rowData[3],
-                            currentCalculatorStartDate: (rowData[13].firstMonthOfTarget == "" || rowData[13].firstMonthOfTarget == "Invalid date") || (this.state.firstMonthOfTarget == "Invalid date" || this.state.firstMonthOfTarget == "") ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            currentCalculatorStartDate: (rowData[13].firstMonthOfTarget == "" || rowData[13].firstMonthOfTarget == "Invalid date") && (this.state.firstMonthOfTarget == "Invalid date" || this.state.firstMonthOfTarget == "") ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             currentCalculatorStopDate: rowData[2],
                             currentCalculatorStartValue: startValue,
                             currentCalculatedMomChange: '',
@@ -4431,7 +4431,7 @@ export default class CreateTreeTemplate extends Component {
                             currentEndValueEdit: false,
                             actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (parseInt((rowData[2] - rowData[1]) / 12) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
-                            firstMonthOfTarget: (rowData[13].firstMonthOfTarget == "" || rowData[13].firstMonthOfTarget == "Invalid date") || (this.state.firstMonthOfTarget == "Invalid date" || this.state.firstMonthOfTarget == "") ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
+                            firstMonthOfTarget: (rowData[13].firstMonthOfTarget == "" || rowData[13].firstMonthOfTarget == "Invalid date") && (this.state.firstMonthOfTarget == "Invalid date" || this.state.firstMonthOfTarget == "") ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             actualOrTargetValueListOriginal: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
                             yearsOfTargetOriginal: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (parseInt((rowData[2] - rowData[1]) / 12) + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
                             firstMonthOfTargetOriginal: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
@@ -4441,7 +4441,7 @@ export default class CreateTreeTemplate extends Component {
                         }, () => {
                             if (this.state.showCalculatorFields) {
                                 treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
-                                treeTemplate.monthsInFuture = (12 + Number(this.state.treeTemplate.monthsInFuture));
+                                treeTemplate.monthsInFuture = (24 + Number(this.state.treeTemplate.monthsInFuture));
                                 this.generateMonthList();
                             }
                         });
@@ -4488,7 +4488,7 @@ export default class CreateTreeTemplate extends Component {
                             }, () => {
                                 if (this.state.showCalculatorFields) {
                                     treeTemplate.monthsInPast = (13 - Number(this.state.currentCalculatorStartDate));
-                                    treeTemplate.monthsInFuture = (12 + Number(this.state.currentCalculatorStopDate));
+                                    treeTemplate.monthsInFuture = (24 + Number(this.state.currentCalculatorStopDate));
                                     this.generateMonthList();
                                 }
                             });
@@ -4871,6 +4871,7 @@ export default class CreateTreeTemplate extends Component {
                 var oldSortOrder = child.sortOrder;
                 child.id = nodeId;
                 child.parent = parentNode.newId;
+                child.payload.parentNodeId = child.parent;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -5729,6 +5730,7 @@ export default class CreateTreeTemplate extends Component {
             tempArray = [];
             if (flatList[i].level == 0) {
                 flatList[i].parent = this.state.parentNodeIdForBranch;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
             }
             var nodeId = parseInt(maxNodeId + 1);
             maxNodeId++;
@@ -5742,6 +5744,7 @@ export default class CreateTreeTemplate extends Component {
             flatList[i].payload.nodeId = nodeId;
             if (flatList[i].level != 0) {
                 flatList[i].parent = nodeData.newId;
+                flatList[i].payload.parentNodeId = flatList[i].parent;
             }
             var parentSortOrder = items.filter(c => c.id == flatList[i].parent)[0].sortOrder;
             var childList1 = items.filter(c => c.parent == flatList[i].parent);
@@ -7541,13 +7544,14 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j <= count; j++) {
             var startdate = monthListForModelingCalculator[j * 12].name;
             var stopDate = monthListForModelingCalculator[Number(j * 12 + 11)];
+            var stopDate1 = monthListForModelingCalculator[Number(j * 12 + 22)].id;
             var modifyStartDate1 = monthListForModelingCalculator[Number(j * 12 + 5)].id;
             var modifyStopDate1 = monthListForModelingCalculator[Number(j * 12 + 16)].id;
             var data = [];
-            data[0] = startdate + " to " + stopDate.name
-            data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""
-            data[7] = j == 0 ? "" : modifyStartDate1
-            data[8] = modifyStopDate1
+            data[0] = startdate + " to " + stopDate.name//year
+            data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
+            data[7] = j == 0 ? "" : modifyStartDate1//H
+            data[8] = j == count ? stopDate1 : modifyStopDate1
             dataArray[j] = data;
         }
         var data = dataArray;
@@ -9446,7 +9450,6 @@ export default class CreateTreeTemplate extends Component {
                                                     required
                                                     value={this.state.firstMonthOfTarget}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
                                                     {this.state.monthList.length > 0
                                                         && this.state.monthList.map((item, i) => {
                                                             return (
@@ -9471,7 +9474,6 @@ export default class CreateTreeTemplate extends Component {
                                                     required
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={this.state.yearsOfTarget}>
-                                                    <option value="">{i18n.t('static.common.select')}</option>
                                                     <option key={3} value={3}>3</option>
                                                     <option key={4} value={4}>4</option>
                                                     <option key={5} value={5}>5</option>

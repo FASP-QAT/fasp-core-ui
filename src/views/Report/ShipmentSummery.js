@@ -859,7 +859,7 @@ class ShipmentSummery extends Component {
             budgetLabelsFromProps.push(this.props.match.params.budgetCode);
           }
           fSourceResult = fSourceRequest.result.filter(
-            (b) => b.program.id == programId
+            (b) => [...new Set(b.programs.map(ele => ele.id))].includes(programId)
           );
           this.setState(
             {
@@ -914,7 +914,8 @@ class ShipmentSummery extends Component {
       fundingSourceIds = fundingSourceIds.sort(function (a, b) {
         return parseInt(a.value) - parseInt(b.value);
       });
-      let newFundingSourceList = [... new Set(fundingSourceIds.map((ele) => ele.value))];
+      let newFundingSourceList = [... new Set(fundingSourceIds.map((ele) => Number(ele.value)))];
+      if (localStorage.getItem("sessionType") === 'Online') {
       DropdownService.getBudgetDropdownFilterMultipleFundingSources(newFundingSourceList)
         .then((response) => {
           var budgetList = response.data;
@@ -997,6 +998,55 @@ class ShipmentSummery extends Component {
           }
         });
     }
+   else {
+    var programId = localStorage.getItem("sesProgramIdReport");
+    var db3;
+    var fSourceResult = [];
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db3 = e.target.result;
+      var fSourceTransaction = db3.transaction(["budget"], "readwrite");
+      var fSourceOs = fSourceTransaction.objectStore("budget");
+      var fSourceRequest = fSourceOs.getAll();
+      fSourceRequest.onerror = function (event) {
+      }.bind(this);
+      fSourceRequest.onsuccess = function (event) {
+        var budgetValuesFromProps = [];
+        var budgetLabelsFromProps = [];
+        if (
+          this.props.match.params.budgetId != "" &&
+          this.props.match.params.budgetId != undefined
+        ) {
+          budgetValuesFromProps.push({
+            label: this.props.match.params.budgetCode,
+            value: parseInt(this.props.match.params.budgetId),
+          });
+          budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+        }
+        fSourceResult = fSourceRequest.result.filter(
+          (b) => [...new Set(b.programs.map(ele => ele.id))].includes(Number(programId)) && newFundingSourceList.includes(b.fundingSource.fundingSourceId)
+        );
+        this.setState(
+          {
+            budgetValues: [],
+              budgetLabels: [],
+              fundingSourceValues: fundingSourceIds.map((ele) => ele),
+              fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
+            filteredBudgetList: fSourceResult.sort(function (a, b) {
+              a = a.budgetCode.toLowerCase();
+              b = b.budgetCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+          },
+          () => {
+            this.fetchData();
+          }
+        );
+      }.bind(this);
+    }.bind(this);
+  }
+  }
   };
   handleBudgetChange = (budgetIds) => {
     budgetIds = budgetIds.sort(function (a, b) {
