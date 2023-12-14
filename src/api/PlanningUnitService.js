@@ -59,5 +59,13 @@ class PlanningUnitService {
     getPlanningUnitWithPricesByIds(json) {
         return axios.post(`${API_URL}/api/planningUnit/withPrices/byIds`, json, {});
     }
+    editPlanningUnitCapacity(json) {
+        return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
+        );
+    }
+    getPlanningUnitCapacityForId(planningUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/capacity/${planningUnitId}`, {}
+        );
+    }
 }
 export default new PlanningUnitService();

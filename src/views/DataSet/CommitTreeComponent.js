@@ -3050,6 +3050,7 @@ export default class CommitTreeComponent extends React.Component {
                                                     id="programId"
                                                     bsSize="sm"
                                                     value={this.state.programId}
+                                                    disabled={this.state.loading}
                                                     onChange={(e) => { this.setProgramId(e); }}
                                                 >
                                                     <option value="">{i18n.t('static.common.select')}</option>

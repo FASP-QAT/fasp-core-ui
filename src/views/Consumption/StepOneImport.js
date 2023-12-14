@@ -833,22 +833,38 @@ export default class StepOneImportMapPlanningUnits extends Component {
         })
     }
     setForecastProgramId(event) {
-        var sel = document.getElementById("forecastProgramId");
-        var tempId = sel.options[sel.selectedIndex].text;
-        let forecastProgramVersionId = tempId.split('~')[1];
-        let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == event.target.value && c.versionId == forecastProgramVersionId)[0]
-        let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-        let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
-        forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-        this.setState({
-            forecastProgramId: event.target.value,
-            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-            forecastProgramVersionId: forecastProgramVersionId,
-            selectedForecastProgram: selectedForecastProgram
-        }, () => {
-            this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
-            this.filterData();
-        })
+        var forecastProgramId = event.target.value;
+        if (forecastProgramId != "" && forecastProgramId != 0) {
+            var sel = document.getElementById("forecastProgramId");
+            var tempId = sel.options[sel.selectedIndex].text;
+            let forecastProgramVersionId = tempId.split('~')[1];
+            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == event.target.value && c.versionId == forecastProgramVersionId)[0]
+            let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+            let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
+            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+            this.setState({
+                forecastProgramId: event.target.value,
+                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                forecastProgramVersionId: forecastProgramVersionId,
+                selectedForecastProgram: selectedForecastProgram
+            }, () => {
+                this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
+                this.filterData();
+            })
+        } else {
+            var dt = new Date();
+            dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+            var dt1 = new Date();
+            dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+            this.setState({
+                forecastProgramId: event.target.value,
+                rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+                forecastProgramVersionId: 0,
+                selectedForecastProgram: '',
+            },()=>{
+                jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+            })
+        }
     }
     checkValidation = function () {
         var valid = true;

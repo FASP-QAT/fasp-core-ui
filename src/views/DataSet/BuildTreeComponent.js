@@ -2521,6 +2521,8 @@ export default class BuildTree extends Component {
                 this.setState({ items })
             }
             if (parameterName == 'type' && (value == 0 || value == 1) && (!this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].hasOwnProperty("extrapolation") || this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true")) {
+                console.log("this.state.nodeDataMomList Test@123",this.state.nodeDataMomList);
+                console.log("Current Item Test@123",this.state.currentItemConfig.context.id)
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
@@ -7390,7 +7392,7 @@ export default class BuildTree extends Component {
             curTreeObj
         }, () => {
             if (!itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
-                this.calculateMOMData(newItem.id, 0);
+                this.calculateMOMData(parent, 0);
             } else {
                 this.setState({
                     loading: false
@@ -7623,6 +7625,7 @@ export default class BuildTree extends Component {
         }
     };
     onCursoChanged(event, data) {
+        console.log("Data Test@123",data)
         const { context: item } = data;
         if (item != null) {
             this.setState({
@@ -8345,6 +8348,8 @@ export default class BuildTree extends Component {
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             var save = false;
+                            console.log("this.state.currentNodeTypeId Test@123",this.state.currentNodeTypeId);
+                            console.log("this.state.currentItemConfig.context.payload.nodeType.id Test@123",this.state.currentItemConfig.context.payload.nodeType.id)
                             if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
                                 var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
                                 if (cf == true) {
@@ -10611,7 +10616,8 @@ export default class BuildTree extends Component {
                                 onClick={(event) => {
                                     this.setState({
                                         modelingEl: "",
-                                        modelingTabChanged: false
+                                        modelingTabChanged: false,
+                                        currentNodeTypeId:""
                                     }, () => {
                                         try {
                                             jexcel.destroy(document.getElementById('modelingJexcel'), true);

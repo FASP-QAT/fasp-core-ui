@@ -184,9 +184,14 @@ export default class PlanningUnitSetting extends Component {
                 }
             }
             if (data[i].x == 0) {
-                (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if(index==0){
+                    (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+                }
             }
             if (data[i].x == 1) {
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if(index==0){
                 let temp = data[i].value.split(" | ");
                 let temp_obj = {
                     id: parseInt(temp[1]),
@@ -201,6 +206,7 @@ export default class PlanningUnitSetting extends Component {
                         (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
                     }
                 )
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ import moment from 'moment';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants';
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate) {
+    console.log("Node Id Test@123",nodeId)
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);

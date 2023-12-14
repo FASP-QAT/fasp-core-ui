@@ -10320,6 +10320,7 @@ export default class CreateTreeTemplate extends Component {
                                         levelUnitId = getLevelUnit[0].unit != null && getLevelUnit[0].unit.id != null ? getLevelUnit[0].unit.id : "";
                                     }
                                     this.setState({
+                                        currentNodeTypeId:"",
                                         isValidError: true,
                                         isTemplateChanged: true,
                                         tempPlanningUnitId: '',
