@@ -9802,7 +9802,7 @@ export default class BuildTree extends Component {
                                                     lang={pickerLang.months}
                                                     onChange={this.handleAMonthChange5}
                                                 >
-                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox6} />
                                                 </Picker>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
@@ -10128,6 +10128,14 @@ export default class BuildTree extends Component {
     }
     handleClickMonthBox2 = (e) => {
         this.pickAMonth2.current.show()
+    }
+
+    handleClickMonthBox5 = (e) => {
+        this.pickAMonth5.current.show()
+    }
+
+    handleClickMonthBox6 = (e) => {
+        this.pickAMonth6.current.show()
     }
     handleAMonthChange2 = (year, month) => {
     }
