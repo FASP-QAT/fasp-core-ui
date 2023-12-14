@@ -1429,7 +1429,7 @@ class CompareAndSelectScenario extends Component {
             }
             if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
                 var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass);
+                cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass=="red"?"compareAndSelectRed":this.state.finalData[j].compareToConsumptionForecastClass);
             }
 
         }
