@@ -1996,7 +1996,7 @@ class EquivalancyUnit extends Component {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         }
 
-        elInstance.setValueFromCoords(12, y, 1, true);
+        // elInstance.setValueFromCoords(12, y, 1, true);
 
     }
 
