@@ -2939,7 +2939,7 @@
     "static.currency.currency": "Divisa (inglés)",
     "static.message.invaliddate": "La fecha no es válida",
     "static.report.planningUOM": "Unidad de medida del producto",
-    "static.programPU.monthsInPastTooltip": "¿Cuántos meses se deben usar para calcular el consumo promedio mensual (AMC)? Incluya más meses en el futuro si los datos de pronóstico son una mejor base para los cálculos de existencias, como en el caso de los productos de temporada.",
+    "static.programPU.monthsInPastTooltip": "¿Cuántos meses se deben utilizar para calcular el consumo medio mensual (AMC)? Incluya más meses en el pasado si los datos del pronóstico son una mejor base para los cálculos de existencias, como en el caso de productos de temporada.",
     "static.supplyPlan.v": "v",
     "static.extrapolation.LeastFourteenMonths": "Al menos 14 meses de datos de consumo real",
     "static.listTreeTemp.templateDetails": "Detalles de la plantilla",

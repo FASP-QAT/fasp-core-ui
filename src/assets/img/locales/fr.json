@@ -2940,7 +2940,7 @@
     "static.currency.currency": "Devise (anglais)",
     "static.message.invaliddate": "Date invalide",
     "static.report.planningUOM": "Unité de mesure du produit",
-    "static.programPU.monthsInPastTooltip": "Combien de mois faut-il utiliser pour calculer la consommation mensuelle moyenne (CMM) ? Inclure plus de mois à l`avenir si les données prévisionnelles constituent une meilleure base pour les calculs de stock, comme dans le cas des produits saisonniers.",
+    "static.programPU.monthsInPastTooltip": "Combien de mois faut-il prendre en compte pour calculer la consommation mensuelle moyenne (CMA) ? Incluez davantage de mois dans le passé si les données prévisionnelles constituent une meilleure base pour les calculs de stocks, comme dans le cas de produits saisonniers.",
     "static.supplyPlan.v": "v",
     "static.extrapolation.LeastFourteenMonths": "Au moins 14 mois de données de consommation réelle",
     "static.listTreeTemp.templateDetails": "Détails du modèle",
