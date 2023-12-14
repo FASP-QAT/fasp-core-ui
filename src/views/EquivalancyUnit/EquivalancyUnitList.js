@@ -1418,7 +1418,6 @@ class EquivalancyUnit extends Component {
         if (x == 6 && !isNaN(rowData[6]) && rowData[5].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         }
-        elInstance.setValueFromCoords(12, y, 1, true);
     }
     addRow1 = function () {
         var elInstance = this.state.table2Instance;
