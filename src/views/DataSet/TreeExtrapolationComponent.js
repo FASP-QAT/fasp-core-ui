@@ -2007,7 +2007,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         });
     }
     setButtonFlag(buttonFalg) {
-        this.setState({ buttonFalg: buttonFalg })
+        this.setState({ buttonFalg: buttonFalg });
     }
     
     render() {

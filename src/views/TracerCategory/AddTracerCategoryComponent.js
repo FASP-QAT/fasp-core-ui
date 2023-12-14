@@ -26,7 +26,7 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
         healthAreaId: Yup.string()
-            .required(i18n.t('static.healtharea.healthareatext')),
+            .required(i18n.t('static.program.validhealthareatext')),
     })
 }
 class AddTracerCategoryComponent extends Component {
