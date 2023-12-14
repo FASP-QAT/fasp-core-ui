@@ -666,7 +666,9 @@ export default class BuildTree extends Component {
             modelingTabChanged: false,
             modelingTabError: false,
             modelingChangedOrAdded: false,
-            addNodeError: false
+            addNodeError: false,
+            currentNodeTypeId: "",
+            deleteChildNodes:false
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -7643,7 +7645,8 @@ export default class BuildTree extends Component {
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
                 modelingEl: "",
-                modelingTabChanged: false
+                modelingTabChanged: false,
+                currentNodeTypeId: data.context.payload.nodeType.id
             }, () => {
                 try {
                     jexcel.destroy(document.getElementById('modelingJexcel'), true);
@@ -7739,6 +7742,12 @@ export default class BuildTree extends Component {
                     (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
                 }
             }
+        }
+        if (this.state.deleteChildNodes) {
+            var childNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+            childNodes.map(item => {
+                nodes = nodes.filter(c => !c.sortOrder.startsWith(item.sortOrder))
+            })
         }
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         nodes[findNodeIndex] = currentItemConfig.context;
@@ -8335,27 +8344,45 @@ export default class BuildTree extends Component {
                         }}
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            this.formSubmitLoader();
-                            if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
-                                if (!this.state.isSubmitClicked) {
-                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                        setTimeout(() => {
-                                            if (this.state.addNodeFlag) {
-                                                this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                                            } else {
-                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                            }
-                                            this.setState({
-                                                cursorItem: 0,
-                                                highlightItem: 0,
-                                                activeTab1: new Array(1).fill('1')
-                                            })
-                                        }, 0);
+                            var save = false;
+                            if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
+                                var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
+                                if (cf == true) {
+                                    save = true;
+                                    this.setState({
+                                        deleteChildNodes:true
                                     })
-                                    this.setState({ modelingTabChanged: false })
+                                } else {
                                 }
                             } else {
-                                this.setState({ activeTab1: new Array(1).fill('2') })
+                                save = true;
+                                this.setState({
+                                    deleteChildNodes:false
+                                })
+                            }
+                            if (save) {
+                                this.formSubmitLoader();
+                                if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
+                                    if (!this.state.isSubmitClicked) {
+                                        this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                            setTimeout(() => {
+                                                if (this.state.addNodeFlag) {
+                                                    this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                                                } else {
+                                                    this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                                }
+                                                this.setState({
+                                                    cursorItem: 0,
+                                                    highlightItem: 0,
+                                                    activeTab1: new Array(1).fill('1')
+                                                })
+                                            }, 0);
+                                        })
+                                        this.setState({ modelingTabChanged: false })
+                                    }
+                                } else {
+                                    this.setState({ activeTab1: new Array(1).fill('2') })
+                                }
                             }
                         }}
                         render={

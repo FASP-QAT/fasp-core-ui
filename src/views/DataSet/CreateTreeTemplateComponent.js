@@ -3,8 +3,8 @@ import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
 import i18n from '../../i18n'
-import { confirmAlert } from 'react-confirm-alert'; 
-import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import pdfIcon from '../../assets/img/pdf.png';
@@ -687,7 +687,9 @@ export default class CreateTreeTemplate extends Component {
             startDateDisplay: '',
             endDateDisplay: '',
             beforeEndDateDisplay: '',
-            modelingChangedOrAdded: false
+            modelingChangedOrAdded: false,
+            currentNodeTypeId: "",
+            deleteChildNodes: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -1090,42 +1092,42 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'planningUnitId',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'programPlanningUnitId',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'higherThenConsumptionThreshold',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'lowerThenConsumptionThreshold',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'selectedForecastMap',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'otherUnit',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'createdBy',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: 'createdDate',
                     type: 'hidden',
-                    readOnly: true 
+                    readOnly: true
                 },
                 {
                     title: i18n.t("static.common.select"),
@@ -1464,8 +1466,8 @@ export default class CreateTreeTemplate extends Component {
                 myResult = procurementAgentRequest.result;
                 var listArray = myResult;
                 listArray.sort((a, b) => {
-                    var itemLabelA = (a.procurementAgentCode).toUpperCase(); 
-                    var itemLabelB = (b.procurementAgentCode).toUpperCase(); 
+                    var itemLabelA = (a.procurementAgentCode).toUpperCase();
+                    var itemLabelB = (b.procurementAgentCode).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 let tempList = [];
@@ -2931,7 +2933,7 @@ export default class CreateTreeTemplate extends Component {
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
-            } else if (this.state.currentModelingType == 3) { 
+            } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
@@ -2942,7 +2944,7 @@ export default class CreateTreeTemplate extends Component {
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
-            } else if (this.state.currentModelingType == 4) { 
+            } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
@@ -5057,8 +5059,8 @@ export default class CreateTreeTemplate extends Component {
         PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -5184,8 +5186,8 @@ export default class CreateTreeTemplate extends Component {
         UsageTemplateService.getUsageTemplateListForTree((tracerCategoryId != "" && tracerCategoryId != null ? tracerCategoryId : 0)).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -5476,7 +5478,7 @@ export default class CreateTreeTemplate extends Component {
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
-                        sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? parseFloat((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit).toFixed(8) : "";
+                    sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? parseFloat((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit).toFixed(8) : "";
                     usageText = "For each " + nodeUnitTxt.trim() + "(s) we need " + addCommasWith8Decimals(sharePu) + " " + planningUnit;
                 } else {
                     var puPerInterval = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? parseFloat((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit).toFixed(8) : "";
@@ -5810,8 +5812,8 @@ export default class CreateTreeTemplate extends Component {
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             var listArray = response.data.filter(x => x.forecastMethodTypeId == 1);
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -5860,8 +5862,8 @@ export default class CreateTreeTemplate extends Component {
         UnitService.getUnitListByDimensionId(TREE_DIMENSION_ID).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -5918,8 +5920,8 @@ export default class CreateTreeTemplate extends Component {
         UnitService.getUnitListAll().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -5968,8 +5970,8 @@ export default class CreateTreeTemplate extends Component {
         UsagePeriodService.getUsagePeriod().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -6018,8 +6020,8 @@ export default class CreateTreeTemplate extends Component {
         DatasetService.getUsageTypeList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -6069,8 +6071,8 @@ export default class CreateTreeTemplate extends Component {
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -6118,8 +6120,8 @@ export default class CreateTreeTemplate extends Component {
         ModelingTypeService.getModelingTypeListActive().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -6167,8 +6169,8 @@ export default class CreateTreeTemplate extends Component {
             );
         DropdownService.getTreeTemplateListForDropdown().then(response => {
             var treeTemplateList = response.data.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -7395,7 +7397,8 @@ export default class CreateTreeTemplate extends Component {
                 scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList != null ? (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList : [],
                 highlightItem: item.id,
                 cursorItem: item.id,
-                usageText: ''
+                usageText: '',
+                currentNodeTypeId: data.context.payload.nodeType.id
             }, () => {
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
                     var itemConfig = data.context;
@@ -7472,6 +7475,12 @@ export default class CreateTreeTemplate extends Component {
         let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
+        if (this.state.deleteChildNodes) {
+            var childNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+            childNodes.map(item => {
+                nodes = nodes.filter(c => !c.sortOrder.startsWith(item.sortOrder))
+            })
+        }
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         if (this.state.hideFUPUNode) {
             if (nodeTypeId == 4 || nodeTypeId == 5) {
@@ -8083,23 +8092,41 @@ export default class CreateTreeTemplate extends Component {
                         }}
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged: true }, () => {
-                                    setTimeout(() => {
-                                        if (this.state.addNodeFlag) {
-                                            this.onAddButtonClick(this.state.currentItemConfig)
-                                        } else {
-                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                        }
-                                        if (this.state.modelingChangedOrAdded) {
-                                            this.formSubmitLoader();
-                                        }
-                                        this.setState({
-                                            cursorItem: 0,
-                                            highlightItem: 0
-                                        })
-                                    }, 0);
+                            var save = false;
+                            if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
+                                var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
+                                if (cf == true) {
+                                    save = true;
+                                    this.setState({
+                                        deleteChildNodes: true
+                                    })
+                                } else {
+                                }
+                            } else {
+                                save = true;
+                                this.setState({
+                                    deleteChildNodes: false
                                 })
+                            }
+                            if (save) {
+                                if (!this.state.isSubmitClicked) {
+                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged: true }, () => {
+                                        setTimeout(() => {
+                                            if (this.state.addNodeFlag) {
+                                                this.onAddButtonClick(this.state.currentItemConfig)
+                                            } else {
+                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                            }
+                                            if (this.state.modelingChangedOrAdded) {
+                                                this.formSubmitLoader();
+                                            }
+                                            this.setState({
+                                                cursorItem: 0,
+                                                highlightItem: 0
+                                            })
+                                        }, 0);
+                                    })
+                                }
                             }
                         }}
                         render={
@@ -10107,8 +10134,8 @@ export default class CreateTreeTemplate extends Component {
         const { treeTemplateList } = this.state;
         let treeTemplates = treeTemplateList.length > 0
             && treeTemplateList.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
             }).map((item, i) => {
                 return (

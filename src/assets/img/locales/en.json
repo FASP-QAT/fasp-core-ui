@@ -3232,5 +3232,6 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.tree.nodeTypeChanged":"You have changed the node type of the node, so all the child nodes will be deleted. Are you sure you want to continue?"
 }
