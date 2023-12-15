@@ -9,13 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import UnitService from '../../api/UnitService.js';
 import AuthenticationService from '../Common/AuthenticationService';
-let initialValues = {
-    message: '',
-    label: '',
-    genericLabel: '',
-    unitId: []
 
-}
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -184,12 +178,6 @@ export default class EditForecastingUnitComponent extends Component {
         );
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
-                initialValues = {
-                    message: '',
-                    label: response.data.label.label_en,
-                    genericLabel: response.data.genericLabel.label_en,
-                    unitId: response.data.unit.id
-                }
                 this.setState({
                     forecastingUnit: response.data, loading: false
                 });
@@ -269,7 +257,11 @@ export default class EditForecastingUnitComponent extends Component {
                         <Card>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    label: this.state.forecastingUnit.label.label_en,
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en,
+                                    unitId: this.state.forecastingUnit.unit.id
+                                }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
