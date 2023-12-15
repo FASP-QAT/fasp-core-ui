@@ -2399,7 +2399,8 @@ export default class ListTreeComponent extends Component {
             this.setState({
                 datasetIdModal: event.target.value,
                 regionList:[],
-                regionValues:[]
+                regionValues:[],
+                regionMultiList:[]
             }, () => {
                 if (this.state.datasetIdModal != "") {
                     let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == this.state.datasetIdModal.split("~v")[0] && c.currentVersion.versionId == this.state.datasetIdModal.split("~v")[1].toString().split(" ")[0])[0];

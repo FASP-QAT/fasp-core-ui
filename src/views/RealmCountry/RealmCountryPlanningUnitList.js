@@ -1018,7 +1018,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
     tr.children[6].classList.add("InfoTrAsteriskTheadtrTdImageARU");
-    tr.children[6].title = i18n.t("static.message.tooltipMultiplier");
+    tr.children[6].title = i18n.t("static.tooltip.conversionfactorARU");
   };
   blur = function (instance) {
   };
