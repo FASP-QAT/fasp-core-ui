@@ -2666,6 +2666,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
+                        <div className="row">
+                            <div className="col-md-12">
+                                <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
+                            </div>
+                        </div>
                         <Form name='simpleForm'>
                             <div className=" pl-0">
                                 <div className="row">
@@ -3239,7 +3244,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </div>
                                             </div>
                                             {(this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
-                                            <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                             <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                                 {this.state.showData &&
                                                     <>
