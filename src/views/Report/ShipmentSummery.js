@@ -759,155 +759,155 @@ class ShipmentSummery extends Component {
   }
   getBudgetList() {
     var programId = localStorage.getItem("sesProgramIdReport");
-    if(this.state.programId!="" && this.state.programId!=0 && programId!=""){
-    if (localStorage.getItem("sessionType") === 'Online') {
-      DropdownService.getBudgetDropdownBasedOnProgram(programId)
-        .then((response) => {
-          var listArray = response.data;
-          var proList = [];
-          for (var i = 0; i < listArray.length; i++) {
-            var programJson = {
-              budgetId: listArray[i].id,
-              label: listArray[i].label,
-              budgetCode: listArray[i].code,
-            };
-            proList[i] = programJson;
-          }
-          proList.sort((a, b) => {
-            var itemLabelA = a.budgetCode.toUpperCase();
-            var itemLabelB = b.budgetCode.toUpperCase();
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-          var budgetValuesFromProps = [];
-          var budgetLabelsFromProps = [];
-          if (
-            this.props.match.params.budgetId != "" &&
-            this.props.match.params.budgetId != undefined
-          ) {
-            budgetValuesFromProps.push({
-              label: this.props.match.params.budgetCode,
-              value: parseInt(this.props.match.params.budgetId),
-            });
-            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-          }
-          this.setState(
-            {
-              budgetValues: budgetValuesFromProps,
-              budgetLabels: budgetLabelsFromProps,
-              budgets: proList,
-              filteredBudgetList: proList,
-            },
-            () => {
-              this.fetchData();
+    if (this.state.programId != "" && this.state.programId != 0 && programId != "") {
+      if (localStorage.getItem("sessionType") === 'Online') {
+        DropdownService.getBudgetDropdownBasedOnProgram(programId)
+          .then((response) => {
+            var listArray = response.data;
+            var proList = [];
+            for (var i = 0; i < listArray.length; i++) {
+              var programJson = {
+                budgetId: listArray[i].id,
+                label: listArray[i].label,
+                budgetCode: listArray[i].code,
+              };
+              proList[i] = programJson;
             }
-          );
-        })
-        .catch((error) => {
-          this.setState({
-            budgets: [],
-          });
-          if (error.message === "Network Error") {
+            proList.sort((a, b) => {
+              var itemLabelA = a.budgetCode.toUpperCase();
+              var itemLabelB = b.budgetCode.toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var budgetValuesFromProps = [];
+            var budgetLabelsFromProps = [];
+            if (
+              this.props.match.params.budgetId != "" &&
+              this.props.match.params.budgetId != undefined
+            ) {
+              budgetValuesFromProps.push({
+                label: this.props.match.params.budgetCode,
+                value: parseInt(this.props.match.params.budgetId),
+              });
+              budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+            }
+            this.setState(
+              {
+                budgetValues: budgetValuesFromProps,
+                budgetLabels: budgetLabelsFromProps,
+                budgets: proList,
+                filteredBudgetList: proList,
+              },
+              () => {
+                this.fetchData();
+              }
+            );
+          })
+          .catch((error) => {
             this.setState({
-              message: API_URL.includes("uat")
-                ? i18n.t("static.common.uatNetworkErrorMessage")
-                : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+              budgets: [],
             });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.fundingsource.fundingsource"),
-                  }),
-                });
-                break;
-              default:
-                this.setState({ message: "static.unkownError" });
-                break;
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat")
+                  ? i18n.t("static.common.uatNetworkErrorMessage")
+                  : API_URL.includes("demo")
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, {
+                      entityname: i18n.t("static.fundingsource.fundingsource"),
+                    }),
+                  });
+                  break;
+                default:
+                  this.setState({ message: "static.unkownError" });
+                  break;
+              }
             }
-          }
-        });
-    } else {
-      var db3;
-      var fSourceResult = [];
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db3 = e.target.result;
-        var fSourceTransaction = db3.transaction(["budget"], "readwrite");
-        var fSourceOs = fSourceTransaction.objectStore("budget");
-        var fSourceRequest = fSourceOs.getAll();
-        fSourceRequest.onerror = function (event) {
-        }.bind(this);
-        fSourceRequest.onsuccess = function (event) {
-          var budgetValuesFromProps = [];
-          var budgetLabelsFromProps = [];
-          if (
-            this.props.match.params.budgetId != "" &&
-            this.props.match.params.budgetId != undefined
-          ) {
-            budgetValuesFromProps.push({
-              label: this.props.match.params.budgetCode,
-              value: parseInt(this.props.match.params.budgetId),
-            });
-            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-          }
-          fSourceResult = fSourceRequest.result.filter(
-            (b) => [...new Set(b.programs.map(ele => ele.id))].includes(programId)
-          );
-          this.setState(
-            {
-              budgetValues: budgetValuesFromProps,
-              budgetLabels: budgetLabelsFromProps,
-              budgets: fSourceResult.sort(function (a, b) {
-                a = a.budgetCode.toLowerCase();
-                b = b.budgetCode.toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }),
-              filteredBudgetList: fSourceResult.sort(function (a, b) {
-                a = a.budgetCode.toLowerCase();
-                b = b.budgetCode.toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }),
-            },
-            () => {
-              this.fetchData();
+          });
+      } else {
+        var db3;
+        var fSourceResult = [];
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+          db3 = e.target.result;
+          var fSourceTransaction = db3.transaction(["budget"], "readwrite");
+          var fSourceOs = fSourceTransaction.objectStore("budget");
+          var fSourceRequest = fSourceOs.getAll();
+          fSourceRequest.onerror = function (event) {
+          }.bind(this);
+          fSourceRequest.onsuccess = function (event) {
+            var budgetValuesFromProps = [];
+            var budgetLabelsFromProps = [];
+            if (
+              this.props.match.params.budgetId != "" &&
+              this.props.match.params.budgetId != undefined
+            ) {
+              budgetValuesFromProps.push({
+                label: this.props.match.params.budgetCode,
+                value: parseInt(this.props.match.params.budgetId),
+              });
+              budgetLabelsFromProps.push(this.props.match.params.budgetCode);
             }
-          );
+            fSourceResult = fSourceRequest.result.filter(
+              (b) => [...new Set(b.programs.map(ele => ele.id))].includes(programId)
+            );
+            this.setState(
+              {
+                budgetValues: budgetValuesFromProps,
+                budgetLabels: budgetLabelsFromProps,
+                budgets: fSourceResult.sort(function (a, b) {
+                  a = a.budgetCode.toLowerCase();
+                  b = b.budgetCode.toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
+                filteredBudgetList: fSourceResult.sort(function (a, b) {
+                  a = a.budgetCode.toLowerCase();
+                  b = b.budgetCode.toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
+              },
+              () => {
+                this.fetchData();
+              }
+            );
+          }.bind(this);
         }.bind(this);
-      }.bind(this);
-    }
-  }else{
-    var budgetValuesFromProps = [];
-          var budgetLabelsFromProps = [];
-          if (
-            this.props.match.params.budgetId != "" &&
-            this.props.match.params.budgetId != undefined
-          ) {
-            budgetValuesFromProps.push({
-              label: this.props.match.params.budgetCode,
-              value: parseInt(this.props.match.params.budgetId),
-            });
-            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-          }
-    this.setState(
-      {
-        budgetValues: budgetValuesFromProps,
-        budgetLabels: budgetLabelsFromProps,
-        budgets: [],
-        filteredBudgetList: [],
-      },
-      () => {
-        this.fetchData();
       }
-    );
-  }
+    } else {
+      var budgetValuesFromProps = [];
+      var budgetLabelsFromProps = [];
+      if (
+        this.props.match.params.budgetId != "" &&
+        this.props.match.params.budgetId != undefined
+      ) {
+        budgetValuesFromProps.push({
+          label: this.props.match.params.budgetCode,
+          value: parseInt(this.props.match.params.budgetId),
+        });
+        budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+      }
+      this.setState(
+        {
+          budgetValues: budgetValuesFromProps,
+          budgetLabels: budgetLabelsFromProps,
+          budgets: [],
+          filteredBudgetList: [],
+        },
+        () => {
+          this.fetchData();
+        }
+      );
+    }
   }
   handleFundingSourceChange = (fundingSourceIds) => {
     if (fundingSourceIds.length != 0) {
@@ -916,137 +916,147 @@ class ShipmentSummery extends Component {
       });
       let newFundingSourceList = [... new Set(fundingSourceIds.map((ele) => Number(ele.value)))];
       if (localStorage.getItem("sessionType") === 'Online') {
-      DropdownService.getBudgetDropdownFilterMultipleFundingSources(newFundingSourceList)
-        .then((response) => {
-          var budgetList = response.data;
-          var bList = [];
-          for (var i = 0; i < budgetList.length; i++) {
-            var budgetJson = {
-              budgetId: budgetList[i].id,
-              label: budgetList[i].label,
-              budgetCode: budgetList[i].code,
-            };
-            bList[i] = budgetJson;
-          }
-          this.setState(
-            {
-              budgetValues: [],
-              budgetLabels: [],
-              fundingSourceValues: fundingSourceIds.map((ele) => ele),
-              fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
-              filteredBudgetList: bList,
-            },
-            () => {
-              this.fetchData();
+        DropdownService.getBudgetDropdownFilterMultipleFundingSources(newFundingSourceList)
+          .then((response) => {
+            var budgetList = response.data;
+            var bList = [];
+            for (var i = 0; i < budgetList.length; i++) {
+              var budgetJson = {
+                budgetId: budgetList[i].id,
+                label: budgetList[i].label,
+                budgetCode: budgetList[i].code,
+              };
+              bList[i] = budgetJson;
             }
-          );
-        })
-        .catch((error) => {
-          this.setState(
-            {
-              budgetValues: [],
-              budgetLabels: [],
-              filteredBudgetList: [],
-              loading: false,
-            },
-            () => {
-              this.fetchData();
+            this.setState(
+              {
+                budgetValues: [],
+                budgetLabels: [],
+                fundingSourceValues: fundingSourceIds.map((ele) => ele),
+                fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
+                filteredBudgetList: bList,
+              },
+              () => {
+                this.fetchData();
+              }
+            );
+          })
+          .catch((error) => {
+            this.setState(
+              {
+                budgetValues: [],
+                budgetLabels: [],
+                filteredBudgetList: [],
+                loading: false,
+              },
+              () => {
+                this.fetchData();
+              }
+            );
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat")
+                  ? i18n.t("static.common.uatNetworkErrorMessage")
+                  : API_URL.includes("demo")
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                loading: false,
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`);
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`);
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, {
+                      entityname: i18n.t("static.dashboard.program"),
+                    }),
+                    loading: false,
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, {
+                      entityname: i18n.t("static.dashboard.program"),
+                    }),
+                    loading: false,
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: "static.unkownError",
+                    loading: false,
+                  });
+                  break;
+              }
             }
-          );
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat")
-                ? i18n.t("static.common.uatNetworkErrorMessage")
-                : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
-              loading: false,
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`);
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`);
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              default:
-                this.setState({
-                  message: "static.unkownError",
-                  loading: false,
-                });
-                break;
-            }
-          }
-        });
-    }
-   else {
-    var programId = localStorage.getItem("sesProgramIdReport");
-    var db3;
-    var fSourceResult = [];
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db3 = e.target.result;
-      var fSourceTransaction = db3.transaction(["budget"], "readwrite");
-      var fSourceOs = fSourceTransaction.objectStore("budget");
-      var fSourceRequest = fSourceOs.getAll();
-      fSourceRequest.onerror = function (event) {
-      }.bind(this);
-      fSourceRequest.onsuccess = function (event) {
-        var budgetValuesFromProps = [];
-        var budgetLabelsFromProps = [];
-        if (
-          this.props.match.params.budgetId != "" &&
-          this.props.match.params.budgetId != undefined
-        ) {
-          budgetValuesFromProps.push({
-            label: this.props.match.params.budgetCode,
-            value: parseInt(this.props.match.params.budgetId),
           });
-          budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-        }
-        fSourceResult = fSourceRequest.result.filter(
-          (b) => [...new Set(b.programs.map(ele => ele.id))].includes(Number(programId)) && newFundingSourceList.includes(b.fundingSource.fundingSourceId)
-        );
-        this.setState(
-          {
-            budgetValues: [],
-              budgetLabels: [],
-              fundingSourceValues: fundingSourceIds.map((ele) => ele),
-              fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
-            filteredBudgetList: fSourceResult.sort(function (a, b) {
-              a = a.budgetCode.toLowerCase();
-              b = b.budgetCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-          },
-          () => {
-            this.fetchData();
-          }
-        );
-      }.bind(this);
-    }.bind(this);
-  }
-  }
+      }
+      else {
+        var programId = localStorage.getItem("sesProgramIdReport");
+        var db3;
+        var fSourceResult = [];
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+          db3 = e.target.result;
+          var fSourceTransaction = db3.transaction(["budget"], "readwrite");
+          var fSourceOs = fSourceTransaction.objectStore("budget");
+          var fSourceRequest = fSourceOs.getAll();
+          fSourceRequest.onerror = function (event) {
+          }.bind(this);
+          fSourceRequest.onsuccess = function (event) {
+            var budgetValuesFromProps = [];
+            var budgetLabelsFromProps = [];
+            if (
+              this.props.match.params.budgetId != "" &&
+              this.props.match.params.budgetId != undefined
+            ) {
+              budgetValuesFromProps.push({
+                label: this.props.match.params.budgetCode,
+                value: parseInt(this.props.match.params.budgetId),
+              });
+              budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+            }
+            fSourceResult = fSourceRequest.result.filter(
+              (b) => [...new Set(b.programs.map(ele => ele.id))].includes(Number(programId)) && newFundingSourceList.includes(b.fundingSource.fundingSourceId)
+            );
+            this.setState(
+              {
+                budgetValues: [],
+                budgetLabels: [],
+                fundingSourceValues: fundingSourceIds.map((ele) => ele),
+                fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
+                filteredBudgetList: fSourceResult.sort(function (a, b) {
+                  a = a.budgetCode.toLowerCase();
+                  b = b.budgetCode.toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
+              },
+              () => {
+                this.fetchData();
+              }
+            );
+          }.bind(this);
+        }.bind(this);
+      }
+    } else {
+      this.setState({
+        budgetValues: [],
+        budgetLabels: [],
+        fundingSourceValues: [],
+        fundingSourceLabels: [],
+        filteredBudgetList: [],
+      },()=>{
+        this.fetchData();
+      })
+    }
   };
   handleBudgetChange = (budgetIds) => {
     budgetIds = budgetIds.sort(function (a, b) {
@@ -1539,17 +1549,17 @@ class ShipmentSummery extends Component {
       }
     } else {
       var budgetValuesFromProps = [];
-          var budgetLabelsFromProps = [];
-          if (
-            this.props.match.params.budgetId != "" &&
-            this.props.match.params.budgetId != undefined
-          ) {
-            budgetValuesFromProps.push({
-              label: this.props.match.params.budgetCode,
-              value: parseInt(this.props.match.params.budgetId),
-            });
-            budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-          }
+      var budgetLabelsFromProps = [];
+      if (
+        this.props.match.params.budgetId != "" &&
+        this.props.match.params.budgetId != undefined
+      ) {
+        budgetValuesFromProps.push({
+          label: this.props.match.params.budgetCode,
+          value: parseInt(this.props.match.params.budgetId),
+        });
+        budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+      }
       this.setState({
         versions: [],
         planningUnits: [],
