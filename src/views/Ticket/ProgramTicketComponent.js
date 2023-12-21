@@ -68,7 +68,7 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         shippedToArrivedByRoadLeadTime: Yup.string()
-            .required(i18n.t('static.program.shippedToArrivedByRoadLeadTime'))
+            .required(i18n.t('static.program.shippedToArrivedByRoadtext'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         arrivedToDeliveredLeadTime: Yup.string()
@@ -986,7 +986,7 @@ export default class ProgramTicketComponent extends Component {
                                             type="number"
                                             min="0"
                                             name="roadFreightPerc" id="roadFreightPerc" />
-                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
+                                        <FormFeedback>{errors.roadFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
