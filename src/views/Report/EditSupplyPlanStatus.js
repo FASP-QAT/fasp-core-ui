@@ -34,7 +34,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import CurrencyService from '../../api/CurrencyService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
-import { confirmAlert } from 'react-confirm-alert'; 
+import { confirmAlert } from 'react-confirm-alert';
 import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.report.problem');
 const validationSchemaForAddingProblem = function (values) {
@@ -224,23 +224,23 @@ class EditSupplyPlanStatus extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.addMannualProblem = this.addMannualProblem.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
-        this.roundAMC=this.roundAMC.bind(this);
+        this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
     }
-    roundAMC(amc){
-        if(amc!=null){
-        if(Number(amc).toFixed(0)>=100){
-            return Number(amc).toFixed(0);
-        }else if(Number(amc).toFixed(1)>=10){
-            return Number(amc).toFixed(1);
-        }else if(Number(amc).toFixed(2)>=1){
-            return Number(amc).toFixed(2);
-        }else{
-            return Number(amc).toFixed(3);
+    roundAMC(amc) {
+        if (amc != null) {
+            if (Number(amc).toFixed(0) >= 100) {
+                return Number(amc).toFixed(0);
+            } else if (Number(amc).toFixed(1) >= 10) {
+                return Number(amc).toFixed(1);
+            } else if (Number(amc).toFixed(2) >= 1) {
+                return Number(amc).toFixed(2);
+            } else {
+                return Number(amc).toFixed(3);
+            }
+        } else {
+            return null;
         }
-    }else{
-        return null;
-    }
     }
     addCommas(cell, row) {
         cell += '';
@@ -364,7 +364,7 @@ class EditSupplyPlanStatus extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
                         valid = false;
-                    } else if(!reg2.test(value)){
+                    } else if (!reg2.test(value)) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -390,7 +390,7 @@ class EditSupplyPlanStatus extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
                         valid = false;
-                    } else if(!reg2.test(value)){
+                    } else if (!reg2.test(value)) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -451,7 +451,7 @@ class EditSupplyPlanStatus extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                } else if(!reg2.test(rowData1[9])){
+                } else if (!reg2.test(rowData1[9])) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -475,7 +475,7 @@ class EditSupplyPlanStatus extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-                } else if(!reg2.test(rowData1[10])){
+                } else if (!reg2.test(rowData1[10])) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.validSpace.string'));
@@ -496,7 +496,7 @@ class EditSupplyPlanStatus extends Component {
                 this.el.setComments(col, "");
             }
         }
-        if(problemList.length > 0){
+        if (problemList.length > 0) {
             if (x == 11) {
                 if (problemList[0].problemStatus.id != value) {
                     elInstance.setValueFromCoords(21, y, true, true);
@@ -518,7 +518,7 @@ class EditSupplyPlanStatus extends Component {
                     elInstance.setValueFromCoords(22, y, "", true);
                 }
             }
-            }
+        }
     }
     hideFirstComponent() {
     }
@@ -826,9 +826,9 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => { 
+                    }).catch(error => {
                     });
-                }).catch(error => { 
+                }).catch(error => {
                 });
             }.bind(this)
         }.bind(this)
@@ -941,9 +941,9 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => { 
+                    }).catch(error => {
                     });
-                }).catch(error => { 
+                }).catch(error => {
                 });
             }.bind(this)
         }.bind(this)
@@ -1121,12 +1121,12 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             })
-                                        }).catch(error => {  });
-                                    }).catch(error => {  });
-                                }).catch(error => {  });
-                            }).catch(error => {  });
-                        }).catch(error => {  });
-                    }).catch(error => {  });
+                                        }).catch(error => { });
+                                    }).catch(error => { });
+                                }).catch(error => { });
+                            }).catch(error => { });
+                        }).catch(error => { });
+                    }).catch(error => { });
                 }).catch(error => { });
             }.bind(this)
         }.bind(this)
@@ -1989,8 +1989,8 @@ class EditSupplyPlanStatus extends Component {
                     a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
                     b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
-                }.bind(this)), 
-                planningUnitDropdownList: response.data.map((item, i) => ({id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang)})),
+                }.bind(this)),
+                planningUnitDropdownList: response.data.map((item, i) => ({ id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang) })),
                 message: ''
             })
         })
@@ -2413,7 +2413,7 @@ class EditSupplyPlanStatus extends Component {
                 }]
             },
             tooltips: {
-                mode:'nearest',
+                mode: 'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2426,7 +2426,7 @@ class EditSupplyPlanStatus extends Component {
                         } else if (tooltipItems.datasetIndex == 2) {
                             return "";
                         } else {
-                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : ' + (tooltipItems.yLabel.toLocaleString());
                         }
                     }
                 },
@@ -2482,7 +2482,7 @@ class EditSupplyPlanStatus extends Component {
                 }]
             },
             tooltips: {
-                mode:'nearest',
+                mode: 'nearest',
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
@@ -2495,7 +2495,7 @@ class EditSupplyPlanStatus extends Component {
                         } else if (tooltipItems.datasetIndex == 2) {
                             return "";
                         } else {
-                            return data.datasets[tooltipItems.datasetIndex].label + ' : '+(tooltipItems.yLabel.toLocaleString());
+                            return data.datasets[tooltipItems.datasetIndex].label + ' : ' + (tooltipItems.yLabel.toLocaleString());
                         }
                     }.bind(this)
                 },
@@ -2757,7 +2757,7 @@ class EditSupplyPlanStatus extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px',display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
@@ -2767,14 +2767,14 @@ class EditSupplyPlanStatus extends Component {
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px',display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
                                             <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                         </ul>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px',display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
                                             {
@@ -3709,6 +3709,35 @@ class EditSupplyPlanStatus extends Component {
                     }
                 }
                 return items1;
+            }.bind(this),
+            sorting: function (direction, column) {
+                if(column!=19){
+                return function (a, b) {
+                    var valueA = this.el.getValueFromCoords(column, a[0], true);
+                    var valueB = this.el.getValueFromCoords(column, b[0], true);
+
+                    // Consider blank rows in the sorting
+                    if (!direction) {
+                        return (valueA > valueB) ? 1 : (valueA < valueB) ? -1 : 0;
+                    } else {
+                        return (valueA > valueB) ? -1 : (valueA < valueB) ? 1 : 0;
+                    }
+
+                }.bind(this)
+            }else{
+                return function (a, b) {
+                    var valueA = this.el.getValueFromCoords(column, a[0], true);
+                    var valueB = this.el.getValueFromCoords(column, b[0], true);
+
+                    // Consider blank rows in the sorting
+                    if (!direction) {
+                        return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? 1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? -1 : 0;
+                    } else {
+                        return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? -1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? 1 : 0;
+                    }
+
+                }.bind(this)
+            }
             }.bind(this)
         };
         var problemEl = jexcel(document.getElementById("problemListDiv"), options);
@@ -3733,7 +3762,7 @@ class EditSupplyPlanStatus extends Component {
             program: program,
         });
     }
-   
+
     addMannualProblem() {
         this.getProblemCriticality();
         this.setState({
@@ -3772,7 +3801,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         message: response.data.message,
                         problemReportChanged: 0,
-                        remainingDataChanged:0,
+                        remainingDataChanged: 0,
                     })
                     this.componentDidMount();
                     this.toggle(0, '2');
@@ -4686,7 +4715,7 @@ class EditSupplyPlanStatus extends Component {
                                     .then(response => {
                                         let temp_version_status = 0;
                                         temp_version_status = response.data.currentVersion.versionStatus.id;
-                                        if(temp_version_status == this.state.temp_currentVersion_id){
+                                        if (temp_version_status == this.state.temp_currentVersion_id) {
                                             var validation = this.checkValidation();
                                             if (validation == true) {
                                                 document.getElementById("submitButton").disabled = true;
@@ -4710,7 +4739,7 @@ class EditSupplyPlanStatus extends Component {
                                                     if (map.get("21") == false && map.get("13") != 4) {
                                                         isAllCheckForReviewed = false
                                                     }
-                                                    if(map.get("0") == 0){
+                                                    if (map.get("0") == 0) {
                                                         reviewedProblemList.push({
                                                             problemReportId: 0,
                                                             realmProblem: {
@@ -4744,22 +4773,22 @@ class EditSupplyPlanStatus extends Component {
 
                                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                                         .then(response => {
-                                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                                            if (this.state.program.currentVersion.versionStatus.id != 1) {
                                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                                             } else {
                                                                 document.getElementById("submitButton").disabled = false;
-                                                            this.setState({
-                                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                                submitColor: "green",
-                                                                problemReportChanged: 0,
-                                                                remainingDataChanged: 0
+                                                                this.setState({
+                                                                    submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                                    submitColor: "green",
+                                                                    problemReportChanged: 0,
+                                                                    remainingDataChanged: 0
 
-                                                                // isModalOpen: !this.state.isModalOpen,
-                                                            }, () => {
-                                                                this.hideMessageComponent()
-                                                                this.componentDidMount();
-                                                            })
-                                                        }
+                                                                    // isModalOpen: !this.state.isModalOpen,
+                                                                }, () => {
+                                                                    this.hideMessageComponent()
+                                                                    this.componentDidMount();
+                                                                })
+                                                            }
 
                                                         })
                                                         .catch(
@@ -4820,7 +4849,7 @@ class EditSupplyPlanStatus extends Component {
                                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                                 }
                                             }
-                                        }else{
+                                        } else {
                                             confirmAlert({
                                                 message: i18n.t("static.supplyplan.inconsistent"),
                                                 buttons: [
@@ -4834,7 +4863,7 @@ class EditSupplyPlanStatus extends Component {
                                                         label: i18n.t('static.common.close')
                                                     }
                                                 ]
-                                              });
+                                            });
                                         }
                                     })
                                     .catch(
@@ -4847,7 +4876,7 @@ class EditSupplyPlanStatus extends Component {
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-                        
+
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
@@ -4944,8 +4973,8 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 &nbsp;
                                             </FormGroup>
@@ -5035,7 +5064,7 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
-    resetClickedModal=()=>{
+    resetClickedModal = () => {
     }
     updateState(parameterName, value) {
         this.setState({

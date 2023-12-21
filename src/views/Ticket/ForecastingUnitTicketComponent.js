@@ -384,19 +384,11 @@ export default class ForecastingUnitTicketComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
-                if (item.level > 1) {
                     return (
                         <option key={i} value={item.payloadId}>
                             {getLabelText(item.payload.label, this.state.lang)}
                         </option>
                     )
-                } else {
-                    return (
-                        <option key={i} value={item.payloadId} style={{ color: "gray" }}>
-                            {getLabelText(item.payload.label, this.state.lang)}
-                        </option>
-                    )
-                }
             }, this);
         return (
             <div className="col-md-12">
