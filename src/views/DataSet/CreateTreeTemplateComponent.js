@@ -4332,7 +4332,7 @@ export default class CreateTreeTemplate extends Component {
                                 onclick: function () {
                                     if (obj.getJson(null, false).length == 1) {
                                         var data = [];
-                                        data[0] = 0;
+                                        data[0] = '';
                                         data[1] = parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1;
                                         data[2] = this.state.maxMonth
                                         data[3] = ''

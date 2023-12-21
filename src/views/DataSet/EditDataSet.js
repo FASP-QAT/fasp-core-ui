@@ -53,15 +53,15 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
-        programCode1: Yup.string()
-            .test('programCode', i18n.t('static.programValidation.programCode'),
-                function (value) {
-                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }),
+        // programCode1: Yup.string()
+        //     .test('programCode', i18n.t('static.programValidation.programCode'),
+        //         function (value) {
+        //             if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
+        //         })
     })
 }
 export default class EditProgram extends Component {
