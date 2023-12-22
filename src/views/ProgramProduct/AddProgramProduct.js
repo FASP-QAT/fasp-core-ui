@@ -433,7 +433,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip")
+                                                                    tooltip: i18n.t("static.tooltipupdateplanning.monthsInFutureAMC")
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
