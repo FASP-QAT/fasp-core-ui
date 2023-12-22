@@ -2,7 +2,6 @@ import moment from 'moment';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants';
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate) {
-    console.log("Node Id Test@123",nodeId)
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -59,14 +58,15 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
                 }
                 var transferToNodeList = [];
-                if (nodeId != -1 && nodeId!=0) {
+                if (nodeId != -1 && nodeId != 0) {
                     var curNode = flatList.filter(c => c.id == nodeId)[0];
-                    var currentNodeType = curNode.payload.nodeType.id;
-                    var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
-                    if (currentNodeType == 2 && parentNodeType == 1) {
-                        flatList = flatList.filter(node => node.sortOrder.startsWith(curNode.sortOrder) || (curNode.sortOrder).startsWith(node.sortOrder));
+                    if (curNode != undefined) {
+                        var curNodeParent = flatList.filter(c => c.id == curNode.parent)[0];
+                        if (curNodeParent != undefined) {
+                            flatList = flatList.filter(c => c.sortOrder.startsWith(curNodeParent.sortOrder));
+                        }
                     } else {
-                        flatList = flatList.filter(c => c.sortOrder.startsWith(curNode.sortOrder));
+                        flatList = [];
                     }
                 }
                 for (var fl = 0; fl < flatList.length; fl++) {
