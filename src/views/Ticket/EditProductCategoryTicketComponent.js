@@ -233,19 +233,11 @@ export default class EditProductCategoryTicketComponent extends Component {
             }, this);
         let planningUnitCategoryList = planningUnitCategories.length > 0
             && planningUnitCategories.map((item, i) => {
-                if (item.level > 1) {
                     return (
                         <option key={i} value={item.payloadId}>
                             {getLabelText(item.payload.label, this.state.lang)}
                         </option>
                     )
-                } else {
-                    return (
-                        <option key={i} value={item.payloadId} disabled={true}>
-                            {getLabelText(item.payload.label, this.state.lang)}
-                        </option>
-                    )
-                }
             }, this);
         return (
             <div className="col-md-12">

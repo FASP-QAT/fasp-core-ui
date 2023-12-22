@@ -18,7 +18,8 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         procurementAgentCode: Yup.string()
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string')),
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
@@ -305,10 +306,10 @@ export default class ProcurementAgentTicketComponent extends Component {
                         initialValues={{
                             summary: summaryText_1,
                             realmName: this.props.items.userRealmId,
-                            procurementAgentName: '',
-                            procurementAgentCode: '',
-                            submittedToApprovedLeadTime: '',
-                            approvedToShippedLeadTime: '',
+                            procurementAgentName: this.state.procurementAgent.procurementAgentName,
+                            procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
+                            submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
+                            approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                             localProcurementAgent: false,
                             notes: ""
                         }}

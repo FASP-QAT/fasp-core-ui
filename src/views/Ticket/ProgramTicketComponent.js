@@ -12,6 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import HealthAreaService from '../../api/HealthAreaService';
+import DropdownService from '../../api/DropdownService';
 import classNames from 'classnames';
 import { API_URL, SPACE_REGEX } from '../../Constants';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
@@ -152,7 +153,7 @@ export default class ProgramTicketComponent extends Component {
             program.regionId = event.target.value;
         }
         if (event.target.name == "organisationId") {
-            program.organisationId = event.target.value !== "" ? this.state.organisationList.filter(c => c.organisationId == event.target.value)[0].label.label_en : "";
+            program.organisationId = event.target.value !== "" ? this.state.organisationList.filter(c => c.id == event.target.value)[0].label.label_en : "";
             this.state.organisationId = event.target.value
         }
         if (event.target.name == "healthAreaId") {
@@ -344,7 +345,7 @@ export default class ProgramTicketComponent extends Component {
                         }
                     }
                 );
-            ProgramService.getOrganisationList(realmId)
+            DropdownService.getOrganisationDropdownList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -676,7 +677,7 @@ export default class ProgramTicketComponent extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
