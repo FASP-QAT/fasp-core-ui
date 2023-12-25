@@ -3037,7 +3037,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[3] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0;
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -3232,7 +3232,7 @@ export default class BuildTree extends Component {
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            data[5] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
             data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentScenario.manualChangesEffectFuture;
@@ -3329,10 +3329,14 @@ export default class BuildTree extends Component {
                 return false;
             }.bind(this),
         };
+        console.log("Options Test@123",options)
+        console.log("Mom Jexcel Test@123",document.getElementById("momJexcel"));
         if (document.getElementById("momJexcel") != null) {
+            console.log("In if Test@123");
             var momEl = jexcel(document.getElementById("momJexcel"), options);
             this.el = momEl;
         } else {
+            console.log("In else Test@123")
             var momEl = "";
         }
         this.setState({

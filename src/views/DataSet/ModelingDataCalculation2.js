@@ -63,7 +63,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     if (curNode != undefined) {
                         var curNodeParent = flatList.filter(c => c.id == curNode.parent)[0];
                         if (curNodeParent != undefined) {
-                            flatList = flatList.filter(c => c.sortOrder.startsWith(curNodeParent.sortOrder));
+                            if (curNodeParent.payload.nodeType.id != 1) {
+                                flatList = flatList.filter(c => c.sortOrder.startsWith(curNodeParent.sortOrder));
+                            }
                         }
                     } else {
                         flatList = [];

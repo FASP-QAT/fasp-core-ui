@@ -3677,7 +3677,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[3] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),2)`
             var momListParentForMonth = momListParent.filter(c => c.month == momList[j].month);
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -3880,7 +3880,7 @@ export default class CreateTreeTemplate extends Component {
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            data[5] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
             data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             data[8] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
