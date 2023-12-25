@@ -243,7 +243,7 @@
     "static.procurementUnit.validSupplierIdText": "Select Manufacturer",
     "static.shipment.totalCost": "Total Cost",
     "static.realmcountry.airFreightPercentagetext": "Enter air freight percentage",
-    "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
+    "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the future if the future data is more reliable and predicts the future.",
     "static.manualTagging.conversionERPToPU": "Conversion Factor (ERP to QAT PU)",
     "static.forecastValidation.noMissingPlanningUnitsFound": "No missing planning units found",
     "static.common.selectProgram": "Select Program",
