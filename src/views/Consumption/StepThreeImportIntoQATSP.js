@@ -1,82 +1,47 @@
-import React, { Component } from 'react';
+import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import moment from "moment";
+import React, { Component } from 'react';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import {
+    Button,
+    FormGroup, Input, InputGroup,
+    Label,
+    Modal,
+    ModalBody,
+    ModalHeader
+} from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import i18n from '../../i18n';
-import csvicon from '../../assets/img/csv.png';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import ReportService from '../../api/ReportService';
-import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
-import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
-import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
-import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
-import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
-import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
-import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
-import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
-
-import {
-    // Badge,
-    Button,
-    // ButtonDropdown,
-    // ButtonGroup,
-    // ButtonToolbar,
-    // Card,
-    // CardBody,
-    // CardFooter,
-    // CardHeader,
-    // CardTitle,
-    // Col,
-    // Widgets,
-    // Dropdown,
-    // DropdownItem,
-    // DropdownMenu,
-    // DropdownToggle,
-    // Progress,
-    // Pagination,
-    // PaginationItem,
-    // PaginationLink,
-    // Row,
-    // CardColumns,
-    // Table,
-    FormGroup, Input, InputGroup,
-    // InputGroupAddon, 
-    Label,
-    Modal, ModalHeader, ModalFooter, ModalBody
-    // Form
-} from 'reactstrap';
-// import MonthBox from '../../CommonComponent/MonthBox.js';
-// import ProgramService from '../../api/ProgramService';
-import getLabelText from '../../CommonComponent/getLabelText';
-// import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QAT_DATASOURCE_ID, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from '../../Constants.js';
-import moment from "moment";
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html';
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html';
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import CryptoJS from 'crypto-js';
-
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, FORECASTED_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, FORECAST_DATEPICKER_START_MONTH, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, QAT_DATASOURCE_ID, SECRET_KEY } from '../../Constants.js';
+import ReportService from '../../api/ReportService';
+import csvicon from '../../assets/img/csv.png';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
 export default class StepThreeImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
-
         var dt = new Date();
         dt.setMonth(dt.getMonth() - FORECAST_DATEPICKER_START_MONTH);
-
         this.state = {
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            // loading: false,
             selSource: [],
             actualConsumptionData: [],
             stepOneData: [],
@@ -89,7 +54,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             languageEl: '',
             consumptionData: [],
             monthArrayList: [],
-            realm:{}
+            realm: {}
         }
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -98,39 +63,27 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.changeColor = this.changeColor.bind(this);
         this.updateState = this.updateState.bind(this);
         this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
-
-
-
     }
-
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
-
     updateState(parameterName, value) {
-
         this.setState({
             [parameterName]: value
         })
     }
-
     redirectToDashbaord() {
         this.props.redirectToDashboard();
     }
-
     monthDiff(dateFrom, dateTo) {
         return dateTo.getMonth() - dateFrom.getMonth() +
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
-
     changeColor() {
-
         var elInstance = this.state.languageEl;
-
         var json = elInstance.getJson();
-
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
@@ -138,7 +91,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var currentForecastedValue = rowData[8];
             var forecastConsumption = rowData[4];
             var isOldDate = rowData[13];
-
             if (forecastConsumption === "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
@@ -146,11 +98,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                 }
             }
-
-
             if (id == true && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
-                    // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
                 }
             } else {
@@ -158,7 +107,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                 }
             }
-
             if (!isOldDate && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var cell1 = elInstance.getCell(`J${parseInt(j) + 1}`)
@@ -168,10 +116,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         }
     }
-
     exportCSV() {
         var csvRow = [];
-
         const headers = [];
         headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
@@ -183,16 +129,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.QATForecastImport.convertedForecastConsumption'));
         headers.push(i18n.t('static.QATForecastImport.currentForecastConsumption'));
         headers.push(i18n.t('static.quantimed.importData'));
-
         var A = [this.addDoubleQuoteToRowContent(headers)]
         this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.v1).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.v2).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.v3, ele.v4.replaceAll(' ', '%20'), ele.v5, ele.v6, ele.v7, ele.v8, ele.v9, ele.v10 == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
-            // console.log(A[i])
             csvRow.push(A[i].join(","))
         }
-
         var csvString = csvRow.join("%0A")
-        // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -200,17 +142,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         document.body.appendChild(a)
         a.click()
     }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-
     formSubmit() {
         var minDate = moment(this.props.items.startDate).format("YYYY-MM-DD");
         var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
         var curUser = AuthenticationService.getLoggedInUserId();
         var curUserName = AuthenticationService.getLoggedInUsername();
-
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.importFromQATSupplyPlan.confirmAlert'),
@@ -220,7 +159,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var db1;
-                        var storeOS;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onerror = function (event) {
@@ -229,18 +167,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             this.props.hideFirstComponent();
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
-
                             db1 = e.target.result;
                             var transaction;
                             var programTransaction;
-
                             transaction = db1.transaction(['programData'], 'readwrite');
                             programTransaction = transaction.objectStore('programData');
-
-
                             var programId = this.props.items.programId;
-                            // console.log("programId in submit12", programId)
-
                             var programRequest = programTransaction.get(programId);
                             programRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
@@ -253,7 +185,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
                                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                 var generalProgramJson = JSON.parse(generalProgramData);
-
                                 var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                 var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                 var rcpuRequest = rcpuOs.getAll();
@@ -262,7 +193,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
-
                                 rcpuRequest.onsuccess = function (event) {
                                     var rcpuResult = [];
                                     rcpuResult = rcpuRequest.result;
@@ -271,12 +201,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         actionList = []
                                     }
                                     var elInstance = this.state.languageEl;
-
                                     var json = elInstance.getJson();
-                                    // var qunatimedData = this.state.selSource;
                                     var finalImportQATDataSelSource = this.state.selSource;
                                     var finalImportQATDataSelSourceFilter = finalImportQATDataSelSource.filter((c, indexFilter) => json[indexFilter][9] == true);
-
                                     var finalImportQATData = Object.values(finalImportQATDataSelSourceFilter.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
                                         if (!a[v16]) {
                                             a[v16] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
@@ -285,9 +212,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
                                         return a;
                                     }, {}));
-
-                                    // console.log("finalImportQATData===>", finalImportQATData)
-
                                     var finalPuList = []
                                     for (var i = 0; i < finalImportQATData.length; i++) {
                                         var index = finalPuList.findIndex(c => c == finalImportQATData[i].v10)
@@ -300,10 +224,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             })
                                         }
                                     }
-
-
                                     for (var pu = 0; pu < finalPuList.length; pu++) {
-
                                         var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalPuList[pu]);
                                         var programJson = {}
                                         if (planningUnitDataIndex != -1) {
@@ -320,27 +241,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 supplyPlan: []
                                             }
                                         }
-
                                         var consumptionDataList = (programJson.consumptionList);
-
                                         var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && c.v18);
-
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
                                                 && c.actualFlag.toString() == "false" && c.multiplier == 1);
-                                            // console.log("FINAL-----2", index)
-
                                             if (index != -1) {
                                                 consumptionDataList[index].consumptionQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[index].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[index].dataSource.id = QAT_DATASOURCE_ID;
-
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
                                                 consumptionDataList[index].notes = "Imported on " + moment(curDate).format("DD-MMM-YYYY") + " by " + curUserName + " from " + finalImportQATDataFilter[i].v17;
                                             } else {
-
                                                 var consumptionJson = {
                                                     consumptionId: 0,
                                                     dataSource: {
@@ -376,10 +290,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 consumptionDataList.push(consumptionJson);
                                             }
                                         }
-
                                         programJson.consumptionList = consumptionDataList;
-                                        // console.log("FINAL--------------@@@@@@@@@", programJson.consumptionList)
-
                                         if (planningUnitDataIndex != -1) {
                                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                         } else {
@@ -387,40 +298,29 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
                                     }
                                     generalProgramJson.actionList = actionList;
-
                                     programDataJson.planningUnitDataList = planningUnitDataList;
                                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                                     programRequest.result.programData = programDataJson;
-
                                     var transaction1;
                                     var programTransaction1;
                                     var finalImportQATData = this.state.selSource;
-
                                     transaction1 = db1.transaction(['programData'], 'readwrite');
                                     programTransaction1 = transaction1.objectStore('programData');
                                     var putRequest = programTransaction1.put(programRequest.result);
-
                                     putRequest.onerror = function (event) {
-
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                         this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
                                     putRequest.onsuccess = function (event) {
-
                                         var finalQATPlanningList = [];
                                         for (var i = 0; i < finalImportQATData.length; i++) {
-
                                             var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10 && finalImportQATData[i].v18)
-                                            // console.log("inside success", finalImportQATData)
-
                                             if (index == -1) {
                                                 finalQATPlanningList.push(parseInt(finalImportQATData[i].v10))
                                             }
                                         }
-
                                         calculateSupplyPlan(this.props.items.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);
-
                                     }.bind(this);
                                 }.bind(this);
                             }.bind(this);
@@ -432,31 +332,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 }
             ]
         });
-
     }
-
     loaded = function (instance, cell, x, y, value) {
-
     }
-
     componentDidMount() {
-
     }
-
     handleRangeChange(value, text, listIndex) {
-        //
     }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
     filterData() {
         var realmId = AuthenticationService.getRealmId();
         var db1;
-        var storeOS;
-        var supplyPlanRegionList = [];
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
@@ -505,13 +394,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         }
                         fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
                     }
-                    // console.log("Props items---------------->", this.props.items);
-
                     var unitIds = ""
                     unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
                     var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
                     var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
-
                     let inputJson = {
                         "programId": Number(this.props.items.forecastProgramId),
                         "versionId": Number(this.props.items.versionId),
@@ -521,35 +407,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         "aggregateByYear": false,
                         "unitIds": unitIds
                     }
-
-                    // console.log("OnlineInputJson---------------->", inputJson);
-                    // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
-
-                    // console.log("RESP---------->unitDesc", unitDescArr);
                     let tempList = [];
                     let supplyPlanPlanningUnitId = [];
                     let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
-
                     let supplyPlanRegionList = this.props.items.stepTwoData;
-                    // console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
-                    // for (let i = 0; i < supplyPlanRegionList.length; i++) {
                     for (let j = 0; j < selectedSupplyPlan.length; j++) {
                         supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
                     }
-                    // }
-
                     ReportService.forecastOutput(inputJson)
                         .then(response => {
-                            // console.log("RESP---------->forecastOutput", response.data);
                             let primaryConsumptionData = response.data;
-                            // var count1 = 1;
                             for (let i = 0; i < primaryConsumptionData.length; i++) {
                                 let rem = 0;
                                 for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
-                                    // for (let k = 0; k < selectedSupplyPlan.length; k++) {
-                                    // for (let l = 0; l < supplyPlanRegionList.length; l++) {
-                                    // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
-                                    // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
                                     var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
                                     var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
                                     if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0 && primaryConsumptionData[i].monthlyForecastData[j].consumptionQty != null) {
@@ -581,93 +451,77 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                             v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
                                             v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
-
                                         });
                                     }
-                                    // count1++;
-                                    // }
-                                    // }
                                 }
                             }
-
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
-                            if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
-                            } else {
-                                a[v13].v7 += v7;
-                                a[v13].v5 += v5;
-                            }
-                            return a;
-                        }, {}));
-                        // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
-                        this.setState({
-                            selSource: resultTrue,
-                            realm:realm,
-                            loading: true
-                        }, () => {
-                            this.buildJexcel();
-                        })
-
-                    }).catch(
-                        error => {
-                            // console.log("Error @@@@@@@@@@", error)
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    // message: 'static.unkownError',
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
+                            let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
+                                if (!a[v13]) {
+                                    a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
+                                } else {
+                                    a[v13].v7 += v7;
+                                    a[v13].v5 += v5;
+                                }
+                                return a;
+                            }, {}));
+                            this.setState({
+                                selSource: resultTrue,
+                                realm: realm,
+                                loading: true
+                            }, () => {
+                                this.buildJexcel();
+                            })
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
-
-                    // console.log("step 3-tempList--->", tempList)
+                        );
                 }.bind(this)
             }.bind(this)
         }.bind(this)
     }
-
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
         var buildCSVTable = [];
-
         var count = 0;
         if (papuList.length != 0) {
-
             for (var j = 0; j < papuList.length; j++) {
-                // console.log("papuList[j].v5", papuList[j].v5, " --papuList[j].v8--", papuList[j].v8)
                 data = [];
                 data[0] = papuList[j].v1
                 data[1] = papuList[j].v2
@@ -683,45 +537,31 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[11] = papuList[j].v10;
                 data[12] = papuList[j].v11;
                 data[13] = papuList[j].v18;
-
                 papuDataArr[count] = data;
                 count++;
-
                 buildCSVTable.push({
-                    v1: papuList[j].v1,//Forecast planning unit
-                    v2: papuList[j].v2,//Supply plan planning unit name
-                    v3: papuList[j].v3,// Supply plan region name
-                    v4: papuList[j].v4, // Month
-                    v5: papuList[j].v5,//Forecasting module consumption qty
-                    v6: papuList[j].v15,//Multiplier
-                    v7: papuList[j].v6,// Multiplication
-                    v8: papuList[j].v7,//Supply plan module qty
-                    v9: papuList[j].v8,// Check
-                    v10: true,// Supply plan planning unit id
+                    v1: papuList[j].v1,
+                    v2: papuList[j].v2,
+                    v3: papuList[j].v3,
+                    v4: papuList[j].v4,
+                    v5: papuList[j].v5,
+                    v6: papuList[j].v15,
+                    v7: papuList[j].v6,
+                    v8: papuList[j].v7,
+                    v9: papuList[j].v8,
+                    v10: true,
                 })
-
             }
         }
-
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapRegion"), true);
-
         this.el = jexcel(document.getElementById("mapImport"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapImport"), true);
-
-        var json = [];
         var data = papuDataArr;
-        // console.log("data.length---------->", data.length);
-
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);
-
         var options = {
             data: data,
             columnDrag: true,
@@ -753,7 +593,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.QATForecastImport.forcastConsumption'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -762,7 +601,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.QATForecastImport.perOfForecast'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -771,7 +609,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -780,7 +617,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.QATForecastImport.convertedForecastConsumption'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -789,7 +625,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.QATForecastImport.currentForecastConsumption'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -821,34 +656,23 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     // type: 'text',
                     // visible: false
                 },
-
                 {
                     title: 'Is Old Data?',
                     type: 'hidden'
                 },
-
-
             ],
             pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            // allowDeleteRow: true,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             onload: function (obj, x, y, e) {
                 jExcelLoadedFunction(obj);
             },
@@ -856,7 +680,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             license: JEXCEL_PRO_KEY,
             contextMenu: false,
         };
-
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
@@ -865,42 +688,33 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("loading", false);
             this.changeColor();
         })
-
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         var { rangeValue } = this.state
         if (this.props.items.startDate != "") {
             var startDate1 = moment(this.props.items.startDate).format("MMM YYYY");
             var stopDate1 = moment(this.props.items.stopDate).format("MMM YYYY");
             rangeValue = startDate1 + " to " + stopDate1
         }
-
         let datasetList = this.props.items.datasetList;
         let datasets = null
         datasets = datasetList.filter(c => c.programId == this.props.items.forecastProgramId)[0]
-
         let supplyPlanList = this.props.items.programs;
         let supplyPlan = null
-
         supplyPlan = supplyPlanList.filter(c => c.id == this.props.items.programId)[0]
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
                 <div className="Card-header-addicon pb-0">
                     <div className="card-header-actions" style={{ marginTop: '-25px' }}>
-                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         <a className="card-header-action">
                             <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                         </a>
-                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                     </div>
                 </div>
                 <Modal isOpen={this.state.showGuidance}
@@ -940,9 +754,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label> */}
                             <Label htmlFor="appendedInputButton">Supply Plan version</Label>
                             <div className="controls">
                                 <InputGroup>
@@ -958,9 +770,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
                             <Label htmlFor="appendedInputButton">Forecast program</Label>
                             <div className="controls ">
                                 <InputGroup>
@@ -977,7 +787,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
                             <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
                             <div className="controls ">
                                 <InputGroup>
@@ -994,10 +803,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                     </div>
-
                 </div>
                 <div className="pr-lg-0 Card-header-reporticon">
-                    {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">
                         <a className="card-header-action">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
@@ -1005,29 +812,18 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     </div>}
                 </div>
                 <AuthenticationServiceComponent history={this.props.history} />
-                {/* <h4 className="red">{this.props.message}</h4> */}
-                {/* <ul className="legendcommitversion list-group">
-                    <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
-                </ul> */}
                 <div class="col-md-10 mt-2 pl-lg-0 form-group" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
-                            {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
                             <span class="legendcommitversionText red">Data already exists in Supply Plan Program</span>
                         </li>
                         <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
-                            {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
                             <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {this.state.realm.forecastConsumptionMonthsInPast} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
-
                 <p style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
-
-                {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
-                {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="consumptionDataEntryTable">
-
                     <div id="mapImport" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
@@ -1035,24 +831,18 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
                 </div>
                 <FormGroup>
-                    {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
                     <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
                     &nbsp;
-                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
                     <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                     &nbsp;
                 </FormGroup>
-
             </>
         );
     }
-
 }

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -12,41 +11,15 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-
 const initialValuesFour = {
     organisationId: ''
 }
-
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
     })
 }
-
-const validateFour = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorFour(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorFour = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
 export default class PipelineProgramDataStepFour extends Component {
     constructor(props) {
         super(props);
@@ -54,49 +27,8 @@ export default class PipelineProgramDataStepFour extends Component {
             organisationList: []
         }
     }
-
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            organisationId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('organisationForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    // getOrganisationList() {
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     ProgramService.getOrganisationList(document.getElementById('realmId').value)
-    //         .then(response => {
-    //             if (response.status == 200) {
-    //                 this.setState({
-    //                     organisationList: response.data
-    //                 })
-    //             } else {
-    //                 this.setState({
-    //                     message: response.data.messageCode
-    //                 })
-    //             }
-    //         })
-
-
-    // }
-
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getOrganisationList(realmId)
             .then(response => {
@@ -114,13 +46,11 @@ export default class PipelineProgramDataStepFour extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -151,7 +81,6 @@ export default class PipelineProgramDataStepFour extends Component {
                     }
                 }
             );
-
     }
     render() {
         const { organisationList } = this.state;
@@ -163,18 +92,15 @@ export default class PipelineProgramDataStepFour extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
                     initialValues={{ organisationId: this.props.items.program.organisation.id }}
-                    validate={validateFour(validationSchemaFour)}
+                    validationSchema={validationSchemaFour}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // this.props.finishedStepFour && this.props.finishedStepFour();
                         this.props.endProgramInfoStepThree && this.props.endProgramInfoStepThree();
-
                     }}
                     render={
                         ({
@@ -205,23 +131,18 @@ export default class PipelineProgramDataStepFour extends Component {
                                     >
                                         <option value="">{i18n.t('static.common.select')}</option>
                                         {realmOrganisation}
-
                                     </Input>
-
                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                 </FormGroup>
                                 <FormGroup>
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)}  >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                 </FormGroup>
                             </Form>
                         )} />
-
-
             </>
-
         );
     }
 }

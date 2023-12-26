@@ -1,23 +1,18 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
-import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import UserService from '../../api/UserService';
-import CountryService from '../../api/CountryService';
-import HealthAreaService from '../../api/HealthAreaService';
-import OrganisationTypeService from "../../api/OrganisationTypeService.js";
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX, API_URL } from '../../Constants';
-import OrganisationService from '../../api/OrganisationService';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants';
+import HealthAreaService from '../../api/HealthAreaService';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import OrganisationService from '../../api/OrganisationService';
+import OrganisationTypeService from "../../api/OrganisationTypeService.js";
+import UserService from '../../api/UserService';
+import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
 const initialValues = {
@@ -29,7 +24,6 @@ const initialValues = {
     notes: '',
     organisationType: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -48,35 +42,9 @@ const validationSchema = function (values) {
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.common.displayName'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext')),
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class OrganisationTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -110,7 +78,6 @@ export default class OrganisationTicketComponent extends Component {
         this.getDisplayName = this.getDisplayName.bind(this);
         this.getOrganisationTypeByRealmId = this.getOrganisationTypeByRealmId.bind(this);
     }
-
     dataChange(event) {
         let { organisation } = this.state
         if (event.target.name == "summary") {
@@ -134,9 +101,6 @@ export default class OrganisationTicketComponent extends Component {
                 organisationTypeId: event.target.value
             })
         }
-        // if (event.target.name === "realmCountryId") {
-        //     organisation.realmCountryId = event.target.value
-        // }        
         if (event.target.name == "notes") {
             organisation.notes = event.target.value;
         }
@@ -144,66 +108,31 @@ export default class OrganisationTicketComponent extends Component {
             organisation
         }, () => { })
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            realmId: true,
-            realmCountryId: true,
-            organisationCode: true,
-            organisationName: true,
-            notes: true,
-            organisationType: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+   
     getDisplayName() {
         let realmId = this.state.realm;
-        // let realmId = 1;
         let organisationValue = this.state.organisation.organisationName;
-        // let organisationValue = "USAID"
         organisationValue = organisationValue.replace(/[^A-Za-z0-9]/g, "");
         organisationValue = organisationValue.trim().toUpperCase();
         if (realmId != 0 && organisationValue.length != 0) {
-
-            if (organisationValue.length >= 4) {//minus 2
+            if (organisationValue.length >= 4) {
                 organisationValue = organisationValue.slice(0, 2);
-                // console.log("DISPLAYNAME-BEF----->", organisationValue);
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
                             organisation
                         });
-
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -234,29 +163,23 @@ export default class OrganisationTicketComponent extends Component {
                             }
                         }
                     );
-
-            } else {// not need to minus
-                // console.log("DISPLAYNAME-BEF-else----->", organisationValue);
+            } else {
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
                             organisation
                         });
-
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -288,87 +211,18 @@ export default class OrganisationTicketComponent extends Component {
                         }
                     );
             }
-
         }
-
     }
-
     Capitalize(str) {
         this.state.organisation.organisationName = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // CountryService.getCountryListAll()
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             var listArray = response.data;
-        //             listArray.sort((a, b) => {
-        //                 var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-        //                 var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-        //                 return itemLabelA > itemLabelB ? 1 : -1;
-        //             });
-        //             this.setState({
-        //                 countries: listArray, loading: false
-        //             })
-        //         }
-        //         else {
-
-        //             this.setState({
-        //                 message: response.data.messageCode
-        //             },
-        //                 () => {
-        //                     this.hideSecondComponent();
-        //                 })
-        //         }
-
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({
-        //                     message: 'static.unkownError',
-        //                     loading: false
-        //                 });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-
-        //                     case 401:
-        //                         this.props.history.push(`/login/static.message.sessionExpired`)
-        //                         break;
-        //                     case 403:
-        //                         this.props.history.push(`/accessDenied`)
-        //                         break;
-        //                     case 500:
-        //                     case 404:
-        //                     case 406:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                     case 412:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                     default:
-        //                         this.setState({
-        //                             message: 'static.unkownError',
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
-
         UserService.getRealmList()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -379,29 +233,24 @@ export default class OrganisationTicketComponent extends Component {
                     this.setState({
                         realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
-
                     let { organisation } = this.state;
                     organisation.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         organisation
                     }, () => {
-
                         this.getRealmCountryList(this.props.items.userRealmId);
                         this.getOrganisationTypeByRealmId(this.props.items.userRealmId);
-
                     })
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -433,18 +282,15 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
-
     getOrganisationTypeByRealmId(realmId) {
-
         if (realmId != "") {
             OrganisationTypeService.getOrganisationTypeByRealmId(realmId)
                 .then(response => {
-                    // console.log("OrganisationType list------>", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -461,13 +307,11 @@ export default class OrganisationTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -505,9 +349,7 @@ export default class OrganisationTicketComponent extends Component {
                 loading: false,
             })
         }
-
     }
-
     updateFieldData(value) {
         let { organisation } = this.state;
         this.setState({ countryId: value });
@@ -519,17 +361,15 @@ export default class OrganisationTicketComponent extends Component {
         organisation.realmCountryId = realmCountryIdArray;
         this.setState({ organisation: organisation });
     }
-
     getRealmCountryList(realmId) {
-        // AuthenticationService.setupAxiosInterceptors();
         if (realmId != "") {
             HealthAreaService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         var json = listArray;
@@ -550,13 +390,11 @@ export default class OrganisationTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -589,21 +427,13 @@ export default class OrganisationTicketComponent extends Component {
                 );
         }
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
-
     resetClicked() {
         let { organisation } = this.state;
-        // organisation.summary = '';
         organisation.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         organisation.realmCountryId = '';
         organisation.organisationName = '';
@@ -618,9 +448,7 @@ export default class OrganisationTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -630,7 +458,6 @@ export default class OrganisationTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         const { organisationTypeList } = this.state;
         let organisationTypes = organisationTypeList.length > 0
             && organisationTypeList.map((item, i) => {
@@ -638,7 +465,6 @@ export default class OrganisationTicketComponent extends Component {
                     <option key={i} value={item.organisationTypeId}>{item.label.label_en}</option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -656,16 +482,14 @@ export default class OrganisationTicketComponent extends Component {
                             notes: this.state.organisation.notes,
                             organisationType: this.state.organisationTypeId
                         }}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
                             })
                             this.state.organisation.summary = summaryText_2;
                             this.state.organisation.userLanguageCode = this.state.lang;
-                            // console.log("SUBMIT---------->", this.state.organisation);
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -689,13 +513,11 @@ export default class OrganisationTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -841,20 +663,15 @@ export default class OrganisationTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.organisation.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                </Form>
+                                                                    </Form>
                             )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -868,5 +685,4 @@ export default class OrganisationTicketComponent extends Component {
             </div>
         );
     }
-
 }

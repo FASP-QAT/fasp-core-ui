@@ -1,29 +1,21 @@
-import React, { Component } from "react";
-import { NavLink } from 'react-router-dom';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import getLabelText from '../../CommonComponent/getLabelText';
-import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import i18n from '../../i18n';
-import CountryService from '../../api/CountryService.js';
-import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import moment from 'moment';
-import RealmCountryService from '../../api/RealmCountryService';
 import jexcel from 'jspreadsheet';
+import moment from 'moment';
+import React, { Component } from "react";
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { Search } from 'react-bootstrap-table2-toolkit';
+import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL,PROGRAM_TYPE_DATASET } from "../../Constants";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET } from "../../Constants";
 import DropdownService from '../../api/DropdownService';
 import ReportService from "../../api/ReportService";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dataSet.dataSet');
 export default class ProgramList extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -35,15 +27,12 @@ export default class ProgramList extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editProgram = this.editProgram.bind(this);
         this.addNewProgram = this.addNewProgram.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChange = this.dataChange.bind(this);
-
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -53,125 +42,78 @@ export default class ProgramList extends Component {
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     dataChange() {
         localStorage.setItem("FMCountryId", document.getElementById("countryId").value);
         localStorage.setItem("FMSelStatus", document.getElementById("active").value)
     }
     filterData() {
         let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : -1;
-        // var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
         var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : -1;
-        
-        // console.log("countryId--------->", countryId);
-        // console.log("selStatus--------->", selStatus);
-        // if (countryId != 0 && selStatus != "") {
-        //     console.log("1------------");
-        //     let tempSelStatus = (selStatus == "true" ? true : false)
-        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
-        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId && c.active == tempSelStatus)
-        //     // this.setState({
-        //         // selProgram: selProgram
-        //     // }, () => {
-        //         this.buildJExcel();
-        //     // });
-        // } else if (countryId != 0) {
-        //     console.log("2------------");
-        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
-        //     const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
-        //     this.setState({
-        //         selProgram: selProgram
-        //     }, () => {
-        //         this.buildJExcel();
-        //     });
-        // } else if (selStatus != "") {
-        //     console.log("3------------");
-        //     let tempSelStatus = (selStatus == "true" ? true : false)
-        //     const selProgram = this.state.programList.filter(c => c.active == tempSelStatus)
-        //     this.setState({
-        //         selProgram: selProgram
-        //     }, () => {
-        //         this.buildJExcel();
-        //     });
-        // } else {
-        //     console.log("4------------");
-        //     this.setState({
-        //         selProgram: this.state.programList
-        //     }, () => {
-        //         this.buildJExcel();
-        //     });
-        // }
-        if (countryId != 0 && selStatus != "") {        
-// changes
-ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,countryId,selStatus)    
-        .then(response => {
-            if (response.status == 200) {
-                // console.log("resp--------------------", response.data);
-                this.setState({
-                    programList: response.data,
-                    selProgram: response.data,
-                },
-                    () => {
-                        this.buildJExcel();
-                    })
-            } else {
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+        if (countryId != 0 && selStatus != "") {
+            ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET, countryId, selStatus)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            programList: response.data,
+                            selProgram: response.data,
+                        },
+                            () => {
+                                this.buildJExcel();
+                            })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     }
-                }
-            }
-        );
-    }
-    else {
-            // console.log("4------------");
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+        else {
             this.setState({
                 selProgram: this.state.programlist
             }, () => {
@@ -179,42 +121,22 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             });
         }
     }
-
-    editProgram(program) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
-            this.props.history.push({
-                pathname: `/program/editProgram/${program.programId}`,
-                // state: { program }
-            });
-        }
-    }
-
     buildJExcel() {
-        let programList = this.state.selProgram;        
+        let programList = this.state.selProgram;
         programList.sort((a, b) => {
-            var itemLabelA = getLabelText(a.program.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            var itemLabelA = getLabelText(a.program.label, this.state.lang).toUpperCase();
+            var itemLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
         });
-        // console.log("programList---->after", programList);
         let programArray = [];
         let count = 0;
-
         for (var j = 0; j < programList.length; j++) {
             let healthAreaLabels = programList[j].healthAreas;
             let haValues = [];
             let regionLabels = programList[j].regions;
-            let reValues = []; 
+            let reValues = [];
             haValues.push(' ' + getLabelText(healthAreaLabels.label, this.state.lang));
             reValues.push(' ' + getLabelText(regionLabels.label, this.state.lang));
-            // healthAreaLabels.map(c => {
-            //     haValues.push(' ' + getLabelText(c.label, this.state.lang));
-            // })
-            // regionLabels.map(c => {
-            //     reValues.push(' ' + getLabelText(c.label, this.state.lang));
-            // })
-            // console.log("programList---->reValues", reValues);
-            
             data = [];
             data[0] = programList[j].program.id
             data[1] = getLabelText(programList[j].realm.label, this.state.lang)
@@ -228,23 +150,13 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             data[9] = programList[j].programNotes
             data[10] = programList[j].lastUpdatedBy.username;
             data[11] = (programList[j].lastUpdatedDate ? moment(programList[j].lastUpdatedDate).format(`YYYY-MM-DD`) : null)
-
-
             programArray[count] = data;
             count++;
         }
-        // console.log("programArray---->",programArray)
-        // if (programList.length == 0) {
-        //   data = [];
-        //   programArray[0] = data;
-        // }
-        // console.log("programArray---->", programArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = programArray;
-
         var options = {
             data: data,
             columnDrag: true,
@@ -254,88 +166,63 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                 {
                     title: 'programId',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.realm'),
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dataset.forecastingProgram'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.datasetDisplayName'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.realmcountry'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.organisation'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.healthareaheader'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.inventory.region'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.programmanager'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
                 },
-
             ],
-            // text: {
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
             editable: false,
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -346,7 +233,6 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
-
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -354,304 +240,88 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             languageEl: languageEl, loading: false
         })
     }
-
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-
-            // if (x == 0 && value != 0) {
             if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
             } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
                     this.props.history.push({
                         pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
-                        // pathname: `/demographic/scenarioOne`,
                     });
                 }
             }
         }
     }.bind(this);
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
-
     componentDidMount() {
-        // console.log("props--------------------", this.props);
-        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
-
-        // ProgramService.getDataSetListAll()
-        ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,-1,-1)    
-        .then(response => {
-            if (response.status == 200) {
-                // console.log("resp--------------------", response.data);
-                this.setState({
-                    programList: response.data,
-                    selProgram: response.data,
-                },
-                    () => {
-                        this.filterData();
-                    })
-            } else {
-                this.setState({
-                    message: response.data.messageCode, loading: false
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
+        ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET, -1, -1)
+            .then(response => {
+                if (response.status == 200) {
                     this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
+                        programList: response.data,
+                        selProgram: response.data,
+                    },
+                        () => {
+                            this.filterData();
+                        })
                 } else {
-                    switch (error.response ? error.response.status : "") {
-
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
-
-        // let programJson1 = {
-        //     "createdBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "createdDate": "2021-02-20 11:00:00",
-        //     "lastModifiedBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "lastModifiedDate": "2021-02-20 12:00:00",
-        //     "active": true,
-        //     "programId": 1,
-        //     "programCode": "BEN-PRHCON-MOH",
-        //     "realmCountry": {
-        //         "realmCountryId": 5,
-        //         "country": {
-        //             "countryId": 19,
-        //             "countryCode": "BEN",
-        //             "countryCode2": null,
-        //             "label": {
-        //                 "labelId": 216,
-        //                 "label_en": "Benin",
-        //             },
-        //         },
-        //         "realm": {
-        //             "realmId": 1,
-        //             "label": {
-        //                 "labelId": 4,
-        //                 "label_en": "Global Health",
-        //             },
-        //             "realmCode": "GHR",
-        //         },
-        //     },
-        //     "organisation": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Ministry of Health",
-        //         },
-        //         "code": "MOH"
-        //     },
-        //     "healthArea": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Condoms,PRH/Condoms",
-        //         },
-        //         "code": "ARV"
-        //     },
-        //     "label": {
-        //         "label_en": "Benin PRH,Condoms Forecast Dataset",
-        //     },
-        //     "programNotes": "",
-        //     "airFreightPerc": 25,
-        //     "seaFreightPerc": 8,
-        //     "plannedToSubmittedLeadTime": 0.5,
-        //     "submittedToApprovedLeadTime": 1.25,
-        //     "approvedToShippedLeadTime": 0.75,
-        //     "shippedToArrivedByAirLeadTime": 1,
-        //     "shippedToArrivedBySeaLeadTime": 0.25,
-        //     "arrivedToDeliveredLeadTime": 0.5,
-        //     "useRegions": "National"
-        // }
-
-        // let programJson2 = {
-        //     "createdBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "createdDate": "2021-02-20 11:00:00",
-        //     "lastModifiedBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "lastModifiedDate": "2021-02-20 12:00:00",
-        //     "active": true,
-        //     "programId": 2,
-        //     "programCode": "BEN-ARV/RTK-MOH",
-        //     "realmCountry": {
-        //         "realmCountryId": 5,
-        //         "country": {
-        //             "countryId": 19,
-        //             "countryCode": "BEN",
-        //             "countryCode2": null,
-        //             "label": {
-        //                 "labelId": 216,
-        //                 "label_en": "Benin",
-        //             },
-        //         },
-        //         "realm": {
-        //             "realmId": 1,
-        //             "label": {
-        //                 "labelId": 4,
-        //                 "label_en": "Global Health",
-        //             },
-        //             "realmCode": "GHR",
-        //         },
-        //     },
-        //     "organisation": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Ministry of Health",
-        //         },
-        //         "code": "MOH"
-        //     },
-        //     "healthArea": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Antiretrovirals,HIV rapid test kits",
-        //         },
-        //         "code": "ARV"
-        //     },
-        //     "label": {
-        //         "label_en": "Benin ARV Forecast Dataset",
-        //     },
-        //     "programNotes": "",
-        //     "airFreightPerc": 25,
-        //     "seaFreightPerc": 8,
-        //     "plannedToSubmittedLeadTime": 0.5,
-        //     "submittedToApprovedLeadTime": 1.25,
-        //     "approvedToShippedLeadTime": 0.75,
-        //     "shippedToArrivedByAirLeadTime": 1,
-        //     "shippedToArrivedBySeaLeadTime": 0.25,
-        //     "arrivedToDeliveredLeadTime": 0.5,
-        //     "useRegions": "National"
-        // }
-
-        // let programJson3 = {
-        //     "createdBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "createdDate": "2021-02-20 11:00:00",
-        //     "lastModifiedBy": {
-        //         "userId": 8,
-        //         "username": "Shubham D"
-        //     },
-        //     "lastModifiedDate": "2021-02-20 12:00:00",
-        //     "active": true,
-        //     "programId": 3,
-        //     "programCode": "BEN-MAL-MOH",
-        //     "realmCountry": {
-        //         "realmCountryId": 5,
-        //         "country": {
-        //             "countryId": 19,
-        //             "countryCode": "BEN",
-        //             "countryCode2": null,
-        //             "label": {
-        //                 "labelId": 216,
-        //                 "label_en": "Benin",
-        //             },
-        //         },
-        //         "realm": {
-        //             "realmId": 1,
-        //             "label": {
-        //                 "labelId": 4,
-        //                 "label_en": "Global Health",
-        //             },
-        //             "realmCode": "GHR",
-        //         },
-        //     },
-        //     "organisation": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Ministry of Health",
-        //         },
-        //         "code": "MOH"
-        //     },
-        //     "healthArea": {
-        //         "id": 1,
-        //         "label": {
-        //             "label_en": "Malaria",
-        //         },
-        //         "code": "ARV"
-        //     },
-        //     "label": {
-        //         "label_en": "Benin Malaria Forecast Dataset",
-        //     },
-        //     "programNotes": "",
-        //     "airFreightPerc": 25,
-        //     "seaFreightPerc": 8,
-        //     "plannedToSubmittedLeadTime": 0.5,
-        //     "submittedToApprovedLeadTime": 1.25,
-        //     "approvedToShippedLeadTime": 0.75,
-        //     "shippedToArrivedByAirLeadTime": 1,
-        //     "shippedToArrivedBySeaLeadTime": 0.25,
-        //     "arrivedToDeliveredLeadTime": 0.5,
-        //     "useRegions": "North,South"
-        // }
-
-        // this.setState({
-        //     programList: [programJson1, programJson2, programJson3],
-        //     selProgram: [programJson1, programJson2, programJson3],
-        // },
-        //     () => {
-        //         this.filterData();
-        //     })
-
-
+            );
         let realmId = AuthenticationService.getRealmId();
-        // RealmCountryService.getRealmCountryrealmIdById(realmId)
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -664,13 +334,11 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -702,39 +370,22 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                 }
             );
     }
-
     addNewProgram() {
         this.props.history.push({
             pathname: "/dataset/addDataSet"
         });
-    }
-
-
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
     }
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-        // const { countryList } = this.state;
-        // let countries = countryList.length > 0
-        //   && countryList.map((item, i) => {
-        //     return (
-        //       <option key={i} value={item.countryId}>
-        //         {getLabelText(item.label, this.state.lang)}
-        //       </option>
-        //     )
-        //   }, this);
-
         const { countryList } = this.state;
         let countries = countryList.length > 0
             && countryList.map((item, i) => {
@@ -744,7 +395,6 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -756,7 +406,6 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/loadDeleteDataSet" className="supplyplanformulas">{i18n.t('static.dashboard.downloadprogram')}</a> {i18n.t('static.tree.or')} <a href="/#/dataset/versionSettings" className='supplyplanformulas'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
                     </div>
                     <div className="Card-header-addicon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATASET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
@@ -764,32 +413,10 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                         </div>
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
-                        {/* <Col md="3 pl-0" >
-              <FormGroup className="Selectdiv mt-md-2 mb-md-0">
-                <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
-
-                <div className="controls SelectGo">
-                  <InputGroup>
-                    <Input
-                      type="select"
-                      name="countryId"
-                      id="countryId"
-                      bsSize="sm"
-                      onChange={this.filterData}
-                    >
-                      <option value="0">{i18n.t('static.common.all')}</option>
-                      {countries}
-                    </Input>
-                  </InputGroup>
-                </div>
-              </FormGroup>
-            </Col> */}
-
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
-
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
@@ -797,8 +424,8 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                                                 name="countryId"
                                                 id="countryId"
                                                 bsSize="sm"
-                                                onChange={() => {this.dataChange(); this.filterData() } }
-                                                value={ localStorage.getItem("FMCountryId") }
+                                                onChange={() => { this.dataChange(); this.filterData() }}
+                                                value={localStorage.getItem("FMCountryId")}
                                             >
                                                 <option value="-1">{i18n.t('static.common.all')}</option>
                                                 {countries}
@@ -806,12 +433,6 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                {/* <Input
-                                    type="hidden"
-                                    name="countryId"
-                                    id="countryId"
-                                    bsSize="sm"
-                                ></Input> */}
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
@@ -821,13 +442,12 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                                                 name="active"
                                                 id="active"
                                                 bsSize="sm"
-                                                onChange={() => {this.dataChange(); this.filterData() } }
+                                                onChange={() => { this.dataChange(); this.filterData() }}
                                                 value={localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : true}
                                             >
                                                 <option value="-1">{i18n.t('static.common.all')}</option>
                                                 <option value="1">{i18n.t('static.common.active')}</option>
                                                 <option value="0">{i18n.t('static.common.disabled')}</option>
-
                                             </Input>
                                         </InputGroup>
                                     </div>
@@ -842,17 +462,13 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </CardBody>
                 </Card>
-
             </div>
         )
     }

@@ -1,74 +1,50 @@
+import CryptoJS from "crypto-js";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import jexcel from "jspreadsheet";
+import moment from "moment";
 import React, { Component } from "react";
+import "react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
+import { Search } from "react-bootstrap-table2-toolkit";
+import Picker from "react-month-picker";
+import { MultiSelect } from "react-multi-select-component";
 import {
   Card,
-  CardHeader,
-  Form,
   CardBody,
   FormGroup,
   Input,
   InputGroup,
-  InputGroupAddon,
-  Label,
-  Button,
-  Col,
+  Label
 } from "reactstrap";
-import "react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
-import i18n from "../../i18n";
-import RegionService from "../../api/RegionService";
-import AuthenticationService from "../Common/AuthenticationService.js";
-import getLabelText from "../../CommonComponent/getLabelText";
-import RealmCountryService from "../../api/RealmCountryService.js";
-
-import BootstrapTable from "react-bootstrap-table-next";
-import filterFactory, {
-  textFilter,
-  selectFilter,
-  multiSelectFilter,
-} from "react-bootstrap-table2-filter";
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
-import paginationFactory from "react-bootstrap-table2-paginator";
-import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import pdfIcon from "../../assets/img/pdf.png";
-import csvicon from "../../assets/img/csv.png";
-import Picker from "react-month-picker";
-import MonthBox from "../../CommonComponent/MonthBox.js";
-import ProgramService from "../../api/ProgramService";
-import CryptoJS from "crypto-js";
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import {
-  SECRET_KEY,
+  jExcelLoadedFunction
+} from "../../CommonComponent/JExcelCommonFunctions.js";
+import { LOGO } from "../../CommonComponent/Logo.js";
+import MonthBox from "../../CommonComponent/MonthBox.js";
+import getLabelText from "../../CommonComponent/getLabelText";
+import {
+  API_URL,
   INDEXED_DB_NAME,
   INDEXED_DB_VERSION,
   JEXCEL_PAGINATION_OPTION,
   JEXCEL_PRO_KEY,
-  polling,
-  REPORT_DATEPICKER_START_MONTH,
-  REPORT_DATEPICKER_END_MONTH,
-  API_URL,
   PROGRAM_TYPE_SUPPLY_PLAN,
+  REPORT_DATEPICKER_END_MONTH,
+  REPORT_DATEPICKER_START_MONTH,
+  SECRET_KEY
 } from "../../Constants.js";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import ProductService from "../../api/ProductService";
-import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
-import moment from "moment";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { LOGO } from "../../CommonComponent/Logo.js";
-import ReportService from "../../api/ReportService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
-import { Online, Offline } from "react-detect-offline";
-import FundingSourceService from "../../api/FundingSourceService";
-import { MultiSelect } from "react-multi-select-component";
-import jexcel from "jspreadsheet";
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-import {
-  jExcelLoadedFunction,
-  jExcelLoadedFunctionOnlyHideRow,
-} from "../../CommonComponent/JExcelCommonFunctions.js";
-import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import DropdownService from "../../api/DropdownService";
-
+import FundingSourceService from "../../api/FundingSourceService";
+import ReportService from "../../api/ReportService";
+import csvicon from "../../assets/img/csv.png";
+import pdfIcon from "../../assets/img/pdf.png";
+import i18n from "../../i18n";
+import AuthenticationService from "../Common/AuthenticationService.js";
+import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -87,7 +63,6 @@ const pickerLang = {
   from: "From",
   to: "To",
 };
-
 class ProcurementAgentExport extends Component {
   constructor(props) {
     super(props);
@@ -114,7 +89,6 @@ class ProcurementAgentExport extends Component {
       fundingSourceLabels: [],
       data: [],
       lang: localStorage.getItem("lang"),
-      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       rangeValue: {
         from: { year: dt.getFullYear(), month: dt.getMonth() + 1 },
         to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 },
@@ -131,7 +105,6 @@ class ProcurementAgentExport extends Component {
       programId: "",
       versionId: "",
     };
-    this.formatLabel = this.formatLabel.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -139,19 +112,15 @@ class ProcurementAgentExport extends Component {
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
-
   makeText = (m) => {
     if (m && m.year && m.month)
       return pickerLang.months[m.month - 1] + ". " + m.year;
     return "?";
   };
-
   getPrograms = () => {
     this.setState({ loading: true });
-    if (isSiteOnline()) {
-      // AuthenticationService.setupAxiosInterceptors();
+    if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-
       DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then((response) => {
           var proList = [];
@@ -185,12 +154,11 @@ class ProcurementAgentExport extends Component {
           );
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -228,40 +196,14 @@ class ProcurementAgentExport extends Component {
             }
           }
         });
-      // .catch(
-      //     error => {
-      //         this.setState({
-      //             programs: [], loading: false
-      //         }, () => { this.consolidatedProgramList() })
-      //         if (error.message === "Network Error") {
-      //             this.setState({ message: error.message, loading: false });
-      //         } else {
-      //             switch (error.response ? error.response.status : "") {
-      //                 case 500:
-      //                 case 401:
-      //                 case 404:
-      //                 case 406:
-      //                 case 412:
-      //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-      //                     break;
-      //                 default:
-      //                     this.setState({ message: 'static.unkownError', loading: false });
-      //                     break;
-      //             }
-      //         }
-      //     }
-      // );
     } else {
-      // console.log("offline");
       this.consolidatedProgramList();
       this.setState({ loading: false });
     }
   };
   consolidatedProgramList = () => {
-    const lan = "en";
     const { programs } = this.state;
     var proList = programs;
-
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -270,9 +212,7 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-
       getRequest.onerror = function (event) {
-        // Handle errors!
       };
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -284,23 +224,15 @@ class ProcurementAgentExport extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
             );
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            // console.log(programNameLabel);
-
             var f = 0;
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                // console.log("already exist");
               }
             }
             if (f == 0) {
@@ -308,7 +240,6 @@ class ProcurementAgentExport extends Component {
             }
           }
         }
-        var lang = this.state.lang;
         if (
           localStorage.getItem("sesProgramIdReport") != "" &&
           localStorage.getItem("sesProgramIdReport") != undefined
@@ -339,19 +270,15 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
-
   getProcurementAgent = () => {
     let programId = document.getElementById("programId").value;
     this.setState({ loading: true });
-
-    if (isSiteOnline()) {
-      // AuthenticationService.setupAxiosInterceptors();
+    if (localStorage.getItem("sessionType") === 'Online') {
       var programJson = [programId];
       DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(
         programJson
       )
         .then((response) => {
-          // console.log("getProcurementAgent", JSON.stringify(response.data));
           var listArray = response.data;
           var listArrays = [];
           for (var i = 0; i < listArray.length; i++) {
@@ -363,8 +290,8 @@ class ProcurementAgentExport extends Component {
             listArray[i] = arr;
           }
           listArrays.sort((a, b) => {
-            var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+            var itemLabelA = a.procurementAgentCode.toUpperCase();
+            var itemLabelB = b.procurementAgentCode.toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState(
@@ -389,12 +316,11 @@ class ProcurementAgentExport extends Component {
           );
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -432,38 +358,12 @@ class ProcurementAgentExport extends Component {
             }
           }
         });
-      // .catch(
-      //     error => {
-      //         this.setState({
-      //             procurementAgents: [], loading: false
-      //         }, () => { this.consolidatedProcurementAgentList() })
-      //         if (error.message === "Network Error") {
-      //             this.setState({ message: error.message, loading: false });
-      //         } else {
-      //             switch (error.response ? error.response.status : "") {
-      //                 case 500:
-      //                 case 401:
-      //                 case 404:
-      //                 case 406:
-      //                 case 412:
-      //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-      //                     break;
-      //                 default:
-      //                     this.setState({ message: 'static.unkownError', loading: false });
-      //                     break;
-      //             }
-      //         }
-      //     }
-      // );
     } else {
-      // console.log("offline");
       this.consolidatedProcurementAgentList();
       this.setState({ loading: false });
     }
   };
-
   consolidatedProcurementAgentList = () => {
-    const lan = "en";
     const { procurementAgents } = this.state;
     var proList = procurementAgents;
     let programId = document.getElementById("programId").value;
@@ -475,24 +375,12 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["procurementAgent"], "readwrite");
       var procuremntAgent = transaction.objectStore("procurementAgent");
       var getRequest = procuremntAgent.getAll();
-
       getRequest.onerror = function (event) {
-        // Handle errors!
       };
       getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
-        // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        // var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        // // console.log("ProcurementAgentMyResult------>>>>", myResult);
         for (var i = 0; i < myResult.length; i++) {
-          // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-          // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-          // // console.log(programNameLabel);
-
-          // var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-          // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-
           var f = 0;
           for (var k = 0; k < this.state.procurementAgents.length; k++) {
             if (
@@ -500,7 +388,6 @@ class ProcurementAgentExport extends Component {
               myResult[i].procurementAgentId
             ) {
               f = 1;
-              // console.log("already exist");
             }
           }
           if (f == 0) {
@@ -513,7 +400,6 @@ class ProcurementAgentExport extends Component {
           }
           var listArray = proList;
         }
-        // console.log("listArrays", listArray, "==programId", programId);
         this.setState({
           procurementAgents: listArray.sort(function (a, b) {
             a = a.procurementAgentCode.toLowerCase();
@@ -523,14 +409,10 @@ class ProcurementAgentExport extends Component {
         });
         let viewby = document.getElementById("viewById").value;
         if (viewby == 1) {
-          // // console.log("viewby", this.state.procurementAgents)
-
           if (listArray.length > 0) {
             document.getElementById("procurementAgentDiv").style.display =
               "block";
-            // document.getElementById("fundingSourceDiv").style.display = "block";
           } else {
-            // // console.log("viewby", viewby)
             this.setState({
               viewby: 2,
             });
@@ -542,19 +424,15 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
-
   filterVersion = () => {
-    // document.getElementById("planningUnitId").checked = false;
-    // let programId = document.getElementById("programId").value;
     let programId = this.state.programId;
     if (programId != 0) {
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(
         (c) => c.programId == programId
       );
-      // console.log(program);
       if (program.length == 1) {
-        if (isSiteOnline()) {
+        if (localStorage.getItem("sessionType") === 'Online') {
           this.setState(
             {
               versions: [],
@@ -565,7 +443,6 @@ class ProcurementAgentExport extends Component {
                 programId
               )
                 .then((response) => {
-                  // console.log("response===>", response.data);
                   this.setState(
                     {
                       versions: [],
@@ -589,12 +466,11 @@ class ProcurementAgentExport extends Component {
                   });
                   if (error.message === "Network Error") {
                     this.setState({
-                      // message: 'static.unkownError',
                       message: API_URL.includes("uat")
                         ? i18n.t("static.common.uatNetworkErrorMessage")
                         : API_URL.includes("demo")
-                        ? i18n.t("static.common.demoNetworkErrorMessage")
-                        : i18n.t("static.common.prodNetworkErrorMessage"),
+                          ? i18n.t("static.common.demoNetworkErrorMessage")
+                          : i18n.t("static.common.prodNetworkErrorMessage"),
                       loading: false,
                     });
                   } else {
@@ -659,10 +535,8 @@ class ProcurementAgentExport extends Component {
     this.fetchData();
   };
   consolidatedVersionList = (programId) => {
-    const lan = "en";
     const { versions } = this.state;
     var verList = versions;
-
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -671,9 +545,7 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["programData"], "readwrite");
       var program = transaction.objectStore("programData");
       var getRequest = program.getAll();
-
       getRequest.onerror = function (event) {
-        // Handle errors!
       };
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -688,29 +560,20 @@ class ProcurementAgentExport extends Component {
             myResult[i].userId == userId &&
             myResult[i].programId == programId
           ) {
-            var bytes = CryptoJS.AES.decrypt(
-              myResult[i].programName,
-              SECRET_KEY
-            );
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(
               myResult[i].programData.generalData,
               SECRET_KEY
             );
             var programData = databytes.toString(CryptoJS.enc.Utf8);
             var version = JSON.parse(programData).currentVersion;
-
             version.versionId = `${version.versionId} (Local)`;
             verList.push(version);
           }
         }
-
-        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
         versionList.reverse();
-        // console.log("versionList", versionList);
         if (
           localStorage.getItem("sesVersionIdReport") != "" &&
           localStorage.getItem("sesVersionIdReport") != undefined
@@ -753,7 +616,6 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
-
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -769,16 +631,13 @@ class ProcurementAgentExport extends Component {
             { message: i18n.t("static.program.validversion"), data: [] },
             () => {
               this.el = jexcel(document.getElementById("tableDiv"), "");
-              // this.el.destroy();
               jexcel.destroy(document.getElementById("tableDiv"), true);
             }
           );
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
           if (versionId.includes("Local")) {
-            const lan = "en";
             var db1;
-            var storeOS;
             getDatabase();
             var openRequest = indexedDB.open(
               INDEXED_DB_NAME,
@@ -794,9 +653,7 @@ class ProcurementAgentExport extends Component {
                 "programPlanningUnit"
               );
               var planningunitRequest = planningunitOs.getAll();
-              var planningList = [];
               planningunitRequest.onerror = function (event) {
-                // Handle errors!
               };
               planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
@@ -830,33 +687,23 @@ class ProcurementAgentExport extends Component {
               }.bind(this);
             }.bind(this);
           } else {
-            // AuthenticationService.setupAxiosInterceptors();
-
             this.setState({ loading: true });
-            //let productCategoryId = document.getElementById("productCategoryId").value;
             var programJson = {
               tracerCategoryIds: [],
               programIds: [programId],
             };
-            // console.log("**", programJson);
-
-            //let productCategoryId = document.getElementById("productCategoryId").value;
             DropdownService.getProgramPlanningUnitDropdownList(programJson)
               .then((response) => {
-                // console.log(
-                  // "**getProgramPlanningUnitDropdownList",
-                  // response.data
-                // );
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                   var itemLabelA = getLabelText(
                     a.label,
                     this.state.lang
-                  ).toUpperCase(); // ignore upper and lowercase
+                  ).toUpperCase();
                   var itemLabelB = getLabelText(
                     b.label,
                     this.state.lang
-                  ).toUpperCase(); // ignore upper and lowercase
+                  ).toUpperCase();
                   return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState(
@@ -875,18 +722,13 @@ class ProcurementAgentExport extends Component {
                   planningUnits: [],
                   loading: false,
                 });
-                // console.log(
-                  // "**getProgramPlanningUnitDropdownList" + error.response
-                // );
-
                 if (error.message === "Network Error") {
                   this.setState({
-                    // message: 'static.unkownError',
                     message: API_URL.includes("uat")
                       ? i18n.t("static.common.uatNetworkErrorMessage")
                       : API_URL.includes("demo")
-                      ? i18n.t("static.common.demoNetworkErrorMessage")
-                      : i18n.t("static.common.prodNetworkErrorMessage"),
+                        ? i18n.t("static.common.demoNetworkErrorMessage")
+                        : i18n.t("static.common.prodNetworkErrorMessage"),
                     loading: false,
                   });
                 } else {
@@ -930,35 +772,11 @@ class ProcurementAgentExport extends Component {
                   }
                 }
               });
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             planningUnits: [],
-            //         })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
           }
         }
       }
     );
   };
-
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -987,7 +805,6 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
-
   handleFundingSourceChange = (fundingSourceIds) => {
     fundingSourceIds = fundingSourceIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1002,60 +819,44 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
-
   handleRangeChange(value, text, listIndex) {
-    //
   }
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
       this.fetchData();
     });
   }
-
   _handleClickRangeBox(e) {
     this.refs.pickRange.show();
   }
-  formatter = (value) => {
-    var cell1 = value;
-    cell1 += "";
-    var x = cell1.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  };
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map((ele) => '"' + ele + '"');
   };
   exportCSV(columns) {
     let viewby = document.getElementById("viewById").value;
-
     var csvRow = [];
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.dateRange") +
-          " : " +
-          this.makeText(this.state.rangeValue.from) +
-          " ~ " +
-          this.makeText(this.state.rangeValue.to)
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.dateRange") +
+        " : " +
+        this.makeText(this.state.rangeValue.from) +
+        " ~ " +
+        this.makeText(this.state.rangeValue.to)
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     if (viewby == 1) {
       csvRow.push("");
       this.state.procurementAgentLabels.map((ele) =>
         csvRow.push(
           '"' +
-            (
-              i18n.t("static.procurementagent.procurementagent") +
-              " : " +
-              ele.toString()
-            ).replaceAll(" ", "%20") +
-            '"'
+          (
+            i18n.t("static.procurementagent.procurementagent") +
+            " : " +
+            ele.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
         )
       );
     } else if (viewby == 2) {
@@ -1063,57 +864,56 @@ class ProcurementAgentExport extends Component {
       this.state.fundingSourceLabels.map((ele) =>
         csvRow.push(
           '"' +
-            (
-              i18n.t("static.budget.fundingsource") +
-              " : " +
-              ele.toString()
-            ).replaceAll(" ", "%20") +
-            '"'
+          (
+            i18n.t("static.budget.fundingsource") +
+            " : " +
+            ele.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
         )
       );
     }
     csvRow.push("");
-
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.program.program") +
-          " : " +
-          document.getElementById("programId").selectedOptions[0].text
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.program.program") +
+        " : " +
+        document.getElementById("programId").selectedOptions[0].text
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.versionFinal*") +
-          "  :  " +
-          document.getElementById("versionId").selectedOptions[0].text
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.versionFinal*") +
+        "  :  " +
+        document.getElementById("versionId").selectedOptions[0].text
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     this.state.planningUnitValues.map((ele) =>
       csvRow.push(
         '"' +
-          (
-            i18n.t("static.planningunit.planningunit") +
-            " : " +
-            ele.label.toString()
-          ).replaceAll(" ", "%20") +
-          '"'
+        (
+          i18n.t("static.planningunit.planningunit") +
+          " : " +
+          ele.label.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
       )
     );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.program.isincludeplannedshipment") +
-          " : " +
-          document.getElementById("isPlannedShipmentId").selectedOptions[0].text
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.program.isincludeplannedshipment") +
+        " : " +
+        document.getElementById("isPlannedShipmentId").selectedOptions[0].text
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push("");
@@ -1122,7 +922,6 @@ class ProcurementAgentExport extends Component {
       '"' + i18n.t("static.common.youdatastart").replaceAll(" ", "%20") + '"'
     );
     csvRow.push("");
-
     const headers = [];
     if (viewby == 3) {
       columns.splice(0, 2);
@@ -1134,9 +933,7 @@ class ProcurementAgentExport extends Component {
         headers[idx] = item.text.replaceAll(" ", "%20");
       });
     }
-
     var A = [this.addDoubleQuoteToRowContent(headers)];
-    // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
     if (viewby == 1) {
       this.state.data.map((ele) =>
         A.push(
@@ -1196,15 +993,10 @@ class ProcurementAgentExport extends Component {
         )
       );
     }
-
-    // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
     for (var i = 0; i < A.length; i++) {
-      // console.log(A[i]);
       csvRow.push(A[i].join(","));
     }
-
     var csvString = csvRow.join("%0A");
-    // console.log("csvString" + csvString);
     var a = document.createElement("a");
     a.href = "data:attachment/csv," + csvString;
     a.target = "_Blank";
@@ -1223,16 +1015,13 @@ class ProcurementAgentExport extends Component {
     document.body.appendChild(a);
     a.click();
   }
-
   exportPDF = (columns) => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
-
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6);
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i);
-
         doc.setPage(i);
         doc.text(
           "Page " + String(i) + " of " + String(pageCount),
@@ -1255,7 +1044,6 @@ class ProcurementAgentExport extends Component {
     const addHeaders = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
       var viewby = document.getElementById("viewById").value;
-
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
@@ -1264,10 +1052,10 @@ class ProcurementAgentExport extends Component {
         doc.setTextColor("#002f6c");
         doc.text(
           i18n.t("static.report.shipmentCostReport") +
-            " " +
-            i18n.t("static.program.savedBy") +
-            " " +
-            document.getElementById("viewById").selectedOptions[0].text,
+          " " +
+          i18n.t("static.program.savedBy") +
+          " " +
+          document.getElementById("viewById").selectedOptions[0].text,
           doc.internal.pageSize.width / 2,
           60,
           {
@@ -1279,10 +1067,10 @@ class ProcurementAgentExport extends Component {
           doc.setFont("helvetica", "normal");
           doc.text(
             i18n.t("static.report.dateRange") +
-              " : " +
-              this.makeText(this.state.rangeValue.from) +
-              " ~ " +
-              this.makeText(this.state.rangeValue.to),
+            " : " +
+            this.makeText(this.state.rangeValue.from) +
+            " ~ " +
+            this.makeText(this.state.rangeValue.to),
             doc.internal.pageSize.width / 8,
             90,
             {
@@ -1293,8 +1081,8 @@ class ProcurementAgentExport extends Component {
           if (viewby == 1) {
             var procurementAgentText = doc.splitTextToSize(
               i18n.t("static.procurementagent.procurementagent") +
-                " : " +
-                this.state.procurementAgentLabels.join("; "),
+              " : " +
+              this.state.procurementAgentLabels.join("; "),
               (doc.internal.pageSize.width * 3) / 4
             );
             doc.text(
@@ -1306,8 +1094,8 @@ class ProcurementAgentExport extends Component {
           } else if (viewby == 2) {
             var fundingSourceText = doc.splitTextToSize(
               i18n.t("static.budget.fundingsource") +
-                " : " +
-                this.state.fundingSourceLabels.join("; "),
+              " : " +
+              this.state.fundingSourceLabels.join("; "),
               (doc.internal.pageSize.width * 3) / 4
             );
             doc.text(doc.internal.pageSize.width / 8, 110, fundingSourceText);
@@ -1315,12 +1103,11 @@ class ProcurementAgentExport extends Component {
           } else {
             poslen = 90;
           }
-          // console.log(poslen);
           poslen = poslen + 20;
           doc.text(
             i18n.t("static.program.program") +
-              " : " +
-              document.getElementById("programId").selectedOptions[0].text,
+            " : " +
+            document.getElementById("programId").selectedOptions[0].text,
             doc.internal.pageSize.width / 8,
             poslen,
             {
@@ -1330,8 +1117,8 @@ class ProcurementAgentExport extends Component {
           poslen = poslen + 20;
           doc.text(
             i18n.t("static.report.versionFinal*") +
-              " : " +
-              document.getElementById("versionId").selectedOptions[0].text,
+            " : " +
+            document.getElementById("versionId").selectedOptions[0].text,
             doc.internal.pageSize.width / 8,
             poslen,
             {
@@ -1341,9 +1128,9 @@ class ProcurementAgentExport extends Component {
           poslen = poslen + 20;
           doc.text(
             i18n.t("static.program.isincludeplannedshipment") +
-              " : " +
-              document.getElementById("isPlannedShipmentId").selectedOptions[0]
-                .text,
+            " : " +
+            document.getElementById("isPlannedShipmentId").selectedOptions[0]
+              .text,
             doc.internal.pageSize.width / 8,
             poslen,
             {
@@ -1353,28 +1140,22 @@ class ProcurementAgentExport extends Component {
           poslen = poslen + 20;
           var planningText = doc.splitTextToSize(
             i18n.t("static.planningunit.planningunit") +
-              " : " +
-              this.state.planningUnitLabels.join("; "),
+            " : " +
+            this.state.planningUnitLabels.join("; "),
             (doc.internal.pageSize.width * 3) / 4
           );
           doc.text(doc.internal.pageSize.width / 8, poslen, planningText);
         }
       }
     };
-
     const unit = "pt";
-    const size = "A4"; // Use A1, A2, A3 or A4
-    const orientation = "landscape"; // portrait or landscape
-
+    const size = "A4";
+    const orientation = "landscape";
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
-
     doc.setFontSize(8);
-
     var viewby = document.getElementById("viewById").value;
-
     const headers = [];
-
     let data = [];
     if (viewby == 1) {
       columns.map((item, idx) => {
@@ -1478,47 +1259,42 @@ class ProcurementAgentExport extends Component {
         },
       };
     }
-
     doc.autoTable(content);
     addHeaders(doc);
     addFooters(doc);
     doc.save(
       i18n.t("static.report.shipmentCostReport") +
-        " " +
-        i18n.t("static.program.savedBy") +
-        document.getElementById("viewById").selectedOptions[0].text +
-        ".pdf"
+      " " +
+      i18n.t("static.program.savedBy") +
+      document.getElementById("viewById").selectedOptions[0].text +
+      ".pdf"
     );
   };
-
   buildJExcel() {
     let shipmentCosttList = this.state.data;
-    // console.log("shipmentCosttList @@@---->", shipmentCosttList);
     let shipmentCostArray = [];
     let count = 0;
-
     let viewby = this.state.viewby;
-
     for (var j = 0; j < shipmentCosttList.length; j++) {
       data = [];
       data[0] =
         viewby == 1
           ? getLabelText(
-              shipmentCosttList[j].procurementAgent.label,
-              this.state.lang
-            )
+            shipmentCosttList[j].procurementAgent.label,
+            this.state.lang
+          )
           : viewby == 2
-          ? getLabelText(
+            ? getLabelText(
               shipmentCosttList[j].fundingSource.label,
               this.state.lang
             )
-          : {};
+            : {};
       data[1] =
         viewby == 1
           ? shipmentCosttList[j].procurementAgent.code
           : viewby == 2
-          ? shipmentCosttList[j].fundingSource.code
-          : {};
+            ? shipmentCosttList[j].fundingSource.code
+            : {};
       data[2] = getLabelText(
         shipmentCosttList[j].planningUnit.label,
         this.state.lang
@@ -1528,94 +1304,40 @@ class ProcurementAgentExport extends Component {
       data[5] = shipmentCosttList[j].freightPerc.toFixed(2);
       data[6] = shipmentCosttList[j].freightCost;
       data[7] = shipmentCosttList[j].totalCost.toFixed(2);
-
       shipmentCostArray[count] = data;
       count++;
     }
-    // if (shipmentCosttList.length == 0) {
-    //     data = [];
-    //     shipmentCostArray[0] = data;
-    // }
-    // // console.log("shipmentCostArray---->", shipmentCostArray);
     this.el = jexcel(document.getElementById("tableDiv"), "");
-    // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
-    var json = [];
     var data = shipmentCostArray;
-
-    // // console.log("RENDER VIEWBY-------", viewby);
     let obj1 = {};
     let obj2 = {};
     if (viewby == 1) {
       obj1 = {
-        // dataField: 'procurementAgent.label',
-        // text: 'Procurement Agent',
-        // sort: true,
-        // align: 'center',
-        // headerAlign: 'center',
-        // formatter: (cell, row) => {
-        //     return getLabelText(cell, this.state.lang);
-        // },
-        // style: { width: '70px' },
-
         title: i18n.t("static.procurementagent.procurementagent"),
         type: "text",
-        // readOnly: true
       };
-
       obj2 = {
-        // dataField: 'procurementAgent.code',
-        // text: 'Procurement Agent Code',
-        // sort: true,
-        // align: 'center',
-        // headerAlign: 'center',
-        // style: { width: '70px' },
-
         title: i18n.t("static.report.procurementagentcode"),
         type: "text",
-        // readOnly: true
       };
     } else if (viewby == 2) {
       obj1 = {
-        // dataField: 'fundingSource.label',
-        // text: i18n.t('static.budget.fundingsource'),
-        // sort: true,
-        // align: 'center',
-        // headerAlign: 'center',
-        // formatter: (cell, row) => {
-        //     return getLabelText(cell, this.state.lang);
-        // },
-        // style: { width: '100px' },
-
         title: i18n.t("static.budget.fundingsource"),
         type: "text",
-        // readOnly: true
       };
-
       obj2 = {
-        // dataField: 'fundingSource.code',
-        // text: i18n.t('static.fundingsource.fundingsourceCode'),
-        // sort: true,
-        // align: 'center',
-        // headerAlign: 'center',
-        // style: { width: '100px' },
-
         title: i18n.t("static.fundingsource.fundingsourceCode"),
         type: "text",
-        // readOnly: true
       };
     } else {
       obj1 = {
-        // hidden: true,
         type: "hidden",
       };
-
       obj2 = {
-        // hidden: true
         type: "hidden",
       };
     }
-
     var options = {
       data: data,
       columnDrag: true,
@@ -1627,60 +1349,47 @@ class ProcurementAgentExport extends Component {
         {
           title: i18n.t("static.report.planningUnit"),
           type: "text",
-          // readOnly: true
         },
         {
           title: i18n.t("static.report.qty"),
           type: "numeric",
           mask: "#,##",
-          // readOnly: true
         },
         {
           title: i18n.t("static.report.productCost"),
           type: "numeric",
           mask: "#,##.00",
           decimal: ".",
-          // readOnly: true
         },
         {
           title: i18n.t("static.report.freightPer"),
           type: "numeric",
           mask: "#,##.00",
           decimal: ".",
-          // readOnly: true
         },
         {
           title: i18n.t("static.report.freightCost"),
           type: "numeric",
           mask: "#,##.00",
           decimal: ".",
-          // readOnly: true
         },
         {
           title: i18n.t("static.report.totalCost"),
           type: "numeric",
           mask: "#,##.00",
           decimal: ".",
-          // readOnly: true
         },
       ],
-      // text: {
-      //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //     show: '',
-      //     entries: '',
-      // },
       editable: false,
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
-      // tableOverflow: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       onselection: this.selected,
-
       oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,
@@ -1699,19 +1408,16 @@ class ProcurementAgentExport extends Component {
       loading: false,
     });
   }
-
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
   };
-
   fetchData = () => {
-    // console.log("-------------------IN FETCHDATA-----------------------------");
     let versionId = document.getElementById("versionId").value;
     let programId = document.getElementById("programId").value;
     let viewby = document.getElementById("viewById").value;
     let procurementAgentIds =
       this.state.procurementAgentValues.length ==
-      this.state.procurementAgents.length
+        this.state.procurementAgents.length
         ? []
         : this.state.procurementAgentValues.map((ele) => ele.value.toString());
     let fundingSourceIds =
@@ -1721,7 +1427,6 @@ class ProcurementAgentExport extends Component {
     let isPlannedShipmentId = document.getElementById(
       "isPlannedShipmentId"
     ).value;
-
     let planningUnitIds =
       this.state.planningUnitValues.length == this.state.planningUnits.length
         ? []
@@ -1741,7 +1446,6 @@ class ProcurementAgentExport extends Component {
         this.state.rangeValue.to.month,
         0
       ).getDate();
-
     if (viewby == 1) {
       if (
         programId > 0 &&
@@ -1754,10 +1458,8 @@ class ProcurementAgentExport extends Component {
             (ele) => ele.value
           );
           var db1;
-          var storeOS;
           getDatabase();
           this.setState({ loading: true });
-          var regionList = [];
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
             this.setState({
@@ -1767,17 +1469,12 @@ class ProcurementAgentExport extends Component {
           }.bind(this);
           openRequest.onsuccess = function (e) {
             var version = versionId.split("(")[0].trim();
-
-            //for user id
             var userBytes = CryptoJS.AES.decrypt(
               localStorage.getItem("curUser"),
               SECRET_KEY
             );
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-            //for program id
             var program = `${programId}_v${version}_uId_${userId}`;
-
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(
               ["programData"],
@@ -1785,7 +1482,6 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -1794,9 +1490,6 @@ class ProcurementAgentExport extends Component {
               });
             }.bind(this);
             programRequest.onsuccess = function (e) {
-              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              // var programJson = JSON.parse(programData);
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -1811,14 +1504,12 @@ class ProcurementAgentExport extends Component {
                 var sList = programJson.shipmentList;
                 shipmentList = shipmentList.concat(sList);
               }
-
               var programTransaction = db1.transaction(
                 ["program"],
                 "readwrite"
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-
               program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
@@ -1835,24 +1526,17 @@ class ProcurementAgentExport extends Component {
                     seaFreight = programResult[k].seaFreightPerc;
                   }
                 }
-
-                // var shipmentList = (programJson.shipmentList);
-                // console.log("shipmentList----*********----", shipmentList);
-
                 const activeFilter = shipmentList.filter(
                   (c) =>
                     (c.active == true || c.active == "true") &&
                     (c.accountFlag == true || c.accountFlag == "true")
                 );
-                // const activeFilter = shipmentList;
                 let isPlannedShipment = [];
                 if (isPlannedShipmentId == 1) {
-                  //yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                   isPlannedShipment = activeFilter.filter(
                     (c) => c.shipmentStatus.id != 8
                   );
                 } else {
-                  //no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
                   isPlannedShipment = activeFilter.filter(
                     (c) =>
                       c.shipmentStatus.id == 3 ||
@@ -1868,10 +1552,6 @@ class ProcurementAgentExport extends Component {
                   const procurementAgentFilter = isPlannedShipment.filter(
                     (c) => c.procurementAgent.id == procurementAgentId
                   );
-                  // const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-                  // EXPECTED_DELIVERY_DATE
-                  // // console.log("startDate===>", startDate);
-                  // // console.log("stopDate===>", endDate);
                   const dateFilter = procurementAgentFilter.filter((c) =>
                     moment(
                       c.receivedDate == null || c.receivedDate == ""
@@ -1879,8 +1559,6 @@ class ProcurementAgentExport extends Component {
                         : c.receivedDate
                     ).isBetween(startDate, endDate, null, "[)")
                   );
-                  // console.log("dateFilter====>", dateFilter);
-
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
                     for (let j = 0; j < dateFilter.length; j++) {
@@ -1889,9 +1567,7 @@ class ProcurementAgentExport extends Component {
                       }
                     }
                   }
-                  // // console.log("offline data----", planningUnitFilter);
                   for (let j = 0; j < planningUnitFilter.length; j++) {
-                    // // console.log("hi===>", parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)));
                     let freight = 0;
                     if (planningUnitFilter[j].shipmentMode === "Air") {
                       freight = airFreight;
@@ -1949,26 +1625,23 @@ class ProcurementAgentExport extends Component {
                         planningUnitFilter[j].currency.conversionRateToUsd,
                       totalCost:
                         planningUnitFilter[j].productCost *
-                          planningUnitFilter[j].currency.conversionRateToUsd +
+                        planningUnitFilter[j].currency.conversionRateToUsd +
                         planningUnitFilter[j].freightCost *
-                          planningUnitFilter[j].currency.conversionRateToUsd,
+                        planningUnitFilter[j].currency.conversionRateToUsd,
                       currency: planningUnitFilter[j].currency,
                     };
                     data.push(json);
                   }
                 });
-                // console.log("data----->", data);
                 var planningUnitsinData = data.map((q) =>
                   parseInt(q.planningUnit.id)
                 );
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // console.log("userFilter===>###", useFilter);
                 var filteredData = [];
                 var myJson = [];
                 for (var uf = 0; uf < useFilter.length; uf++) {
-                  // for (var p = 0; p < data.length; p++) {
                   var planningUnitFilterdata = data.filter(
                     (c) => c.planningUnit.id == useFilter[uf]
                   );
@@ -1978,7 +1651,6 @@ class ProcurementAgentExport extends Component {
                   var uniqueProcurementAgentIds = procurementAgentIds.filter(
                     (q, idx) => procurementAgentIds.indexOf(q) === idx
                   );
-                  // // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
                   for (var u = 0; u < uniqueProcurementAgentIds.length; u++) {
                     var pupaFilterdata = planningUnitFilterdata.filter(
                       (c) =>
@@ -1986,7 +1658,6 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
-                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -1997,19 +1668,19 @@ class ProcurementAgentExport extends Component {
                       freightCost =
                         Number(freightCost) +
                         Number(pupaFilterdata[pf].freightCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          );
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        );
                       totalCost =
                         Number(totalCost) +
                         Number(pupaFilterdata[pf].productCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          ) +
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        ) +
                         Number(pupaFilterdata[pf].freightCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          );
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        );
                     }
                     myJson = {
                       active: true,
@@ -2025,12 +1696,9 @@ class ProcurementAgentExport extends Component {
                       freightCost: freightCost,
                       totalCost: totalCost,
                     };
-
-                    // }
                     filteredData.push(myJson);
                   }
                 }
-                // console.log("filteredData===>", filteredData);
                 this.setState(
                   {
                     data: filteredData,
@@ -2063,21 +1731,15 @@ class ProcurementAgentExport extends Component {
             planningUnitIds: planningUnitIds,
             includePlannedShipments: includePlannedShipments,
           };
-          // console.log("inputjson-------", inputjson);
-          // AuthenticationService.setupAxiosInterceptors();
           this.setState({ loading: true });
-
           ReportService.procurementAgentExporttList(inputjson)
             .then((response) => {
-              // console.log("Online Data------", response.data);
               this.setState(
                 {
                   data: response.data,
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
-                  // this.consolidatedProcurementAgentList();
                   this.buildJExcel();
                 }
               );
@@ -2089,21 +1751,18 @@ class ProcurementAgentExport extends Component {
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
                   this.consolidatedProcurementAgentList();
                   this.el = jexcel(document.getElementById("tableDiv"), "");
-                  // this.el.destroy();
                   jexcel.destroy(document.getElementById("tableDiv"), true);
                 }
               );
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
                 });
               } else {
@@ -2139,41 +1798,12 @@ class ProcurementAgentExport extends Component {
                 }
               }
             });
-          // .catch(
-          //     error => {
-          //         this.setState({
-          //             data: [], loading: false
-          //         }, () => {
-          //             this.consolidatedProgramList();
-          //             this.consolidatedProcurementAgentList();
-          //             this.el = jexcel(document.getElementById("tableDiv"), '');
-          //             this.el.destroy();
-          //         })
-          //         if (error.message === "Network Error") {
-          //             this.setState({ message: error.message, loading: false });
-          //         } else {
-          //             switch (error.response ? error.response.status : "") {
-          //                 case 500:
-          //                 case 401:
-          //                 case 404:
-          //                 case 406:
-          //                 case 412:
-          //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
-          //                     break;
-          //                 default:
-          //                     this.setState({ message: 'static.unkownError', loading: false });
-          //                     break;
-          //             }
-          //         }
-          //     }
-          // );
         }
       } else if (programId == 0) {
         this.setState(
           { message: i18n.t("static.report.selectProgram"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2182,7 +1812,6 @@ class ProcurementAgentExport extends Component {
           { message: i18n.t("static.program.validversion"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2194,7 +1823,6 @@ class ProcurementAgentExport extends Component {
           },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2206,7 +1834,6 @@ class ProcurementAgentExport extends Component {
           },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2223,9 +1850,7 @@ class ProcurementAgentExport extends Component {
             (ele) => ele.value
           );
           var db1;
-          var storeOS;
           getDatabase();
-          var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
@@ -2236,17 +1861,12 @@ class ProcurementAgentExport extends Component {
           }.bind(this);
           openRequest.onsuccess = function (e) {
             var version = versionId.split("(")[0].trim();
-
-            //for user id
             var userBytes = CryptoJS.AES.decrypt(
               localStorage.getItem("curUser"),
               SECRET_KEY
             );
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-            //for program id
             var program = `${programId}_v${version}_uId_${userId}`;
-
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(
               ["programData"],
@@ -2254,7 +1874,6 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -2263,10 +1882,6 @@ class ProcurementAgentExport extends Component {
               });
             }.bind(this);
             programRequest.onsuccess = function (e) {
-              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              // var programJson = JSON.parse(programData);
-
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -2281,14 +1896,12 @@ class ProcurementAgentExport extends Component {
                 var sList = programJson.shipmentList;
                 shipmentList = shipmentList.concat(sList);
               }
-
               var programTransaction = db1.transaction(
                 ["program"],
                 "readwrite"
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-
               program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
@@ -2305,24 +1918,17 @@ class ProcurementAgentExport extends Component {
                     seaFreight = programResult[k].seaFreightPerc;
                   }
                 }
-
-                // var shipmentList = (programJson.shipmentList);
-
                 const activeFilter = shipmentList.filter(
                   (c) =>
                     (c.active == true || c.active == "true") &&
                     (c.accountFlag == true || c.accountFlag == "true")
                 );
-                // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-
                 let isPlannedShipment = [];
                 if (isPlannedShipmentId == 1) {
-                  //yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                   isPlannedShipment = activeFilter.filter(
                     (c) => c.shipmentStatus.id != 8
                   );
                 } else {
-                  //no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
                   isPlannedShipment = activeFilter.filter(
                     (c) =>
                       c.shipmentStatus.id == 3 ||
@@ -2338,9 +1944,6 @@ class ProcurementAgentExport extends Component {
                   const fundingSourceFilter = isPlannedShipment.filter(
                     (c) => c.fundingSource.id == fundingSourceId
                   );
-
-                  // const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-
                   const dateFilter = fundingSourceFilter.filter((c) =>
                     moment(
                       c.receivedDate == null || c.receivedDate == ""
@@ -2348,9 +1951,6 @@ class ProcurementAgentExport extends Component {
                         : c.receivedDate
                     ).isBetween(startDate, endDate, null, "[)")
                   );
-                  // console.log("DB LIST---", dateFilter);
-                  // console.log("SELECTED LIST---", planningUnitIds);
-
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
                     for (let j = 0; j < dateFilter.length; j++) {
@@ -2359,8 +1959,6 @@ class ProcurementAgentExport extends Component {
                       }
                     }
                   }
-
-                  // console.log("offline data----", planningUnitFilter);
                   for (let j = 0; j < planningUnitFilter.length; j++) {
                     let freight = 0;
                     if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -2403,9 +2001,9 @@ class ProcurementAgentExport extends Component {
                         planningUnitFilter[j].currency.conversionRateToUsd,
                       totalCost:
                         planningUnitFilter[j].productCost *
-                          planningUnitFilter[j].currency.conversionRateToUsd +
+                        planningUnitFilter[j].currency.conversionRateToUsd +
                         planningUnitFilter[j].freightCost *
-                          planningUnitFilter[j].currency.conversionRateToUsd,
+                        planningUnitFilter[j].currency.conversionRateToUsd,
                       currency: planningUnitFilter[j].currency,
                     };
                     data.push(json);
@@ -2415,11 +2013,9 @@ class ProcurementAgentExport extends Component {
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // // console.log("userFilter===>", useFilter);
                 var filteredData = [];
                 var myJson = [];
                 for (var uf = 0; uf < useFilter.length; uf++) {
-                  // for (var p = 0; p < data.length; p++) {
                   var planningUnitFilterdata = data.filter(
                     (c) => c.planningUnit.id == useFilter[uf]
                   );
@@ -2435,7 +2031,6 @@ class ProcurementAgentExport extends Component {
                     );
                     var qty = 0;
                     var productCost = 0;
-                    var freightPerc = 0;
                     var freightCost = 0;
                     var totalCost = 0;
                     for (var pf = 0; pf < pupaFilterdata.length; pf++) {
@@ -2446,19 +2041,19 @@ class ProcurementAgentExport extends Component {
                       freightCost =
                         Number(freightCost) +
                         Number(pupaFilterdata[pf].freightCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          );
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        );
                       totalCost =
                         Number(totalCost) +
                         Number(pupaFilterdata[pf].productCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          ) +
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        ) +
                         Number(pupaFilterdata[pf].freightCost) *
-                          Number(
-                            pupaFilterdata[pf].currency.conversionRateToUsd
-                          );
+                        Number(
+                          pupaFilterdata[pf].currency.conversionRateToUsd
+                        );
                     }
                     myJson = {
                       active: true,
@@ -2474,12 +2069,9 @@ class ProcurementAgentExport extends Component {
                       freightCost: freightCost,
                       totalCost: totalCost,
                     };
-
-                    // }
                     filteredData.push(myJson);
                   }
                 }
-                // console.log("end offline data----", filteredData);
                 this.setState(
                   {
                     data: filteredData,
@@ -2513,18 +2105,14 @@ class ProcurementAgentExport extends Component {
             includePlannedShipments: includePlannedShipments,
           };
           this.setState({ loading: true });
-
-          // AuthenticationService.setupAxiosInterceptors();
           ReportService.fundingSourceExportList(inputjson)
             .then((response) => {
-              // // console.log(JSON.stringify(response.data))
               this.setState(
                 {
                   data: response.data,
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
                   this.consolidatedFundingSourceList();
                   this.buildJExcel();
                 }
@@ -2537,21 +2125,18 @@ class ProcurementAgentExport extends Component {
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
                   this.consolidatedFundingSourceList();
                   this.el = jexcel(document.getElementById("tableDiv"), "");
-                  // this.el.destroy();
                   jexcel.destroy(document.getElementById("tableDiv"), true);
                 }
               );
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
                 });
               } else {
@@ -2587,42 +2172,12 @@ class ProcurementAgentExport extends Component {
                 }
               }
             });
-          // .catch(
-          //     error => {
-          //         this.setState({
-          //             data: [], loading: false
-          //         }, () => {
-          //             this.consolidatedProgramList();
-          //             this.consolidatedFundingSourceList();
-          //             this.el = jexcel(document.getElementById("tableDiv"), '');
-          //             this.el.destroy();
-
-          //         })
-          //         if (error.message === "Network Error") {
-          //             this.setState({ message: error.message, loading: false });
-          //         } else {
-          //             switch (error.response ? error.response.status : "") {
-          //                 case 500:
-          //                 case 401:
-          //                 case 404:
-          //                 case 406:
-          //                 case 412:
-          //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
-          //                     break;
-          //                 default:
-          //                     this.setState({ message: 'static.unkownError', loading: false });
-          //                     break;
-          //             }
-          //         }
-          //     }
-          // );
         }
       } else if (programId == 0) {
         this.setState(
           { message: i18n.t("static.report.selectProgram"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2631,7 +2186,6 @@ class ProcurementAgentExport extends Component {
           { message: i18n.t("static.program.validversion"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2643,7 +2197,6 @@ class ProcurementAgentExport extends Component {
           },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2655,7 +2208,6 @@ class ProcurementAgentExport extends Component {
           },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -2670,11 +2222,8 @@ class ProcurementAgentExport extends Component {
           planningUnitIds = this.state.planningUnitValues.map(
             (ele) => ele.value
           );
-
           var db1;
-          var storeOS;
           getDatabase();
-          var regionList = [];
           this.setState({ loading: true });
           var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
           openRequest.onerror = function (event) {
@@ -2685,17 +2234,12 @@ class ProcurementAgentExport extends Component {
           }.bind(this);
           openRequest.onsuccess = function (e) {
             var version = versionId.split("(")[0].trim();
-
-            //for user id
             var userBytes = CryptoJS.AES.decrypt(
               localStorage.getItem("curUser"),
               SECRET_KEY
             );
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
-            //for program id
             var program = `${programId}_v${version}_uId_${userId}`;
-
             db1 = e.target.result;
             var programDataTransaction = db1.transaction(
               ["programData"],
@@ -2703,7 +2247,6 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -2712,10 +2255,6 @@ class ProcurementAgentExport extends Component {
               });
             }.bind(this);
             programRequest.onsuccess = function (e) {
-              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              // var programJson = JSON.parse(programData);
-
               var planningUnitDataList =
                 programRequest.result.programData.planningUnitDataList;
               var shipmentList = [];
@@ -2730,14 +2269,12 @@ class ProcurementAgentExport extends Component {
                 var sList = programJson.shipmentList;
                 shipmentList = shipmentList.concat(sList);
               }
-
               var programTransaction = db1.transaction(
                 ["program"],
                 "readwrite"
               );
               var programOs = programTransaction.objectStore("program");
               var program1Request = programOs.getAll();
-
               program1Request.onerror = function (event) {
                 this.setState({
                   loading: false,
@@ -2754,23 +2291,17 @@ class ProcurementAgentExport extends Component {
                     seaFreight = programResult[k].seaFreightPerc;
                   }
                 }
-
-                // var shipmentList = (programJson.shipmentList);
-
                 const activeFilter = shipmentList.filter(
                   (c) =>
                     (c.active == true || c.active == "true") &&
                     (c.accountFlag == true || c.accountFlag == "true")
                 );
-
                 let isPlannedShipment = [];
                 if (isPlannedShipmentId == 1) {
-                  //yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                   isPlannedShipment = activeFilter.filter(
                     (c) => c.shipmentStatus.id != 8
                   );
                 } else {
-                  //no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
                   isPlannedShipment = activeFilter.filter(
                     (c) =>
                       c.shipmentStatus.id == 3 ||
@@ -2780,8 +2311,6 @@ class ProcurementAgentExport extends Component {
                       c.shipmentStatus.id == 7
                   );
                 }
-
-                // const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
                 const dateFilter = isPlannedShipment.filter((c) =>
                   moment(
                     c.receivedDate == null || c.receivedDate == ""
@@ -2798,8 +2327,6 @@ class ProcurementAgentExport extends Component {
                     }
                   }
                 }
-
-                // console.log("offline data----", planningUnitFilter);
                 for (let j = 0; j < planningUnitFilter.length; j++) {
                   let freight = 0;
                   if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -2826,37 +2353,27 @@ class ProcurementAgentExport extends Component {
                       planningUnitFilter[j].currency.conversionRateToUsd,
                     totalCost:
                       planningUnitFilter[j].productCost *
-                        planningUnitFilter[j].currency.conversionRateToUsd +
+                      planningUnitFilter[j].currency.conversionRateToUsd +
                       planningUnitFilter[j].freightCost *
-                        planningUnitFilter[j].currency.conversionRateToUsd,
+                      planningUnitFilter[j].currency.conversionRateToUsd,
                     currency: planningUnitFilter[j].currency,
                   };
                   data.push(json);
                 }
-
                 var planningUnitsinData = data.map((q) => parseInt(q.planningUnit.id));
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // // console.log("userFilter===>", useFilter);
                 var filteredData = [];
                 var myJson = [];
-                // console.log("User Filter@@@", useFilter);
                 for (var uf = 0; uf < useFilter.length; uf++) {
-                  // for (var p = 0; p < data.length; p++) {
                   var planningUnitFilterdata = data.filter(
                     (c) => c.planningUnit.id == useFilter[uf]
                   );
-                  // // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
                   var qty = 0;
                   var productCost = 0;
-                  var freightPerc = 0;
                   var freightCost = 0;
                   var totalCost = 0;
-                  // console.log(
-                    // "@@@PlanningUnitFiltered data",
-                    // planningUnitFilterdata
-                  // );
                   for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
                     qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
                     productCost =
@@ -2865,22 +2382,22 @@ class ProcurementAgentExport extends Component {
                     freightCost =
                       Number(freightCost) +
                       Number(planningUnitFilterdata[pf].freightCost) *
-                        Number(
-                          planningUnitFilterdata[pf].currency
-                            .conversionRateToUsd
-                        );
+                      Number(
+                        planningUnitFilterdata[pf].currency
+                          .conversionRateToUsd
+                      );
                     totalCost =
                       Number(totalCost) +
                       Number(planningUnitFilterdata[pf].productCost) *
-                        Number(
-                          planningUnitFilterdata[pf].currency
-                            .conversionRateToUsd
-                        ) +
+                      Number(
+                        planningUnitFilterdata[pf].currency
+                          .conversionRateToUsd
+                      ) +
                       Number(planningUnitFilterdata[pf].freightCost) *
-                        Number(
-                          planningUnitFilterdata[pf].currency
-                            .conversionRateToUsd
-                        );
+                      Number(
+                        planningUnitFilterdata[pf].currency
+                          .conversionRateToUsd
+                      );
                   }
                   myJson = {
                     active: true,
@@ -2897,11 +2414,8 @@ class ProcurementAgentExport extends Component {
                     freightCost: freightCost,
                     totalCost: totalCost,
                   };
-
-                  // }
                   filteredData.push(myJson);
                 }
-
                 this.setState(
                   {
                     data: filteredData,
@@ -2934,18 +2448,14 @@ class ProcurementAgentExport extends Component {
             includePlannedShipments: includePlannedShipments,
           };
           this.setState({ loading: true });
-
-          // AuthenticationService.setupAxiosInterceptors();
           ReportService.AggregateShipmentByProduct(inputjson)
             .then((response) => {
-              // console.log("Online Data------", response.data);
               this.setState(
                 {
                   data: response.data,
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
                   this.buildJExcel();
                 }
               );
@@ -2957,21 +2467,18 @@ class ProcurementAgentExport extends Component {
                   loading: false,
                 },
                 () => {
-                  // this.consolidatedProgramList();
                   this.consolidatedProcurementAgentList();
                   this.el = jexcel(document.getElementById("tableDiv"), "");
-                  // this.el.destroy();
                   jexcel.destroy(document.getElementById("tableDiv"), true);
                 }
               );
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
                 });
               } else {
@@ -3007,41 +2514,12 @@ class ProcurementAgentExport extends Component {
                 }
               }
             });
-          // .catch(
-          //     error => {
-          //         this.setState({
-          //             data: [], loading: false
-          //         }, () => {
-          //             this.consolidatedProgramList();
-          //             this.consolidatedProcurementAgentList();
-          //             this.el = jexcel(document.getElementById("tableDiv"), '');
-          //             this.el.destroy();
-          //         })
-          //         if (error.message === "Network Error") {
-          //             this.setState({ message: error.message, loading: false });
-          //         } else {
-          //             switch (error.response ? error.response.status : "") {
-          //                 case 500:
-          //                 case 401:
-          //                 case 404:
-          //                 case 406:
-          //                 case 412:
-          //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
-          //                     break;
-          //                 default:
-          //                     this.setState({ message: 'static.unkownError', loading: false });
-          //                     break;
-          //             }
-          //         }
-          //     }
-          // );
         }
       } else if (programId == 0) {
         this.setState(
           { message: i18n.t("static.report.selectProgram"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -3050,7 +2528,6 @@ class ProcurementAgentExport extends Component {
           { message: i18n.t("static.program.validversion"), data: [] },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
@@ -3062,14 +2539,12 @@ class ProcurementAgentExport extends Component {
           },
           () => {
             this.el = jexcel(document.getElementById("tableDiv"), "");
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
           }
         );
       }
     }
   };
-
   toggleView = () => {
     let viewby = document.getElementById("viewById").value;
     this.setState({
@@ -3085,10 +2560,7 @@ class ProcurementAgentExport extends Component {
         () => {
           this.fetchData();
           this.el = jexcel(document.getElementById("tableDiv"), "");
-          // this.el.destroy();
           jexcel.destroy(document.getElementById("tableDiv"), true);
-          // this.consolidatedProgramList();
-          // this.consolidatedProcurementAgentList();
         }
       );
     } else if (viewby == 2) {
@@ -3101,10 +2573,7 @@ class ProcurementAgentExport extends Component {
         () => {
           this.fetchData();
           this.el = jexcel(document.getElementById("tableDiv"), "");
-          // this.el.destroy();
           jexcel.destroy(document.getElementById("tableDiv"), true);
-          // this.consolidatedProgramList();
-          // this.consolidatedProcurementAgentList();
         }
       );
     } else {
@@ -3115,17 +2584,13 @@ class ProcurementAgentExport extends Component {
           data: [],
         },
         () => {
-          // this.consolidatedProgramList();
-          // this.consolidatedProcurementAgentList();
           this.fetchData();
           this.el = jexcel(document.getElementById("tableDiv"), "");
-          // this.el.destroy();
           jexcel.destroy(document.getElementById("tableDiv"), true);
         }
       );
     }
   };
-
   componentDidMount() {
     this.getFundingSource();
     this.getPrograms();
@@ -3135,7 +2600,6 @@ class ProcurementAgentExport extends Component {
       viewby: viewby,
     });
   }
-
   setProgramId(event) {
     this.setState(
       {
@@ -3149,19 +2613,7 @@ class ProcurementAgentExport extends Component {
       }
     );
   }
-
   setVersionId(event) {
-    // this.setState({
-    //     versionId: event.target.value
-    // }, () => {
-    //     if (this.state.data.length != 0) {
-    //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
-    //         this.fetchData();
-    //     } else {
-    //         this.getPlanningUnit();
-    //     }
-    // })
-
     if (this.state.versionId != "" || this.state.versionId != undefined) {
       this.setState(
         {
@@ -3183,14 +2635,11 @@ class ProcurementAgentExport extends Component {
       );
     }
   }
-
   getFundingSource = () => {
     this.setState({ loading: true });
-    if (isSiteOnline()) {
-      // AuthenticationService.setupAxiosInterceptors();
+    if (localStorage.getItem("sessionType") === 'Online') {
       FundingSourceService.getFundingSourceListAll()
         .then((response) => {
-          // // console.log(JSON.stringify(response.data))
           this.setState(
             {
               fundingSources: response.data,
@@ -3213,12 +2662,11 @@ class ProcurementAgentExport extends Component {
           );
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -3256,41 +2704,14 @@ class ProcurementAgentExport extends Component {
             }
           }
         });
-      // .catch(
-      //     error => {
-      //         this.setState({
-      //             fundingSources: [], loading: false
-      //         }, () => { this.consolidatedFundingSourceList() })
-      //         if (error.message === "Network Error") {
-      //             this.setState({ message: error.message, loading: false });
-      //         } else {
-      //             switch (error.response ? error.response.status : "") {
-      //                 case 500:
-      //                 case 401:
-      //                 case 404:
-      //                 case 406:
-      //                 case 412:
-      //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-      //                     break;
-      //                 default:
-      //                     this.setState({ message: 'static.unkownError', loading: false });
-      //                     break;
-      //             }
-      //         }
-      //     }
-      // );
     } else {
-      // console.log("offline");
       this.consolidatedFundingSourceList();
       this.setState({ loading: false });
     }
   };
-
   consolidatedFundingSourceList = () => {
-    const lan = "en";
     const { fundingSources } = this.state;
     var proList = fundingSources;
-
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3299,9 +2720,7 @@ class ProcurementAgentExport extends Component {
       var transaction = db1.transaction(["fundingSource"], "readwrite");
       var fundingSource = transaction.objectStore("fundingSource");
       var getRequest = fundingSource.getAll();
-
       getRequest.onerror = function (event) {
-        // Handle errors!
       };
       getRequest.onsuccess = function (event) {
         var myResult = [];
@@ -3310,7 +2729,6 @@ class ProcurementAgentExport extends Component {
           localStorage.getItem("curUser"),
           SECRET_KEY
         );
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           var f = 0;
           for (var k = 0; k < this.state.fundingSources.length; k++) {
@@ -3319,7 +2737,6 @@ class ProcurementAgentExport extends Component {
               myResult[i].fundingSourceId
             ) {
               f = 1;
-              // console.log("already exist");
             }
           }
           var programData = myResult[i];
@@ -3338,45 +2755,20 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
-
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
-
-  addCommas(cell, row) {
-    // // console.log("row---------->", row);
-
-    cell += "";
-    var x = cell.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    // return "(" + currencyCode + ")" + "  " + x1 + x2;
-    return x1 + x2;
-  }
-
   render() {
     jexcel.setDictionary({
       Show: " ",
       entries: " ",
     });
-
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
         {i18n.t("static.common.result", { from, to, size })}
       </span>
     );
-
     const { procurementAgents } = this.state;
-
     const { fundingSources } = this.state;
-
     const { programs } = this.state;
-
     const { versions } = this.state;
     let versionList =
       versions.length > 0 &&
@@ -3390,7 +2782,6 @@ class ProcurementAgentExport extends Component {
           </option>
         );
       }, this);
-
     const { planningUnits } = this.state;
     let planningUnitList =
       planningUnits.length > 0 &&
@@ -3400,167 +2791,58 @@ class ProcurementAgentExport extends Component {
           value: item.id,
         };
       }, this);
-
     const { rangeValue } = this.state;
-
     let viewby = this.state.viewby;
-    // // console.log("RENDER VIEWBY-------", viewby);
     let obj1 = {};
     let obj2 = {};
     if (viewby == 1) {
       obj1 = {
-        dataField: "procurementAgent.label",
         text: "Procurement Agent",
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "70px" },
       };
-
       obj2 = {
-        dataField: "procurementAgent.code",
         text: "Procurement Agent Code",
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { width: "70px" },
       };
     } else if (viewby == 2) {
       obj1 = {
-        dataField: "fundingSource.label",
         text: i18n.t("static.budget.fundingsource"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "100px" },
       };
-
       obj2 = {
-        dataField: "fundingSource.code",
         text: i18n.t("static.fundingsource.fundingsourceCode"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { width: "100px" },
       };
     } else {
       obj1 = {
         hidden: true,
       };
-
       obj2 = {
         hidden: true,
       };
     }
-
     const columns = [
       obj1,
       obj2,
       {
-        dataField: "planningUnit.id",
         text: i18n.t("static.report.qatPID"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        style: { align: "center" },
       },
       {
-        dataField: "planningUnit.label",
         text: i18n.t("static.report.planningUnit"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return getLabelText(cell, this.state.lang);
-        },
-        style: { width: "400px" },
       },
       {
-        dataField: "qty",
         text: i18n.t("static.report.qty"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "productCost",
         text: i18n.t("static.report.productCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "freightPerc",
         text: i18n.t("static.report.freightPer"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: (cell, row) => {
-          return cell.toFixed(2);
-        },
-        style: { width: "100px" },
       },
       {
-        dataField: "freightCost",
         text: i18n.t("static.report.freightCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
       {
-        dataField: "totalCost",
         text: i18n.t("static.report.totalCost"),
-        sort: true,
-        align: "center",
-        headerAlign: "center",
-        formatter: this.addCommas,
-        style: { width: "100px" },
       },
     ];
-    const options = {
-      hidePageListOnlyOnePage: true,
-      firstPageText: i18n.t("static.common.first"),
-      prePageText: i18n.t("static.common.back"),
-      nextPageText: i18n.t("static.common.next"),
-      lastPageText: i18n.t("static.common.last"),
-      nextPageTitle: i18n.t("static.common.firstPage"),
-      prePageTitle: i18n.t("static.common.prevPage"),
-      firstPageTitle: i18n.t("static.common.nextPage"),
-      lastPageTitle: i18n.t("static.common.lastPage"),
-      showTotal: true,
-      paginationTotalRenderer: customTotal,
-      disablePageTitle: true,
-      sizePerPageList: [
-        {
-          text: "10",
-          value: 10,
-        },
-        {
-          text: "30",
-          value: 30,
-        },
-        {
-          text: "50",
-          value: 50,
-        },
-        {
-          text: "All",
-          value: this.state.selRegion.length,
-        },
-      ],
-    };
+    
     const checkOnline = localStorage.getItem("sessionType");
     return (
       <div className="animated">
@@ -3570,10 +2852,6 @@ class ProcurementAgentExport extends Component {
         <SupplyPlanFormulas ref="formulaeChild" />
         <Card>
           <div className="Card-header-reporticon">
-            {/* <div className="card-header-actions">
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                        </div> */}
             {checkOnline === "Online" && this.state.data.length > 0 && (
               <div className="card-header-actions">
                 <a className="card-header-action">
@@ -3652,7 +2930,6 @@ class ProcurementAgentExport extends Component {
                       }}
                       value={rangeValue}
                       lang={pickerLang}
-                      //theme="light"
                       onChange={this.handleRangeChange}
                       onDismiss={this.handleRangeDissmis}
                     >
@@ -3667,7 +2944,6 @@ class ProcurementAgentExport extends Component {
                     </Picker>
                   </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">
                     {i18n.t("static.program.program")}
@@ -3679,7 +2955,6 @@ class ProcurementAgentExport extends Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        // onChange={this.filterVersion}
                         onChange={(e) => {
                           this.setProgramId(e);
                         }}
@@ -3692,7 +2967,6 @@ class ProcurementAgentExport extends Component {
                           programs.map((item, i) => {
                             return (
                               <option key={i} value={item.programId}>
-                                {/* {getLabelText(item.label, this.state.lang)} */}
                                 {item.programCode}
                               </option>
                             );
@@ -3701,7 +2975,6 @@ class ProcurementAgentExport extends Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">
                     {i18n.t("static.report.versionFinal*")}
@@ -3713,7 +2986,6 @@ class ProcurementAgentExport extends Component {
                         name="versionId"
                         id="versionId"
                         bsSize="sm"
-                        // onChange={(e) => { this.getPlanningUnit(); }}
                         onChange={(e) => {
                           this.setVersionId(e);
                         }}
@@ -3727,7 +2999,6 @@ class ProcurementAgentExport extends Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">
                     {i18n.t("static.report.planningUnit")}
@@ -3751,7 +3022,6 @@ class ProcurementAgentExport extends Component {
                     />
                   </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3" style={{ zIndex: "1" }}>
                   <Label htmlFor="appendedInputButton">
                     {i18n.t("static.program.isincludeplannedshipment")}
@@ -3773,7 +3043,6 @@ class ProcurementAgentExport extends Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
                 <FormGroup className="col-md-3" style={{ zIndex: "1" }}>
                   <Label htmlFor="appendedInputButton">
                     {i18n.t("static.common.display")}
@@ -3788,7 +3057,6 @@ class ProcurementAgentExport extends Component {
                         onChange={this.toggleView}
                         value={this.state.viewby}
                       >
-                        {/* <option value="-1">{i18n.t('static.common.select')}</option> */}
                         <option value="2">
                           {i18n.t("static.dashboard.fundingsource")}
                         </option>
@@ -3809,7 +3077,6 @@ class ProcurementAgentExport extends Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
-
                 <FormGroup
                   className="col-md-3"
                   id="procurementAgentDiv"
@@ -3892,7 +3159,6 @@ class ProcurementAgentExport extends Component {
                       <strong>{i18n.t("static.common.loading")}</strong>
                     </h4>
                   </div>
-
                   <div class="spinner-border blue ml-4" role="status"></div>
                 </div>
               </div>

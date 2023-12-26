@@ -1,10 +1,8 @@
 import React from "react";
-import { PROBLEM_STATUS_IN_COMPLIANCE } from "../../Constants";
 import { Table } from "reactstrap";
+import { PROBLEM_STATUS_IN_COMPLIANCE } from "../../Constants";
 import i18n from "../../i18n";
-
 export default class ProblemListDashboardComponent extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -14,11 +12,9 @@ export default class ProblemListDashboardComponent extends React.Component {
             problemDashboardList: []
         }
     }
-
     componentDidMount() {
         var problemListUnFilttered = this.props.problemListUnFilttered.filter(c => c.planningUnitActive != false && c.regionActive != false);
         var problemCategoryList = this.props.problemCategoryList;
-        // console.log("problemListUnFilttered", problemListUnFilttered)
         var problemCategoryListFiltered = [];
         var problemStatusList = this.props.problemStatusList.filter(c => c.id != PROBLEM_STATUS_IN_COMPLIANCE);
         var problemStatusListSorted = [];
@@ -27,7 +23,6 @@ export default class ProblemListDashboardComponent extends React.Component {
         problemStatusListSorted.push(problemStatusList[2]);
         problemStatusList = problemStatusListSorted;
         var problemDashboardList = [];
-
         for (var pc = 0; pc < problemListUnFilttered.length; pc++) {
             if (problemListUnFilttered[pc].problemCategory != undefined) {
                 if (problemListUnFilttered[pc].problemCategory.id == 4 || problemListUnFilttered[pc].problemCategory.id == 5 || problemListUnFilttered[pc].problemCategory.id == 6) {
@@ -36,8 +31,6 @@ export default class ProblemListDashboardComponent extends React.Component {
                 }
             }
         }
-
-
         for (var pc = 0; pc < problemCategoryList.length; pc++) {
             if (problemCategoryList[pc].id != 4 && problemCategoryList[pc].id != 5 && problemCategoryList[pc].id != 6) {
                 problemCategoryListFiltered.push(problemCategoryList[pc]);
@@ -74,17 +67,12 @@ export default class ProblemListDashboardComponent extends React.Component {
             problemCategory: -1,
             count: problemListUnFilttered.filter(c => c.problemStatus != undefined && c.problemStatus.id != PROBLEM_STATUS_IN_COMPLIANCE).length
         })
-        // console.log("problemListUnFilttered", problemListUnFilttered)
-        // console.log("problemListUnFilttered", problemCategoryListFiltered)
-
         this.setState({
-            // problemListUnFilttered1: problemListUnFilttered,
             problemCategoryListFiltered: problemCategoryListFiltered,
             problemStatusList: problemStatusList,
             problemDashboardList: problemDashboardList
         })
     }
-
     render() {
         return (
             <div className="ProblemListDashboardBorder">

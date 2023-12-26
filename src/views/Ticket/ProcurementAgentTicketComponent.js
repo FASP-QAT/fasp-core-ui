@@ -1,30 +1,15 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import RealmService from '../../api/RealmService';
-import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, API_URL } from '../../Constants';
-import ProcurementAgentService from '../../api/ProcurementAgentService';
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import ProcurementAgentService from '../../api/ProcurementAgentService';
+import RealmService from '../../api/RealmService';
+import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
 let summaryText_2 = "Add Procurement Agent"
-const initialValues = {
-    summary: "",
-    realmName: "",
-    procurementAgentName: '',
-    procurementAgentCode: '',
-    submittedToApprovedLeadTime: '',
-    approvedToShippedLeadTime: '',
-    localProcurementAgent: false,
-    notes: ""
-}
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -33,9 +18,8 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         procurementAgentCode: Yup.string()
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly')),
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string')),
-        // .required(i18n.t('static.procurementagent.codetext')),
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
@@ -46,35 +30,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class ProcurementAgentTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -100,7 +58,6 @@ export default class ProcurementAgentTicketComponent extends Component {
         this.getDisplayName = this.getDisplayName.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
-
     dataChange(event) {
         let { procurementAgent } = this.state
         if (event.target.name == "summary") {
@@ -134,42 +91,14 @@ export default class ProcurementAgentTicketComponent extends Component {
             procurementAgent
         }, () => { })
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            realmName: true,
-            procurementAgentCode: true,
-            procurementAgentName: true,
-            submittedToApprovedLeadTime: true,
-            approvedToShippedLeadTime: true,
-            notes: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -180,26 +109,22 @@ export default class ProcurementAgentTicketComponent extends Component {
                     this.setState({
                         realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
-
                     let { procurementAgent } = this.state;
                     procurementAgent.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         procurementAgent
                     }, () => {
-
                     })
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -231,21 +156,13 @@ export default class ProcurementAgentTicketComponent extends Component {
                 }
             );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
-
     resetClicked() {
         let { procurementAgent } = this.state;
-        // procurementAgent.summary = '';
         procurementAgent.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         procurementAgent.procurementAgentCode = '';
         procurementAgent.procurementAgentName = '';
@@ -257,7 +174,6 @@ export default class ProcurementAgentTicketComponent extends Component {
         },
             () => { });
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -265,39 +181,30 @@ export default class ProcurementAgentTicketComponent extends Component {
             return "";
         }
     }
-
     getDisplayName() {
         let realmId = this.state.realmId;
-        // let realmId = 1;
         let procurementAgentValue = this.state.procurementAgent.procurementAgentName;
-        // let procurementAgentValue = "USAID"
         procurementAgentValue = procurementAgentValue.replace(/[^A-Za-z0-9]/g, "");
         procurementAgentValue = procurementAgentValue.trim().toUpperCase();
         if (realmId != '' && procurementAgentValue.length != 0) {
-
-            if (procurementAgentValue.length >= 10) {//minus 2
+            if (procurementAgentValue.length >= 10) {
                 procurementAgentValue = procurementAgentValue.slice(0, 8);
-                // console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
                             procurementAgent
                         });
-
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -328,29 +235,23 @@ export default class ProcurementAgentTicketComponent extends Component {
                             }
                         }
                     );
-
-            } else {// not need to minus
-                // console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
+            } else {
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
                             procurementAgent
                         });
-
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -382,13 +283,9 @@ export default class ProcurementAgentTicketComponent extends Component {
                         }
                     );
             }
-
         }
-
     }
-
     render() {
-
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -398,7 +295,6 @@ export default class ProcurementAgentTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -410,14 +306,14 @@ export default class ProcurementAgentTicketComponent extends Component {
                         initialValues={{
                             summary: summaryText_1,
                             realmName: this.props.items.userRealmId,
-                            procurementAgentName: '',
-                            procurementAgentCode: '',
-                            submittedToApprovedLeadTime: '',
-                            approvedToShippedLeadTime: '',
+                            procurementAgentName: this.state.procurementAgent.procurementAgentName,
+                            procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
+                            submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
+                            approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                             localProcurementAgent: false,
                             notes: ""
                         }}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
@@ -425,7 +321,6 @@ export default class ProcurementAgentTicketComponent extends Component {
                             this.state.procurementAgent.summary = summaryText_2;
                             this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -449,13 +344,11 @@ export default class ProcurementAgentTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -530,8 +423,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmList}
                                         </Input>
-                                        {/* </InputGroupAddon> */}
-                                        <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                                                                <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
@@ -546,8 +438,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             required
                                             value={this.Capitalize(this.state.procurementAgent.procurementAgentName)}
                                         />
-                                        {/* </InputGroupAddon> */}
-                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
+                                                                                <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
@@ -563,8 +454,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             maxLength={10}
                                             value={this.state.procurementAgent.procurementAgentCode}
                                         />
-                                        {/* </InputGroupAddon> */}
-                                        <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
+                                                                                <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
@@ -580,8 +470,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                             min="0"
                                         />
-                                        {/* </InputGroupAddon> */}
-                                        <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                                                <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
@@ -597,8 +486,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             value={this.state.procurementAgent.approvedToShippedLeadTime}
                                             min="1"
                                         />
-                                        {/* </InputGroupAddon> */}
-                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
+                                                                                <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
@@ -646,20 +534,15 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.procurementAgent.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                </Form>
+                                                                    </Form>
                             )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -673,5 +556,4 @@ export default class ProcurementAgentTicketComponent extends Component {
             </div>
         );
     }
-
 }

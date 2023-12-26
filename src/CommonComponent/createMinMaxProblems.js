@@ -1,8 +1,5 @@
-import moment, { months } from 'moment';
-import getProblemCriticality from './getProblemCriticality';
-
-export default function createMinMaxProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList,openProblemStatusObj) {
-
+import moment from 'moment';
+export default function createMinMaxProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj) {
     var json = {
         problemReportId: 0,
         program: {
@@ -12,7 +9,6 @@ export default function createMinMaxProblems(programObj, versionID, problemObj, 
         },
         versionId: versionID,
         realmProblem: problemObj,
-
         dt: moment(Date.now()).utcOffset('-0500').format("YYYY-MM-DD"),
         region: {
             id: regionObj.regionId,
@@ -21,7 +17,6 @@ export default function createMinMaxProblems(programObj, versionID, problemObj, 
         planningUnit: {
             id: planningUnitObj.planningUnit.id,
             label: planningUnitObj.planningUnit.label,
-
         },
         shipmentId: '',
         data5: JSON.stringify(causeJson),
@@ -29,9 +24,9 @@ export default function createMinMaxProblems(programObj, versionID, problemObj, 
         regionActive: true,
         newAdded: false,
         problemActionIndex: problemActionIndex,
-        problemCategory:problemObj.problem.problemCategory,
+        problemCategory: problemObj.problem.problemCategory,
         problemStatus: openProblemStatusObj,
-        problemType:problemObj.problemType,
+        problemType: problemObj.problemType,
         reviewed: false,
         reviewNotes: '',
         reviewedDate: '',
@@ -60,6 +55,4 @@ export default function createMinMaxProblems(programObj, versionID, problemObj, 
         ]
     }
     problemActionList.push(json);
-    // problemActionIndex++;
-
 }

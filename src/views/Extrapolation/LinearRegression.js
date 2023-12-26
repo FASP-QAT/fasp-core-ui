@@ -1,111 +1,5 @@
-import regression from 'regression';
-import ExtrapolationService from '../../api/ExtrapolationService.js';
-import i18n from '../../i18n.js';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
-import { calculateCI } from './CalculateCI.js';
 export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId, planningUnitId) {
-    // console.log("InputData@@@", inputData)
-
-    //     // const noOfMonthsForProjection = noOfProjectionMonths;
-    //     // let actualMonths = data[data.length - 1].month;
-
-    //     // const result = regression.linear(initializeRegression(data));
-    //     // const gradient = result.equation[0];
-    //     // const yIntercept = result.equation[1];
-
-    //     // for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
-    //     //     if (x <= actualMonths) {
-    //     //         var linearReg = getLinearRegression(x, gradient, yIntercept);
-    //     //         data[x - 1].forecast = linearReg > 0 ? linearReg : 0;
-    //     //         // data[x - 1].forecast = getLinearRegression(x, gradient, yIntercept);
-    //     //     } else {
-    //     //         var linearReg = getLinearRegression(x, gradient, yIntercept);
-    //     //         data[x - 1] = { "month": x, "actual": null, "forecast": linearReg > 0 ? linearReg : 0 };
-    //     //         // data[x - 1] = { "month": x, "actual": null, "forecast": getLinearRegression(x, gradient, yIntercept) };
-    //     //     }
-    //     // }
-    //     // calculateError(data, "linearRegressionError", props);
-    //     // calculateCI(data, Number(confidence), "linearRegressionData", props);
-    //     // props.updateState("", data);
-    //     // // Print the output
-    //     // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
-    //     //     console.log(y+" = "+data[y-1].forecast);
-    //     // }
-    //     var data = []
-    //     for (var i = 0; i < inputData.length; i++) {
-    //         data.push(Number(inputData[i].actual));
-    //     }
-    //     var json = {
-    //         "data": data,
-    //         "n": Number(noOfProjectionMonths),
-    //         "level": Number(confidence)
-    //     }
-    //     console.log("Json@@@@@@L", json);
-    //     ExtrapolationService.regression(json)
-    //         .then(response => {
-    //             if (response.status == 200) {
-    //                 console.log("response.status@@@@@@", response);
-    //                 var responseData = response.data;
-    //                 var output = [];
-    //                 var count = 0;
-    //                 for (var k = 0; k < responseData.fits.length; k++) {
-    //                     count += 1;
-    //                     output.push({ month: count, 
-                        //    actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, 
-                        //    forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0, ci: null })
-    //                 }
-    //                 for (var j = 0; j < responseData.forecast.length; j++) {
-    //                     count += 1;
-    //                     output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
-    //                 }
-
-    //                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-    //                 if (page == "DataEntry") {
-    //                     var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
-    //                     props.updateLinearRegressionData(linearRegressionData);
-    //                 }else if (page == "importFromQATSP") {
-    //                     var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
-    //                     props.updateLinearRegressionData(linearRegressionData);
-    //                 } else {
-    //                     // calculateCI(output, Number(confidenceLevel), "tesData", props)
-    //                     props.updateState("linearRegressionData", output);
-    //                     calculateError(output, "linearRegressionError", props);
-    //                 }
-    //             }
-    //         }).catch(error => {
-    //             console.log("Error@@@@@@", error)
-    //             if (page == "DataEntry") {
-    //                 var linearRegressionData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
-    //                 props.updateLinearRegressionData(linearRegressionData);
-    //             }else if (page == "importFromQATSP") {
-    //                 var linearRegressionData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
-    //                 props.updateLinearRegressionData(linearRegressionData);
-    //             } else {
-    //             if (!isTreeExtrapolation) {
-    //                 // props.updateState("showData", false);
-    //                 // props.updateState("dataEl", "");
-    //                 props.updateState("loading", false);
-    //                 props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
-    //                 props.updateState("dataChanged", true);
-    //                 // props.updateState("show", false);
-    //                 // props.el = jexcel(document.getElementById("tableDiv"), '');
-    //                 // props.el.destroy();
-    //             }
-    //         }
-    //         })
-    // }
-
-    // // function getLinearRegression(month, gradient, yIntercept) {
-    // //     return gradient * month + yIntercept;
-    // // }
-
-    // // function initializeRegression(data) {
-    // //     let tmpArray = new Array();
-    // //     for (let x = 0; x < data.length; x++) {
-    // //         tmpArray.push(new Array(data[x].month, data[x].actual));
-    // //     }
-    // //     return tmpArray;
-    // // }
     const tTable = [
         { "df": 1, "zValue": [4.16529977009041, 6.31375151467504, 12.7062047361747, 63.6567411628715, 127.321336468872, 636.619248768789] },
         { "df": 2, "zValue": [2.28193058772768, 2.91998558035373, 4.30265272974946, 9.92484320091829, 14.0890472755553, 31.5990545764454] },
@@ -142,9 +36,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
         { "df": 80, "zValue": [1.45348806591882, 1.66412457858967, 1.99006342125445, 2.63869059634418, 2.8869720507572, 3.41633745847698] },
         { "df": 100, "zValue": [1.45067487130889, 1.66023432608534, 1.98397151852356, 2.62589052143802, 2.87065152383654, 3.39049131116426] },
         { "df": 1000, "zValue": [1.44063798599448, 1.64637881728548, 1.96233908082641, 2.58075469806595, 2.81327786048555, 3.30028264842394] }
-    
     ]
-    
     function getCriticalTValue(df, confidence) {
         if (df > 2) {
             df = df - 2;
@@ -173,64 +65,27 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
                 return null;
         }
     }
-    
-    // Actual data
-    // inputData = [{ month: 1, actual: 1807.37, forecast: null },
-    // { month: 2, actual: 2355.32, forecast: null },
-    // { month: 3, actual: 2591.83, forecast: null },
-    // { month: 4, actual: 2236.39, forecast: null },
-    // { month: 5, actual: 1549.14, forecast: null },
-    // { month: 6, actual: 2105.79, forecast: null },
-    // { month: 7, actual: 2041.32, forecast: null },
-    // { month: 8, actual: 2021.01, forecast: null },
-    // { month: 9, actual: 1870.46, forecast: null },
-    // { month: 10, actual: 2390.56, forecast: null },
-    // { month: 11, actual: 2198.03, forecast: null },
-    // { month: 12, actual: 2046.83, forecast: null },
-    // { month: 13, actual: 1934.19, forecast: null },
-    // { month: 14, actual: 2406.41, forecast: null },
-    // { month: 15, actual: 2249.06, forecast: null },
-    // { month: 16, actual: 2211.56, forecast: null },
-    // { month: 17, actual: 2237.05, forecast: null },
-    // { month: 18, actual: 2856.43, forecast: null },
-    // { month: 19, actual: 2799.57, forecast: null },
-    // { month: 20, actual: 2645.33, forecast: null },
-    // { month: 21, actual: 2563.59, forecast: null },
-    // { month: 22, actual: 3146.52, forecast: null },
-    // { month: 23, actual: 3196.68, forecast: null },
-    // { month: 24, actual: 2930.48, forecast: null }]
-    
-    
     var data = [];
     for (var i = 0; i < inputData.length; i++) {
         data.push([inputData[i].month, inputData[i].actual])
-    
     }
-    
-    // Number of months you want to project data for
     const count = noOfProjectionMonths;
-    // Confidence # that you Confidence Interval for
     const confidenceLevel = confidence;
-    
     let sumOfXMinusXBarSqr = 0;
     let sumOfXMinusXBar = 0;
     let sumOfYMinusYBarSqr = 0;
     let sumOfXMinusXBarIntoYMinusYBar = 0;
-    
     let SSE = 0;
     let xBar = 0;
     let sumX = 0;
     let yBar = 0;
     let sumY = 0;
-    
     for (let x = 0; x < data.length; x++) {
         sumX += data[x][0];
         sumY += data[x][1];
     }
-    
     xBar = sumX / data.length;
     yBar = sumY / data.length;
-    
     for (let x = 0; x < data.length; x++) {
         let xMinusXBar = (data[x][0] - xBar);
         let yMinusYBar = (data[x][1] - yBar);
@@ -239,27 +94,20 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
         sumOfXMinusXBarIntoYMinusYBar += xMinusXBar * yMinusYBar;
         sumOfYMinusYBarSqr += Math.pow(yMinusYBar, 2);
     }
-    
     let gradient = sumOfXMinusXBarIntoYMinusYBar / sumOfXMinusXBarSqr;
     let yIntercept = yBar - (xBar * gradient);
-    
     for (let x = 0; x < data.length; x++) {
         let y = (gradient * (x + 1)) + yIntercept;
         SSE += Math.pow(y - data[x][1], 2)
     }
-    
     let varX = sumOfXMinusXBarSqr / data.length;
     let sqrtOfRegression = Math.pow(SSE / (data.length - 2), 0.5);
     let criticalTValue = getCriticalTValue(data.length, Number(confidenceLevel));
-    let sumYMinusY1Sqr = 0;
     let a = sqrtOfRegression / Math.pow(data.length, 0.5);
     var output = [];
-    
     for (let x = 0; x < data.length + count; x++) {
         let y = (gradient * (x + 1)) + yIntercept;
         let ciString = "";
-        let yString;
-        let cLevel = "";
         if (x >= data.length) {
             let b1 = Math.pow(x + 1 - xBar, 2);
             let b2 = Math.pow((1 + (b1 / varX)), 0.5);
@@ -272,8 +120,6 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
         }
     }
-    // console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-    
         if (page == "DataEntry") {
             var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
             props.updateLinearRegressionData(linearRegressionData);
@@ -281,7 +127,6 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
             props.updateLinearRegressionData(linearRegressionData);
         } else {
-            // calculateCI(output, Number(confidenceLevel), "tesData", props)
             props.updateState("linearRegressionData", output);
             calculateError(output, "linearRegressionError", props);
         }   
