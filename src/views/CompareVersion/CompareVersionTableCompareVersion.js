@@ -26,10 +26,6 @@ export default class CompareVersionTableCompareVersion extends Component {
         }
         this.loaded = this.loaded.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
-        this.toggleLarge = this.toggleLarge.bind(this);
-        this.showData = this.showData.bind(this);
-        this.acceptCurrentChanges = this.acceptCurrentChanges.bind(this);
-        this.acceptIncomingChanges = this.acceptIncomingChanges.bind(this);
     }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
