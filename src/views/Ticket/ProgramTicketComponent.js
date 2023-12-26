@@ -12,34 +12,11 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import HealthAreaService from '../../api/HealthAreaService';
+import DropdownService from '../../api/DropdownService';
 import classNames from 'classnames';
 import { API_URL, SPACE_REGEX } from '../../Constants';
-
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
-const initialValues = {
-    summary: "",
-    programName: '',
-    programCode: '',
-    realmId: "",
-    realmCountryId: '',
-    regionId: '',
-    organisationId: '',
-    healthAreaId: '',
-    programManager: '',
-    airFreightPerc: '',
-    seaFreightPerc: '',
-    roadFreightPerc: '',
-    plannedToSubmittedLeadTime: '',
-    submittedToApprovedLeadTime: '',
-    approvedToShippedLeadTime: '',
-    shippedToArrivedByAirLeadTime: '',
-    shippedToArrivedBySeaLeadTime: '',
-    shippedToArrivedByRoadLeadTime: '',
-    arrivedToDeliveredLeadTime: '',
-    notes: ""
-}
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -62,17 +39,14 @@ const validationSchema = function (values) {
         airFreightPerc: Yup.string()
             .required(i18n.t('static.program.validairfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         seaFreightPerc: Yup.string()
             .required(i18n.t('static.program.validseafreighttext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         roadFreightPerc: Yup.string()
             .required(i18n.t('static.program.validroadfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext'))
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         plannedToSubmittedLeadTime: Yup.string()
             .required(i18n.t('static.program.validplantosubmittext'))
@@ -95,42 +69,16 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         shippedToArrivedByRoadLeadTime: Yup.string()
-            .required(i18n.t('static.program.shippedToArrivedByRoadLeadTime'))
+            .required(i18n.t('static.program.shippedToArrivedByRoadtext'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         arrivedToDeliveredLeadTime: Yup.string()
             .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class ProgramTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -182,7 +130,6 @@ export default class ProgramTicketComponent extends Component {
         this.getProgramDisplayCode = this.getProgramDisplayCode.bind(this);
         this.changeRealmCountry = this.changeRealmCountry.bind(this);
     }
-
     dataChange(event) {
         let { program } = this.state
         if (event.target.name == "summary") {
@@ -196,30 +143,22 @@ export default class ProgramTicketComponent extends Component {
         }
         if (event.target.name == "realmId") {
             program.realmId = event.target.value !== "" ? this.state.realmList.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
-            // this.setState({
             this.state.realmId = event.target.value
-            // })            
         }
         if (event.target.name == "realmCountryId") {
             program.realmCountryId = event.target.value !== "" ? this.state.realmCountryList.filter(c => c.realmCountryId == event.target.value)[0].country.label.label_en : "";
-            // this.setState({
             this.state.realmCountryId = event.target.value
-            // })            
         }
         if (event.target.name == "regionId") {
             program.regionId = event.target.value;
         }
         if (event.target.name == "organisationId") {
-            program.organisationId = event.target.value !== "" ? this.state.organisationList.filter(c => c.organisationId == event.target.value)[0].label.label_en : "";
-            // this.setState({
+            program.organisationId = event.target.value !== "" ? this.state.organisationList.filter(c => c.id == event.target.value)[0].label.label_en : "";
             this.state.organisationId = event.target.value
-            // })            
         }
         if (event.target.name == "healthAreaId") {
             program.healthAreaId = event.target.value !== "" ? this.state.healthAreaList.filter(c => c.healthAreaId == event.target.value)[0].label.label_en : "";
-            // this.setState({
             this.state.healthAreaId = event.target.value
-            // })            
         }
         if (event.target.name == "programManager") {
             program.programManager = event.target.options[event.target.selectedIndex].innerHTML;
@@ -264,7 +203,6 @@ export default class ProgramTicketComponent extends Component {
             program
         }, () => { })
     };
-
     changeRealmCountry(event) {
         if (event === null) {
             let { program } = this.state;
@@ -287,17 +225,15 @@ export default class ProgramTicketComponent extends Component {
             });
         }
     }
-
     getDependentLists(realmId) {
-        // AuthenticationService.setupAxiosInterceptors();
         if (realmId != "") {
             ProgramService.getProgramManagerList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = (a.username).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = (b.username).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = (a.username).toUpperCase(); 
+                            var itemLabelB = (b.username).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -312,13 +248,11 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -349,14 +283,13 @@ export default class ProgramTicketComponent extends Component {
                         }
                     }
                 );
-
             ProgramService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         var countryList = [];
@@ -377,13 +310,11 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -414,14 +345,13 @@ export default class ProgramTicketComponent extends Component {
                         }
                     }
                 );
-
-            ProgramService.getOrganisationList(realmId)
+            DropdownService.getOrganisationDropdownList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -436,13 +366,11 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -473,14 +401,13 @@ export default class ProgramTicketComponent extends Component {
                         }
                     }
                 );
-
             ProgramService.getHealthAreaList(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -495,13 +422,11 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -534,16 +459,14 @@ export default class ProgramTicketComponent extends Component {
                 );
         }
     }
-
     getRegionList(e) {
-        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.value)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     var json = listArray;
@@ -564,13 +487,11 @@ export default class ProgramTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -613,57 +534,15 @@ export default class ProgramTicketComponent extends Component {
         program.regionId = regionIdArray;
         this.setState({ program: program });
     }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            programName: true,
-            programCode: true,
-            realmId: true,
-            realmCountryId: true,
-            regionId: true,
-            organisationId: true,
-            healthAreaId: true,
-            programManager: true,
-            airFreightPerc: true,
-            seaFreightPerc: true,
-            roadFreightPerc: true,
-            plannedToSubmittedLeadTime: true,
-            submittedToApprovedLeadTime: true,
-            approvedToShippedLeadTime: true,
-            shippedToArrivedByAirLeadTime: true,
-            shippedToArrivedBySeaLeadTime: true,
-            shippedToArrivedByRoadLeadTime: true,
-            arrivedToDeliveredLeadTime: true,
-            healthAreaId: true,
-            notes: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+   
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -674,15 +553,12 @@ export default class ProgramTicketComponent extends Component {
                         this.setState({
                             realmList: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
-
                         let { program } = this.state;
                         program.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             program
                         }, () => {
-
                             this.getDependentLists(this.props.items.userRealmId);
-
                         })
                     }
                 } else {
@@ -694,13 +570,11 @@ export default class ProgramTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -732,21 +606,13 @@ export default class ProgramTicketComponent extends Component {
                 }
             );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
-
     resetClicked() {
         let { program } = this.state;
-        // program.summary = '';
         program.programName = '';
         program.programCode = '';
         program.realmId = this.props.items.userRealmId !== "" ? this.state.realmList.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -777,37 +643,29 @@ export default class ProgramTicketComponent extends Component {
         },
             () => { });
     }
-
     getProgramDisplayCode() {
         let items = this.state;
         var country = items.realmCountryId;
         var technicalArea = items.healthAreaId;
         var organisation = items.organisationId;
-        // console.log(country, "===", technicalArea, "===", organisation)
         if ((country != "" && country != undefined) && (technicalArea != "" && technicalArea != undefined) && (organisation != "" && organisation != undefined)) {
             var countryCode = this.state.realmCountryList.filter(c => c.realmCountryId == country)[0].country.countryCode;
             var technicalAreaCode = this.state.healthAreaList.filter(c => c.healthAreaId == technicalArea)[0].healthAreaCode;
             var organisationCode = this.state.organisationList.filter(c => c.organisationId == organisation)[0].organisationCode;
             var programDisplayCode = countryCode + "-" + technicalAreaCode + "-" + organisationCode;
-            // console.log("programDisplayCode", programDisplayCode);
-
             let { program } = this.state;
             program.programCode = programDisplayCode;
             this.setState({
                 program
             })
         }
-
     }
-
     render() {
-
         const { realmList } = this.state;
         const { programManagerList } = this.state;
         const { realmCountryList } = this.state;
         const { organisationList } = this.state;
         const { healthAreaList } = this.state;
-
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
                 return (
@@ -816,25 +674,14 @@ export default class ProgramTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
-
         let realmHealthArea = healthAreaList.length > 0
             && healthAreaList.map((item, i) => {
                 return (
@@ -843,8 +690,6 @@ export default class ProgramTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
-
         let programManagers = programManagerList.length > 0
             && programManagerList.map((item, i) => {
                 return (
@@ -853,7 +698,6 @@ export default class ProgramTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -884,7 +728,7 @@ export default class ProgramTicketComponent extends Component {
                             arrivedToDeliveredLeadTime: '',
                             notes: ""
                         }}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
@@ -892,7 +736,6 @@ export default class ProgramTicketComponent extends Component {
                             this.state.program.summary = summaryText_2;
                             this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -916,13 +759,11 @@ export default class ProgramTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -999,18 +840,6 @@ export default class ProgramTicketComponent extends Component {
                                     </FormGroup>
                                     < FormGroup >
                                         <Label for="realmCountryId">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                        {/* <Input type="select" name="realmCountryId" id="realmCountryId"
-                                                bsSize="sm"
-                                                valid={!errors.realmCountryId && this.state.program.realmCountryId != ''}
-                                                invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e); this.getProgramDisplayCode() }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmCountryId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmCountries}
-                                            </Input> */}
-
                                         <Select
                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                 { 'is-valid': !errors.realmCountryId && this.state.program.realmCountryId != '' },
@@ -1031,7 +860,6 @@ export default class ProgramTicketComponent extends Component {
                                             options={this.state.countryList}
                                             value={this.state.realmCountryId}
                                         />
-
                                         <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                     </FormGroup>
                                     < FormGroup >
@@ -1097,9 +925,7 @@ export default class ProgramTicketComponent extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}</Label>
                                         <Input
                                             type="text" name="programCode"
-                                            // valid={!errors.programCode}
                                             bsSize="sm"
-                                            // invalid={touched.programCode && !!errors.programCode || this.state.program.programCode == ''}
                                             readOnly
                                             onBlur={handleBlur}
                                             value={this.state.program.programCode}
@@ -1161,7 +987,7 @@ export default class ProgramTicketComponent extends Component {
                                             type="number"
                                             min="0"
                                             name="roadFreightPerc" id="roadFreightPerc" />
-                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
+                                        <FormFeedback>{errors.roadFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
@@ -1271,20 +1097,15 @@ export default class ProgramTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.program.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                </Form>
+                                                                    </Form>
                             )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -1298,5 +1119,4 @@ export default class ProgramTicketComponent extends Component {
             </div>
         );
     }
-
 }

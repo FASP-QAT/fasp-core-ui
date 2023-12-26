@@ -1,25 +1,29 @@
-import React, { Component } from "react";
-import {
-    Row, Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form
-} from 'reactstrap';
-import Select from 'react-select';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import '../Forms/ValidationForms/ValidationForms.css';
-import 'react-select/dist/react-select.min.css';
-import ProgramService from "../../api/ProgramService";
-import { lang } from "moment";
-import i18n from "../../i18n"
-import HealthAreaService from "../../api/HealthAreaService";
-import getLabelText from '../../CommonComponent/getLabelText'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { Formik } from 'formik';
+import { lang } from "moment";
+import React, { Component } from "react";
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import {
+    Button,
+    Card, CardBody,
+    CardFooter,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label,
+    Row
+} from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 import DropdownService from '../../api/DropdownService';
-
+import ProgramService from "../../api/ProgramService";
+import i18n from "../../i18n";
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     programName: '',
@@ -32,12 +36,10 @@ let initialValues = {
     regionId: [],
     programCode1: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            // .required(i18n.t('static.program.validprogramtext')),
             .required('Enter forecasting program name'),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
@@ -47,55 +49,25 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        // programNotes: Yup.string()
-        //     .required(i18n.t('static.program.validnotestext'))
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
-        // uniqueCode: Yup.string()
-        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
-        programCode1: Yup.string()
-            .test('programCode', i18n.t('static.programValidation.programCode'),
-                function (value) {
-                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }),
+        // programCode1: Yup.string()
+        //     .test('programCode', i18n.t('static.programValidation.programCode'),
+        //         function (value) {
+        //             if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
+        //         })
     })
-}
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 export default class EditProgram extends Component {
     constructor(props) {
-        // console.log("in constructor");
         super(props);
         this.state = {
-            // program: this.props.location.state.program,
             uniqueCode: '',
             program: {
                 programCode: '<%RC%>-<%TA%>-<%OR%>-',
@@ -136,7 +108,6 @@ export default class EditProgram extends Component {
                         label_pr: '',
                         label_fr: ''
                     }
-
                 },
                 programManager: {
                     userId: '',
@@ -159,12 +130,7 @@ export default class EditProgram extends Component {
                 programNotes: '',
                 regionArray: [],
                 healthAreaArray: []
-
-
             },
-            // regionList: [{ value: '1', label: 'R1' },
-            // { value: '2', label: 'R2' },
-            // { value: '3', label: 'R3' }],
             regionId: '',
             healthAreaId: '',
             lang: localStorage.getItem('lang'),
@@ -180,9 +146,7 @@ export default class EditProgram extends Component {
             organisationCode: '',
             realmCountryCode: '',
             isChanged: false,
-
         }
-
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -194,11 +158,9 @@ export default class EditProgram extends Component {
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
     }
-
     changeMessage(message) {
         this.setState({ message: message })
     }
-
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
@@ -207,20 +169,13 @@ export default class EditProgram extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     Capitalize(str) {
         let { program } = this.state
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
-            // console.log("program obj===>", response.data);
             var proObj = response.data;
-            // var healthAreaArrayDummy=[];
-            // healthAreaArrayDummy.push(response.data.healthArea.id);
-            // proObj.healthAreaArray=healthAreaArrayDummy;
-
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
@@ -241,17 +196,13 @@ export default class EditProgram extends Component {
                 organisationCode: organisationCode,
                 realmCountryCode: realmCountryCode
             })
-
-            // AuthenticationService.setupAxiosInterceptors();
-            // ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.dataSetId)
                 .then(response => {
-                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.username.toUpperCase(); 
+                            var itemLabelB = b.username.toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         listArray = listArray.filter(c => c.active == true);
@@ -270,13 +221,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -307,19 +256,17 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        // console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
                         regList.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.label.toUpperCase(); 
+                            var itemLabelB = b.label.toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -334,13 +281,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -371,15 +316,13 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
-            // ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
             DropdownService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -394,13 +337,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -431,12 +372,11 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
             ProgramService.getHealthAreaListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
                         var haList = [];
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_FP")) {
                             var json = response.data;
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
@@ -447,11 +387,10 @@ export default class EditProgram extends Component {
                                 haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                             }
                         }
-
                         var listArray = haList;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.label.toUpperCase(); 
+                            var itemLabelB = b.label.toUpperCase(); 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -467,13 +406,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -504,18 +441,15 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -546,9 +480,7 @@ export default class EditProgram extends Component {
                 }
             }
         );
-
     }
-
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -559,15 +491,12 @@ export default class EditProgram extends Component {
             healthAreaCode: healthAreaCode.slice(0, -1)
         })
     }
-
     generateOrganisationCode(event) {
-        // console.log("generateOrganisationCode===",this.state.organisationList)
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
     }
-
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -615,43 +544,9 @@ export default class EditProgram extends Component {
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
-
         this.setState({ program, isChanged: true }, () => { 
-            // console.log(this.state) 
-        })
-
-    }
-    touchAll(setTouched, errors) {
-        setTouched({
-            programName: true,
-            realmId: true,
-            realmCountryId: true,
-            organisationId: true,
-            userId: true,
-            airFreightPerc: true,
-            healthAreaId: true,
-            regionId: true,
-            programCode1: true
-            // uniqueCode:''
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('programForm', (fieldName) => {
-            return Boolean(errors[fieldName])
         })
     }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
     render() {
         const { programManagerList } = this.state;
         let programManagers = programManagerList.length > 0
@@ -662,31 +557,16 @@ export default class EditProgram extends Component {
                     </option>
                 )
             }, this);
-        // const { healthAreaList } = this.state;
-        // let realmHealthArea = healthAreaList.length > 0
-        //     && healthAreaList.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.healthAreaId}>
-        //                 {/* {item.healthAreaCode} */}
-        //                 {getLabelText(item.label, this.state.lang)}
-        //             </option>
-        //         )
-        //     }, this);
-
         const { organisationList } = this.state;
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {/* {item.organisationCode} */}
-                        {getLabelText(item.label, this.state.lang)}
+                                                {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
-
-
         return (
-
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -709,15 +589,13 @@ export default class EditProgram extends Component {
                                     programCode1: this.state.uniqueCode,
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     let pro = this.state.program;
                                     pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
-                                    // console.log("Pro=---------------->+++", pro)
                                     ProgramService.editDataset(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -729,19 +607,16 @@ export default class EditProgram extends Component {
                                                     this.hideSecondComponent();
                                                 })
                                         }
-
                                     }
                                     ).catch(
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    // message: 'static.unkownError',
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
@@ -772,7 +647,6 @@ export default class EditProgram extends Component {
                                             }
                                         }
                                     );
-
                                 }}
                                 render={
                                     ({
@@ -788,16 +662,10 @@ export default class EditProgram extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-
                                         <Form onSubmit={handleSubmit} noValidate name='programForm' autocomplete="off">
-                                            {/* <CardHeader>
-                                                    <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
-                                                </CardHeader> */}
-                                            <CardBody>
-
+                                                                                        <CardBody>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-
                                                     <Input
                                                         value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
                                                         bsSize="sm"
@@ -807,11 +675,9 @@ export default class EditProgram extends Component {
                                                         onBlur={handleBlur}
                                                         disabled
                                                         type="text" name="realmCountryId" id="realmCountryId">
-
                                                     </Input>
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.dashboard.healthareaheader')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
@@ -830,14 +696,12 @@ export default class EditProgram extends Component {
                                                         multi
                                                         options={this.state.healthAreaList}
                                                         value={this.state.program.healthAreaArray}
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_FP") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
-
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -848,18 +712,15 @@ export default class EditProgram extends Component {
                                                         type="select"
                                                         name="organisationId"
                                                         id="organisationId"
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_ORG_FOR_FP") ? true : false}
                                                         value={this.state.program.organisation.id}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {realmOrganisation}
-
                                                     </Input>
-
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="select">{i18n.t('static.inventory.region')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
@@ -881,13 +742,11 @@ export default class EditProgram extends Component {
                                                     />
                                                     <FormFeedback>{errors.regionId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="company">{i18n.t('static.dataset.forecastingProgram')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName}
                                                         bsSize="sm"
-                                                        // invalid={touched.programName && !!errors.programName || this.state.program.label.label_en == ''}
                                                         invalid={touched.programName && !!errors.programName || !!errors.programName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -918,21 +777,16 @@ export default class EditProgram extends Component {
                                                             <Label htmlFor="company"></Label>
                                                             <Input
                                                                 onBlur={handleBlur}
-                                                                // valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
-                                                                // invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                                                 bsSize="sm"
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 type="text"
                                                                 maxLength={6}
                                                                 value={this.state.uniqueCode}
-                                                                disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                                disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_PC_FOR_FP") ? true : false}
                                                                 name="programCode1" id="programCode1" />
-                                                            {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
-                                                        </FormGroup>
+                                                                                                                    </FormGroup>
                                                     </Col>
                                                 </FormGroup>
-
-
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -942,30 +796,21 @@ export default class EditProgram extends Component {
                                                         invalid={touched.userId && !!errors.userId || this.state.program.programManager.userId == ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
-                                                        {/* <option value="0">Please select</option> */}
-                                                        {/* <option value="1">Anchal</option> */}
-                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                                                                                                                        <option value="">{i18n.t('static.common.select')}</option>
                                                         {programManagers}
-
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
-
                                                 </FormGroup>
                                                 <FormGroup>
-
                                                     <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-
                                                     <Input
                                                         value={this.state.program.programNotes}
                                                         bsSize="sm"
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        // maxLength={600}
                                                         type="textarea" name="programNotes" id="programNotes" />
                                                     <FormFeedback>{errors.programNotes}</FormFeedback>
-
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
@@ -1001,13 +846,12 @@ export default class EditProgram extends Component {
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
-
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     {this.state.isChanged == true && <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -1020,23 +864,18 @@ export default class EditProgram extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         );
     }
     cancelClicked() {
         this.props.history.push(`/dataSet/listDataSet/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
@@ -1048,10 +887,6 @@ export default class EditProgram extends Component {
                 uniqueCode = ""
             }
             var proObj = response.data;
-            // var healthAreaArrayDummy=[];
-            // healthAreaArrayDummy.push(response.data.healthArea.id);
-            // proObj.healthAreaArray=healthAreaArrayDummy;
-
             this.setState({
                 program: proObj,
                 uniqueCode: uniqueCode,
@@ -1072,10 +907,8 @@ export default class EditProgram extends Component {
                 uniqueCode: this.state.uniqueCode,
                 healthAreaArray: this.state.program.healthAreaArray
             }
-            // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
-                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             programManagerList: response.data
@@ -1089,13 +922,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -1126,11 +957,9 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        // console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
@@ -1148,13 +977,11 @@ export default class EditProgram extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -1185,18 +1012,15 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -1227,6 +1051,5 @@ export default class EditProgram extends Component {
                 }
             }
         );
-
     }
 }

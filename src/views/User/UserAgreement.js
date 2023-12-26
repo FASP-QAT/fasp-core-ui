@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
-import { Formik } from 'formik';
-import i18n from '../../i18n'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import UserService from '../../api/UserService'
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, FormGroup } from 'reactstrap';
 import { API_URL } from '../../Constants';
+import UserService from '../../api/UserService';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 export default class UserAgreementComponent extends Component {
     constructor(props) {
         super(props);
@@ -16,14 +15,14 @@ export default class UserAgreementComponent extends Component {
         this.decline = this.decline.bind(this);
     }
     accept() {
-        // AuthenticationService.setupAxiosInterceptors();
+
         UserService.acceptUserAgreement().then(response => {
             this.props.history.push(`/syncProgram`)
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
+
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
@@ -74,7 +73,6 @@ export default class UserAgreementComponent extends Component {
                     <Col xs="12" sm="12">
                         <Card>
                             <CardHeader>
-                                {/* <strong>{i18n.t('static.user.agreement')}</strong> */}
                                 <FormGroup>
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.decline}><i className="fa fa-times"></i> {i18n.t('static.common.decline')}</Button>
                                     <Button type="submit" size="md" color="success" onClick={this.accept} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.accept')}</Button>
@@ -82,7 +80,6 @@ export default class UserAgreementComponent extends Component {
                             </CardHeader>
                             <CardBody>
 
-                                {/* English EULA */}
                                 <Col xs="11" sm="11">
                                     <div className="text-justify">
                                         <h4 className="UserTitle">End-User License Agreement</h4>
@@ -142,7 +139,6 @@ export default class UserAgreementComponent extends Component {
 
                                         <p>
                                             <h4 className="UserTitle">Automatic Software Updates</h4>
-                                            {/* <div className="rounded-list list-group"> */}
                                             <p>The Software sends information described at the URL above to determine whether
                                                 there are any patches, bug fixes, updates, upgrades or other modifications
                                                 to improve the Software. You agree that the Software may automatically install
@@ -157,7 +153,6 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Master Data and Reference Data Sync :</strong> The offline app regularly sends and receives data from the web application. This cannot be disabled as it is a core component of the application.</p></li>
 
                                             </ul>
-                                            {/* </div> */}
                                         </p>
                                         <p>
                                             <h4 className="UserTitle">Open-Source Notices</h4>
@@ -273,7 +268,6 @@ export default class UserAgreementComponent extends Component {
                                     </div>
                                 </Col><br />
                                 <hr></hr><br />
-                                {/* French EULA */}
                                 <Col xs="11" sm="11">
                                     <div className="text-justify">
                                         <h4 className="UserTitle">Conditions générales d’utilisation</h4>
@@ -332,7 +326,6 @@ export default class UserAgreementComponent extends Component {
 
                                         <p>
                                             <h4 className="UserTitle">Mises à niveau automatiques du logiciel</h4>
-                                            {/* <div className="rounded-list list-group"> */}
                                             <p>Le logiciel envoie les informations précisées à l’adresse URL ci-dessus afin de déterminer
                                                 si des correctifs, corrections de bogues, mises à niveau, mises à jour ou autres modifications
                                                 servant à améliorer le logiciel sont disponibles. Vous acceptez que ces améliorations soient
@@ -347,7 +340,6 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Synchronisation des données de référence :</strong> L’application hors ligne envoie et reçoit des données depuis l’application web. Cette fonctionnalité ne peut pas être désactivée, car il s’agit d’un élément central de l’application. </p></li>
 
                                             </ul>
-                                            {/* </div> */}
                                         </p>
                                         <p>
                                             <h4 className="UserTitle">Notifications Open Source </h4>
@@ -456,7 +448,6 @@ export default class UserAgreementComponent extends Component {
                                     </div>
                                 </Col><br />
                                 <hr></hr><br />
-                                {/* Portuguese EULA */}
                                 <Col xs="11" sm="11">
                                     <div className="text-justify">
                                         <h4 className="UserTitle">Acordo de Licença do Utilizador Final </h4>
@@ -513,7 +504,6 @@ export default class UserAgreementComponent extends Component {
 
                                         <p>
                                             <h4 className="UserTitle">Atualizações de software automáticas</h4>
-                                            {/* <div className="rounded-list list-group"> */}
                                             <p>O Software envia as informações descritas no URL acima para determinar se existem correções,
                                                 correções de erros, atualizações ou outras modificações que melhorem o Software. O utilizador
                                                 aceita que o Software poderá instalar automaticamente tais melhorias do Software no seu computador
@@ -526,7 +516,6 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Sincronização de dados de referência e dados principais :</strong> A app offline envia e recebe regularmente dados da aplicação da web. Esta ação não pode ser desativada, uma vez que é um componente essencial da aplicação. </p></li>
 
                                             </ul>
-                                            {/* </div> */}
                                         </p>
                                         <p>
                                             <h4 className="UserTitle">Avisos de software open-source </h4>
@@ -633,7 +622,6 @@ export default class UserAgreementComponent extends Component {
                                     </div>
                                 </Col><br />
                                 <hr></hr><br />
-                                {/* Spanish EULA */}
                                 <Col xs="11" sm="11">
                                     <div className="text-justify">
                                         <h4 className="UserTitle">Contrato de licencia para usuario final </h4>
@@ -703,7 +691,6 @@ export default class UserAgreementComponent extends Component {
 
                                         <p>
                                             <h4 className="UserTitle">Actualizaciones automáticas del Software.</h4>
-                                            {/* <div className="rounded-list list-group"> */}
                                             <p>El Software envía la información que se describe en la URL antes mencionada para determinar
                                                 si hay revisiones, correcciones de errores, actualizaciones u otras modificaciones para
                                                 mejorar el Software. Usted acepta que el Software pueda instalar automáticamente en su computadora
@@ -716,7 +703,6 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Sincronización de datos maestros y datos de referencia :</strong> La aplicación sin conexión periódicamente envía y recibe datos de la aplicación web. Esta función no se puede deshabilitar porque es un componente esencial de la aplicación. </p></li>
 
                                             </ul>
-                                            {/* </div> */}
                                         </p>
                                         <p>
                                             <h4 className="UserTitle">Avisos sobre código abierto </h4>
@@ -826,8 +812,6 @@ export default class UserAgreementComponent extends Component {
                         </Card>
                     </Col>
                 </div>
-                {/* </Container>
-            </div> */}
             </div>
         )
     }

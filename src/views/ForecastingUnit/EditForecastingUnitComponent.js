@@ -1,65 +1,28 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants.js';
 import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
-import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL, SPACE_REGEX } from '../../Constants.js';
 import UnitService from '../../api/UnitService.js';
+import AuthenticationService from '../Common/AuthenticationService';
 
-let initialValues = {
-    message: '',
-    label: '',
-    genericLabel: '',
-    unitId: []
-
-}
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
         genericLabel: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            // .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
         unitId: Yup.string()
             .required(i18n.t('static.unit.unittext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
 export default class EditForecastingUnitComponent extends Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
@@ -121,33 +84,19 @@ export default class EditForecastingUnitComponent extends Component {
             loading: true,
             units: []
         }
-
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-
     dataChange(event) {
         let { forecastingUnit } = this.state
-
         if (event.target.name === "label") {
             forecastingUnit.label.label_en = event.target.value
         }
@@ -166,45 +115,17 @@ export default class EditForecastingUnitComponent extends Component {
         if (event.target.name == "unitId") {
             forecastingUnit.unit.id = event.target.value;
         }
-
         else if (event.target.name === "active") {
             forecastingUnit.active = event.target.id === "active2" ? false : true
         }
-
-
         this.setState(
             {
                 forecastingUnit
             }
         )
-
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            'label': true,
-            'unitId': true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('forecastingUnitForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -220,13 +141,11 @@ export default class EditForecastingUnitComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -259,12 +178,6 @@ export default class EditForecastingUnitComponent extends Component {
         );
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
-                initialValues = {
-                    message: '',
-                    label: response.data.label.label_en,
-                    genericLabel: response.data.genericLabel.label_en,
-                    unitId: response.data.unit.id
-                }
                 this.setState({
                     forecastingUnit: response.data, loading: false
                 });
@@ -277,19 +190,15 @@ export default class EditForecastingUnitComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -320,9 +229,7 @@ export default class EditForecastingUnitComponent extends Component {
                 }
             }
         );
-
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { forecastingUnit } = this.state
@@ -331,7 +238,6 @@ export default class EditForecastingUnitComponent extends Component {
             return "";
         }
     }
-
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -349,13 +255,14 @@ export default class EditForecastingUnitComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
-                                validate={validate(validationSchema)}
+                                initialValues={{
+                                    label: this.state.forecastingUnit.label.label_en,
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en,
+                                    unitId: this.state.forecastingUnit.unit.id
+                                }}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
@@ -377,13 +284,11 @@ export default class EditForecastingUnitComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -415,8 +320,6 @@ export default class EditForecastingUnitComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -474,7 +377,6 @@ export default class EditForecastingUnitComponent extends Component {
                                                         id="label"
                                                         bsSize="sm"
                                                         valid={!errors.label}
-                                                        // invalid={touched.label && !!errors.label || this.state.forecastingUnit.label.label_en == ''}
                                                         invalid={(touched.label && !!errors.label) || !!errors.label}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -489,7 +391,6 @@ export default class EditForecastingUnitComponent extends Component {
                                                         id="genericLabel"
                                                         bsSize="sm"
                                                         valid={!errors.genericLabel}
-                                                        // invalid={touched.genericLabel && !!errors.genericLabel || this.state.forecastingUnit.genericLabel.label_en == ''}
                                                         invalid={(touched.genericLabel && !!errors.genericLabel) || !!errors.genericLabel}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
@@ -517,7 +418,6 @@ export default class EditForecastingUnitComponent extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
@@ -558,9 +458,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -569,21 +467,15 @@ export default class EditForecastingUnitComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-
-
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
-
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message, { entityname })}</h6>
                     <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>
@@ -594,25 +486,20 @@ export default class EditForecastingUnitComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             this.setState({
                 forecastingUnit: response.data
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -643,7 +530,5 @@ export default class EditForecastingUnitComponent extends Component {
                 }
             }
         );
-
     }
 }
-

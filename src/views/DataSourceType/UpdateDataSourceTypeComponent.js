@@ -1,60 +1,26 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { ALPHABET_NUMBER_REGEX, API_URL, SPACE_REGEX } from '../../Constants.js';
-
-let initialValues = {
-    label: ''
-}
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            // .matches(/^([a-zA-Z]+\s)*[a-zA-Z]+$/, i18n.t('static.message.rolenamevalidtext'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
 export default class UpdateDataSourceTypeComponent extends Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
             dataSourceType:
             {
                 active: '',
-
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -74,13 +40,10 @@ export default class UpdateDataSourceTypeComponent extends Component {
             },
             loading: true
         }
-
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
@@ -88,58 +51,22 @@ export default class UpdateDataSourceTypeComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-
-
     dataChange(event) {
         let { dataSourceType } = this.state
-
         if (event.target.name === "label") {
             dataSourceType.label.label_en = event.target.value
         }
-
         else if (event.target.name === "active") {
             dataSourceType.active = event.target.id === "active2" ? false : true
         }
-
-
         this.setState(
             {
                 dataSourceType
             }
         )
-
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            'label': true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('dataSourceTypeForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -147,7 +74,6 @@ export default class UpdateDataSourceTypeComponent extends Component {
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -155,20 +81,16 @@ export default class UpdateDataSourceTypeComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -200,16 +122,13 @@ export default class UpdateDataSourceTypeComponent extends Component {
                 }
             );
     }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { dataSourceType } = this.state
             dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
-
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -217,15 +136,12 @@ export default class UpdateDataSourceTypeComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.dataSourceType.label.label_en
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
@@ -247,13 +163,11 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -285,8 +199,6 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -327,7 +239,6 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.label}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')} </Label>
                                                     <FormGroup check inline>
@@ -368,9 +279,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -379,21 +288,15 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-
-
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
-
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -404,26 +307,21 @@ export default class UpdateDataSourceTypeComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             this.setState({
                 dataSourceType: response.data
             });
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -455,6 +353,4 @@ export default class UpdateDataSourceTypeComponent extends Component {
                 }
             );
     }
-
 }
-

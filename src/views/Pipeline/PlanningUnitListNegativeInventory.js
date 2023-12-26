@@ -1,22 +1,18 @@
-import React, { Component } from 'react';
 import jexcel from 'jspreadsheet';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import i18n from '../../i18n';
-import PipelineService from '../../api/PipelineService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, CardFooter, Button } from 'reactstrap';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { API_URL, JEXCEL_PRO_KEY } from '../../Constants';
-
+import PipelineService from '../../api/PipelineService.js';
+import i18n from '../../i18n';
 export default class PlanningUnitListNegativeInventory extends Component {
-
     constructor(props) {
         super(props);
         this.cancelClicked = this.cancelClicked.bind(this);
     }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
                 var planningUnitListFinalInventory = response.data;
@@ -29,12 +25,8 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     data[1] = negtiveInventoryList[j].inventory;
                     dataArray.push(data);
                 }
-
                 this.el = jexcel(document.getElementById("planningUnitList"), '');
-                // this.el.destroy();
                 jexcel.destroy(document.getElementById("planningUnitList"), true);
-
-                var json = [];
                 var data = dataArray;
                 var options = {
                     data: data,
@@ -44,57 +36,41 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         {
                             title: i18n.t('static.report.planningUnit'),
                             type: 'text',
-                            // readOnly: true
                         },
                         {
                             title: i18n.t('static.inventory.totalInvontory'),
                             type: 'numeric',
-                            // readOnly: true
-
                         }
-
                     ],
                     editable: false,
                     pagination: false,
                     search: true,
                     columnSorting: true,
-                    // tableOverflow: true,
                     wordWrap: true,
-                    // paginationOptions: [10, 25, 50, 100],
-                    // position: 'top',
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     allowDeleteRow: false,
                     onchange: this.changed,
                     oneditionend: this.onedit,
                     copyCompatibility: true,
-                    // text: {
-                    //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                    //     show: '',
-                    //     entries: '',
-                    // },
                     onload: this.loaded,
                     filters: true,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
-
                     license: JEXCEL_PRO_KEY,
                 };
                 var elVar = jexcel(document.getElementById("planningUnitList"), options);
                 this.el = elVar;
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -126,23 +102,17 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 }
             );
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         return (
             <>
                 <Card>
-                    {/* <CardHeader>
-                        <strong>Planning Unit List</strong>
-                    </CardHeader> */}
                     <CardBody className="pt-lg-0">
                         <div className="table-responsive consumptionDataEntryTable" >
                             <div id="planningUnitList">
@@ -156,9 +126,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
             </>
         );
     }
-
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList`);
     }
-
 }
