@@ -1,65 +1,46 @@
+import { Formik } from "formik";
 import React, { Component } from 'react';
-import RealmService from '../../api/RealmService';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import i18n from '../../i18n';
-import {
-    Row, Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText, FormText, InputGroup
-} from 'reactstrap';
-import ProductCategoryService from '../../api/PoroductCategoryService';
 import SortableTree, {
+    addNodeUnderParent,
+    changeNodeAtPath,
     getFlatDataFromTree,
-    getTreeFromFlatData,
-    getNodeAtPath, addNodeUnderParent, removeNodeAtPath, changeNodeAtPath, defaultSearchMethod
+    getTreeFromFlatData
 } from "react-sortable-tree";
 import 'react-sortable-tree/style.css';
-import { node } from 'prop-types';
+import {
+    Button,
+    Card, CardBody,
+    CardFooter,
+    Col,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    InputGroup,
+    InputGroupAddon,
+    Label,
+    Row
+} from 'reactstrap';
 import * as Yup from 'yup';
-import { Formik } from "formik";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-
+import ProductCategoryService from '../../api/PoroductCategoryService';
+import RealmService from '../../api/RealmService';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 let initialValues = {
     productCategory: ''
 }
-
 const validationSchema = function (values, t) {
-    // console.log("made by us schema--->", values)
     return Yup.object().shape({
         productCategory: Yup.string()
             .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-
     })
 }
 
-const validate = (getValidationSchema) => {
-
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class ProductCategoryTree extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -76,9 +57,6 @@ export default class ProductCategoryTree extends Component {
             searchFoundCount: null,
             loading: true,
             lang: localStorage.getItem('lang')
-            // searchFocusIndex: 0
-
-
         }
         this.getProductCategoryListByRealmId = this.getProductCategoryListByRealmId.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -88,15 +66,8 @@ export default class ProductCategoryTree extends Component {
         this.enableNode = this.enableNode.bind(this);
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
-        this.setTreeData = this.setTreeData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.handleSearchOnChange = this.handleSearchOnChange.bind(this);
-        // this.selectPrevMatch = this.selectPrevMatch.bind(this);
-        // this.selectNextMatch = this.selectNextMatch.bind(this);
-    }
-
-    setTreeData(treeData) {
-        // console.log("treeData----->", treeData);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -104,19 +75,14 @@ export default class ProductCategoryTree extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     componentDidMount() {
-        // setTimeout(function () { //Start the timer
-        //     this.setState({ loading: false })
-        // }.bind(this), 500)
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -124,7 +90,6 @@ export default class ProductCategoryTree extends Component {
                         loading: false
                     })
                     let realmId = AuthenticationService.getRealmId();
-                    // // console.log("realmId----->",realmId);
                     if (realmId != -1) {
                         document.getElementById("realmId").value = realmId
                         document.getElementById("realmId").disabled = true;
@@ -145,13 +110,11 @@ export default class ProductCategoryTree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -202,43 +165,30 @@ export default class ProductCategoryTree extends Component {
             });
             this.hideSecondComponent();
             document.getElementById("treeDiv").style.display = "none";
-
         } else {
             this.setState({
                 message: '',
                 loading: true
             });
-            // AuthenticationService.setupAxiosInterceptors();
-
             ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
-
                 .then(response => {
-                    // console.log("response product category list ====>", response.data);
                     if (response.status == 200) {
                         this.setState({
                             productCategoryList: response.data,
                             loading: false,
                         });
-
-                        // console.log("this.state.productCategoryList====>", this.state.productCategoryList);
                         var treeData = getTreeFromFlatData({
                             flatData: this.state.productCategoryList.map(
                                 node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
-                            getKey: node => node.id, // resolve a node's key
-                            getParentKey: node => node.parentId, // resolve a node's parent's key
-                            rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
+                            getKey: node => node.id,
+                            getParentKey: node => node.parentId,
+                            rootKey: null
                         });
-                        // console.log("treeData------>", treeData);
-
-
                         this.state.productCategoryList.map(item => {
                             if (item.id > this.state.maxId) {
                                 this.setState({ maxId: item.id })
                             }
-
                         });
-
-
                         this.setState({ treeData: treeData, loading: false });
                         document.getElementById("treeDiv").style.display = "block";
                     } else {
@@ -251,13 +201,11 @@ export default class ProductCategoryTree extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -289,38 +237,23 @@ export default class ProductCategoryTree extends Component {
                     }
                 );
         }
-
-
     }
     addNewNode() {
-        // console.log("this.state.treeData===>", this.state.treeData);
         let children = this.state.treeData[0].children;
         let duplicate = 0;
-        // console.log("children--------->", children);
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
             ignoreCollapsed: false
         });
         if (children != undefined) {
-            // for (let i = 0; i < children.length; i++) {
-            //     if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
-            //         // // console.log("Children Duplicate");
-            //         duplicate = 1;
-            //     }
-            // }
-
             for (let i = 0; i < unsortedFlatTreeData.length; i++) {
-                if (this.state.nodename.localeCompare(unsortedFlatTreeData[i].node.payload.label.label_en) == 0) {//same
-                    // // console.log("Children Duplicate");
+                if (this.state.nodename.localeCompare(unsortedFlatTreeData[i].node.payload.label.label_en) == 0) {
                     duplicate = 1;
                 }
             }
-
-
         }
-        if (duplicate == 0) {//not duplicate found
-
+        if (duplicate == 0) {
             let currentMaxId = this.state.maxId + 1;
             const addNode = {
                 id: currentMaxId,
@@ -338,7 +271,6 @@ export default class ProductCategoryTree extends Component {
                 },
                 isNew: true
             };
-
             var newNode = addNodeUnderParent({
                 treeData: this.state.treeData,
                 parentKey: 1,
@@ -346,7 +278,7 @@ export default class ProductCategoryTree extends Component {
                 getNodeKey: ({ node }) => node.id
             })
             this.setState({ treeData: newNode.treeData, maxId: currentMaxId, nodename: '' });
-        } else {//duplicate found
+        } else {
             this.setState({
                 message: i18n.t('static.productCategoryTree.duplicateProductCategoryTree'),
                 color: '#BA0C2F'
@@ -356,10 +288,8 @@ export default class ProductCategoryTree extends Component {
         this.setState({
             duplicate: duplicate
         })
-
     }
     disableNode(rowInfo) {
-        // // console.log("disable node row info---->", rowInfo);
         const changeNode = {
             id: rowInfo.node.id,
             parentId: rowInfo.parentNode.id,
@@ -385,15 +315,12 @@ export default class ProductCategoryTree extends Component {
             getNodeKey: ({ node }) => node.id
         });
         this.setState({ treeData: disabledNode });
-        // // console.log("disabledNode--->", disabledNode);
         let disableChideNodes = getFlatDataFromTree({
             treeData: disabledNode,
             getNodeKey: ({ node }) => node.id,
             ignoreCollapsed: false
         });
-        // // console.log("before--->", disableChideNodes)
         var disabledChildNode = disabledNode;
-
         var currentDisabledNodeId = '';
         disableChideNodes.map(disableNodeInfo => {
             if (disableNodeInfo.parentNode != null && disableNodeInfo.parentNode.id == rowInfo.node.id) {
@@ -414,7 +341,6 @@ export default class ProductCategoryTree extends Component {
                     children: disableNodeInfo.node.children,
                     isNew: disableNodeInfo.node.isNew
                 };
-
                 disabledChildNode = changeNodeAtPath({
                     treeData: disabledChildNode,
                     path: disableNodeInfo.path,
@@ -423,7 +349,6 @@ export default class ProductCategoryTree extends Component {
                 });
                 this.setState({ treeData: disabledChildNode });
                 currentDisabledNodeId = disableNodeInfo.node.id;
-
                 disableChideNodes.map(disableNodeInfo => {
                     if (disableNodeInfo.parentNode != null && disableNodeInfo.parentNode.id == currentDisabledNodeId) {
                         const changeNode = {
@@ -454,9 +379,7 @@ export default class ProductCategoryTree extends Component {
                     }
                 }
                 )
-
             }
-
         }
         )
     }
@@ -487,7 +410,6 @@ export default class ProductCategoryTree extends Component {
             this.setState({ message: i18n.t('static.productCategory.parentIsDisabled') });
             this.hideSecondComponent();
         }
-
     }
     getSortedFaltTreeData() {
         this.setState({ loading: true })
@@ -515,14 +437,9 @@ export default class ProductCategoryTree extends Component {
             submitJson.push(json);
         }
         )
-        // console.log("submit json---->", submitJson);
-        // console.log("submit json---->", JSON.stringify(submitJson));
         ProductCategoryService.addProductCategory(submitJson)
             .then(response => {
                 if (response.status == 200) {
-                    // // console.log("success-------------------------.");
-                    // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
-                    // this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.productCategory.success'))
                     this.props.history.push(`/productCategory/productCategoryTree/` + 'green/' + i18n.t('static.productCategory.success'))
                     this.setState({
                         message: i18n.t('static.productCategory.success'),
@@ -542,13 +459,11 @@ export default class ProductCategoryTree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -579,64 +494,22 @@ export default class ProductCategoryTree extends Component {
                     }
                 }
             );
-
     }
     reSetTree() {
         this.setState({ nodename: '' });
         this.getProductCategoryListByRealmId();
     }
-    touchAll(errors) {
-        this.validateForm(errors);
-    }
-    validateForm(errors) {
-        this.findFirstError('productCategoryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     handleSearchOnChange = e => {
         this.setState({
             searchQuery: e.target.value,
         });
     };
-
-    // selectPrevMatch = () => {
-    //     // const { searchFocusIndex, searchFoundCount } = this.state;
-
-    //     this.setState({
-    //         searchFocusIndex:
-    //            this.state.searchFocusIndex !== null
-    //                 ? (this.state.searchFoundCount + this.state.searchFocusIndex - 1) % this.state.searchFoundCount
-    //                 : this.state.searchFoundCount - 1
-    //     });
-    // };
-
-    // selectNextMatch = () => {
-    //     // const { searchFocusIndex, searchFoundCount } = this.state;
-
-    //     this.setState({
-    //         searchFocusIndex:
-    //         this.state.searchFocusIndex !== null
-    //                 ? (this.state.searchFocusIndex + 1) % this.state.searchFoundCount
-    //                 : 0
-    //     });
-    // };
-
     render() {
         const { searchString, searchFocusIndex, searchFoundCount } = this.state;
-
         const customSearchMethod = ({ node, searchQuery }) =>
             searchQuery &&
             node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1;
-
         const selectPrevMatch = () =>
             this.setState({
                 searchFocusIndex:
@@ -644,7 +517,6 @@ export default class ProductCategoryTree extends Component {
                         ? (searchFoundCount + searchFocusIndex - 1) % searchFoundCount
                         : searchFoundCount - 1,
             });
-
         const selectNextMatch = () =>
             this.setState({
                 searchFocusIndex:
@@ -652,7 +524,6 @@ export default class ProductCategoryTree extends Component {
                         ? (searchFocusIndex + 1) % searchFoundCount
                         : 0,
             });
-
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -662,7 +533,6 @@ export default class ProductCategoryTree extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -674,9 +544,6 @@ export default class ProductCategoryTree extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="mb-lg-0">
-                            {/* <CardHeader className="pb-lg-1">
-                                <strong>Product Category</strong>
-                            </CardHeader> */}
                             <CardBody className="pb-lg-0 pt-lg-1">
                                 <Col md="3 pl-0" >
                                     <FormGroup>
@@ -687,14 +554,10 @@ export default class ProductCategoryTree extends Component {
                                                     bsSize="sm"
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     type="select" name="realmId" id="realmId"
-                                                // onChange={this.getProductCategoryListByRealmId}
                                                 >
                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
-                                                {/* <InputGroupAddon addonType="append">
-                                                    <Button color="secondary Gobtn btn-sm" onClick={this.getProductCategoryListByRealmId}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon> */}
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
@@ -703,7 +566,6 @@ export default class ProductCategoryTree extends Component {
                         </Card>
                     </Col>
                 </Row>
-
                 <Row id="treeDiv" style={{ display: "none" }}>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card style={{ display: this.state.loading ? "none" : "block" }}>
@@ -711,15 +573,13 @@ export default class ProductCategoryTree extends Component {
                                 <Formik
                                     enableReinitialize={true}
                                     initialValues={initialValues}
-                                    validate={validate(validationSchema)}
+                                    validationSchema={validationSchema}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addNewNode();
                                         if (this.state.duplicate == 1) {
-
                                         } else {
                                             resetForm({ productCategory: '' });
                                         }
-
                                     }}
                                     render={
                                         ({
@@ -735,7 +595,6 @@ export default class ProductCategoryTree extends Component {
                                             handleReset
                                         }) => (
                                             <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm' autocomplete="off">
-
                                                 <FormGroup>
                                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         <Row>
@@ -753,24 +612,16 @@ export default class ProductCategoryTree extends Component {
                                                                 <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                             </Col>
                                                             <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
+                                                                <Button className="text-white" type="submit" size="sm" color="success" ><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
                                                             </Col>
                                                         </Row>}
                                                 </FormGroup>
-                                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
-                                                        // <CardFooter>
-                                                        <FormGroup className="mr-4">
-                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        </ FormGroup>
-                                                        // </CardFooter>
-                                                    } */}
                                             </Form>
                                         )} />
                                 <div className="col-md-12 ">
                                     <Col md="3 float-right" >
                                         <InputGroup>
-                                        <Label className='pt-1 pr-3'>{i18n.t('static.jexcel.search')}</Label>
+                                            <Label className='pt-1 pr-3'>{i18n.t('static.jexcel.search')}</Label>
                                             <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
                                             <InputGroupAddon addonType="append">
                                                 <button type="button" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
@@ -797,24 +648,19 @@ export default class ProductCategoryTree extends Component {
                                                 })
                                             }
                                             generateNodeProps={rowInfo => {
-                                                // // console.log(rowInfo);
-                                                // if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
                                                 if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null)) {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
-
                                                                 <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
                                                             height: '35px'
                                                         }
-
                                                     }
                                                     return nodeprops;
                                                 }
-                                                // else if (rowInfo.node.payload.active == false && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
                                                 if (rowInfo.node.payload.active == false && (rowInfo.parentNode != null)) {
                                                     let nodeprops = {
                                                         buttons: [
@@ -825,11 +671,9 @@ export default class ProductCategoryTree extends Component {
                                                         style: {
                                                             height: '35px', color: '#ced5de'
                                                         }
-
                                                     }
                                                     return nodeprops;
                                                 }
-                                                // else if (rowInfo.node.isNew == false && (rowInfo.parentNode == null || rowInfo.parentNode.id == 1)) {
                                                 else if (rowInfo.node.isNew == false && (rowInfo.parentNode == null)) {
                                                     let nodeprops = {
                                                         canDrag: false
@@ -839,29 +683,9 @@ export default class ProductCategoryTree extends Component {
                                             }
                                             }
                                             onChange={treeData => this.setState({ treeData })}
-                                        // onChange={treeData => this.setTreeData(treeData)}
                                         />
-
                                     </div>
                                 </FormGroup>
-                                {/* <input type='text' onInput={(e) => { this.defaultSearchMethod(e.target.value)}} /> */}
-                                {/* <input type="search" onChange={this.handleSearchOnChange} className="form-control" />
-                                <button
-                                    type="button"
-                                    disabled={!this.state.searchFoundCount}
-                                    onClick={selectPrevMatch}
-                                >
-                                    &lt;
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={!this.state.searchFoundCount}
-                                    onClick={selectNextMatch}
-                                >
-                                    &gt;
-                                 </button> */}
-
                             </CardBody>
                             <CardFooter>
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
@@ -876,9 +700,7 @@ export default class ProductCategoryTree extends Component {
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
@@ -889,9 +711,7 @@ export default class ProductCategoryTree extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>

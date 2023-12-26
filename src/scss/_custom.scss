@@ -11740,7 +11740,7 @@ label.arrow_label:before {
 
 .jss_filters_options {
   height: auto !important;
-  max-height: 320px !important;
+  max-height: 206px!important;
 }
 
 .borderedBoxforformulae {
@@ -12527,4 +12527,7 @@ label.arrow_label:before {
     min-width: 150px;
     // top:83px!important;
   }
+}
+.jss > tbody > tr > td.readonly.compareAndSelectRed {
+  color: #BA0C2F !important;
 }

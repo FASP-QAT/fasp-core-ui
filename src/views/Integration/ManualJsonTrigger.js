@@ -1,29 +1,30 @@
-import React from "react";
-import { Component } from "react";
-import i18n from "../../i18n";
+import jexcel from "jspreadsheet";
+import moment from "moment";
+import React, { Component } from "react";
+import Picker from "react-month-picker";
+import { MultiSelect } from "react-multi-select-component";
 import {
+  Button,
   Card,
   CardBody,
-  Label,
-  Input,
-  FormGroup,
   CardFooter,
-  Button,
   Col,
-  Form,
-  InputGroup,
+  FormGroup,
+  Label,
   Modal,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
-  Dropdown,
+  ModalFooter,
+  ModalHeader
 } from "reactstrap";
-import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import jexcel from "jspreadsheet";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import ProgramService from "../../api/ProgramService";
-import IntegrationService from "../../api/IntegrationService";
+import {
+  checkValidtion,
+  jExcelLoadedFunction,
+  jExcelLoadedFunctionOnlyHideRow
+} from "../../CommonComponent/JExcelCommonFunctions";
+import MonthBox from "../../CommonComponent/MonthBox.js";
+import getLabelText from "../../CommonComponent/getLabelText";
 import {
   API_URL,
   JEXCEL_PAGINATION_OPTION,
@@ -31,22 +32,12 @@ import {
   PROGRAM_TYPE_SUPPLY_PLAN,
   SPV_REPORT_DATEPICKER_START_MONTH,
 } from "../../Constants";
-import {
-  checkValidtion,
-  jExcelLoadedFunction,
-  jExcelLoadedFunctionOnlyHideRow,
-  jExcelLoadedFunctionOnlyHideRowOld,
-} from "../../CommonComponent/JExcelCommonFunctions";
-import moment from "moment";
-import AuthenticationService from "../Common/AuthenticationService";
-import { Prompt } from "react-router";
-import Picker from "react-month-picker";
-import MonthBox from "../../CommonComponent/MonthBox.js";
-import { MultiSelect } from "react-multi-select-component";
-import getLabelText from "../../CommonComponent/getLabelText";
-import RealmCountryService from "../../api/RealmCountryService";
 import DropdownService from "../../api/DropdownService";
-
+import IntegrationService from "../../api/IntegrationService";
+import RealmCountryService from "../../api/RealmCountryService";
+import i18n from "../../i18n";
+import AuthenticationService from "../Common/AuthenticationService";
+import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 const entityname = i18n.t("static.integration.manualProgramIntegration");
 export default class ConsumptionDetails extends Component {
   constructor(props) {
@@ -66,13 +57,13 @@ export default class ConsumptionDetails extends Component {
       isModalOpen: false,
       rangeValue:
         localStorage.getItem("sesRangeValueManualJson") != "" &&
-        localStorage.getItem("sesRangeValueManualJson") != undefined &&
-        localStorage.getItem("sesRangeValueManualJson") != null
+          localStorage.getItem("sesRangeValueManualJson") != undefined &&
+          localStorage.getItem("sesRangeValueManualJson") != null
           ? JSON.parse(localStorage.getItem("sesRangeValueManualJson"))
           : {
-              from: { year: dt.getFullYear(), month: dt.getMonth() + 1 },
-              to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 },
-            },
+            from: { year: dt.getFullYear(), month: dt.getMonth() + 1 },
+            to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 },
+          },
       minDate: {
         year: new Date().getFullYear() - 10,
         month: new Date().getMonth() + 1,
@@ -100,7 +91,6 @@ export default class ConsumptionDetails extends Component {
     this.filterProgram = this.filterProgram.bind(this);
     this.getVersions = this.getVersions.bind(this);
   }
-
   modelOpenClose() {
     this.setState({}, () => {
       if (!this.state.isModalOpen) {
@@ -141,7 +131,6 @@ export default class ConsumptionDetails extends Component {
       }
     });
   }
-
   test() {
     this.setState(
       {
@@ -152,7 +141,6 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
-
   showModal() {
     var data = [];
     var tableData = [];
@@ -164,7 +152,6 @@ export default class ConsumptionDetails extends Component {
       data = [];
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
-    // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
     var options = {
       data: tableData,
@@ -192,7 +179,6 @@ export default class ConsumptionDetails extends Component {
       filters: false,
       search: false,
       columnSorting: false,
-      // tableOverflow: true,
       wordWrap: true,
       paginationOptions: false,
       parseFormulas: true,
@@ -201,26 +187,15 @@ export default class ConsumptionDetails extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: true,
       onchange: this.changed,
-      // onblur: this.blur,
-      // onfocus: this.focus,
-      // oneditionend: this.onedit,
       copyCompatibility: true,
-      // onpaste: this.onPaste,
       allowManualInsertRow: false,
       license: JEXCEL_PRO_KEY,
       editable: true,
-      // text: {
-      //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-      //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-      //     show: '',
-      //     entries: '',
-      // },
       onload: this.loadedModal,
       contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {
         } else {
-          // Insert new row before
           if (obj.options.allowInsertRow == true) {
             items.push({
               title: i18n.t("static.common.insertNewRowBefore"),
@@ -236,7 +211,6 @@ export default class ConsumptionDetails extends Component {
               }.bind(this),
             });
           }
-          // after
           if (obj.options.allowInsertRow == true) {
             items.push({
               title: i18n.t("static.common.insertNewRowAfter"),
@@ -252,17 +226,13 @@ export default class ConsumptionDetails extends Component {
               }.bind(this),
             });
           }
-          // Delete a row
           if (obj.options.allowDeleteRow == true) {
-            // region id
-            // if (obj.getRowData(y)[5] == 0) {
             items.push({
               title: i18n.t("static.common.deleterow"),
               onclick: function () {
                 obj.deleteRow(parseInt(y));
               },
             });
-            // }
           }
         }
         return items;
@@ -275,12 +245,10 @@ export default class ConsumptionDetails extends Component {
       dataEL: varEL,
     });
   }
-
   componentDidMount() {
     this.setState({
       loading: true,
     });
-
     IntegrationService.getIntegrationListAll()
       .then((response) => {
         if (response.status == 200) {
@@ -293,12 +261,11 @@ export default class ConsumptionDetails extends Component {
             });
           });
           integrationList.sort((a, b) => {
-            var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase
+            var itemLabelA = a.name.toUpperCase();
+            var itemLabelB = b.name.toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           let realmId = AuthenticationService.getRealmId();
-          // let realmId = document.getElementById('realmId').value
           RealmCountryService.getRealmCountryForProgram(realmId)
             .then((countryResponse) => {
               var countryValues = [];
@@ -315,19 +282,17 @@ export default class ConsumptionDetails extends Component {
                 var itemLabelA = getLabelText(
                   a.label,
                   this.state.lang
-                ).toUpperCase(); // ignore upper and lowercase
+                ).toUpperCase();
                 var itemLabelB = getLabelText(
                   b.label,
                   this.state.lang
-                ).toUpperCase(); // ignore upper and lowercase
+                ).toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
               this.setState(
                 {
-                  // countrys: response.data.map(ele => ele.realmCountry)
                   countrys: listArray,
                   countryValues: countryValues,
-                  // programList: plList,
                   integrationList: integrationList,
                   loading: false,
                 },
@@ -343,12 +308,11 @@ export default class ConsumptionDetails extends Component {
               });
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
                 });
               } else {
@@ -388,123 +352,6 @@ export default class ConsumptionDetails extends Component {
                 }
               }
             });
-          //         var data = [];
-          //         var tableData = []
-          //         data[0] = "";
-          //         data[1] = "";
-          //         data[2] = "";
-          //         tableData[0] = data;
-          //         this.el = jexcel(document.getElementById("tableDiv"), '');
-          //         // this.el.destroy();
-          //         jexcel.destroy(document.getElementById("tableDiv"), true);
-          //         var options = {
-          //             data: tableData,
-          //             columnDrag: true,
-          //             colWidths: [100, 100, 100],
-          //             columns: [
-
-          //                 {
-          //                     title: i18n.t('static.budget.program'),
-          //                     type: 'dropdown',
-          //                     source: plList
-          //                 },
-          //                 {
-          //                     title: i18n.t('static.report.version'),
-          //                     type: 'dropdown',
-          //                     source: [],
-          //                     filter: this.filterVersion
-          //                 },
-          //                 {
-          //                     title: i18n.t('static.integration.integration'),
-          //                     type: 'dropdown',
-          //                     source: integrationList,
-
-          //                 }
-
-          //             ],
-          //             pagination: localStorage.getItem("sesRecordCount"),
-          //             filters: false,
-          //             search: true,
-          //             columnSorting: false,
-          //             // tableOverflow: true,
-          //             wordWrap: true,
-          //             paginationOptions: false,
-          //             parseFormulas: true,
-          //             position: 'top',
-          //             allowInsertColumn: false,
-          //             allowManualInsertColumn: false,
-          //             allowDeleteRow: true,
-          //             onchange: this.changed,
-          //             // onblur: this.blur,
-          //             // onfocus: this.focus,
-          //             // oneditionend: this.onedit,
-          //             copyCompatibility: true,
-          //             // onpaste: this.onPaste,
-          //             allowManualInsertRow: false,
-          //             license: JEXCEL_PRO_KEY,
-          //             editable: true,
-          //             // text: {
-          //             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-          //             //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-          //             //     show: '',
-          //             //     entries: '',
-          //             // },
-          //             onload: this.loaded,
-          //             contextMenu: function (obj, x, y, e) {
-          //                 var items = [];
-          //                 if (y == null) {
-
-          //                 } else {
-          //                     // Insert new row before
-          //                     if (obj.options.allowInsertRow == true) {
-          //                         items.push({
-          //                             title: i18n.t('static.common.insertNewRowBefore'),
-          //                             onclick: function () {
-          //                                 var data = [];
-          //                                 data[0] = "";
-          //                                 data[1] = "";
-          //                                 data[2] = "";
-          //                                 obj.insertRow(data, parseInt(y), 1);
-          //                             }.bind(this)
-          //                         });
-          //                     }
-          //                     // after
-          //                     if (obj.options.allowInsertRow == true) {
-          //                         items.push({
-          //                             title: i18n.t('static.common.insertNewRowAfter'),
-          //                             onclick: function () {
-          //                                 var data = [];
-          //                                 data[0] = "";
-          //                                 data[1] = "";
-          //                                 data[2] = "";
-          //                                 obj.insertRow(data, parseInt(y));
-          //                             }.bind(this)
-          //                         });
-          //                     }
-          //                     // Delete a row
-          //                     if (obj.options.allowDeleteRow == true) {
-          //                         // region id
-          //                         // if (obj.getRowData(y)[5] == 0) {
-          //                         items.push({
-          //                             title: i18n.t("static.common.deleterow"),
-          //                             onclick: function () {
-          //                                 obj.deleteRow(parseInt(y));
-          //                             }
-          //                         });
-          //                         // }
-          //                     }
-          //                 }
-          //                 return items;
-          //             }.bind(this)
-          //         };
-          //         var varEL = ""
-          //         this.el = jexcel(document.getElementById("tableDiv"), options);
-          //         varEL = this.el
-          //         this.setState({
-          //             dataEL: varEL,
-          //             loading: false,
-          //             programList: plList
-          //         })
         } else {
           this.setState(
             {
@@ -526,12 +373,11 @@ export default class ConsumptionDetails extends Component {
         });
         if (error.message === "Network Error") {
           this.setState({
-            // message: 'static.unkownError',
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             color: "red",
             loading: false,
           });
@@ -570,20 +416,18 @@ export default class ConsumptionDetails extends Component {
         }
       });
   }
-
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
   };
-
   loadedModal = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
-    if(document.getElementsByClassName("jss").length>1){
+    if (document.getElementsByClassName("jss").length > 1) {
       var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
       var tr = asterisk.firstChild;
       tr.children[1].classList.add("AsteriskTheadtrTd");
       tr.children[2].classList.add("AsteriskTheadtrTd");
       tr.children[3].classList.add("AsteriskTheadtrTd");
-    }else{
+    } else {
       var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
       var tr = asterisk.firstChild;
       tr.children[1].classList.add("AsteriskTheadtrTd");
@@ -591,7 +435,6 @@ export default class ConsumptionDetails extends Component {
       tr.children[3].classList.add("AsteriskTheadtrTd");
     }
   };
-
   filterVersion = function (instance, cell, c, r, source) {
     var value = this.state.dataEL.getJson(null, false)[r][0];
     var versionList = this.state.programList.filter((c) => c.id == value)[0]
@@ -609,7 +452,6 @@ export default class ConsumptionDetails extends Component {
     });
     return vlList.reverse();
   }.bind(this);
-
   addRowClicked() {
     var obj = this.state.dataEL;
     var data = [];
@@ -618,7 +460,6 @@ export default class ConsumptionDetails extends Component {
     data[2] = "";
     obj.insertRow(data);
   }
-
   changed = function (instance, cell, x, y, value) {
     if (this.state.changedFlag == false) {
       this.setState({
@@ -637,7 +478,6 @@ export default class ConsumptionDetails extends Component {
       checkValidtion("text", "C", y, rowData[2], elInstance);
     }
   };
-
   submitClicked() {
     var validation = this.checkValidations();
     if (validation == true) {
@@ -655,10 +495,8 @@ export default class ConsumptionDetails extends Component {
             integrationId: item[2],
           });
         });
-        // console.log("List Test@@@123", list);
         IntegrationService.addManualJson(list)
           .then((response) => {
-            // console.log(response.data);
             if (response.status == "200") {
               this.setState(
                 {
@@ -690,12 +528,11 @@ export default class ConsumptionDetails extends Component {
           .catch((error) => {
             if (error.message === "Network Error") {
               this.setState({
-                // message: 'static.unkownError',
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
                 color: "red",
                 loading: false,
               });
@@ -715,7 +552,6 @@ export default class ConsumptionDetails extends Component {
                   this.setState({
                     message: "static.unkownError",
                     color: "red",
-                    // message: i18n.t('static.message.alreadExists'),
                     loading: false,
                   });
                   break;
@@ -759,55 +595,43 @@ export default class ConsumptionDetails extends Component {
       );
     }
   }
-
   checkValidations() {
     var valid = true;
     var elInstance = this.state.dataEL;
     var json = elInstance.getJson(null, false);
-    // console.log("Json Test@@@123", json);
     var validation = "";
     for (var y = 0; y < json.length; y++) {
       if (json[y][0] != "" || json[y][1] != "" || json[y][2] != "") {
-        // console.log("y Test@@@123", y);
         var rowData = elInstance.getRowData(y);
-        // console.log("Row Data Test@@@123", rowData);
         validation = checkValidtion("text", "A", y, rowData[0], elInstance);
-        // console.log("Validation 1 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
         validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-        // console.log("Validation 2 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-        // console.log("Validation 3 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
       }
     }
-    // console.log("Valid Test@@@123", valid);
     return valid;
   }
-
   hideFirstComponent() {
     document.getElementById("div1").style.display = "block";
     this.state.timeout = setTimeout(function () {
       document.getElementById("div1").style.display = "none";
     }, 30000);
   }
-
   hideSecondComponent() {
     document.getElementById("div2").style.display = "block";
     this.state.timeout = setTimeout(function () {
       document.getElementById("div2").style.display = "none";
     }, 30000);
   }
-
   handleRangeChange(value, text, listIndex) {
-    //
   }
   handleRangeDissmis(value) {
     localStorage.setItem("sesRangeValueManualJson", JSON.stringify(value));
@@ -820,11 +644,9 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
-
   _handleClickRangeBox(e) {
     this.pickRange.current.show();
   }
-
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -835,14 +657,11 @@ export default class ConsumptionDetails extends Component {
       },
       () => {
         this.filterProgram();
-        // this.filterData(this.state.rangeValue)
       }
     );
   }
-
   filterProgram = () => {
     let countryIds = this.state.countryValues.map((ele) => ele.value);
-    // console.log("countryIds", countryIds, "programs", this.state.programs);
     this.setState(
       {
         programListBasedOnCountry: [],
@@ -860,7 +679,6 @@ export default class ConsumptionDetails extends Component {
             .then((programResponse) => {
               if (programResponse.status == 200) {
                 var programList = programResponse.data;
-                // console.log("programList", programList);
                 var plList = [];
                 programList.map((item) => {
                   plList.push({
@@ -870,28 +688,25 @@ export default class ConsumptionDetails extends Component {
                   });
                 });
                 plList.sort((a, b) => {
-                  var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                  var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase
+                  var itemLabelA = a.name.toUpperCase();
+                  var itemLabelB = b.name.toUpperCase();
                   return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 plList.map((item) => {
                   programValues.push({ value: item.id });
                 });
-
                 if (plList.length > 0) {
                   this.setState(
                     {
                       programListBasedOnCountry: plList.sort((a, b) => {
-                        var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelA = a.name.toUpperCase();
+                        var itemLabelB = b.name.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       }),
                       programValues: programValues,
                       loading: false,
                     },
                     () => {
-                      // console.log("programValues", programValues);
-
                       this.getVersions();
                     }
                   );
@@ -906,7 +721,6 @@ export default class ConsumptionDetails extends Component {
                     }
                   );
                 }
-
                 this.setState({
                   programList: plList,
                   loading: false,
@@ -930,12 +744,11 @@ export default class ConsumptionDetails extends Component {
               });
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   color: "red",
                   loading: false,
                 });
@@ -988,7 +801,6 @@ export default class ConsumptionDetails extends Component {
       }
     );
   };
-
   getVersions() {
     this.setState(
       {
@@ -997,34 +809,26 @@ export default class ConsumptionDetails extends Component {
       () => {
         let progList = this.state.programListBasedOnCountry;
         let programValues = this.state.programValues.map((ele) => ele.value);
-
         if (progList.length != 0) {
-          // console.log("Json Test@@@123", this.state.loading);
-
           var keys = [];
           var values = [];
           let newProgramList = [...new Set(programValues)];
-
           DropdownService.getVersionListForPrograms(
             PROGRAM_TYPE_SUPPLY_PLAN,
             newProgramList
           )
             .then((versionResponse) => {
               if (versionResponse.status == 200) {
-                //to get values
                 for (let value of Object.values(versionResponse.data)) {
                   values.push(value);
                 }
-                //to get keys
                 for (let key of Object.keys(versionResponse.data)) {
                   keys.push(key);
                 }
                 for (var i = 0; i < keys.length; i++) {
-                  // verLst[keys[i]] = values[i];
                   progList.filter((c) => c.id == keys[i])[0].versionList =
                     values[i];
                 }
-
                 this.setState(
                   {
                     programListBasedOnCountry: progList,
@@ -1053,15 +857,13 @@ export default class ConsumptionDetails extends Component {
                 programList: [],
                 loading: false,
               });
-
               if (error.message === "Network Error") {
                 this.setState({
-                  // message: 'static.unkownError',
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   color: "red",
                   loading: false,
                 });
@@ -1114,7 +916,6 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
-
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1128,7 +929,6 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
-
   showReport() {
     this.setState(
       {
@@ -1152,10 +952,8 @@ export default class ConsumptionDetails extends Component {
           realmCountryIds: realmCountryIds,
           programIds: programIds,
         };
-        // console.log("Json Test@@@123", json);
         IntegrationService.reportForManualIntegration(json)
           .then((response) => {
-            // console.log(response.data);
             var dataForJexcel = [];
             if (realmCountryIds.length > 0 && programIds.length > 0) {
               dataForJexcel = response.data.sort((a, b) => {
@@ -1165,7 +963,6 @@ export default class ConsumptionDetails extends Component {
               });
             }
             if (response.status == "200") {
-              // console.log("Response.data Test@@@123", response.data);
               var data = [];
               var tableData = [];
               for (var i = 0; i < dataForJexcel.length; i++) {
@@ -1196,7 +993,6 @@ export default class ConsumptionDetails extends Component {
                 tableData.push(data);
               }
               this.el = jexcel(document.getElementById("tableDivReport"), "");
-              // this.el.destroy();
               jexcel.destroy(document.getElementById("tableDivReport"), true);
               var options = {
                 data: tableData,
@@ -1222,7 +1018,6 @@ export default class ConsumptionDetails extends Component {
                   {
                     title: i18n.t("static.manualIntegration.jsonCreationDate"),
                     options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                    // readOnly: true,
                     type: "calendar",
                   },
                   {
@@ -1234,7 +1029,6 @@ export default class ConsumptionDetails extends Component {
                 filters: true,
                 search: true,
                 columnSorting: true,
-                // tableOverflow: true,
                 wordWrap: true,
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 parseFormulas: true,
@@ -1242,21 +1036,10 @@ export default class ConsumptionDetails extends Component {
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
                 allowDeleteRow: false,
-                // onchange: this.changed,
-                // onblur: this.blur,
-                // onfocus: this.focus,
-                // oneditionend: this.onedit,
                 copyCompatibility: true,
-                // onpaste: this.onPaste,
                 allowManualInsertRow: false,
                 license: JEXCEL_PRO_KEY,
                 editable: false,
-                // text: {
-                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     show: '',
-                //     entries: '',
-                // },
                 onload: this.loaded,
                 contextMenu: function (obj, x, y, e) {
                   var items = [];
@@ -1270,9 +1053,7 @@ export default class ConsumptionDetails extends Component {
               );
               varEL = this.el;
               this.setState({
-                // dataEL: varEL,
                 loading: false,
-                // programList: plList
               });
             } else {
               this.setState(
@@ -1287,15 +1068,13 @@ export default class ConsumptionDetails extends Component {
             }
           })
           .catch((error) => {
-            // console.log("Err Test@@@123", error);
             if (error.message === "Network Error") {
               this.setState({
-                // message: 'static.unkownError',
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
                 color: "red",
                 loading: false,
               });
@@ -1315,7 +1094,6 @@ export default class ConsumptionDetails extends Component {
                   this.setState({
                     message: "static.unkownError",
                     color: "red",
-                    // message: i18n.t('static.message.alreadExists'),
                     loading: false,
                   });
                   break;
@@ -1339,13 +1117,11 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
-
   render() {
     jexcel.setDictionary({
       Show: " ",
       entries: " ",
     });
-
     const { countrys } = this.state;
     let countryList =
       countrys.length > 0 &&
@@ -1355,18 +1131,15 @@ export default class ConsumptionDetails extends Component {
           value: item.id,
         };
       }, this);
-
     const { programListBasedOnCountry } = this.state;
     let programList = [];
     programList =
       programListBasedOnCountry.length > 0 &&
       programListBasedOnCountry.map((item, i) => {
         return (
-          // { label: getLabelText(item.label, this.state.lang), value: item.programId }
           { label: item.name, value: item.id }
         );
       }, this);
-
     const pickerLang = {
       months: [
         "Jan",
@@ -1385,17 +1158,14 @@ export default class ConsumptionDetails extends Component {
       from: "From",
       to: "To",
     };
-
     const makeText = (m) => {
       if (m && m.year && m.month)
         return pickerLang.months[m.month - 1] + ". " + m.year;
       return "?";
     };
-
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        {/* <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5> */}
         <h5 className={this.state.color} id="div1">
           {i18n.t(this.state.message)}
         </h5>
@@ -1430,7 +1200,6 @@ export default class ConsumptionDetails extends Component {
                         ref={this.pickRange}
                         value={this.state.rangeValue}
                         lang={pickerLang}
-                        //theme="light"
                         onChange={this.handleRangeChange}
                         onDismiss={this.handleRangeDissmis}
                       >
@@ -1445,13 +1214,11 @@ export default class ConsumptionDetails extends Component {
                       </Picker>
                     </div>
                   </FormGroup>
-
                   <FormGroup className="col-md-3">
                     <Label htmlFor="countrysId">
                       {i18n.t("static.program.realmcountry")}
                     </Label>
                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-
                     <div className="controls edit">
                       <MultiSelect
                         bsSize="sm"
@@ -1476,13 +1243,11 @@ export default class ConsumptionDetails extends Component {
                       )}
                     </div>
                   </FormGroup>
-
                   <FormGroup className="col-md-3">
                     <Label htmlFor="programIds">
                       {i18n.t("static.program.program")}
                     </Label>
                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-
                     <MultiSelect
                       bsSize="sm"
                       name="programIds"
@@ -1522,7 +1287,6 @@ export default class ConsumptionDetails extends Component {
                           <strong>{i18n.t("static.loading.loading")}</strong>
                         </h4>
                       </div>
-
                       <div class="spinner-border blue ml-4" role="status"></div>
                     </div>
                   </div>

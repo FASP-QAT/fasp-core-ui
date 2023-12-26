@@ -1,46 +1,29 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-// import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import BudgetServcie from '../../api/BudgetService';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText'
-import i18n from '../../i18n';
-import { Bar, HorizontalBar } from 'react-chartjs-2';
+import { Card, CardBody, Col, FormGroup, Label } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import ProgramService from '../../api/ProgramService';
-import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator';
-import FundingSourceService from '../../api/FundingSourceService';
-import moment from 'moment';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-
-import { MultiSelect } from 'react-multi-select-component';
-
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import ReportService from '../../api/ReportService';
-import pdfIcon from '../../assets/img/pdf.png';
-import csvicon from '../../assets/img/csv.png';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import jexcel from 'jspreadsheet';
+import moment from 'moment';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { Search } from 'react-bootstrap-table2-toolkit';
+import { HorizontalBar } from 'react-chartjs-2';
+import Picker from 'react-month-picker';
+import { MultiSelect } from 'react-multi-select-component';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo.js';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
-const ref = React.createRef();
-const entityname = i18n.t('static.dashboard.budget');
+import ReportService from '../../api/ReportService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -52,7 +35,6 @@ const chartoptions =
         text: i18n.t('static.dashboard.budget')
     },
     scales: {
-
         yAxes: [{
             id: 'A',
             position: 'left',
@@ -65,14 +47,11 @@ const chartoptions =
                 beginAtZero: true,
                 fontColor: 'blue'
             },
-
         }],
         xAxes: [{
             scaleLabel: {
                 display: true,
-                // labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
                 labelString: i18n.t('static.supplyPlan.amountInUSD'),
-                // + '' + i18n.t('static.report.inmillions'),
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
@@ -80,26 +59,13 @@ const chartoptions =
             ticks: {
                 fontColor: 'black',
                 callback: function (value) {
-                    // var cell1 = value
-                    // cell1 += '';
-                    // var x = cell1.split('.');
-                    // var x1 = x[0];
-                    // var x2 = x.length > 1 ? '.' + x[1] : '';
-                    // var rgx = /(\d+)(\d{3})/;
-                    // while (rgx.test(x1)) {
-                    //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    // }
-                    // return x1 + x2;
                     if (value != null) {
                         return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     }
-
-
                 }
             }
         }]
     },
-
     tooltips: {
         mode: 'index',
         intersect: false,
@@ -107,20 +73,8 @@ const chartoptions =
         custom: CustomTooltips,
         callbacks: {
             label: function (tooltipItem, data) {
-
                 let label = data.labels[tooltipItem.index];
                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                // var cell1 = value
-                // cell1 += '';
-                // var x = cell1.split('.');
-                // var x1 = x[0];
-                // var x2 = x.length > 1 ? '.' + x[1] : '';
-                // var rgx = /(\d+)(\d{3})/;
-                // while (rgx.test(x1)) {
-                //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                // }
-                // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             }
         }
@@ -139,8 +93,6 @@ const chartoptions =
         }
     }
 }
-
-
 class Budgets extends Component {
     constructor(props) {
         super(props);
@@ -156,10 +108,8 @@ class Budgets extends Component {
             programValues: [],
             programLabels: [],
             programs: [],
-            // versions: [],
             show: false,
             loading: true,
-            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -170,50 +120,32 @@ class Budgets extends Component {
             programValues: [],
             jexcelDataEl: ""
         }
-
-
         this.formatDate = this.formatDate.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
-        this.addCommas = this.addCommas.bind(this);
-        this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
-        // this.setProgramId = this.setProgramId.bind(this);
-        // this.setVersionId = this.setVersionId.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-
     }
     show() {
-
     }
     handleRangeChange(value, text, listIndex) {
-        //
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.filterData();
         })
-
     }
-
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-
     getFundingSource = () => {
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
+        if (localStorage.getItem("sessionType") === 'Online') {
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
-                    // console.log("json===>", JSON.stringify(response.data))
-                    var fundingSourceValues=[];
-                    var fundingSources=response.data;
-                    fundingSources.map(ele=>{
-                        fundingSourceValues.push({label:ele.code,value:ele.id})
+                    var fundingSourceValues = [];
+                    var fundingSources = response.data;
+                    fundingSources.map(ele => {
+                        fundingSourceValues.push({ label: ele.code, value: ele.id })
                     })
                     this.setState({
                         fundingSources: fundingSources.sort(function (a, b) {
@@ -221,21 +153,18 @@ class Budgets extends Component {
                             b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }), loading: false,
-                        fundingSourceValues:fundingSourceValues,
+                        fundingSourceValues: fundingSourceValues,
                         fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
-                        // this.consolidatedFundingSourceList()
                     })
                 }).catch(
                     error => {
                         this.setState({
                             fundingSources: [], loading: false
                         }, () => {
-                            // this.consolidatedFundingSourceList()
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: error.message, 
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
@@ -255,70 +184,10 @@ class Budgets extends Component {
                         }
                     }
                 );
-
         } else {
-            // console.log('offline')
-            // this.consolidatedFundingSourceList()
             this.setState({ loading: false })
         }
-
     }
-
-    // consolidatedFundingSourceList = () => {
-    //     const lan = 'en';
-    //     const { fundingSources } = this.state
-    //     var proList = fundingSources;
-
-    //     var db1;
-    //     getDatabase();
-    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    //     openRequest.onsuccess = function (e) {
-    //         db1 = e.target.result;
-    //         var transaction = db1.transaction(['fundingSource'], 'readwrite');
-    //         var fundingSource = transaction.objectStore('fundingSource');
-    //         var getRequest = fundingSource.getAll();
-
-    //         getRequest.onerror = function (event) {
-    //             // Handle errors!
-    //         };
-    //         getRequest.onsuccess = function (event) {
-    //             var myResult = [];
-    //             myResult = getRequest.result;
-    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-    //             for (var i = 0; i < myResult.length; i++) {
-
-    //                 var f = 0
-    //                 for (var k = 0; k < this.state.fundingSources.length; k++) {
-    //                     if (this.state.fundingSources[k].id == myResult[i].fundingSourceId) {
-    //                         f = 1;
-    //                         // console.log('already exist')
-    //                     }
-    //                 }
-    //                 var programData = {
-    //                     id: myResult[i].fundingSourceId,
-    //                     code: myResult[i].fundingSourceCode,
-    //                     label: myResult[i].label
-    //                 };
-    //                 if (f == 0) {
-    //                     proList.push(programData)
-    //                 }
-
-    //             }
-
-    //             this.setState({
-    //                 fundingSources: proList.sort(function (a, b) {
-    //                     a = a.code.toLowerCase();
-    //                     b = b.code.toLowerCase();
-    //                     return a < b ? -1 : a > b ? 1 : 0;
-    //                 })
-    //             })
-
-    //         }.bind(this);
-
-    //     }.bind(this);
-    // }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
@@ -331,50 +200,27 @@ class Budgets extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
-
             this.filterData()
         })
     }
-
-    hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
-
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
     exportCSV = (columns) => {
-
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-        // csvRow.push('"' + (i18n.t('ststatic.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
-        var re;
-
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        // this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundNStr(ele.budgetAmt), this.roundNStr(ele.plannedBudgetAmt), this.roundNStr(ele.orderedBudgetAmt), this.roundNStr((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
-        // this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
         this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDateCSV(ele.startDate), this.formatDateCSV(ele.stopDate)])));
-
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -388,14 +234,11 @@ class Budgets extends Component {
     }
     exportPDF = (columns) => {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -403,17 +246,13 @@ class Budgets extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
-
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
@@ -426,46 +265,27 @@ class Budgets extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                    //     align: 'left'
-                    // })
                     var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 150, programText)
-                    // doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                    //     align: 'left'
-                    // })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
-
                 }
-
             }
         }
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4"; 
+        const orientation = "landscape"; 
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
-
         var canvas = document.getElementById("cool-canvas");
-        //creates image
-
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
-
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
-
         const headers = columns.map((item, idx) => (item.text));
-        // const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundNStr(ele.budgetAmt)), this.formatter(this.roundNStr(ele.plannedBudgetAmt)), this.formatter(this.roundNStr(ele.orderedBudgetAmt)), this.formatter(this.roundNStr(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
-        // const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
         const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
-
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: height,
@@ -480,217 +300,22 @@ class Budgets extends Component {
                 6: { cellWidth: 90 },
                 7: { cellWidth: 90 },
             }
-
         };
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.budgetheader') + ".pdf")
     }
-
-
-
     filterData() {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString())
-        // let versionId = document.getElementById('versionId').value
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
-
-        // // console.log('programIds.length', programIds.length)
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
-            // localStorage.setItem("sesVersionIdReport", versionId);
-            // if (versionId.includes('Local')) {
-            //     this.setState({ loading: true })
-
-            //     var db1;
-            //     getDatabase();
-            //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-
-            //     var procurementAgentList = [];
-            //     var fundingSourceList = [];
-            //     var budgetList = [];
-
-            //     openRequest.onerror = function (event) {
-            //         this.setState({
-            //             loading: false
-            //         })
-            //     }.bind(this);
-            //     openRequest.onsuccess = function (e) {
-            //         db1 = e.target.result;
-
-            //         var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-            //         var budgetOs = budgetTransaction.objectStore('budget');
-            //         var budgetRequest = budgetOs.getAll();
-
-            //         budgetRequest.onerror = function (event) {
-            //             this.setState({
-            //                 loading: false
-            //             })
-            //         }.bind(this);
-            //         budgetRequest.onsuccess = function (event) {
-            //             var budgetResult = [];
-            //             budgetResult = budgetRequest.result;
-            //             // console.log('B*******', budgetResult)
-            //             for (var k = 0, j = 0; k < budgetResult.length; k++) {
-            //                 // console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
-            //                 // console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
-            //                 // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
-            //                 if (budgetResult[k].programs[0].id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
-            //                     budgetList[j++] = budgetResult[k]
-            //             }
-            //             // console.log("budgetList---", budgetList);
-            //             // console.log("B** budget 1 ---", budgetList);
-            //             var transaction = db1.transaction(['programData'], 'readwrite');
-            //             var programTransaction = transaction.objectStore('programData');
-            //             var version = (versionId.split('(')[0]).trim()
-            //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-            //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-            //             var program = `${programId}_v${version}_uId_${userId}`
-            //             var data = [];
-            //             var programRequest = programTransaction.get(program);
-
-            //             programRequest.onerror = function (event) {
-            //                 this.setState({
-            //                     loading: false
-            //                 })
-            //             }.bind(this);
-            //             programRequest.onsuccess = function (event) {
-            //                 // var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-            //                 // var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
-            //                 // var programDataRequest = programDataOs.get(program);
-            //                 // programDataRequest.onsuccess = function (event) {
-
-            //                 //     var planningUnitProgramDataList = programDataRequest.result.programData.planningUnitDataList;
-            //                 //     var programDataShipmentList = [];
-            //                 //     for (var pu = 0; pu < planningUnitProgramDataList.length; pu++) {
-            //                 //         var planningUnitData = planningUnitProgramDataList[pu];
-            //                 //         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-            //                 //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            //                 //         var programJson = JSON.parse(programData);
-            //                 //         var sList = programJson.shipmentList;
-            //                 //         programDataShipmentList = programDataShipmentList.concat(sList);
-            //                 //     }
-            //                 //     for (var l = 0; l < budgetList.length; l++) {
-            //                 //         shipmentList = programDataShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-            //                 //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
-            //                 //         var plannedShipmentbudget = 0;
-            //                 //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
-            //                 //             // console.log(ele)
-            //                 //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-            //                 //         });
-            //                 //         var OrderedShipmentbudget = 0;
-            //                 //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
-            //                 //         shiplist.map(ele => {
-            //                 //             // console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-            //                 //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-            //                 //         });
-            //                 //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
-            //                 //     }
-            //                 // }.bind(this);
-
-
-            //                 var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-            //                 var shipmentList = [];
-            //                 for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-            //                     var planningUnitData = planningUnitDataList[pu];
-            //                     var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-            //                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            //                     var programJson = JSON.parse(programData);
-            //                     var sList = programJson.shipmentList;
-            //                     shipmentList = shipmentList.concat(sList);
-            //                 }
-            //                 // console.log("B** program json ---", programJson);
-            //                 for (var l = 0; l < budgetList.length; l++) {
-            //                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-            //                     shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
-            //                     // console.log("B** shipment list ---", shipmentList);
-            //                     var plannedShipmentbudget = 0;
-            //                     (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
-            //                         plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-            //                     });
-            //                     // console.log("B** planned shipment budget ---", plannedShipmentbudget);
-            //                     var OrderedShipmentbudget = 0;
-            //                     var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
-            //                     // console.log("B** shiplist ---", shiplist);
-            //                     shiplist.map(ele => {
-            //                         // console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-            //                         OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-            //                     });
-
-            //                     var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
-
-
-            //                     // console.log("B** order shipment budget ---", remainingbudget);
-            //                     // console.log("B** budget list l ==>", budgetList[l]);
-            //                     var json = {
-            //                         budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
-            //                         program: { id: budgetList[l].programs.id, label: budgetList[l].programs.label, code: programJson.programCode },
-            //                         fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
-            //                         currency: budgetList[l].currency,
-            //                         // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-            //                         // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-            //                         plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
-            //                         orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
-            //                         startDate: budgetList[l].startDate,
-            //                         stopDate: budgetList[l].stopDate,
-            //                         budgetAmt: budgetList[l].budgetAmt,
-            //                         remainingBudgetAmtUsd: (budgetList[l].budgetUsdAmt - budgetList[l].usedUsdAmt)
-
-            //                     }
-
-            //                     data.push(json)
-            //                     // console.log("B** json ---", json);
-            //                 }
-            //                 // console.log("B** data ---", data);
-
-            //                 data.sort(function (a, b) {
-            //                     var keyA = new Date(a.startDate),
-            //                         keyB = new Date(b.startDate);
-            //                     // Compare the 2 dates
-            //                     if (keyA < keyB) return -1;
-            //                     if (keyA > keyB) return 1;
-            //                     return 0;
-            //                 });
-            //                 data.sort(function (a, b) {
-            //                     var keyA1 = new Date(a.startDate),
-            //                         keyA11 = new Date(a.stopDate),
-            //                         keyB1 = new Date(b.startDate),
-            //                         keyB11 = new Date(b.stopDate);
-            //                     // Compare the 2 dates
-            //                     if (keyA1.getTime() === keyB1.getTime()) {
-            //                         if (keyA11 < keyB11) return -1;
-            //                         if (keyA11 > keyB11) return 1;
-            //                     }
-            //                     return 0;
-            //                 });
-
-            //                 // console.log("data---->", data);
-            //                 this.setState({
-            //                     selBudget: data,
-            //                     message: '',
-            //                     loading: false
-            //                 }, () => {
-            //                     this.buildJexcel()
-            //                 })
-
-
-
-            //             }.bind(this)
-
-
-            //         }.bind(this)
-            //     }.bind(this)
-
-            // } else {
             this.setState({ loading: true })
-            // var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
             var inputjson = { "programIds": programId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
-            // console.log("Input Json Test@123", inputjson)
-            // AuthenticationService.setupAxiosInterceptors();
             ReportService.budgetReport(inputjson)
                 .then(response => {
-                    // console.log("BudgetData--------", response.data);
                     this.setState({
                         selBudget: response.data, message: '', loading: false
                     }, () => {
@@ -703,13 +328,11 @@ class Budgets extends Component {
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -740,32 +363,6 @@ class Budgets extends Component {
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             selBudget: [], loading: false
-            //         })
-
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ loading: false, message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
-            // }
         } else if (this.state.programValues.length == 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.common.selectProgram') });
@@ -782,7 +379,6 @@ class Budgets extends Component {
             return "";
         }
     }
-
     formatDateCSV(cell) {
         if (cell != null && cell != "") {
             var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`);
@@ -791,25 +387,21 @@ class Budgets extends Component {
             return "";
         }
     }
-    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-
     getPrograms = () => {
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
-                        if(response.data[i].active==true){
-                        var programJson = {
-                            programId: response.data[i].id,
-                            label: response.data[i].label,
-                            programCode: response.data[i].code
+                        if (response.data[i].active == true) {
+                            var programJson = {
+                                programId: response.data[i].id,
+                                label: response.data[i].label,
+                                programCode: response.data[i].code
+                            }
+                            proList.push(programJson)
                         }
-                        proList.push(programJson)
-                    }
                     }
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -823,17 +415,14 @@ class Budgets extends Component {
                         this.setState({
                             programs: [], loading: false
                         }, () => {
-                            // this.consolidatedProgramList()
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -864,391 +453,20 @@ class Budgets extends Component {
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             programs: [], loading: false
-            //         }, () => { this.consolidatedProgramList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message, loading: false });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ loading: false, message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
         } else {
-            // console.log('offline')
-            // this.consolidatedProgramList()
             this.setState({ loading: false })
         }
-
     }
-    // consolidatedProgramList = () => {
-    //     const lan = 'en';
-    //     const { programs } = this.state
-    //     var proList = programs;
-
-    //     var db1;
-    //     getDatabase();
-    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    //     openRequest.onsuccess = function (e) {
-    //         db1 = e.target.result;
-    //         var transaction = db1.transaction(['programData'], 'readwrite');
-    //         var program = transaction.objectStore('programData');
-    //         var getRequest = program.getAll();
-
-    //         getRequest.onerror = function (event) {
-    //             // Handle errors!
-    //         };
-    //         getRequest.onsuccess = function (event) {
-    //             var myResult = [];
-    //             myResult = getRequest.result;
-    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-    //             for (var i = 0; i < myResult.length; i++) {
-    //                 if (myResult[i].userId == userId) {
-    //                     var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-    //                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-    //                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-    //                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-    //                     // console.log(programNameLabel)
-
-    //                     var f = 0
-    //                     for (var k = 0; k < this.state.programs.length; k++) {
-    //                         if (this.state.programs[k].programId == programData.programId) {
-    //                             f = 1;
-    //                             // console.log('already exist')
-    //                         }
-    //                     }
-    //                     if (f == 0) {
-    //                         proList.push(programData)
-    //                     }
-    //                 }
-
-
-    //             }
-    //             var lang = this.state.lang;
-
-    //             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-    //                 this.setState({
-    //                     programs: proList.sort(function (a, b) {
-    //                         a = getLabelText(a.label, lang).toLowerCase();
-    //                         b = getLabelText(b.label, lang).toLowerCase();
-    //                         return a < b ? -1 : a > b ? 1 : 0;
-    //                     }),
-    //                     programId: localStorage.getItem("sesProgramIdReport")
-    //                 }, () => {
-    //                     this.filterVersion();
-    //                     this.filterData()
-    //                 })
-    //             } else {
-    //                 this.setState({
-    //                     programs: proList.sort(function (a, b) {
-    //                         a = getLabelText(a.label, lang).toLowerCase();
-    //                         b = getLabelText(b.label, lang).toLowerCase();
-    //                         return a < b ? -1 : a > b ? 1 : 0;
-    //                     })
-    //                 })
-
-    //             }
-
-    //         }.bind(this);
-
-    //     }.bind(this);
-
-
-    // }
-
-
-    roundNStr = num => {
-        var roundNum = Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-        // console.log('num ' + num + 'roundNum ', roundNum)
-        if (roundNum != 0) {
-            return roundNum + ' ' + i18n.t('static.common.million')
-        } else {
-            return num
-        }
-    }
-    roundN = num => {
-        return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-
-    }
-    // filterVersion = () => {
-    //     // let programId = document.getElementById("programId").value;
-    //     let programId = this.state.programId;
-    //     document.getElementById("versionId").value = 0
-    //     if (programId != 0) {
-
-    //         // localStorage.setItem("sesProgramIdReport", programId);
-    //         const program = this.state.programs.filter(c => c.programId == programId)
-    //         // console.log(program)
-    //         if (program.length == 1) {
-    //             if (isSiteOnline()) {
-    //                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-    //                     .then(response => {
-    //                         // console.log("response===>", response.data)
-    //                         this.setState({
-    //                             versions: []
-    //                         }, () => {
-    //                             this.setState({
-    //                                 versions: response.data
-    //                             }, () => {
-    //                                 this.consolidatedVersionList(programId)
-    //                             });
-    //                         });
-    //                     }).catch(
-    //                         error => {
-    //                             this.setState({
-    //                                 programs: [], loading: false
-    //                             })
-    //                             if (error.message === "Network Error") {
-    //                                 this.setState({
-    //                                     // message: 'static.unkownError',
-    //                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-    //                                     loading: false
-    //                                 });
-    //                             } else {
-    //                                 switch (error.response ? error.response.status : "") {
-
-    //                                     case 401:
-    //                                         this.props.history.push(`/login/static.message.sessionExpired`)
-    //                                         break;
-    //                                     case 403:
-    //                                         this.props.history.push(`/accessDenied`)
-    //                                         break;
-    //                                     case 500:
-    //                                     case 404:
-    //                                     case 406:
-    //                                         this.setState({
-    //                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-    //                                             loading: false
-    //                                         });
-    //                                         break;
-    //                                     case 412:
-    //                                         this.setState({
-    //                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-    //                                             loading: false
-    //                                         });
-    //                                         break;
-    //                                     default:
-    //                                         this.setState({
-    //                                             message: 'static.unkownError',
-    //                                             loading: false
-    //                                         });
-    //                                         break;
-    //                                 }
-    //                             }
-    //                         }
-    //                     );
-
-
-    //             } else {
-    //                 this.setState({
-    //                     versions: []
-    //                 }, () => { this.consolidatedVersionList(programId) })
-    //             }
-    //         } else {
-
-    //             this.setState({
-    //                 versions: []
-    //             })
-
-    //         }
-    //     } else {
-    //         this.setState({
-    //             versions: []
-    //         })
-    //     }
-    // }
-    // consolidatedVersionList = (programId) => {
-    //     const lan = 'en';
-    //     const { versions } = this.state
-    //     var verList = versions;
-
-    //     var db1;
-    //     getDatabase();
-    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    //     openRequest.onsuccess = function (e) {
-    //         db1 = e.target.result;
-    //         var transaction = db1.transaction(['programData'], 'readwrite');
-    //         var program = transaction.objectStore('programData');
-    //         var getRequest = program.getAll();
-
-    //         getRequest.onerror = function (event) {
-    //             // Handle errors!
-    //         };
-    //         getRequest.onsuccess = function (event) {
-    //             var myResult = [];
-    //             myResult = getRequest.result;
-    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-    //             for (var i = 0; i < myResult.length; i++) {
-    //                 if (myResult[i].userId == userId && myResult[i].programId == programId) {
-    //                     var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-    //                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-    //                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-    //                     var programData = databytes.toString(CryptoJS.enc.Utf8)
-    //                     var version = JSON.parse(programData).currentVersion
-
-    //                     version.versionId = `${version.versionId} (Local)`
-    //                     verList.push(version)
-
-    //                 }
-
-
-    //             }
-
-    //             // console.log(verList)
-    //             let versionList = verList.filter(function (x, i, a) {
-    //                 return a.indexOf(x) === i;
-    //             });
-    //             versionList.reverse();
-
-    //             if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-
-    //                 let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
-    //                 if (versionVar != '' && versionVar != undefined) {
-    //                     this.setState({
-    //                         versions: versionList,
-    //                         versionId: localStorage.getItem("sesVersionIdReport")
-    //                     }, () => {
-    //                         this.filterData();
-    //                     })
-    //                 } else {
-    //                     this.setState({
-    //                         versions: versionList,
-    //                         versionId: versionList[0].versionId
-    //                     }, () => {
-    //                         this.filterData();
-    //                     })
-    //                 }
-    //             } else {
-    //                 this.setState({
-    //                     versions: versionList,
-    //                     versionId: versionList[0].versionId
-    //                 }, () => {
-    //                     this.filterData();
-    //                 })
-    //             }
-
-
-    //         }.bind(this);
-
-
-
-    //     }.bind(this)
-
-
-    // }
-
-
     componentDidMount() {
         this.getPrograms()
         this.getFundingSource();
     }
-
-    // setProgramId(event) {
-    //     this.setState({
-    //         programId: event.target.value,
-    //         versionId: ''
-    //     }, () => {
-    //         // localStorage.setItem("sesVersionIdReport", '');
-    //         this.filterVersion();
-    //         this.filterData()
-    //     })
-
-    // }
-
-    // setVersionId(event) {
-    //     this.setState({
-    //         versionId: event.target.value
-    //     }, () => {
-    //         this.filterData();
-    //     })
-
-    // }
-    // showSubFundingSourceLabel(cell, row) {
-    //   return getLabelText(cell.label, this.state.lang);
-    // }
-
-    // showFundingSourceLabel(cell, row) {
-    //   return getLabelText(cell.fundingSource.label, this.state.lang);
-    // }
-
-    // showStatus(cell, row) {
-    //   if (cell) {
-    //     return "Active";
-    //   } else {
-    //     return "Disabled";
-    //   }
-    // }
-    rowClassNameFormat(row, rowIdx) {
-        // row is whole row object
-        // rowIdx is index of row
-        // // console.log('in rowClassNameFormat')
-        // // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
-        return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
-    }
-    formatLabel(cell, row) {
-        // // console.log("celll----", cell);
-        if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
-        }
-    }
-
-    addCommas(cell, row) {
-        // console.log("row---------->", row);
-        //  var currencyCode = row.currency.currencyCode;
-        cell += '';
-        var x = cell.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        // return "(" + currencyCode + ")" + "  " + x1 + x2;
-        // return currencyCode + "    " + x1 + x2;
-        return x1 + x2
-    }
-
-    formatter = value => {
-        if (value != null) {
-            var cell1 = parseFloat(value).toFixed(2)
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
-        } else {
-            return ''
-        }
-    }
-
     formatterValue = value => {
         if (value != null) {
             return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         }
     }
-
     handleChangeProgram = (programIds) => {
-
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -1256,25 +474,19 @@ class Budgets extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
-
             this.filterData()
         })
-
     }
-
     filterOptions = async (options, filter) => {
         if (filter) {
-          return options.filter((i) =>
-            i.label.toLowerCase().includes(filter.toLowerCase())
-          );
+            return options.filter((i) =>
+                i.label.toLowerCase().includes(filter.toLowerCase())
+            );
         } else {
-          return options;
+            return options;
         }
-      };
-
-
+    };
     render() {
-
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
@@ -1282,42 +494,20 @@ class Budgets extends Component {
                     { label: (item.programCode), value: item.programId }
                 )
             }, this);
-        // const { versions } = this.state;
-        // let versionList = versions.length > 0
-        //     && versions.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.versionId}>
-        //                 {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
-        //             </option>
-        //         )
-        //     }, this);
-        // console.log('budget list', this.state.selBudget)
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
-        // console.log('budgets', budgets)
-
-
         let data1 = []
         let data2 = []
         let data3 = []
         let data4 = []
-
         for (var i = 0; i < budgets.length; i++) {
-            // console.log("data3===", this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
-            // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
-            // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
-            // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
-
             data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.orderedBudgetAmt)))
             data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.plannedBudgetAmt)))
             data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) > 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
             data4 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) < 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
         }
-        // console.log("data3==", data3, "===", data4)
-
         const bar = {
-
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
@@ -1369,154 +559,45 @@ class Budgets extends Component {
                     data: data3
                 }
             ],
-
-
-
-
         }
-
-        // console.log('datasets', bar)
         const { SearchBar, ClearSearchButton } = Search;
         const { fundingSourceList } = this.state;
-
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
-
-
         const columns = [
             {
-                dataField: 'budget.label',
                 text: i18n.t('static.budget.budget'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'budget.code',
                 text: i18n.t('static.budget.budgetCode'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-                headerAlign: 'center',
-            },
-            /*{
-                dataField: 'program.label',
-                text: i18n.t('static.budget.program'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
-                formatter: this.formatLabel
             },
             {
-                dataField: 'program.code',
-                headerAlign: 'center',
-                text: i18n.t('static.program.programCode'),
-                sort: true,
-                align: 'center',
-                style: { align: 'center', width: '100px' },
-            },*/
-            {
-                dataField: 'fundingSource.code',
                 text: i18n.t('static.budget.fundingsource'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' }
-                // formatter: this.formatLabel
-
             },
             {
-                dataField: 'currency.label',
                 text: i18n.t('static.dashboard.currency'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatLabel
-
             },
             {
-                dataField: 'budgetAmt',
                 text: i18n.t('static.budget.budgetamount'),
-                // + i18n.t('static.report.inmillions'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                // formatter: this.roundN
-                // formatter: this.formatter
-                formatter: this.formatterValue,
             },
             {
-                dataField: 'plannedBudgetAmt',
                 text: i18n.t('static.report.plannedBudgetAmt'),
-                // + i18n.t('static.report.inmillions'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                // formatter: this.roundN,
-                // formatter: this.formatter,
-                formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
-                dataField: 'orderedBudgetAmt',
                 text: i18n.t('static.report.orderedBudgetAmt'),
-                // + i18n.t('static.report.inmillions'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                // formatter: this.roundN,
-                // formatter: this.formatter,
-                formatter: this.formatterValue,
-                headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
-                dataField: 'orderedBudgetAmt',
                 text: i18n.t('static.report.remainingBudgetAmt'),
-                // + i18n.t('static.report.inmillions'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                // formatter: (cell, row) => {
-                //     return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
-                // }
-                // formatter: (cell, row) => {
-                //     return (row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                // }
-                formatter: (cell, row) => {
-                    return Math.floor((row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                }
             },
-
             {
-                dataField: 'startDate',
                 text: i18n.t('static.common.startdate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatDate
             },
             {
-                dataField: 'stopDate',
                 text: i18n.t('static.common.stopdate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center', width: '100px' },
-                formatter: this.formatDate
             }];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -1550,9 +631,8 @@ class Budgets extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-reporticon" style={{"marginBottom":"13px","marginTop":"7px"}}>
-                    <span className="pl-0 pb-lg-2">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
+                    <div className="Card-header-reporticon" style={{ "marginBottom": "13px", "marginTop": "7px" }}>
+                        <span className="pl-0 pb-lg-2">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
@@ -1565,29 +645,23 @@ class Budgets extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
-
                         <Col md="11 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
                                     <div className="controls  Regioncalender">
-
                                         <Picker
                                             ref="pickRange"
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
-                                            //theme="light"
                                             onChange={this.handleRangeChange}
                                             onDismiss={this.handleRangeDissmis}
                                         >
                                             <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                         </Picker>
-
-
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1604,26 +678,6 @@ class Budgets extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                {/* <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
-                                    <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="versionId"
-                                                id="versionId"
-                                                bsSize="sm"
-                                                // onChange={(e) => { this.filterData() }}
-                                                onChange={(e) => { this.setVersionId(e) }}
-                                                value={this.state.versionId}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {versionList}
-                                            </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup> */}
                                 <FormGroup className="col-md-3" >
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1643,11 +697,8 @@ class Budgets extends Component {
                                                 }, this)}
                                             disabled={this.state.loading}
                                         />
-
                                     </div>
                                 </FormGroup>
-
-
                             </div>
                         </Col>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1660,69 +711,23 @@ class Budgets extends Component {
                                             <div className="col-md-12">
                                                 <div className="chart-wrapper chart-graph-report">
                                                     <HorizontalBar id="cool-canvas" data={bar} options={chartoptions} />
-
                                                 </div>
                                             </div>
-                                            {/* <div className="col-md-12">
-                                                <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                    {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                </button>
-
-                                            </div> */}
                                         </div>}
-
-
                                 </div>
                                 {
-                                    // this.state.show && 
-                                    // this.state.selBudget.length > 0 &&
                                     <div className="dataEnteredTable">
                                         <div id="budgetTable" className='TableWidth100'>
                                         </div>
                                     </div>
                                 }
-
-
-
-                                {/* {this.state.show && this.state.selBudget.length > 0 &&
-                                    <ToolkitProvider
-                                        keyField="budgetId"
-                                        data={this.state.selBudget}
-                                        columns={columns}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div>
-                                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    </div>
-                                                    <div className='fixTableHead'>
-                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                                onClick: (e, row, rowIndex) => {
-                                                                    // console.log("***row", row);
-                                                                    window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
-                                                                }
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>} */}
                             </Col>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div className="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div className="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
@@ -1733,15 +738,11 @@ class Budgets extends Component {
         )
     }
     buildJexcel() {
-        // this.el = jexcel(document.getElementById("budgetTable"), '');
-        // this.el.destroy();
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
-
             var data = this.state.selBudget;
             let outPutListArray = [];
             let count = 0;
-
             for (var j = 0; j < data.length; j++) {
                 var data1 = [];
                 data1[0] = getLabelText(data[j].budget.label, this.state.lang)
@@ -1755,36 +756,25 @@ class Budgets extends Component {
                 data1[8] = data[j].startDate;
                 data1[9] = data[j].stopDate;
                 data1[10] = data[j].budget.id
-
                 outPutListArray[count] = data1;
                 count++;
-                //     indexVar = indexVar + 1;
             }
-
             var options = {
                 data: outPutListArray,
                 columnDrag: false,
-                // colWidths: [20, 100, 200, 50, 50, 50],
                 columns: [
-                    { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
-                    { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
-                    { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
-                    { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
-                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
-                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
-                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                    { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                    { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                    { title: 'Budget Id', type: 'hidden' },//4 E
-
+                    { title: i18n.t('static.budget.budget'), type: 'text' },
+                    { title: i18n.t('static.budget.budgetCode'), type: 'text' },
+                    { title: i18n.t('static.budget.fundingsource'), type: 'text' },
+                    { title: i18n.t('static.dashboard.currency'), type: 'text' },
+                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },
+                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },
+                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },
+                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },
+                    { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
+                    { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
+                    { title: 'Budget Id', type: 'hidden' },
                 ],
-                // text: {
-                //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //   show: '',
-                //   entries: '',
-                // },
                 onload: this.loaded,
                 pagination: localStorage.getItem("sesRecordCount"),
                 filters: false,
@@ -1802,18 +792,6 @@ class Budgets extends Component {
                 editable: false,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    // var items = [];
-                    // if (y != null) {
-                        // if (obj.options.allowInsertRow == true) {
-                            // items.push({
-                            //     title: i18n.t('static.supplyPlan.shipmentsDetails'),
-                            //     onclick: function () {
-                            //         window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
-                            //     }.bind(this)
-                            // });
-                        // }
-                    // }
-                    // return items;
                     return false;
                 }.bind(this),
             };
@@ -1822,16 +800,9 @@ class Budgets extends Component {
         } else {
             jexcel.destroy(document.getElementById("budgetTable"), true);
         }
-        // this.setState({
-        //     jexcelDataEl: jexcelDataEl
-        // })
     }
     loaded = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
-
     }
 }
-
-
 export default Budgets;

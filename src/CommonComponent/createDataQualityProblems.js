@@ -1,7 +1,5 @@
-import moment, { months } from 'moment';
-
-export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList ,openProblemStatusObj) {
-
+import moment from 'moment';
+export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj) {
     var json = {
         problemReportId: 0,
         program: {
@@ -9,9 +7,9 @@ export default function createDataQualityProblems(programObj, versionID, problem
             label: programObj.label,
             code: programObj.programCode
         },
+        
         versionId: versionID,
         realmProblem: problemObj,
-
         dt: moment(Date.now()).utcOffset('-0500').format("YYYY-MM-DD"),
         region: {
             id: regionObj.regionId,
@@ -20,16 +18,13 @@ export default function createDataQualityProblems(programObj, versionID, problem
         planningUnit: {
             id: planningUnitObj.planningUnit.id,
             label: planningUnitObj.planningUnit.label,
-
         },
         shipmentId: '',
         data5: JSON.stringify(causeJson),
         planningUnitActive: true,
         regionActive: true,
         newAdded: false,
-
         problemActionIndex: problemActionIndex,
-
         problemCategory: problemObj.problem.problemCategory,
         problemStatus: openProblemStatusObj,
         problemType: problemObj.problemType,
@@ -61,6 +56,4 @@ export default function createDataQualityProblems(programObj, versionID, problem
         ]
     }
     problemActionList.push(json);
-    // problemActionIndex++;
-
 }

@@ -1,25 +1,19 @@
-import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-// import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import i18n from '../../i18n'
-import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jspreadsheet';
+import moment from 'moment';
+import React, { Component } from 'react';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { Search } from 'react-bootstrap-table2-toolkit';
+import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL } from '../../Constants';
-
-
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import RealmService from "../../api/RealmService";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.procurementagent.procurementagent')
 class ListProcurementAgentComponent extends Component {
     constructor(props) {
@@ -32,14 +26,11 @@ class ListProcurementAgentComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editProcurementAgentType = this.editProcurementAgentType.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgentType = this.addNewProcurementAgentType.bind(this);
-        this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
-
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -49,20 +40,16 @@ class ListProcurementAgentComponent extends Component {
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
     addNewProcurementAgentType() {
         this.props.history.push("/procurementAgentType/addProcurementAgentType");
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
-        // console.log("!!!!!!!", realmId)
         if (realmId != 0) {
             const selProcurementAgentType = this.state.procurementAgentTypeList.filter(c => c.realm.id == realmId)
             this.setState({
@@ -78,21 +65,10 @@ class ListProcurementAgentComponent extends Component {
             });
         }
     }
-
-    editProcurementAgentType(procurementAgentType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
-            this.props.history.push({
-                pathname: `/procurementAgentType/editProcurementAgentType/${procurementAgentType.procurementAgentTypeId}`,
-            });
-        }
-    }
-
     buildJExcel() {
         let procurementAgentTypeList = this.state.selProcurementAgentType;
-        // console.log("procurementAgentList---->", procurementAgentTypeList);
         let procurementAgentTypeArray = [];
         let count = 0;
-
         for (var j = 0; j < procurementAgentTypeList.length; j++) {
             data = [];
             data[0] = procurementAgentTypeList[j].procurementAgentTypeId
@@ -102,22 +78,12 @@ class ListProcurementAgentComponent extends Component {
             data[4] = procurementAgentTypeList[j].lastModifiedBy.username;
             data[5] = (procurementAgentTypeList[j].lastModifiedDate ? moment(procurementAgentTypeList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[6] = procurementAgentTypeList[j].active;
-
-
             procurementAgentTypeArray[count] = data;
             count++;
         }
-        // if (procurementAgentList.length == 0) {
-        //     data = [];
-        //     procurementAgentArray[0] = data;
-        // }
-        // console.log("procurementAgentArray---->", procurementAgentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = procurementAgentTypeArray;
-
         var options = {
             data: data,
             columnDrag: true,
@@ -134,53 +100,38 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                    // visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagenttype.procurementtypename'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagenttype.procurementagenttypecode'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
-                    // readOnly: true,
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
                     ]
                 },
-
             ],
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -204,14 +155,10 @@ class ListProcurementAgentComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
-
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-
             if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
             } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
                     this.props.history.push({
                         pathname: `/procurementAgentType/editProcurementAgentType/${this.el.getValueFromCoords(0, x)}`,
@@ -220,21 +167,18 @@ class ListProcurementAgentComponent extends Component {
             }
         }
     }.bind(this);
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -253,13 +197,11 @@ class ListProcurementAgentComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -290,10 +232,8 @@ class ListProcurementAgentComponent extends Component {
                     }
                 }
             );
-
         ProcurementAgentService.getProcurementAgentTypeListAll()
             .then(response => {
-                // console.log("response.status", response.data)
                 if (response.status == 200) {
                     this.setState({
                         procurementAgentTypeList: response.data,
@@ -310,19 +250,16 @@ class ListProcurementAgentComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -354,24 +291,17 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
-
-    formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
-    }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -381,44 +311,6 @@ class ListProcurementAgentComponent extends Component {
                     </option>
                 )
             }, this);
-
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.procurementagenttype.procurementtypename'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'procurementAgentTypeCode',
-                text: i18n.t('static.procurementagenttype.procurementagenttypecode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }
-        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -452,7 +344,6 @@ class ListProcurementAgentComponent extends Component {
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgentType}><i className="fa fa-plus-square"></i></a>}
@@ -476,9 +367,6 @@ class ListProcurementAgentComponent extends Component {
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmList}
                                             </Input>
-                                            {/* <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
@@ -493,20 +381,15 @@ class ListProcurementAgentComponent extends Component {
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </CardBody>
                 </Card>
-
             </div>
         );
     }
 }
 export default ListProcurementAgentComponent;
-
