@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import RealmService from '../../api/RealmService'
-import AuthenticationService from '../Common/AuthenticationService.js';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, INVENTORY_MONTHS_IN_PAST } from '../../Constants';
+import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, INVENTORY_MONTHS_IN_PAST } from '../../Constants';
-import getLabelText from '../../CommonComponent/getLabelText';
-
-
 const entityname = i18n.t('static.realm.realm');
 const initialValues = {
     realmCode: '',
@@ -21,13 +17,12 @@ const initialValues = {
     minQplTolerance: '',
     minQplToleranceCutOff: '',
     maxQplTolerance: '',
-    actualConsumptionMonthsInPast: '',
-    forecastConsumptionMonthsInPast: '',
-    inventoryMonthsInPast: '',
+    actualConsumptionMonthsInPast: Number(ACTUAL_CONSUMPTION_MONTHS_IN_PAST),
+    forecastConsumptionMonthsInPast: Number(FORECASTED_CONSUMPTION_MONTHS_IN_PAST),
+    inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
     minCountForMode: '',
     minPercForMode: ''
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
@@ -39,25 +34,19 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')),
         minMosMinGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.realm.minMosMinGaurdrail')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
         minMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.minMosMaxGaurdrail')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
         maxMosMaxGaurdrail: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),
-
         minQplTolerance: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
@@ -105,40 +94,9 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .required(i18n.t('static.validated.minPercForMode'))
             .min(0, i18n.t('static.program.validvaluetext')),
-        // .min(0, i18n.t('static.program.validvaluetext')),
-        /*monthInPastForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        monthInFutureForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        orderFrequency: Yup.number()
-            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class AddRealmComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -151,9 +109,6 @@ export default class AddRealmComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                /* monthInPastForAmc: '',
-                 monthInFutureForAmc: '',
-                 orderFrequency: '',*/
                 defaultRealm: true,
                 minMosMinGaurdrail: '',
                 minMosMaxGaurdrail: '',
@@ -175,7 +130,6 @@ export default class AddRealmComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name === "label") {
@@ -217,15 +171,6 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "minPercForMode") {
             realm.minPercForMode = event.target.value
         }
-        /*  if (event.target.name === "monthInPastForAmc") {
-              realm.monthInPastForAmc = event.target.value
-          }
-          if (event.target.name === "monthInFutureForAmc") {
-              realm.monthInFutureForAmc = event.target.value
-          }
-          if (event.target.name === "orderFrequency") {
-              realm.orderFrequency = event.target.value
-          }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -234,43 +179,9 @@ export default class AddRealmComponent extends Component {
                 realm
             }
         )
-
     };
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmCode: true,
-            label: true,
-            minMosMinGaurdrail: true,
-            minMosMaxGaurdrail: true,
-            maxMosMaxGaurdrail: true,
-            minQplTolerance: true,
-            minQplToleranceCutOff: true,
-            maxQplTolerance: true,
-            actualConsumptionMonthsInPast: true,
-            forecastConsumptionMonthsInPast: true,
-            inventoryMonthsInPast: true,
-            minCountForMode: true,
-            minPercForMode: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('realmForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
     }
     hideSecondComponent() {
@@ -282,10 +193,7 @@ export default class AddRealmComponent extends Component {
         let { realm } = this.state
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
-
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -293,33 +201,30 @@ export default class AddRealmComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{
-                                    realmCode: this.state.realm.realmCode,
-                                    label: getLabelText(this.state.realm.label, this.state.lang),
-                                    minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
-                                    minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
-                                    maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
-                                    defaultRealm: this.state.realm.defaultRealm,
-                                    minQplTolerance: this.state.realm.minQplTolerance,
-                                    minQplToleranceCutOff: this.state.realm.minQplToleranceCutOff,
-                                    maxQplTolerance: this.state.realm.maxQplTolerance,
-                                    actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
-                                    forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
-                                    inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
-                                    minCountForMode: this.state.realm.minCountForMode,
-                                    minPercForMode: this.state.realm.minPercForMode,
-                                }}
-                                validate={validate(validationSchema)}
+                                initialValues={initialValues}
+                                // initialValues={{
+                                //     realmCode: this.state.realm.realmCode,
+                                //     label: getLabelText(this.state.realm.label, this.state.lang),
+                                //     minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
+                                //     minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
+                                //     maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
+                                //     defaultRealm: this.state.realm.defaultRealm,
+                                //     minQplTolerance: this.state.realm.minQplTolerance,
+                                //     minQplToleranceCutOff: this.state.realm.minQplToleranceCutOff,
+                                //     maxQplTolerance: this.state.realm.maxQplTolerance,
+                                //     actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
+                                //     forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
+                                //     inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
+                                //     minCountForMode: this.state.realm.minCountForMode,
+                                //     minPercForMode: this.state.realm.minPercForMode,
+                                // }}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     RealmService.addRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -337,13 +242,11 @@ export default class AddRealmComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -354,7 +257,6 @@ export default class AddRealmComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                             this.setState({
-                                                                // message: error.response.data.messageCode,
                                                                 message: i18n.t('static.message.alreadExists'),
                                                                 loading: false
                                                             });
@@ -376,8 +278,6 @@ export default class AddRealmComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -393,7 +293,6 @@ export default class AddRealmComponent extends Component {
                                     }) => (
                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
@@ -439,7 +338,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="minMosMaxGaurdrail"
                                                         id="minMosMaxGaurdrail"
                                                         bsSize="sm"
@@ -454,7 +352,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="maxMosMaxGaurdrail"
                                                         id="maxMosMaxGaurdrail"
                                                         bsSize="sm"
@@ -469,7 +366,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="minQplTolerance">{i18n.t('static.realm.minQplTolerance')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="minQplTolerance"
                                                         id="minQplTolerance"
                                                         bsSize="sm"
@@ -484,7 +380,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="minQplToleranceCutOff">{i18n.t('static.realm.minQplToleranceCutOff')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="minQplToleranceCutOff"
                                                         id="minQplToleranceCutOff"
                                                         bsSize="sm"
@@ -499,7 +394,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="maxQplTolerance">{i18n.t('static.realm.maxQplTolerance')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="maxQplTolerance"
                                                         id="maxQplTolerance"
                                                         bsSize="sm"
@@ -514,7 +408,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionActualConsumption')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="actualConsumptionMonthsInPast"
                                                         id="actualConsumptionMonthsInPast"
                                                         bsSize="sm"
@@ -529,7 +422,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionForecastConsumption')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="forecastConsumptionMonthsInPast"
                                                         id="forecastConsumptionMonthsInPast"
                                                         bsSize="sm"
@@ -544,7 +436,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label>{i18n.t('static.realm.restrictionInventory')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="inventoryMonthsInPast"
                                                         id="inventoryMonthsInPast"
                                                         bsSize="sm"
@@ -556,11 +447,9 @@ export default class AddRealmComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.inventoryMonthsInPast}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label for="minCountForMode">{i18n.t('static.realm.minCountForMode')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="minCountForMode"
                                                         id="minCountForMode"
                                                         bsSize="sm"
@@ -575,7 +464,6 @@ export default class AddRealmComponent extends Component {
                                                 <FormGroup>
                                                     <Label for="minPercForMode">{i18n.t('static.realm.minPercForMode')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
-                                                        // min="0"
                                                         name="minPercForMode"
                                                         id="minPercForMode"
                                                         bsSize="sm"
@@ -587,48 +475,6 @@ export default class AddRealmComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.minPercForMode}</FormFeedback>
                                                 </FormGroup>
-                                                {/*  <FormGroup>
-                                                        <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
-                                                        <Input type="number"
-                                                            name="monthInPastForAmc"
-                                                            id="monthInPastForAmc"
-                                                            bsSize="sm"
-                                                            valid={!errors.monthInPastForAmc}
-                                                            invalid={touched.monthInPastForAmc && !!errors.monthInPastForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.monthInPastForAmc}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.monthInPastForAmc}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="monthInFutureForAmc">{i18n.t('static.realm.monthInFutureForAmc')}</Label>
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="monthInFutureForAmc"
-                                                            id="monthInFutureForAmc"
-                                                            valid={!errors.monthInFutureForAmc}
-                                                            invalid={touched.monthInFutureForAmc && !!errors.monthInFutureForAmc}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.monthInFutureForAmc}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.monthInFutureForAmc}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="orderFrequency">{i18n.t('static.realm.orderFrequency')}</Label>
-                                                        <Input type="number"
-                                                            name="orderFrequency"
-                                                            id="orderFrequency"
-                                                            bsSize="sm"
-                                                            valid={!errors.orderFrequency}
-                                                            invalid={touched.orderFrequency && !!errors.orderFrequency}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.orderFrequency}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
-                                                  </FormGroup>*/}
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                     <FormGroup check inline>
@@ -669,41 +515,32 @@ export default class AddRealmComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <CardFooter>
                                                 <FormGroup>
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
-
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
         let { realm } = this.state
-
         realm.label.label_en = ''
         realm.realmCode = ''
         realm.minMosMinGaurdrail = ''
@@ -723,7 +560,5 @@ export default class AddRealmComponent extends Component {
                 realm
             }
         )
-
     }
-
 }

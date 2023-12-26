@@ -1,54 +1,53 @@
-import React, { Component } from 'react';
-import pdfIcon from '../../assets/img/pdf.png';
-import { LOGO } from '../../CommonComponent/Logo.js'
+import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import Picker from 'react-month-picker'
-import i18n from '../../i18n'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import {
-    SECRET_KEY, DATE_FORMAT_CAP,
-    MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
-    TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
-    PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_WITHOUT_DATE,
-    REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN
-} from '../../Constants.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ProductService from '../../api/ProductService';
-import ProgramService from '../../api/ProgramService';
-import ShipmentStatusService from '../../api/ShipmentStatusService';
-import ProcurementAgentService from '../../api/ProcurementAgentService';
-import FundingSourceService from '../../api/FundingSourceService';
-import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import CryptoJS from 'crypto-js';
-import csvicon from '../../assets/img/csv.png'
 import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import moment from "moment";
+import React, { Component } from 'react';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { Search } from 'react-bootstrap-table2-toolkit';
+import Picker from 'react-month-picker';
+import NumberFormat from 'react-number-format';
 import {
+    Button,
     Card,
     CardBody,
-    // CardFooter,
-    CardHeader,
     Col,
-    Row,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Button
+    FormGroup, Input, InputGroup,
+    Label,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    Table
 } from 'reactstrap';
-import ReportService from '../../api/ReportService';
-import NumberFormat from 'react-number-format';
-
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { LOGO } from '../../CommonComponent/Logo.js';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import {
+    API_URL,
+    DATE_FORMAT_CAP,
+    DATE_FORMAT_CAP_WITHOUT_DATE,
+    INDEXED_DB_NAME, INDEXED_DB_VERSION,
+    JEXCEL_DATE_FORMAT_SM,
+    JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY,
+    PROGRAM_TYPE_SUPPLY_PLAN,
+    REPORT_DATEPICKER_END_MONTH,
+    REPORT_DATEPICKER_START_MONTH,
+    SECRET_KEY
+} from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
-
+import ProgramService from '../../api/ProgramService';
+import ReportService from '../../api/ReportService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -73,7 +72,6 @@ export default class ExpiredInventory extends Component {
             programs: [],
             versions: [],
             planningUnits: [],
-            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -85,11 +83,9 @@ export default class ExpiredInventory extends Component {
             lang: localStorage.getItem('lang')
         }
     }
-
     componentDidMount() {
         this.getPrograms();
     }
-
     setProgramId(event) {
         this.setState(
             {
@@ -100,7 +96,6 @@ export default class ExpiredInventory extends Component {
                 this.filterVersion();
             })
     }
-
     setVersionId(event) {
         this.setState(
             {
@@ -109,15 +104,12 @@ export default class ExpiredInventory extends Component {
                 this.getPlanningUnit();
             })
     }
-
     handleRangeChange(value, text, listIndex) {
-
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData();
         })
-
     }
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
@@ -127,13 +119,10 @@ export default class ExpiredInventory extends Component {
         return '?'
     }
     getPrograms = () => {
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
+        if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
                         var programJson = {
@@ -153,13 +142,11 @@ export default class ExpiredInventory extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -190,42 +177,14 @@ export default class ExpiredInventory extends Component {
                         }
                     }
                 );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             programs: [], loading: false
-            //         }, () => { this.consolidatedProgramList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ loading: false, message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ loading: false, message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
         } else {
-            // console.log('offline')
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
-
     }
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -234,9 +193,7 @@ export default class ExpiredInventory extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -245,28 +202,19 @@ export default class ExpiredInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        // console.log(programNameLabel)
-
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
                             proList.push(programData)
                         }
                     }
-
-
                 }
-                var lang = this.state.lang;
-
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -278,7 +226,6 @@ export default class ExpiredInventory extends Component {
                     }, () => {
                         this.filterVersion();
                     })
-
                 } else {
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -288,93 +235,76 @@ export default class ExpiredInventory extends Component {
                         })
                     })
                 }
-
-
             }.bind(this);
-
         }.bind(this);
-
-
     }
-
-
     filterVersion = () => {
-        // let programId = document.getElementById("programId").value;
         let programId = this.state.programId;
         if (programId != 0) {
-
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            // console.log(program)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-                            .then(response => {
-                                // console.log("response===>2", response.data)
+                        .then(response => {
+                            this.setState({
+                                versions: []
+                            }, () => {
                                 this.setState({
-                                    versions: []
-                                }, () => {
+                                    versions: response.data
+                                }, () => { this.consolidatedVersionList(programId) });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
                                     this.setState({
-                                        versions: response.data
-                                    }, () => { this.consolidatedVersionList(programId) });
-                                });
-                            }).catch(
-                                error => {
-                                    this.setState({
-                                        programs: [], loading: false
-                                    })
-                                    if (error.message === "Network Error") {
-                                        this.setState({
-                                            // message: 'static.unkownError',
-                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                            loading: false
-                                        });
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
-
-                                            case 401:
-                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                break;
-                                            case 403:
-                                                this.props.history.push(`/accessDenied`)
-                                                break;
-                                            case 500:
-                                            case 404:
-                                            case 406:
-                                                this.setState({
-                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                    loading: false
-                                                });
-                                                break;
-                                            case 412:
-                                                this.setState({
-                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                    loading: false
-                                                });
-                                                break;
-                                            default:
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                                break;
-                                        }
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
                                     }
                                 }
-                            );
-
-
+                            }
+                        );
                 } else {
                     this.setState({
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
-
                 this.setState({
                     versions: []
                 })
-
             }
         } else {
             this.setState({
@@ -383,16 +313,13 @@ export default class ExpiredInventory extends Component {
                 outPutList: []
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             });
         }
     }
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -401,9 +328,7 @@ export default class ExpiredInventory extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -412,28 +337,18 @@ export default class ExpiredInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
-
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
-
                     }
-
-
                 }
-
-                // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 });
                 versionList.reverse();
-
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
                     if (versionVar != '' && versionVar != undefined) {
                         this.setState({
@@ -450,7 +365,6 @@ export default class ExpiredInventory extends Component {
                             this.getPlanningUnit();
                         })
                     }
-
                 } else {
                     this.setState({
                         versions: versionList,
@@ -459,14 +373,8 @@ export default class ExpiredInventory extends Component {
                         this.getPlanningUnit();
                     })
                 }
-
-
             }.bind(this);
-
-
-
         }.bind(this)
-
     }
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
@@ -474,19 +382,15 @@ export default class ExpiredInventory extends Component {
         this.setState({
             planningUnits: []
         }, () => {
-
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [], outPutList: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -494,19 +398,15 @@ export default class ExpiredInventory extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
-                            // Handle errors!
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
-
                                     proList[i] = myResult[i]
                                 }
                             }
@@ -517,14 +417,9 @@ export default class ExpiredInventory extends Component {
                             })
                         }.bind(this);
                     }.bind(this)
-
-
                 }
                 else {
-                    // AuthenticationService.setupAxiosInterceptors();
-
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        // console.log('**' + JSON.stringify(response.data))
                         this.setState({
                             planningUnits: response.data, message: ''
                         }, () => {
@@ -537,13 +432,11 @@ export default class ExpiredInventory extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -574,45 +467,19 @@ export default class ExpiredInventory extends Component {
                             }
                         }
                     );
-                    // .catch(
-                    //     error => {
-                    //         this.setState({
-                    //             planningUnits: [],
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({ message: error.message });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-                    //                 case 500:
-                    //                 case 401:
-                    //                 case 404:
-                    //                 case 406:
-                    //                 case 412:
-                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({ message: 'static.unkownError' });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
                 }
             }
         });
-
     }
     dateformatter = value => {
         var dt = new Date(value)
         return moment(dt).format('DD-MMM-YY');
     }
-
     dateformatterCSV = value => {
         var dt = new Date(value)
         return moment(dt).format('DD-MMM-YYYY');
     }
     formatter = value => {
-
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -624,42 +491,26 @@ export default class ExpiredInventory extends Component {
         }
         return x1 + x2;
     }
-
     fetchData() {
-
         let json = {
             "programId": document.getElementById("programId").value,
             "versionId": document.getElementById("versionId").value,
-            // "procurementAgentId": document.getElementById("procurementAgentId").value,
-            // "planningUnitId": document.getElementById("planningUnitId").value,
-            // "fundingSourceId": document.getElementById("fundingSourceId").value,
-            // "shipmentStatusId": document.getElementById("shipmentStatusId").value,
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
             "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
             "includePlannedShipment": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0,
             "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0
-
         }
-
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        // let planningUnitId = document.getElementById("planningUnitId").value;
-        // let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        // let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        // let reportbaseValue = document.getElementById("view").value;
-
         if (programId > 0 && versionId != 0) {
             if (versionId.includes('Local')) {
                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-
                 this.setState({ loading: true })
                 var db1;
-                var storeOS;
                 getDatabase();
-                var regionList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
@@ -675,18 +526,15 @@ export default class ExpiredInventory extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'), loading: false
                         })
                     }.bind(this);
-
                     var program1 = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                     var getRequest1 = program1.getAll();
                     var programPlanningUnitList = [];
-
                     getRequest1.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
@@ -697,17 +545,13 @@ export default class ExpiredInventory extends Component {
                     getRequest1.onsuccess = function (event) {
                         programPlanningUnitList = getRequest1.result;
                     }
-
                     programRequest.onsuccess = function (e) {
-                        // console.log("2----", programRequest)
                         this.setState({
                             localProgramId: programRequest.result.id
                         })
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-
                         var generalProgramJson = JSON.parse(generalProgramData);
-
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         var supplyPlan = [];
                         var shipmentList = [];
@@ -721,13 +565,10 @@ export default class ExpiredInventory extends Component {
                             var smList = programJson.shipmentList;
                             shipmentList = shipmentList.concat(smList);
                         }
-
                         this.setState({
                             supplyPlanDataForAllTransDate: supplyPlan
                         })
                         var list = (supplyPlan).filter(c => (c.expiredStock > 0 && (c.transDate >= startDate && c.transDate <= endDate)));
-                        // console.log("D----------------->List---------------->", list);
-                        // // console.log("D-----------------> supply plan", (programJson.supplyPlan).filter(c => (c.expiredStock > 0)));
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
@@ -739,36 +580,20 @@ export default class ExpiredInventory extends Component {
                                     list1 = ele.batchDetails.filter(c => (c.expiredQtyWps > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
                                 }
                                 list1.map(ele1 => {
-                                    // ele1.createdDate=ele.transDate
                                     var cost = programPlanningUnitList.filter(c => c.planningUnit.id == pu.planningUnit.id)[0].catalogPrice;
-                                    
                                     const temp1 = shipmentList.filter((c) => {
-                                        if(c.batchInfoList.length > 0){
-                                        
+                                        if (c.batchInfoList.length > 0) {
                                             const batchIds = c.batchInfoList.map((p) => p.batch.batchNo);
                                             const expiries = c.batchInfoList.map((p) => moment(p.batch.expiryDate).format("YYYY-MM"));
-                                            
-                                            return c.planningUnit.id === pu.planningUnit.id  && 
+                                            return c.planningUnit.id === pu.planningUnit.id &&
                                                 batchIds.includes(ele1.batchNo) &&
                                                 expiries.includes(moment(ele1.expiryDate).format("YYYY-MM"));
                                         }
                                     });
-                                    
-                                    if(temp1.length > 0){
-                                        // if(temp1.length > 0 && temp1[0].shipmentQty > 0 && temp1[0].shipmentQty != null)
-                                        // freightCost == null => 0, shipmentquantity == 0 || null => catalog price
-                                        // let freightCost;
-                                        // if(temp1[0].freightCost == null || temp1[0].freightCost == ""){
-                                        //     freightCost = 0;
-                                        // }else{
-                                        //     freightCost = temp1[0].freightCost;
-                                        // }
-                                        // cost = (temp1[0].productCost + freightCost) / temp1[0].shipmentQty;
+                                    if (temp1.length > 0) {
                                         cost = temp1[0].rate;
                                     }
                                     let expiredQuantity = document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps;
-
-                                    // cost = cost * expiredQuantity;
                                     var json = {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
@@ -781,7 +606,6 @@ export default class ExpiredInventory extends Component {
                                 })
                             }
                         })
-                        // console.log(data)
                         this.setState({
                             outPutList: data
                         }, () => {
@@ -790,18 +614,15 @@ export default class ExpiredInventory extends Component {
                     }.bind(this)
                 }.bind(this)
             } else {
-                // AuthenticationService.setupAxiosInterceptors();
                 this.setState({ loading: true })
                 ReportService.getExpiredStock(json)
                     .then(response => {
-                        // console.log("-----response", JSON.stringify(response.data));
                         var data = []
                         data = response.data.map(ele => ({
                             ...ele, ...{
                                 shelfLife: (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
                             }
                         }))
-                        // console.log(data)
                         this.setState({
                             outPutList: data
                         }, () => {
@@ -814,16 +635,13 @@ export default class ExpiredInventory extends Component {
                             }, () => {
                                 this.buildJExcel();
                             });
-                            // console.log(error)
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    // message: 'static.unkownError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -854,52 +672,22 @@ export default class ExpiredInventory extends Component {
                             }
                         }
                     );
-                // .catch(
-                //     error => {
-                //         this.setState({
-                //             outPutList: []
-                //         }, () => {
-                //             this.buildJExcel();
-                //         });
-                //         if (error.message === "Network Error") {
-                //             this.setState({ message: error.message, loading: false });
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-                //                 case 500:
-                //                 case 401:
-                //                 case 404:
-                //                 case 406:
-                //                 case 412:
-                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                //                     break;
-                //                 default:
-                //                     this.setState({ loading: false, message: 'static.unkownError' });
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
             }
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             });
-
         } else if (versionId == 0) {
             this.setState({
                 outPutList: []
                 , message: i18n.t('static.program.validversion')
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             });
-
         }
     }
-
     showBatchLedgerClickedLocal(batchNo, createdDate, expiryDate) {
         this.setState({ loading: true })
         var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
@@ -915,9 +703,7 @@ export default class ExpiredInventory extends Component {
             ledgerForBatch: ledgerForBatch,
             loading: false
         })
-        // console.log("ledgerForBatch+++", ledgerForBatch)
     }
-
     showBatchLedgerClickedServer(batchId) {
         this.setState({ loading: true })
         var outPutList = this.state.outPutList.filter(c => c.batchInfo.batchId == batchId);
@@ -930,12 +716,10 @@ export default class ExpiredInventory extends Component {
             loading: false
         })
     }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
     exportCSV = (columns) => {
-
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
@@ -945,14 +729,10 @@ export default class ExpiredInventory extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
-
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-
         var A = [this.addDoubleQuoteToRowContent(headers)]
         this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatterCSV(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(ele.shelfLife), (this.dateformatterCSV(ele.batchInfo.expiryDate)).replaceAll(' ', '%20'), (this.formatter(Math.round(ele.cost * ele.expiredQty))).replaceAll(' ', '%20')])));
-
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -966,14 +746,11 @@ export default class ExpiredInventory extends Component {
     }
     exportPDF = (columns) => {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -981,17 +758,13 @@ export default class ExpiredInventory extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
-
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
@@ -1013,34 +786,17 @@ export default class ExpiredInventory extends Component {
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
-
                 }
-
             }
         }
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
-
-        // var canvas = document.getElementById("cool-canvas");
-        //creates image
-
-        // var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        // var aspectwidth1 = (width - h1);
-
-        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
-
         const headers = columns.map((item, idx) => (item.text));
         const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate), (this.formatter(Math.round(ele.cost * ele.expiredQty)))]);
-
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,
@@ -1053,42 +809,28 @@ export default class ExpiredInventory extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.expiredInventory') + ".pdf")
     }
-
-
     buildJExcel() {
         let outPutList = this.state.outPutList;
-        // // console.log("outPutList---->", outPutList);
         let outPutListArray = [];
         let count = 0;
-
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
             data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[1] = outPutList[j].expiredQty
             data[2] = outPutList[j].batchInfo.batchNo
             data[3] = outPutList[j].batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no')
-            // data[4] = outPutList[j].batchInfo.createdDate
             data[4] = (outPutList[j].batchInfo.createdDate ? moment(outPutList[j].batchInfo.createdDate).format(`YYYY-MM-DD`) : null)
             data[5] = moment(outPutList[j].batchInfo.expiryDate).startOf('month').diff(moment(outPutList[j].batchInfo.createdDate).startOf('month'), 'months', true)
             data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`YYYY-MM-DD`) : null)
             data[7] = outPutList[j].batchInfo.batchId;
             data[8] = outPutList[j].planningUnit.id;
             data[9] = outPutList[j].cost * outPutList[j].expiredQty;
-
             outPutListArray[count] = data;
             count++;
         }
-        // if (costOfInventory.length == 0) {
-        //     data = [];
-        //     outPutListArray[0] = data;
-        // }
-        // // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
         var data = outPutListArray;
-
         var options = {
             data: data,
             columnDrag: true,
@@ -1098,39 +840,32 @@ export default class ExpiredInventory extends Component {
                 {
                     title: i18n.t('static.report.planningUnit'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.expiredQty'),
                     type: 'numeric', mask: '#,##',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.inventory.batchNumber'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.autogenerated'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.batchstartdt'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shelfLife'),
                     type: 'text',
-                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.expiryDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
                 },
                 {
                     type: 'hidden'
@@ -1143,24 +878,16 @@ export default class ExpiredInventory extends Component {
                     type: 'numeric', mask: '#,##',
                 }
             ],
-            // text: {
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -1178,14 +905,11 @@ export default class ExpiredInventory extends Component {
             languageEl: languageEl, loading: false
         })
     }
-
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-
             var elInstance = instance;
             var rowData = elInstance.getRowData(x);
             if (y == 1) {
-                // console.log("+++in y==1")
                 this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
             }
             if (y == 2) {
@@ -1198,9 +922,7 @@ export default class ExpiredInventory extends Component {
             }
         }
     }.bind(this);
-
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
-        // console.log("+++in toggle large")
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
         })
@@ -1211,30 +933,25 @@ export default class ExpiredInventory extends Component {
             this.showBatchLedgerClickedServer(batchId)
         }
     }
-
     actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
         })
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -1244,24 +961,20 @@ export default class ExpiredInventory extends Component {
                     </option>
                 )
             }, this);
-
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {/* {getLabelText(item.label, this.state.lang)} */}
                         {(item.programCode)}
                     </option>
                 )
             }, this)
-
         const { rangeValue } = this.state
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
         const columns = [
             {
                 dataField: 'planningUnit.id',
@@ -1301,7 +1014,6 @@ export default class ExpiredInventory extends Component {
                     }
                     return x1 + x2;
                 }
-
             },
             {
                 dataField: 'batchInfo.batchNo',
@@ -1310,20 +1022,13 @@ export default class ExpiredInventory extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-
-
             }, {
-
-
-
                 dataField: 'batchInfo.autoGenerated',
                 text: i18n.t('static.report.autogenerated'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-
-
             }, {
                 dataField: 'batchInfo.createdDate',
                 text: i18n.t('static.report.batchstartdt'),
@@ -1334,10 +1039,8 @@ export default class ExpiredInventory extends Component {
                 formatter: (cellContent, row) => {
                     return (
                         (row.batchInfo.createdDate ? moment(row.batchInfo.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
-
             },
             {
                 dataField: 'batchInfo.shelfLife',
@@ -1349,10 +1052,8 @@ export default class ExpiredInventory extends Component {
                 formatter: (cellContent, row) => {
                     return (
                         (moment(new Date(row.batchInfo.expiryDate)).diff(new Date(row.batchInfo.createdDate), 'months', true))
-                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
-
             },
             {
                 dataField: 'batchInfo.expiryDate',
@@ -1364,10 +1065,8 @@ export default class ExpiredInventory extends Component {
                 formatter: (cellContent, row) => {
                     return (
                         (row.batchInfo.expiryDate ? moment(row.batchInfo.expiryDate).format(`${DATE_FORMAT_CAP}`) : null)
-                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
-
             },
             {
                 dataField: 'cost',
@@ -1388,11 +1087,8 @@ export default class ExpiredInventory extends Component {
                     }
                     return x1 + x2;
                 }
-
             },
-
         ];
-
         const tabelOptions = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -1421,16 +1117,10 @@ export default class ExpiredInventory extends Component {
         }
         return (
             <div className="animated fadeIn" >
-                {/* <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6> */}
-                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />*/}
-                {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>Expired Inventory</strong> */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />}
@@ -1438,47 +1128,25 @@ export default class ExpiredInventory extends Component {
                             </a>
                         </div>
                     </div>
-                    {/* <CardBody className="pb-lg-0"> */}
-                    {/* <div className="TableCust" > */}
-                    {/* <div ref={ref}> */}
-                    {/* <Form >
-                            <Col md="12 pl-0">
-                                <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                        <div className="controls edit">
-
-                                            <Picker
-                                                ref="pickRange"
-                                                years={{ min: 2013 }}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis} */}
                     <CardBody className="pb-lg-3 pt-lg-0">
                         <div className="TableCust" >
                             <div ref={ref}>
-                                {/* <Form > */}
                                 <Col md="12 pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                             <div className="controls edit">
-
                                                 <Picker
                                                     ref="pickRange"
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
-                                                    //theme="light"
                                                     onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>
                                             </div>
-
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1489,16 +1157,12 @@ export default class ExpiredInventory extends Component {
                                                         name="programId"
                                                         id="programId"
                                                         bsSize="sm"
-                                                        // onChange={this.getProductCategories}
-                                                        // onChange={this.filterVersion}
                                                         onChange={(e) => { this.setProgramId(e); }}
                                                         value={this.state.programId}
-
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {programList}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1511,14 +1175,12 @@ export default class ExpiredInventory extends Component {
                                                         name="versionId"
                                                         id="versionId"
                                                         bsSize="sm"
-                                                        // onChange={(e) => { this.getPlanningUnit(); }}
                                                         onChange={(e) => { this.setVersionId(e); }}
                                                         value={this.state.versionId}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {versionList}
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
@@ -1536,17 +1198,14 @@ export default class ExpiredInventory extends Component {
                                                         <option value="true">{i18n.t('static.program.yes')}</option>
                                                         <option value="false">{i18n.t('static.program.no')}</option>
                                                     </Input>
-
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
                                     </div>
                                 </Col>
-                                {/* </Form> */}
-
                             </div>
                         </div>
-                        {this.state.outPutList.length > 0 && <span style={{ textAlign:'left'}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        {this.state.outPutList.length > 0 && <span style={{ textAlign: 'left' }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="consumptionDataEntryTable ProgramListSearchAlignment">
                             <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
@@ -1555,14 +1214,11 @@ export default class ExpiredInventory extends Component {
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </CardBody>
                 </Card>
                 <Modal isOpen={this.state.expiredStockModal}
@@ -1622,9 +1278,7 @@ export default class ExpiredInventory extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>

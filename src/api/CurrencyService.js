@@ -1,18 +1,14 @@
 import axios from "axios";
 import { API_URL } from '../Constants.js';
-
 class CurrencyService {
-
     addCurrency(json) {
         return axios.post(`${API_URL}/api/currency/`, json, {}
         );
     }
-
     getCurrencyList() {
         return axios.get(`${API_URL}/api/currency/all/`, {
         });
     }
-
     getCurrencyListActive() {
         return axios.get(`${API_URL}/api/currency/`, {
         });

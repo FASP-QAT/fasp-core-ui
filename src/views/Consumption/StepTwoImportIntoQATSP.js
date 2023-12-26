@@ -1,80 +1,59 @@
-import React, { Component } from 'react';
 import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
 import {
     Button,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody
+    FormGroup,
+    Modal,
+    ModalBody,
+    ModalHeader
 } from 'reactstrap';
-import Picker from 'react-month-picker';
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import getLabelText from '../../CommonComponent/getLabelText';
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
-import moment from "moment";
-import CryptoJS from 'crypto-js';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html';
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html';
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
+import { checkValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
-import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
-import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
-import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
-import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
-import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
-import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
-import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
+import getLabelText from '../../CommonComponent/getLabelText';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
 export default class StepTwoImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             lang: localStorage.getItem('lang'),
-            // loading: false,
             selSource: [],
             supplyPlanRegionList: [],
             forecastRegionList: [],
             supplyPlanRegionListJExcel: [],
             selSource2: [],
-
-
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.filterData = this.filterData.bind(this);
-
     }
-
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
-
     formSubmit = function () {
-
         var validation = this.checkValidation();
-        // console.log("validation------->", validation)
         if (validation == true) {
-            // this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 if (parseInt(map1.get("3")) != -1) {
-
                     let json = {
-
                         forecastRegionId: parseInt(map1.get("0")),
                         forecastPercentage: parseInt(map1.get("2")),
                         supplyPlanRegionId: parseInt(map1.get("3")),
@@ -86,56 +65,19 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             this.setState({
                 stepTwoData: changedpapuList,
                 selSource2: tableJson
-
             }, () => {
                 this.props.finishedStepTwo();
             })
             this.props.updateStepOneData("stepTwoData", changedpapuList);
             this.props.updateStepOneData("selSource2", tableJson);
-
-            // console.log("FINAL SUBMIT changedpapuList---stepTwoData", changedpapuList);
-
         } else {
-            // console.log("Something went wrong");
         }
-
-        // this.props.finishedStepTwo();
     }
-
-
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson(null, false);
-        for (var y = 0; y < json.length; y++) {
-
-            //ForecastPlanningUnit
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
-            // console.log("value-----", value);    
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-
-
-        }
+        valid = checkValidation(this.el);
         return valid;
     }
-
-
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
         if (x == 3) {
@@ -144,32 +86,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             } else {
                 this.el.setValueFromCoords(2, y, '', true);
             }
-
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
         }
-
-
-        //#Percentage
-        if (x == 2) {
+        else if (x == 2) {
             let supplyPlanRegionId = this.el.getValueFromCoords(3, y);
             var col = ("C").concat(parseInt(y) + 1);
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,6}(\.\d{1,6})?$/;
             if (supplyPlanRegionId != -1) {
                 if (value == "") {
@@ -177,7 +98,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -197,7 +117,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
         }
         if (!this.state.isChanged1) {
             this.setState({
@@ -205,14 +124,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             });
         }
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
     componentDidMount() {
     }
-
     filterData() {
         let regionList = this.props.items.regionList
         let programRegionList = []
@@ -231,13 +147,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 tempList[i] = paJson
             }
         }
-
         tempList = tempList.sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         })
-
         tempList.unshift({
             name: i18n.t('static.quantimed.doNotImport'),
             id: -1,
@@ -245,7 +159,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             active: true,
             forecastingUnit: []
         });
-
         this.setState({
             programRegionList: programRegionList,
             forecastProgramRegionList: forecastProgramRegionList,
@@ -255,7 +168,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 this.buildJexcel();
             })
     }
-
     buildJexcel() {
         var papuList = this.state.forecastProgramRegionList;
         var data = [];
@@ -263,13 +175,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
-
                 data = [];
                 data[0] = papuList[j].regionId
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
                 data[2] = 100
-
-
                 let match = null;
                 match = this.state.programRegionList.filter(c => c.id == papuList[j].regionId)[0];
                 if (match != null) {
@@ -277,25 +186,16 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 } else {
                     data[3] = ""
                 }
-
                 papuDataArr[count] = data;
                 count++;
             }
         }
-
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
-
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
-
+        jexcel.destroy(document.getElementById("mapRegion"), true);
         this.el = jexcel(document.getElementById("mapImport"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
-
-        var json = [];
+        jexcel.destroy(document.getElementById("mapImport"), true);
         var papuList11 = this.state.selSource2;
         var data;
         if (papuList11 != "") {
@@ -303,8 +203,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         } else {
             data = papuDataArr
         }
-        // var data = papuDataArr;
-
         var options = {
             data: data,
             columnDrag: true,
@@ -313,111 +211,90 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: "Forecast Region(s) id",
                     type: 'hidden',
-                    readOnly: true,//0 A
+                    readOnly: true,
                 },
                 {
                     title: i18n.t('static.QATForecastImport.ForecastRegion'),
                     type: 'text',
                     readOnly: true,
-                    textEditor: true,//1 B
+                    textEditor: true,
                 },
                 {
                     title: i18n.t('static.QATForecastImport.perOfForecast'),
-                    // type: 'text',
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
-                    // readOnly: true,
-                    textEditor: true,//2 C
+                    textEditor: true,
                 },
                 {
                     title: i18n.t('static.QATForecastImport.SPRegion'),
                     type: 'autocomplete',
-                    source: this.state.supplyPlanRegionListJExcel,//3 D
+                    source: this.state.supplyPlanRegionListJExcel,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 }
-
-
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
-                    //left align
                     var rowData = elInstance.getRowData(y);
-
                     var doNotImport = rowData[3];
-                    if (doNotImport == -1) {// grade out
+                    if (doNotImport == -1) {
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
-
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-
                     } else {
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
-
                     }
                 }
-
             }.bind(this),
-            // selectionCopy: false,
-            // pagination: localStorage.getItem("sesRecordCount"),
             pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            // allowDeleteRow: true,
             onchange: this.changed,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // text: {
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            // contextMenu: false
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
-
         this.el = jexcel(document.getElementById("mapRegion"), options);
         this.setState({
             loading: false
         })
         this.props.updateStepOneData("loading", false);
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
-        const { rangeValue } = this.state
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="Card-header-addicon pb-0">
                     <div className="card-header-actions" style={{ marginTop: '-25px' }}>
-                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         <a className="card-header-action">
                             <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                         </a>
-                        {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                     </div>
                 </div>
                 <Modal isOpen={this.state.showGuidance}
@@ -440,7 +317,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     </div>
                 </Modal>
                 <div className="consumptionDataEntryTable">
-
                     <div id="mapRegion" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
@@ -448,9 +324,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
@@ -464,5 +338,4 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             </>
         );
     }
-
 }

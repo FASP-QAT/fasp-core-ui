@@ -1,40 +1,28 @@
-import React, { Component, lazy } from 'react';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import "jspdf-autotable";
+import moment from "moment";
+import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
-import {MultiSelect} from "react-multi-select-component";
+import Picker from 'react-month-picker';
 import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Form,
+    FormGroup, Input, InputGroup, Label,
+    Table
 } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import i18n from '../../i18n'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from '../../api/RealmService';
-import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
-import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import { DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js';
+import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
-import csvicon from '../../assets/img/csv.png'
-import { LOGO } from '../../CommonComponent/Logo.js'
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
-
 class CompareScenario extends Component {
     constructor(props) {
         super(props);
@@ -76,7 +64,6 @@ class CompareScenario extends Component {
                 { consumptionDate: '2020-11-01', consumptionQty: 48, scenario: { scenarioId: 1 }, actualFlag: true },
                 { consumptionDate: '2020-12-01', consumptionQty: 40, scenario: { scenarioId: 1 }, actualFlag: true },
                 { consumptionDate: '2021-01-01', consumptionQty: 34, scenario: { scenarioId: 1 }, actualFlag: true },
-
                 { consumptionDate: '2020-07-01', consumptionQty: 60, scenario: { scenarioId: 1 }, actualFlag: false },
                 { consumptionDate: '2020-08-01', consumptionQty: 59, scenario: { scenarioId: 1 }, actualFlag: false },
                 { consumptionDate: '2020-09-01', consumptionQty: 60, scenario: { scenarioId: 1 }, actualFlag: false },
@@ -89,7 +76,6 @@ class CompareScenario extends Component {
                 { consumptionDate: '2021-04-01', consumptionQty: 55, scenario: { scenarioId: 1 }, actualFlag: false },
                 { consumptionDate: '2021-05-01', consumptionQty: 60, scenario: { scenarioId: 1 }, actualFlag: false },
                 { consumptionDate: '2021-06-01', consumptionQty: 65, scenario: { scenarioId: 1 }, actualFlag: false },
-
                 { consumptionDate: '2020-07-01', consumptionQty: 50, scenario: { scenarioId: 2 }, actualFlag: false },
                 { consumptionDate: '2020-08-01', consumptionQty: 49, scenario: { scenarioId: 2 }, actualFlag: false },
                 { consumptionDate: '2020-09-01', consumptionQty: 50, scenario: { scenarioId: 2 }, actualFlag: false },
@@ -102,7 +88,6 @@ class CompareScenario extends Component {
                 { consumptionDate: '2021-04-01', consumptionQty: 45, scenario: { scenarioId: 2 }, actualFlag: false },
                 { consumptionDate: '2021-05-01', consumptionQty: 50, scenario: { scenarioId: 2 }, actualFlag: false },
                 { consumptionDate: '2021-06-01', consumptionQty: 55, scenario: { scenarioId: 2 }, actualFlag: false },
-
                 { consumptionDate: '2020-07-01', consumptionQty: 40, scenario: { scenarioId: 3 }, actualFlag: false },
                 { consumptionDate: '2020-08-01', consumptionQty: 39, scenario: { scenarioId: 3 }, actualFlag: false },
                 { consumptionDate: '2020-09-01', consumptionQty: 40, scenario: { scenarioId: 3 }, actualFlag: false },
@@ -115,8 +100,6 @@ class CompareScenario extends Component {
                 { consumptionDate: '2021-04-01', consumptionQty: 35, scenario: { scenarioId: 3 }, actualFlag: false },
                 { consumptionDate: '2021-05-01', consumptionQty: 40, scenario: { scenarioId: 3 }, actualFlag: false },
                 { consumptionDate: '2021-06-01', consumptionQty: 45, scenario: { scenarioId: 3 }, actualFlag: false },
-
-
                 { consumptionDate: '2020-07-01', consumptionQty: 50, scenario: { scenarioId: 4 }, actualFlag: false },
                 { consumptionDate: '2020-08-01', consumptionQty: 59, scenario: { scenarioId: 4 }, actualFlag: false },
                 { consumptionDate: '2020-09-01', consumptionQty: 50, scenario: { scenarioId: 4 }, actualFlag: false },
@@ -129,7 +112,6 @@ class CompareScenario extends Component {
                 { consumptionDate: '2021-04-01', consumptionQty: 65, scenario: { scenarioId: 4 }, actualFlag: false },
                 { consumptionDate: '2021-05-01', consumptionQty: 30, scenario: { scenarioId: 4 }, actualFlag: false },
                 { consumptionDate: '2021-06-01', consumptionQty: 65, scenario: { scenarioId: 4 }, actualFlag: false },
-
                 { consumptionDate: '2020-07-01', consumptionQty: 60, scenario: { scenarioId: 5 }, actualFlag: false },
                 { consumptionDate: '2020-08-01', consumptionQty: 69, scenario: { scenarioId: 5 }, actualFlag: false },
                 { consumptionDate: '2020-09-01', consumptionQty: 60, scenario: { scenarioId: 5 }, actualFlag: false },
@@ -146,8 +128,6 @@ class CompareScenario extends Component {
             consumptionData: [],
             scenarioList: [],
             selectedScenarioId: 1,
-
-
         };
         this.getPrograms = this.getPrograms.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -155,21 +135,12 @@ class CompareScenario extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setViewById = this.setViewById.bind(this);
-        // this.getProductCategories = this.getProductCategories.bind(this);
-        //this.pickRange = React.createRef()
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-        // this.setVersionId = this.setVersionId.bind(this);
         this.setForecastingUnit = this.setForecastingUnit.bind(this);
-        this.setRegionVal = this.setRegionVal.bind(this);
-        this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
-        this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
-        this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
         this.storeProduct = this.storeProduct.bind(this);
         this.setEquivalencyUnit = this.setEquivalencyUnit.bind(this);
-
     }
-
     showData() {
         var scenarioList = [
             { scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd", program: { id: 2 }, errorValue: "10%" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646", program: { id: 2 }, errorValue: "12%" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000", program: { id: 2 }, errorValue: "15%" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000", program: { id: 2 }, errorValue: "30%" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b", program: { id: 2 }, errorValue: "20%" },
@@ -182,7 +153,6 @@ class CompareScenario extends Component {
             consumptionData: consumptionData
         })
     }
-
     setEquivalencyUnit(e) {
         var equivalencyUnitId = e.target.value;
         this.setState({
@@ -193,9 +163,7 @@ class CompareScenario extends Component {
             }
         })
     }
-
     storeProduct(e) {
-        // console.log("E++++++++", e.target)
         var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
         var planningUnitId = e.target.value;
         this.setState({
@@ -207,62 +175,6 @@ class CompareScenario extends Component {
             }
         })
     }
-
-    toggleAccordionTotalActual() {
-        this.setState({
-            showTotalActual: !this.state.showTotalActual
-        })
-        var fields = document.getElementsByClassName("totalActual");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalActual == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    toggleAccordionTotalForecast() {
-        this.setState({
-            showTotalForecast: !this.state.showTotalForecast
-        })
-        var fields = document.getElementsByClassName("totalForecast");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalForecast == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    toggleAccordionTotalDiffernce() {
-        this.setState({
-            showTotalDifference: !this.state.showTotalDifference
-        })
-        var fields = document.getElementsByClassName("totalDifference");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalDifference == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    setRegionVal(e) {
-        // console.log("e+++", e);
-        var regionIdArr = [];
-        for (var i = 0; i < e.length; i++) {
-            regionIdArr.push(e[i].value);
-        }
-        var regionListFiltered = this.state.regionList.filter(c => regionIdArr.includes(c.value));
-        this.setState({
-            regionVal: e,
-            regionListFiltered
-        })
-    }
-
     setForecastingUnit(e) {
         var forecastingUnitId = e.target.value;
         this.setState({
@@ -274,7 +186,6 @@ class CompareScenario extends Component {
             }
         })
     }
-
     filterPlanningUnit() {
         var planningUnitListAll = this.state.planningUnitListAll;
         var planningUnits = planningUnitListAll.filter(c => c.program.programId == this.state.programId && c.forecastingUnit.forecastingUnitId == this.state.forecastingUnitId);
@@ -282,38 +193,25 @@ class CompareScenario extends Component {
             planningUnits
         })
     }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-
     exportCSV() {
     }
-
-
     exportPDF = () => {
     }
-
     filterData() {
         let programId = document.getElementById("programId").value;
-        let viewById = document.getElementById("viewById").value;
         let versionId = document.getElementById("versionId").value;
         let planningUnitId = document.getElementById("planningUnitId").value;
-        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        // console.log('values =>', planningUnitId, programId, versionId);
         if (planningUnitId > 0 && programId > 0 && versionId != 0) {
         }
     }
-
-
     getPrograms() {
         this.setState({ programs: [{ label: "Benin PRH,Condoms Forecast Dataset", programId: 1 }, { label: "Benin ARV Forecast Dataset", programId: 2 }, { label: "Benin Malaria Forecast Dataset", programId: 3 }], loading: false });
     }
-
     componentDidMount() {
         this.getPrograms();
         this.setState({
@@ -322,25 +220,19 @@ class CompareScenario extends Component {
             regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
         })
     }
-
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
         }, () => {
-            // localStorage.setItem("sesVersionIdReport", '');
             this.getVersionIds();
         })
     }
-
     setVersionId(event) {
         this.setState({
             versionId: event.target.value,
         }, () => {
-            // localStorage.setItem("sesVersionIdReport", '');
-            // this.filterVersion();
         })
     }
-
     scenarioCheckedChanged(id) {
         var scenarioList = this.state.scenarioList;
         var index = this.state.scenarioList.findIndex(c => c.scenarioId == id);
@@ -348,9 +240,7 @@ class CompareScenario extends Component {
         this.setState({
             scenarioList
         })
-
     }
-
     scenarioOrderChanged(id) {
         var scenarioList = this.state.scenarioList;
         var filteredScenarioList = scenarioList.filter(c => c.scenarioId == id);
@@ -362,14 +252,12 @@ class CompareScenario extends Component {
             selectedScenarioId: id
         })
     }
-
     getVersionIds() {
         var versionListAll = this.state.versionListAll;
         var planningUnitListAll = this.state.planningUnitListAll;
         var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
         var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
         var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
-
         var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
         let stopDate = endDate;
         var monthArrayList = [];
@@ -379,15 +267,11 @@ class CompareScenario extends Component {
             cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
             monthArrayList.push(dt);
         }
-        // var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
         this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId), rangeValue: rangeValue, monthArrayList: monthArrayList });
     }
-
     show() {
-
     }
     handleRangeChange(value, text, listIndex) {
-
     }
     handleRangeDissmis(value) {
         let startDate = value.from.year + '-' + value.from.month + '-01';
@@ -402,44 +286,12 @@ class CompareScenario extends Component {
         this.setState({ rangeValue: value, monthArrayList: monthArrayList }, () => {
             this.filterData();
         })
-
     }
-
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
-
     setViewById(e) {
-        // console.log("e.targetvakue+++", e.target.value)
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,
@@ -468,9 +320,7 @@ class CompareScenario extends Component {
             }
         })
     }
-
     render() {
-
         var chartOptions = {
             title: {
                 display: false,
@@ -533,8 +383,6 @@ class CompareScenario extends Component {
                 }
             }
         }
-
-
         let bar = {}
         if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0) {
             var datasetsArr = [];
@@ -595,10 +443,8 @@ class CompareScenario extends Component {
                 )
             })
             bar = {
-
                 labels: [...new Set(this.state.monthArrayList.map(ele => (moment(ele).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
                 datasets: datasetsArr
-
             };
         }
         const { planningUnits } = this.state;
@@ -612,7 +458,6 @@ class CompareScenario extends Component {
                     </option>
                 )
             }, this);
-
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -622,35 +467,28 @@ class CompareScenario extends Component {
                     </option>
                 )
             }, this);
-
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
         const checkOnline = localStorage.getItem('sessionType');
-
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {checkOnline === 'Online' &&
                             this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-
-
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -659,9 +497,7 @@ class CompareScenario extends Component {
                             this.state.offlineConsumptionList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -682,28 +518,23 @@ class CompareScenario extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setProgramId(e); }}
                                                             value={this.state.programId}
-
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
-
                                                     <Picker
                                                         ref="pickRange"
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
-                                                        //theme="light"
                                                         onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
@@ -720,15 +551,12 @@ class CompareScenario extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setVersionId(e); }}
                                                             value={this.state.versionId}
-
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -766,7 +594,6 @@ class CompareScenario extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             <option value="1">Patient Months</option>
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -792,12 +619,9 @@ class CompareScenario extends Component {
                                                                     )
                                                                 }, this)}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-
-
                                             <FormGroup className="col-md-3" id="planningUnitDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <div className="controls">
@@ -821,7 +645,6 @@ class CompareScenario extends Component {
                                                                     )
                                                                 }, this)}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -866,7 +689,6 @@ class CompareScenario extends Component {
                                                     <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                         <div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -874,17 +696,9 @@ class CompareScenario extends Component {
                                                     <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                     </button>
-
                                                 </div>
                                             </div>}
-
-
-
-
                                     </div>
-
-
-
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.show &&
@@ -923,27 +737,21 @@ class CompareScenario extends Component {
                                                                     </tr>
                                                                 ))}
                                                             </tbody>
-
                                                         </Table>
-
                                                     </div>
                                                 </div>}
                                         </div>
                                     </div>
-
                                 </Col>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
                                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                             <div class="spinner-border blue ml-4" role="status">
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </CardBody>
@@ -952,5 +760,4 @@ class CompareScenario extends Component {
         );
     }
 }
-
 export default CompareScenario;

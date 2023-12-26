@@ -1,7 +1,5 @@
-import moment, { months } from 'moment';
-
+import moment from 'moment';
 export default function incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj) {
-    // console.log("000000=====>in ");
     var filterObj = problemActionList[index];
     var transList = filterObj.problemTransList;
     let tempProblemTransObj = {
@@ -20,5 +18,4 @@ export default function incomplianceProblem(index, username, userId, problemActi
     filterObj.reviewed = false;
     var problemStatusObject = incomplianceProblemStatusObj
     filterObj.problemStatus = problemStatusObject;
-
 }

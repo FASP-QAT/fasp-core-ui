@@ -1,35 +1,19 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
-import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import UserService from '../../api/UserService';
-import RealmService from '../../api/RealmService';
-import LanguageService from '../../api/LanguageService';
-import getLabelText from '../../CommonComponent/getLabelText';
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import classNames from 'classnames';
-import { API_URL, LABEL_REGEX, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants';
-
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import LanguageService from '../../api/LanguageService';
+import RealmService from '../../api/RealmService';
+import UserService from '../../api/UserService';
+import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
-const initialValues = {
-    summary: "",
-    realm: "",
-    name: "",
-    emailId: "",
-    // phoneNumber: "",
-    orgAndCountry: "",
-    role: "",
-    language: "",
-    notes: ""
-}
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -39,16 +23,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         name: Yup.string()
             .required(i18n.t('static.user.validusername'))
-            // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
-        // phoneNumber: Yup.string()
-        //     .min(4, i18n.t('static.user.validphonemindigit'))
-        //     .max(15, i18n.t('static.user.validphonemaxdigit'))
-        //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-        //     .required(i18n.t('static.user.validphone')),
         role: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
@@ -61,52 +39,12 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validrole')),
         language: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
-        // notes: Yup.string()
-        //     .required(i18n.t('static.common.notestext'))
-        // needPhoneValidation: Yup.boolean(),
-        // phoneNumber: Yup.string()
-        //     .when("needPhoneValidation", {
-        //         is: val => {
-        //             return document.getElementById("needPhoneValidation").value === "true";
-
-        //         },
-        //         then: Yup.string().min(4, i18n.t('static.user.validphonemindigit'))
-        //             .max(15, i18n.t('static.user.validphonemaxdigit'))
-        //             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-        //             .required(i18n.t('static.user.validphone')),
-        //         otherwise: Yup.string().notRequired()
-        //     }),
-
         orgAndCountry: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
             .required(i18n.t('static.user.org&CountryText')),
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
 export default class UserTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -115,7 +53,6 @@ export default class UserTicketComponent extends Component {
                 realm: "",
                 name: "",
                 emailId: "",
-                // phoneNumber: "",
                 orgAndCountry: '',
                 role: [],
                 language: "",
@@ -136,7 +73,6 @@ export default class UserTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.roleChange = this.roleChange.bind(this);
     }
-
     dataChange(event) {
         let { user } = this.state
         if (event.target.name == "summary") {
@@ -154,13 +90,9 @@ export default class UserTicketComponent extends Component {
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
         }
-        // if (event.target.name == "phoneNumber") {
-        //     user.phoneNumber = event.target.value;
-        // }
         if (event.target.name == "orgAndCountry") {
             user.orgAndCountry = event.target.value;
         }
-
         if (event.target.name == "language") {
             user.language = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
@@ -174,7 +106,6 @@ export default class UserTicketComponent extends Component {
             user
         }, () => { })
     };
-
     roleChange(roleId) {
         let { user } = this.state;
         let count = 0;
@@ -204,46 +135,15 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            realm: true,
-            name: true,
-            emailId: true,
-            // phoneNumber: true,
-            orgAndCountry: true,
-            role: true,
-            language: true,
-            notes: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+   
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-
         LanguageService.getLanguageListActive()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.label_en.toUpperCase(); 
+                        var itemLabelB = b.label.label_en.toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -257,18 +157,15 @@ export default class UserTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -299,14 +196,13 @@ export default class UserTicketComponent extends Component {
                     }
                 }
             );
-
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -317,13 +213,11 @@ export default class UserTicketComponent extends Component {
                         this.setState({
                             realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
-
                         let { user } = this.state;
                         user.realm = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             user
                         }, () => {
-
                         })
                     }
                 } else {
@@ -334,18 +228,15 @@ export default class UserTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -376,7 +267,6 @@ export default class UserTicketComponent extends Component {
                     }
                 }
             );
-
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
@@ -385,8 +275,8 @@ export default class UserTicketComponent extends Component {
                         roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     roleList.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -400,18 +290,15 @@ export default class UserTicketComponent extends Component {
                             this.hideSecondComponent();
                         })
                 }
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -443,25 +330,16 @@ export default class UserTicketComponent extends Component {
                 }
             );
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
-
     resetClicked() {
         let { user } = this.state;
-        // user.summary = '';
         user.realm = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         user.name = '';
         user.emailId = '';
-        // user.phoneNumber = '';
         user.orgAndCountry = '';
         user.role = '';
         user.language = '';
@@ -474,12 +352,9 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
-
     render() {
-
         const { realms } = this.state;
         const { languages } = this.state;
-
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
@@ -488,7 +363,6 @@ export default class UserTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         let languageList = languages.length > 0
             && languages.map((item, i) => {
                 return (
@@ -497,7 +371,6 @@ export default class UserTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -511,13 +384,12 @@ export default class UserTicketComponent extends Component {
                             realm: this.props.items.userRealmId,
                             name: "",
                             emailId: "",
-                            // phoneNumber: "",
                             orgAndCountry: "",
                             role: "",
                             language: "",
                             notes: ""
                         }}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
@@ -525,7 +397,6 @@ export default class UserTicketComponent extends Component {
                             this.state.user.summary = summaryText_2;
                             this.state.user.userLanguageCode = this.state.lang;
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
-                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -549,13 +420,11 @@ export default class UserTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            // message: 'static.unkownError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -608,13 +477,6 @@ export default class UserTicketComponent extends Component {
                                         name="roleValid"
                                         id="roleValid"
                                     />
-                                    {/* <Input
-                                            type="hidden"
-                                            name="needPhoneValidation"
-                                            id="needPhoneValidation"
-                                            value={(this.state.user.phoneNumber === '' ? false : true)}
-                                        /> */}
-
                                     < FormGroup >
                                         <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text" name="summary" id="summary" readOnly={true}
@@ -667,20 +529,6 @@ export default class UserTicketComponent extends Component {
                                             required />
                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                     </FormGroup>
-                                    {/* <FormGroup>
-                                            <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
-                                            <Input type="text" name="phoneNumber" id="phoneNumber" autoComplete="nope"
-                                                bsSize="sm"
-                                                valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
-                                                invalid={touched.phoneNumber && !!errors.phoneNumber}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.user.phoneNumber}
-                                                required
-                                            />
-                                            <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
-                                        </FormGroup> */}
-
                                     <FormGroup>
                                         <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
@@ -697,7 +545,6 @@ export default class UserTicketComponent extends Component {
                                             value={this.state.user.orgAndCountry}
                                         /><FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                     </FormGroup>
-
                                     <FormGroup className="Selectcontrol-bdrNone">
                                         <Label for="role">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                         <Select
@@ -744,20 +591,15 @@ export default class UserTicketComponent extends Component {
                                             onBlur={handleBlur}
                                             maxLength={600}
                                             value={this.state.user.notes}
-                                        // required 
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className=" mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className=" mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className=" mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
-                                    {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                </Form>
+                                                                    </Form>
                             )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -771,5 +613,4 @@ export default class UserTicketComponent extends Component {
             </div>
         );
     }
-
 }

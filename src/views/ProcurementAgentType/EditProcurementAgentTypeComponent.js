@@ -1,56 +1,22 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, FormFeedback, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n';
-import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SketchPicker } from 'react-color';
-import reactCSS from 'reactcss'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.procurementagenttype');
-
-const initialValues = {
-    procurementAgentTypeName: "",
-}
-
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeCode: Yup.string()
-            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.procurementagenttype.codetext')),
         procurementAgentTypeName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgenTtype.procurementagenttypenametext')),
     })
-}
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
 }
 class EditProcurementAgentTypeComponent extends Component {
     constructor(props) {
@@ -83,25 +49,13 @@ class EditProcurementAgentTypeComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
     }
-
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-
     Capitalize(str) {
         if (str != null && str != "") {
             let { procurementAgent } = this.state;
@@ -110,8 +64,6 @@ class EditProcurementAgentTypeComponent extends Component {
             return "";
         }
     }
-
-
     dataChange(event) {
         let { procurementAgentType } = this.state;
         if (event.target.name == "procurementAgentTypeCode") {
@@ -123,38 +75,13 @@ class EditProcurementAgentTypeComponent extends Component {
         if (event.target.name == "active") {
             procurementAgentType.active = event.target.id === "active2" ? false : true;
         }
-
-
         this.setState({
             procurementAgentType
         },
             () => { });
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            procurementAgentTypeName: true,
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('procurementAgentTypeForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentTypeById(this.props.match.params.procurementAgentTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -172,13 +99,11 @@ class EditProcurementAgentTypeComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -225,13 +150,11 @@ class EditProcurementAgentTypeComponent extends Component {
                                         procurementAgentTypeCode: this.state.procurementAgentType.procurementAgentTypeCode,
                                         procurementAgentTypeName: this.state.procurementAgentType.label.label_en,
                                     }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log("COLOR----->", this.state.procurementAgentType);
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgentType(this.state.procurementAgentType)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -248,13 +171,11 @@ class EditProcurementAgentTypeComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        // message: 'static.unkownError',
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -302,8 +223,6 @@ class EditProcurementAgentTypeComponent extends Component {
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                     <Input
                                                         type="text"
                                                         name="realmId"
@@ -313,18 +232,14 @@ class EditProcurementAgentTypeComponent extends Component {
                                                         value={getLabelText(this.state.procurementAgentType.realm.label, this.state.lang)}
                                                     >
                                                     </Input>
-                                                    {/* </InputGroupAddon> */}
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="procurementAgentTypeName">{i18n.t('static.procurementagenttype.procurementtypename')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                     <Input type="text"
                                                         bsSize="sm"
                                                         name="procurementAgentTypeName"
                                                         id="procurementAgentTypeName"
                                                         valid={!errors.procurementAgentTypeName}
-                                                        // invalid={touched.procurementAgentName && !!errors.procurementAgentName || this.state.procurementAgent.label.label_en == ''}
                                                         invalid={(touched.procurementAgentTypeName && !!errors.procurementAgentTypeName) || !!errors.procurementAgentTypeName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -332,13 +247,10 @@ class EditProcurementAgentTypeComponent extends Component {
                                                         required
                                                         value={getLabelText(this.state.procurementAgentType.label, this.state.lang)}
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.procurementAgentTypeName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="procurementAgentCode">{i18n.t('static.procurementagenttype.procurementagenttypecode')}<span class="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                     <Input type="text"
                                                         bsSize="sm"
                                                         name="procurementAgentTypeCode"
@@ -346,14 +258,11 @@ class EditProcurementAgentTypeComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         valid={!errors.procurementAgentTypeCode}
                                                         invalid={(touched.procurementAgentTypeCode && !!errors.procurementAgentTypeCode) || !!errors.procurementAgentTypeCode}
-                                                        // readOnly={true}
                                                         maxLength={10}
                                                         value={this.state.procurementAgentType.procurementAgentTypeCode}
                                                     />
-                                                    {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.procurementAgentTypeCode}</FormFeedback>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
@@ -394,9 +303,7 @@ class EditProcurementAgentTypeComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -405,27 +312,22 @@ class EditProcurementAgentTypeComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
     cancelClicked() {
         this.props.history.push(`/procurementAgentType/listProcurementAgentType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentTypeById(this.props.match.params.procurementAgentTypeId).then(response => {
             this.setState({
                 procurementAgentType: response.data, loading: false
@@ -434,13 +336,11 @@ class EditProcurementAgentTypeComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -473,5 +373,4 @@ class EditProcurementAgentTypeComponent extends Component {
         );
     }
 }
-
 export default EditProcurementAgentTypeComponent;
