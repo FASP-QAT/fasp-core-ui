@@ -1027,13 +1027,13 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width: '90',
+                    width: '120',
                     filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '180',
+                    width: '150',
                     textEditor: true,//2 C
                   
                 },
