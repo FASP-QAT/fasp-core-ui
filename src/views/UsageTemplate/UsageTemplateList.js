@@ -687,20 +687,15 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width: '90',
-                    filter: this.filterDataset,
-                    required: true,
-                    regex: {
-                        ex: /^\S+(?: \S+)*$/,
-                        text: i18n.t('static.message.spacetext')
-                    }
+                    width: '120',
+                    filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '180',
-                    textEditor: true,
-                    required: true
+                    width: '150',
+                    textEditor: true,//2 C
+                  
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
