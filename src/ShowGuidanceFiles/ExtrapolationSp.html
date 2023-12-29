@@ -192,19 +192,43 @@
 	<p class="pl-lg-3" style="font-size: 13px;">QAT calcula automáticamente las métricas de error de pronóstico utilizando
 		 varios métodos. Éstos incluyen:
 		 <ul style="font-size: 13px;">
-			<li>MAPE (Error porcentual absoluto medio)</li>
-			<li>WAPE (Error porcentual absoluto ponderado)</li>
-			<li>RMSE (Error cuadrático medio)</li>
-			<li>MSE (Error cuadrático medio)<br>En general, cuanto más bajo es el puntaje de error, 
-				más se ajusta el resultado del método de pronóstico a los datos históricos. 
-				En modelos donde se espera que los patrones históricos en un conjunto de datos 
-				se reflejen en los valores futuros, se podría usar un valor de error bajo para 
-				ayudar a seleccionar un método de extrapolación preferido, y QAT resaltará estos 
-				mejores ajustes en una tabla. Sin embargo, si se anticipan cambios sustanciales, 
-				la extrapolación de mejor ajuste puede no ser el pronóstico que seleccione el 
-				usuario.
-			</li>
-			<br>
+			<li>MAPE (Mean Absolute Percentage Error): puede interpretarse como el porcentaje promedio
+				diferencia entre las predicciones y sus objetivos previstos en el conjunto de datos. Por ejemplo, si
+				MAPE es del 15%, entonces sus predicciones están en promedio un 15% lejos de los valores reales.</li>
+				<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MAPE.png"><br>
+
+				<li style="margin-top: 20px;">WAPE (Error porcentual absoluto ponderado): WAPE es una métrica apropiada para cuando el
+					El conjunto de datos utilizado tiene valores bajos o intermitentes. Un porcentaje WAPE de 5 significa que el
+					El pronóstico estuvo desviado en un 5% en todo el conjunto de datos durante un determinado período de evaluación. Dependiendo de
+					En el caso de uso, se recomienda elegir un modelo que proporcione el menor valor WAPE.</li>
+					<br><img class="img-fluid" src="../ShowGuidanceFiles/img/WAPE.png"><br>
+
+					<li style="margin-top: 20px;">RMSE (error cuadrático medio): RMSE se puede interpretar como el error promedio que
+						Las predicciones del modelo tienen en comparación con las reales, con peso adicional agregado a mayores.
+						errores de predicción. Generalmente, cuanto más cerca esté el RMSE de cero, más preciso será el modelo.</li>
+						<br><img class="img-fluid" src="../ShowGuidanceFiles/img/RMSE.png"><br>
+
+						<li style="margin-top: 20px;">MSE (error cuadrático medio): MSE es la media agregada de la diferencia al cuadrado entre
+							los hechos y las predicciones. Debido a esta cuadratura se resaltan grandes errores. MSE es útil
+							cuando se trabaja en modelos donde se deben minimizar grandes errores ocasionales. Generalmente, el
+							cuanto más cerca esté de 0, más preciso será el modelo.</li>
+							<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MSE.png"><br>
+						<li style="margin-top: 20px;">R 2 (la correlación al cuadrado entre la variable dependiente y los valores ajustados):
+							R 2 = 1 - [regresión suma de cuadrados (SSR) / suma total de cuadrados (SST)], donde la suma
+							el cuadrado de los residuos de la regresión (SSR) es la suma de sus residuos al cuadrado, y el
+							La suma total de cuadrados (SST) es la suma de la distancia entre los datos y la media, todos
+							al cuadrado. El valor de R 2 es siempre un número entre 0 y 1. R 2 es una medida del ajuste de un
+							línea de regresión a una serie de observaciones históricas con valores más cercanos a 1 que indican una
+							correspondencia más fuerte entre los valores reales y predichos (modelo de regresión). Es
+							no es una medida de error y no debe usarse por sí solo para evaluar la idoneidad de una predicción,
+							pero en combinación con otras métricas de error y el conocimiento del programa por parte del usuario.</li>
+								<br><img class="img-fluid" src="../ShowGuidanceFiles/img/r2.png">
+								<br>
+								<p style="margin-top: 20px;">Aparte de R 2, cuanto menor sea la puntuación, más se ajustará el resultado del método de pronóstico a la situación histórica.
+									datos. En modelos donde se espera que los patrones históricos en un conjunto de datos se reflejen en el futuro
+									valores, se podría utilizar un valor de error bajo para ayudar a seleccionar un método de extrapolación preferido, y QAT
+									resaltará estos mejores ajustes en una tabla. Sin embargo, si se producen cambios sustanciales que no se ajusten a la situación histórica
+									Si se anticipan datos, la extrapolación que mejor se ajusta puede no ser el pronóstico más apropiado para seleccionar.</p>
 			<p>Para hacer la mejor selección entre los métodos de extrapolación para su 
 				propósito, lo más importante es primero comprender qué método de extrapolación 
 				es el más apropiado para el patrón esperado en los datos. Los métodos de 
