@@ -3020,6 +3020,10 @@ input::placeholder {
 
 .custom-file-label {
   color: #697069 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 80px;
 
 }
 
