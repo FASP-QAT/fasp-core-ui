@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,146 +8,195 @@
 	<title>Mostrar guía</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<style>
-		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
-		body{padding: 0;margin: 0;color: #272127;}
-	
-/* .table1 td, th {
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
   border: 1px solid #c8ced3;
   text-align: left;
   padding: 8px;
   border-collapse: collapse!important;
   width: 100%;
 }*/
-.table1 td {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 th {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 {
-  /* width: 100%; */
-  border-collapse: collapse;
-}
-a {
-    color: #205493;
-    /* text-decoration: none; */
-    background-color: transparent;
-}
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
 	</style>
 </head>
+
 <body style="margin:0;padding:0;background:#e4e5e6;">
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
-							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
-									
+
 									<td style="padding:0 0 10px 0;color:#153643;">
-										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Añadir/Editar nodo - Modelado/Transferencia
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Añadir/Editar nodo
+											- Modelado/Transferencia
 										</h3>
 										<p>
-											<p style="font-size: 13px;">
-												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span>Si un nodo cambia con el tiempo, un usuario puede utilizar la 
-												pestaña Modelado/Transferencia para modelar el crecimiento/pérdida dentro de un solo nodo 
-												o una transferencia de un nodo a otro. Tenga en cuenta que esta funcionalidad solo está 
-												disponible para Nodos de Número (#) y Nodos de Porcentaje (%) (incluyendo Unidades 
-												de Pronóstico y Unidades de Planificación).
-											</p>
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo
+												:</span>Si un nodo cambia con el tiempo, un usuario puede utilizar la
+											pestaña Modelado/Transferencia para modelar el crecimiento/pérdida dentro de
+											un solo nodo
+											o una transferencia de un nodo a otro. Tenga en cuenta que esta
+											funcionalidad solo está
+											disponible para Nodos de Número (#) y Nodos de Porcentaje (%) (incluyendo
+											Unidades
+											de Pronóstico y Unidades de Planificación).
+										</p>
 										</p>
 										<p>
-											<p style="font-size: 13px;">
-												<span  style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pestaña :</span><br>
-												Las usuarias pueden <b>a mano</b> ingrese cualquier cambio deseado a lo largo del tiempo (crecimiento/pérdida/transferencia) en la parte superior
-												Tabla, o ellas pueden utilizar el <br><b><i class="fa fa-calculator" aria-hidden="true"></i> Calculadora de modelado</b> para calcular la tasa mensual de
-												cambio (consulte la sección 'Calculadora de modelado' a continuación para obtener más información). Cada entrada debe agregarse como filas separadas por cambio en la tabla superior
-												(es decir, un nodo no puede crecer ni transferirse en una fila de entrada de datos; deben ser dos filas separadas).
-		</p>
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando
+												esta pestaña :</span><br>
+											Las usuarias pueden <b>a mano</b> ingrese cualquier cambio deseado a lo
+											largo del tiempo (crecimiento/pérdida/transferencia) en la parte superior
+											Tabla, o ellas pueden utilizar el <br><b><i class="fa fa-calculator"
+													aria-hidden="true"></i> Calculadora de modelado</b> para calcular la
+											tasa mensual de
+											cambio (consulte la sección 'Calculadora de modelado' a continuación para
+											obtener más información). Cada entrada debe agregarse como filas separadas
+											por cambio en la tabla superior
+											(es decir, un nodo no puede crecer ni transferirse en una fila de entrada de
+											datos; deben ser dos filas separadas).
+										</p>
 										</p>
 										<p style="font-size: 13px;">
-											<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;" >Reglas para nodos de transferencia:
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Reglas
+												para nodos de transferencia:
 											</span>
-												<ul style="font-size: 13px;">
-												<li>Los nodos numéricos solo pueden transferirse a otros nodos numéricos y deben pertenecer al mismo nivel. </li>
-												<li>Los nodos de porcentaje solo pueden transferirse a otros nodos de porcentaje y deben pertenecer al mismo padre.  </li>
-												<!-- <li>El orden de las operaciones para el cálculo de una transferencia se produce a partir del
+										<ul style="font-size: 13px;">
+											<li>Los nodos numéricos solo pueden transferirse a otros nodos numéricos y
+												deben pertenecer al mismo nivel. </li>
+											<li>Los nodos de porcentaje solo pueden transferirse a otros nodos de
+												porcentaje y deben pertenecer al mismo padre. </li>
+											<!-- <li>El orden de las operaciones para el cálculo de una transferencia se produce a partir del
 													de izquierda a derecha en el árbol de pronóstico. No se puede realizar una transferencia desde
 													de derecha a izquierda, por lo que el usuario debe tener cuidado al diseñar su árbol
 													y determinar dónde se debe colocar cada nodo. </li> -->
-												<li>Las transferencias son siempre negativas desde el nodo de origen y positivas hacia el nodo de destino.  </li>
-												<li>No se permite la extrapolación en un nodo que también tiene una transferencia, ya sea hacia/desde otro nodo. </li>
-											</ul>
+											<li>Las transferencias son siempre negativas desde el nodo de origen y
+												positivas hacia el nodo de destino. </li>
+											<li>No se permite la extrapolación en un nodo que también tiene una
+												transferencia, ya sea hacia/desde otro nodo. </li>
+										</ul>
 										</p>
 										<p>
-											<div class="pl-lg-4 pr-lg-4 table1">
-												<table  style="border-collapse: collapse;">
-													<thead>
-														<tr>
-															<th style="width: 130px;">Tipo de modelado</th>
-															<th># Cálculo de nodos</th>
-															<th>% Cálculo de nodos</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td>Lineal (#)</td>
-															<td>+/- un número estático cada mes</td>
-															<td>N / A</td>
-														</tr>
-														<tr>
-															<td>Lineal (%)</td>
-															<td>+/- un porcentaje estático cada mes, calculado en base al mes de inicio</td>
-															<td>N / A</td>
-														</tr>
-														<tr>
-															<td>Exponencial (%)</td>
-															<td>+/- un porcentaje cada mes, calculado sobre el mes anterior como un porcentaje móvil</td>
-															<td>N / A</td>
-														</tr>
-														<tr>
-															<td>Lineal (% point)</td>
-															<td>N / A</td>
-															<td>+/- un porcentaje estático cada mes (por ejemplo, si el mes inicial es 30 % y el cambio es +1 % cada mes, el próximo mes es 31 %, el siguiente es 32 %, y así sucesivamente)</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Tipo de modelado</th>
+														<th># Cálculo de nodos</th>
+														<th>% Cálculo de nodos</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Lineal (#)</td>
+														<td>+/- un número estático cada mes</td>
+														<td>N / A</td>
+													</tr>
+													<tr>
+														<td>Lineal (%)</td>
+														<td>+/- un porcentaje estático cada mes, calculado en base al
+															mes de inicio</td>
+														<td>N / A</td>
+													</tr>
+													<tr>
+														<td>Exponencial (%)</td>
+														<td>+/- un porcentaje cada mes, calculado sobre el mes anterior
+															como un porcentaje móvil</td>
+														<td>N / A</td>
+													</tr>
+													<tr>
+														<td>Lineal (% point)</td>
+														<td>N / A</td>
+														<td>+/- un porcentaje estático cada mes (por ejemplo, si el mes
+															inicial es 30 % y el cambio es +1 % cada mes, el próximo mes
+															es 31 %, el siguiente es 32 %, y así sucesivamente)</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
 										</p>
 										<p>
-											<ul style="font-size: 13px;">
-												<li>Haga clic en<b>"Mostrar datos mensuales"</b> para mostrar una tabla y un gráfico con el nodo
-													valor a través del tiempo
-													<ul>
-														<li>
-															Esta función es útil para ver cómo modelar y transferir
-Las entradas afectan los datos mensuales tanto en forma gráfica como tabular.  
-														</li>
-														<li>
-															En los datos tabulares, los usuarios pueden agregar un cambio manual para un mes específico o ingresar un porcentaje del índice de estacionalidad.
-(solo disponible para # nodos), según sea necesario. 
-														</li>
-														<li>
-															Si un usuario marca "El cambio manual afecta el mes futuro", el monto manual agregado al final del
-mes se trasladará al comienzo del mes siguiente. Si ninguno de estos
-Los campos son relevantes, los usuarios pueden desmarcar "Mostrar (estacionalidad y) cambio manual" para
-ocultar estas columnas.
-														</li>
-													</ul>
-												</li>	
-											</ul>
+										<ul style="font-size: 13px;">
+											<li>Haga clic en<b>"Mostrar datos mensuales"</b> para mostrar una tabla y un
+												gráfico con el nodo
+												valor a través del tiempo
+												<ul>
+													<li>
+														Esta función es útil para ver cómo modelar y transferir
+														Las entradas afectan los datos mensuales tanto en forma gráfica
+														como tabular.
+													</li>
+													<li>
+														En los datos tabulares, los usuarios pueden agregar un cambio
+														manual para un mes específico o ingresar un porcentaje del
+														índice de estacionalidad.
+														(solo disponible para # nodos), según sea necesario.
+													</li>
+													<li>
+														Si un usuario marca "El cambio manual afecta el mes futuro", el
+														monto manual agregado al final del
+														mes se trasladará al comienzo del mes siguiente. Si ninguno de
+														estos
+														Los campos son relevantes, los usuarios pueden desmarcar
+														"Mostrar (estacionalidad y) cambio manual" para
+														ocultar estas columnas.
+													</li>
+												</ul>
+											</li>
+										</ul>
 										</p>
 										<!-- <p style="font-size: 13px;"><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT tiene una herramienta de cálculo de modelos para los usuarios en caso de que necesiten ayuda para calcular el cambio mensual a lo largo del tiempo en función de una fecha y un porcentaje objetivo
 											final o un cambio porcentual total a lo largo del tiempo. La calculadora de modelado solo está disponible para un nodo # y un nodo %.<br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected
 											the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for # nodes), as needed. If a user checks “Manual Change affects
 											future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &amp;) manual change” to hide these columns.</p>
 											 -->
-											<!-- <p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Reglas para nodos de transferencia:</span>
+										<!-- <p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Reglas para nodos de transferencia:</span>
 												<ul style="font-size: 13px;">
 													<li>Los nodos numéricos solo pueden transferirse a otros nodos numéricos y deben pertenecer al mismo nivel.</li>
 													<li>Percentage nodes can only transfer to other percentage nodes and must belong to the same parent. </li>
@@ -156,240 +206,449 @@ ocultar estas columnas.
 													<li>Extrapolation is not allowed on a node that also has a transfer, whether that be to/from another node. </li>
 												</ul>
 											</p> -->
-											<p><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Ejemplos :</span>
-												<ul style="font-size: 13px;">
-													<li><b>Crecimiento simple</b> (n.° lineal): el siguiente ejemplo muestra un crecimiento de la población cada mes en 500/mes desde enero de 2022 hasta diciembre de 2024.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+										<p><span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Ejemplos
+												:</span>
+										<ul style="font-size: 13px;">
+											<li><b>Crecimiento simple</b> (n.° lineal): el siguiente ejemplo muestra un
+												crecimiento de la población cada mes en 500/mes desde enero de 2022
+												hasta diciembre de 2024.<br><span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
-													<li><b>Pérdida simple</b> (núm. lineal): el siguiente ejemplo muestra la deserción cada mes por 100/mes desde enero de 2022 hasta diciembre de 2024. QAT utiliza un número negativo para indicar una disminución o pérdida.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+											<li><b>Pérdida simple</b> (núm. lineal): el siguiente ejemplo muestra la
+												deserción cada mes por 100/mes desde enero de 2022 hasta diciembre de
+												2024. QAT utiliza un número negativo para indicar una disminución o
+												pérdida.<br><span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
-													<li><b>Crecimiento simple</b> (% lineal): el siguiente ejemplo muestra un crecimiento constante de la población cada mes en un 2 % desde enero de 2022 hasta diciembre de 2024. QAT ha calculado que este cambio aumenta la población en 108,64 cada mes.<br><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+											<li><b>Crecimiento simple</b> (% lineal): el siguiente ejemplo muestra un
+												crecimiento constante de la población cada mes en un 2 % desde enero de
+												2022 hasta diciembre de 2024. QAT ha calculado que este cambio aumenta
+												la población en 108,64 cada mes.<br><span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
-													<li><b>Crecimiento simple</b> (% exponencial): el siguiente ejemplo muestra un crecimiento de la población cada mes del 1 % desde enero de 2022 hasta diciembre de 2024. Debido a que el crecimiento es exponencial, el cambio difiere cada mes.<span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+											<li><b>Crecimiento simple</b> (% exponencial): el siguiente ejemplo muestra
+												un crecimiento de la población cada mes del 1 % desde enero de 2022
+												hasta diciembre de 2024. Debido a que el crecimiento es exponencial, el
+												cambio difiere cada mes.<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
-														<ul>
-															<li>QAT calcula este cambio en 54,32 en enero-22 mes, </li>
-															<li>QAT calcula este cambio en 54,86 en el mes del 22 de febrero, y </li>
-															<li>QAT calcula este cambio en 55.41 en Mar-22 </li>
-														</ul>
-													</li><br>
-													<li><p><b>Pérdida de varios años</b> - el siguiente ejemplo muestra una tasa diferente de deserción (pérdida) cada año. El año 1 (enero de 2022 a diciembre de 2022) reduce la población en un 1 % o 54,32 cada mes, el año 2 (enero de 2023 a diciembre de
-														2023) reduce la población en un 2 % o 95,6 cada mes, etc. QAT utiliza un número negativo para indicar un disminución o pérdida.</p><span><img  src="../ShowGuidanceFiles/img/ModelingTransferScreenshot5.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
-															padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span></li>
-													<li><p><b>Transferir</b> - el siguiente ejemplo muestra una transferencia de 250 pacientes cada mes durante un año, de enero de 2022 a diciembre de 2022, desde el nodo actual (Adultos 1.ª línea) a otro nodo (Adultos 2.ª línea). Esta transferencia también
-														aparecerá en el otro nodo (Adultos 2da línea) atenuada para indicar un cambio no editable.</p><span><img style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
-															padding: 10px;border-radius: 5px;max-width:100%;height: auto;" src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg" ></span></li>
+												<ul>
+													<li>QAT calcula este cambio en 54,32 en enero-22 mes, </li>
+													<li>QAT calcula este cambio en 54,86 en el mes del 22 de febrero, y
+													</li>
+													<li>QAT calcula este cambio en 55.41 en Mar-22 </li>
 												</ul>
-											</p>
-										
-											<p>
-												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">
-													<i class="fa fa-calculator" aria-hidden="true"></i>Calculadora de modelado:</span>
-													<p>Haga clic en el icono de la calculadora de modelado si necesita ayuda para calcular la tasa de cambio mensual. La calculadora de modelado Valor final/cambio está disponible para todos los nodos excepto los nodos de agregación, y la calculadora de modelado Objetivo anual solo está disponible para los nodos numéricos. Comience seleccionando un tipo de modelado (N.° lineal, % lineal o % exponencial).
-														y luego un tipo de objetivo (valor final/cambio u objetivo anual): </p>
-												<ul style="font-size: 13px;">
-													<li><b>Valor final/cambio:</b> Utilícelo si tiene un valor objetivo (no acumulativo) o un cambio total deseado durante un período específico, en lugar de una tasa de cambio mensual conocida.  
-														<ol>
-															<li>
-																Según los datos o suposiciones disponibles, ingrese datos en uno de los siguientes campos:
-Valor final objetivo, cambio objetivo (%) o cambio (#)
-															</li>
-															<li>
-																Después de proporcionar una entrada, los demás campos se completarán automáticamente, así como el resultado final.
-'Cambio mes a mes calculado', que equivale al lineal (#) a continuación. 
-															</li>
-															<li>
-																Cuando el usuario hace clic en 'Aceptar', la tasa de cambio (% o #) será
-Se vuelve a rellenar en la tabla de modelado principal, según las fórmulas siguientes.: 
-		
-																<div class="pl-lg-4 pr-lg-4 table1">
-																	<table  style="border-collapse: collapse;">
-																		<!-- <thead>
+											</li><br>
+											<li>
+												<p><b>Pérdida de varios años</b> - el siguiente ejemplo muestra una tasa
+													diferente de deserción (pérdida) cada año. El año 1 (enero de 2022 a
+													diciembre de 2022) reduce la población en un 1 % o 54,32 cada mes,
+													el año 2 (enero de 2023 a diciembre de
+													2023) reduce la población en un 2 % o 95,6 cada mes, etc. QAT
+													utiliza un número negativo para indicar un disminución o pérdida.
+												</p><span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot5.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+															padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+											<li>
+												<p><b>Transferir</b> - el siguiente ejemplo muestra una transferencia de
+													250 pacientes cada mes durante un año, de enero de 2022 a diciembre
+													de 2022, desde el nodo actual (Adultos 1.ª línea) a otro nodo
+													(Adultos 2.ª línea). Esta transferencia también
+													aparecerá en el otro nodo (Adultos 2da línea) atenuada para indicar
+													un cambio no editable.</p><span><img style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+															padding: 10px;border-radius: 5px;max-width:100%;height: auto;"
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg"></span>
+											</li>
+										</ul>
+										</p>
+
+										<p>
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">
+												<i class="fa fa-calculator" aria-hidden="true"></i>Calculadora de
+												modelado:</span>
+										<p>Haga clic en el icono de la calculadora de modelado si necesita ayuda para
+											calcular el
+											tasa de cambio mensual. La calculadora de modelado <b>Valor final/cambio</b>
+											es
+											disponible para todos los nodos excepto los nodos de agregación, y el
+											modelado
+											La calculadora <b>Objetivo anual</b> solo está disponible para nodos
+											numéricos. Empezar por
+											seleccionar
+											a <b>Tipo de modelado</b> (N.° lineal, % lineal o % exponencial),
+											y luego un <b>Tipo de objetivo</b> (Valor final/Cambio u Objetivo anual):
+										</p>
+										<ul style="font-size: 13px;">
+											<li><b>Valor final/cambio:</b> Utilícelo si tiene un valor objetivo (no
+												acumulativo) o un cambio total deseado durante un período específico, en
+												lugar de una tasa de cambio mensual conocida.
+												<ol>
+													<li>
+														Se completarán la <b>Fecha de inicio</b> y la <b>Fecha
+															objetivo</b>.
+														basado en el
+														entradas originales para Fecha de inicio y Fecha de finalización
+														en el modelado
+														tabla, que por defecto se basa en el período de pronóstico. El
+														El usuario puede cambiarlos si lo desea. Estas dos fechas
+														volverán
+														en la mesa de modelado.
+													</li>
+													<li>
+														El <b>Valor inicial</b> es el valor del nodo al comienzo del
+														mes para
+														la fecha de inicio, según lo calculado por QAT. En otras
+														palabras, el inicio
+														El valor es el valor del nodo antes de que se produzca cualquier
+														cambio en el modelado. Este
+														El campo se calcula y el usuario no puede modificarlo
+														directamente.
+														Si la Fecha de Inicio es el mes posterior al “Mes” en el Nodo
+														Pestaña Datos, entonces el Valor inicial es igual al "Valor de
+														nodo"
+														proporcionado por el usuario en la pestaña Datos del nodo.
+													</li>
+													<li>
+														El <b>Período</b> se calcula como Fecha objetivo - Fecha de
+														inicio (en
+														meses).
+														Este valor no se muestra en la interfaz de QAT, pero se utiliza
+														en las fórmulas siguientes.
+													</li>
+													<li>
+														Con base en los datos o suposiciones disponibles, ingrese los
+														datos en uno de
+														los siguientes campos: <b>Valor final objetivo</b>, <b>Objetivo
+															Cambio (%)</b> o
+														<b>Cambio de objetivo (#)</b>
+													</li>
+													<li>
+														Después de proporcionar una entrada, los otros campos serán
+														se completa automáticamente, así como el <b>'Calculado final
+															Cambio mes a mes'</b>.
+													</li>
+													<li>
+														Cuando el usuario haga clic en 'Aceptar', <b>el cambio mensual
+															(% o #)</b> será
+														Se vuelve a rellenar en la tabla de modelado principal, según
+														las fórmulas.
+														abajo. Todos los cambios negativos se mostrarán como
+														"disminución" y
+														Los cambios positivos se muestran como "aumento", con el número
+														mostrado.
+														en valor absoluto.
+														<br>Si el usuario ingresa <b>Valor final objetivo</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<!-- <thead>
 																			<tr>
 																				<th style="width: 130px;">Modeling Type</th>
 																				<th># Node Calculation</th>
 																				<th>% Node Calculation</th>
 																			</tr>
 																		</thead> -->
-																		<tbody>
-																			<tr>
-																				<td>Campo ingresado por el usuario </td>
-																				<td>Lineal (%) </td>
-																				<td>Lineal (#) </td>
-																				<td>Exponencial (%)</td>
-																			</tr>
-																			<tr>
-																				<td>Valor final objetivo </td>
-																				<td>Valor final en la fecha objetivo. El usuario debe ingresar este valor manualmente. </td>
-																				<td>Valor final en la fecha objetivo. El usuario debe ingresar este valor manualmente. </td>
-																				<tdValor final en la fecha objetivo. El usuario debe ingresar este valor manualmente. </td>
-																			</tr>
-																			<tr>
-																				<td>Cambio de objetivo (%)  </td>
-																				<td>(Valor final objetivo - Valor inicial) / Valor inicial </td>
-																				<td>(Valor final objetivo - Valor inicial) / Valor inicial </td>
-																				<td>(Valor final objetivo - Valor inicial) / Valor inicial</td>
-																			</tr>
-																			<tr>
-																				<td>Cambiar (#) </td>
-																				<td>-</td>
-																				<td>Valor final objetivo - Valor inicial </td>
-																				<td>-</td>
-																			</tr>
-																			</tbody>
-																		</table>
-																	</div>
-																</li>
-															</ol>
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Lineal (%) </b></td>
+																		<td><b>Lineal (#) </b></td>
+																		<td><b>Exponencial (%)</b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio objetivo (%)</b></td>
+																		<td colspan="3">(Valor final objetivo - Inicio
+																			Valor) / Valor inicial</td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio de objetivo (#)</b></td>
+																		<td>-</td>
+																		<td>Valor final objetivo - Valor inicial </td>
+																		<td>-</td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mes a mes calculado</b></td>
+																		<td colspan="3">(Valor final objetivo - Inicio
+																			Valor) / Periodo</td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mensual (%) </b></td>
+																		<td>(((Valor final objetivo - Valor inicial)/
+																			Período) / Valor inicial) * 100</td>
+																		<td>-</td>
+																		<td>((Valor final objetivo / Valor inicial) ^ (1
+																			/
+																			Período) - 1) * 100 </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mensual (#) </b></td>
+																		<td>-</td>
+																		<td>Cambio (#)/Período </td>
+																		<td>-</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+														Si el usuario ingresa <b>Cambio de objetivo (%)</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Lineal (%) </b></td>
+																		<td><b>Lineal (#) </b></td>
+																		<td><b>Exponencial (%)</b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Valor final objetivo </b></td>
+																		<td colspan="3">Valor inicial + (Valor inicial *
+																			Cambio objetivo (%)/100)/100</td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio de objetivo (#)</b></td>
+																		<td>-</td>
+																		<td>Valor final objetivo - Valor inicial </td>
+																		<td>-</td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mes a mes calculado</b></td>
+																		<td colspan="3">(Valor inicial * Cambio objetivo
+																			(%)) / 100 / Periodo </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mensual (%) </b></td>
+																		<td>(((Valor final objetivo - Valor inicial) /
+																			Período) / Valor inicial) * 100 </td>
+																		<td>-</td>
+																		<td>((Valor final objetivo / Valor inicial) ^ (1
+																			/
+																			Período) - 1) * 100 </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mensual (#) </b></td>
+																		<td>-</td>
+																		<td>Cambio de objetivo (#)/Período </td>
+																		<td>-</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+														Si el usuario ingresa <b>Cambio de objetivo (#)</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Lineal (#) </b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Valor final objetivo </b></td>
+																		<td>Valor inicial + cambio objetivo (#) </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio (%) </b></td>
+																		<td>(Valor final objetivo - Valor inicial) /
+																			(Valor inicial
+																			Valor * 100) </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mes a mes calculado</b></td>
+																		<td>Cambio de objetivo (#)/Período </td>
+																	</tr>
+																	<tr>
+																		<td><b>Cambio mensual (%)</b></td>
+																		<td>Cambio de objetivo (#)/período</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
 													</li>
-													<li>
-														<b>Meta Anual:</b> Úselo si tiene valores objetivo (acumulados durante un año). En lugar de
-														simplemente dividiendo los objetivos anuales por 12, lo que crea un patrón escalonado, es decir, la calculadora
-														ayudará a proporcionar un pronóstico fluido.
-														<span><img  src="../ShowGuidanceFiles/img/anualtargetimg.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+												</ol>
+											</li>
+											<li>
+												<b>Meta Anual:</b> Úselo si tiene valores objetivo (acumulados durante
+												un año). En lugar de
+												simplemente dividiendo los objetivos anuales por 12, lo que crea un
+												patrón escalonado, es decir, la calculadora
+												ayudará a proporcionar un pronóstico fluido.
+												<span><img src="../ShowGuidanceFiles/img/anualtargetimg.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
 															padding: 10px;border-radius: 5px;max-width:100%;height: auto;">
-															</span>
-														<ol>
-															<li>Seleccione el primer mes de su objetivo y el número de años
-																de objetivos disponibles.
-																<ul>
-																<li>
-																	QAT completará automáticamente las filas anuales de la tabla según el primer mes del objetivo elegido.
-suponiendo que los objetivos sean para períodos de 12 meses.
-																</li>
-																</ul>
-															</li>
+												</span>
+												<ol>
+													<li>Seleccione el primer mes de su objetivo y el número de años
+														de objetivos disponibles.
+														<ul>
 															<li>
-																En la tabla, ingrese las cifras del año anterior al objetivo (el real) y de cada año objetivo. 
-															</li>
-															<li>
-																Después de ingresar los datos, haga clic en "Calcular" (consulte a continuación el método de cálculo y las fórmulas).
-															</li>
-															<li>
-																Revise las diferencias entre los objetivos deseados y los números calculados de QAT.
-Si las diferencias son grandes, considere si la tasa de cambio sigue una línea lineal o
-patrón exponencial y cambio
-																la <b>Tipo de modelado</b> (N.° lineal, % lineal o % exponencial) y vuelva a calcular si es necesario.  
-															</li>
-															<li>
-																Cuando el usuario hace clic en "Aceptar", QAT completa los valores calculados en dos lugares:
-																<ul>
-																<li>Pestaña Valor de nodo: mes inicial y valor inicial  </li>
-																<li>Pestaña Modelado/Transferencia: se crea una fila por período de 12 meses
-																	después del valor inicial. <b>Tenga en cuenta que estos no son los mismos períodos que
-																		los años objetivo</b>(vea abajo).
-		
-																</li>
-																</ul>
+																QAT completará automáticamente las filas anuales de la
+																tabla según el primer mes del objetivo elegido.
+																suponiendo que los objetivos sean para períodos de 12
+																meses.
 															</li>
 														</ul>
 													</li>
-		
-												</ul>
-												<div class="pl-lg-4 pr-lg-4 table1">
-													<table  style="border-collapse: collapse;">
-														<thead>
-															<tr>
-																<th style="width: 130px;">Campo </th>
-																<th>Explicación / Fórmula </th>
-																
-															</tr>
-														</thead>
-														<tbody>
-															<tr>
-																<td>Cambio anual (%)   </td>
-																<td>Cambio respecto al año anterior. Calculado para cada
-																	año después del primer año. 
-																	= (Valor del año actual - Valor del año anterior) / (Valor del año anterior) </td>
-																
-															</tr>
-															<tr>
-																<td>Cambio mensual (%) / Cambio mensual (#)* </td>
-																<td>Tasa exponencial = (Valor del año 2/Valor del año 1)^ (1/12) -1
+													<li>
+														En la tabla, ingrese las cifras del año anterior al objetivo (el
+														real) y de cada año objetivo.
+													</li>
+													<li>
+														Después de ingresar los datos, haga clic en "Calcular" (consulte
+														a continuación el método de cálculo y las fórmulas).
+													</li>
+													<li>
+														Revise las diferencias entre los objetivos deseados y los
+														números calculados de QAT.
+														Si las diferencias son grandes, considere si la tasa de cambio
+														sigue una línea lineal o
+														patrón exponencial y cambio
+														la <b>Tipo de modelado</b> (N.° lineal, % lineal o %
+														exponencial) y vuelva a calcular si es necesario.
+													</li>
+													<li>
+														Cuando el usuario hace clic en "Aceptar", QAT completa los
+														valores calculados en dos lugares:
+														<ul>
+															<li>Pestaña Valor de nodo: mes inicial y valor inicial </li>
+															<li>Pestaña Modelado/Transferencia: se crea una fila por
+																período de 12 meses
+																después del valor inicial. <b>Tenga en cuenta que estos
+																	no son los mismos períodos que
+																	los años objetivo</b>(vea abajo).
 
-																	Tasa lineal = Cambio anual / 12 </td>
-																
-															</tr>
-															<tr>
-																<td>Mes del nodo**  </td>
-																<td>= n-7, donde n es el primer mes del objetivo. </td>
-																
-															</tr>
-															<tr>
-																<td>Valor de nodo**</td>
-																<td>Se supone que es el primer valor (el valor real) proporcionado por el usuario dividido por 12, ya que se supone que es el punto medio del año.
+															</li>
+														</ul>
+													</li>
+										</ul>
+										</li>
 
-																	= Valor del año/12
-																	
-																	 </td>
-																
-															</tr>
-															<tr>
-																<td>Total calculada</td>
-																<td>Comenzando con el mes del nodo y el valor del nodo, y aplicando el cambio mensual (% o #), 
-																	QAT calcula cada valor mensual y luego proporciona sumas de los valores en períodos 
-																	de 12 meses. 
-																	
-																	 </td>
-																
-															</tr>
-		
-															<tr>
-																<td>Diferencia (objetivo versus calculado, #) </td>
-																<td>Calculado para cada año después del primer año real. esta diferencia
-																	será grande si el cambio anual varía significativamente entre años.
-																	
-																	= Total calculado - Objetivo
-																	 </td>
-																
-															</tr>
-															<tr>
-																<td>Difference (Target vs Calculated, %) </td>
-																<td>Calculado para cada año después del primer año real. Esta diferencia será grande si el cambio anual varía significativamente entre años.
+										</ul>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Campo </th>
+														<th>Explicación / Fórmula </th>
 
-																	= (Total calculado - Objetivo) / Objetivo. 
-																	 </td>
-																
-															</tr>
-															</tbody>
-														</table>
-													</div>
-													<p>
-													<p>@Enfoque de cálculo del objetivo anual: QAT supone que 1/12 del
-														el valor real anual se alcanzó en el punto medio del año real,
-														y 1/12 de los objetivos anuales se alcanzarán en el punto medio de cada año.
-														año objetivo. Luego, QAT interpola efectivamente entre esos puntos medios
-														calculando una tasa de cambio mensual lineal o exponencial. este mensual
-														Luego se aplica la tasa de cambio a ambos años: la segunda mitad del año.
-														primer año y la primera mitad del segundo año. Para lograr esto, QAT
-														calcula los siguientes campos:
-														</p>  
-														<p>
-															* Estos valores no aparecen en la sección 'Calculadora de modelado', pero se completan en el nodo superior de modelado/transferencia.
-															tabla después de que el usuario haga clic en "aceptar". <br>
-															** Estos valores no aparecen en la sección 'Calculadora de modelado', pero completan
-															en los campos del nodo principal después de su uso, haga clic en "aceptar". 
-														</p>
-		</p>
-		
-		 
-											</p>
-											
-										
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Cambio anual (%) </td>
+														<td>Cambio respecto al año anterior. Calculado para cada
+															año después del primer año.
+															= (Valor del año actual - Valor del año anterior) / (Valor
+															del año anterior) </td>
 
-									</li>
-								</ol>
-							</p>
-				</td>
-				</tr>
-				
-		
+													</tr>
+													<tr>
+														<td>Cambio mensual (%) / Cambio mensual (#)* </td>
+														<td>Tasa exponencial = (Valor del año 2/Valor del año 1)^ (1/12)
+															-1
+
+															Tasa lineal = Cambio anual / 12 </td>
+
+													</tr>
+													<tr>
+														<td>Mes del nodo** </td>
+														<td>= n-7, donde n es el primer mes del objetivo. </td>
+
+													</tr>
+													<tr>
+														<td>Valor de nodo**</td>
+														<td>Se supone que es el primer valor (el valor real)
+															proporcionado por el usuario dividido por 12, ya que se
+															supone que es el punto medio del año.
+
+															= Valor del año/12
+
+														</td>
+
+													</tr>
+													<tr>
+														<td>Total calculada</td>
+														<td>Comenzando con el mes del nodo y el valor del nodo, y
+															aplicando el cambio mensual (% o #),
+															QAT calcula cada valor mensual y luego proporciona sumas de
+															los valores en períodos
+															de 12 meses.
+
+														</td>
+
+													</tr>
+
+													<tr>
+														<td>Diferencia (objetivo versus calculado, #) </td>
+														<td>Calculado para cada año después del primer año real. esta
+															diferencia
+															será grande si el cambio anual varía significativamente
+															entre años.
+
+															= Total calculado - Objetivo
+														</td>
+
+													</tr>
+													<tr>
+														<td>Difference (Target vs Calculated, %) </td>
+														<td>Calculado para cada año después del primer año real. Esta
+															diferencia será grande si el cambio anual varía
+															significativamente entre años.
+
+															= (Total calculado - Objetivo) / Objetivo.
+														</td>
+
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<p>
+										<p>@Enfoque de cálculo del objetivo anual: QAT supone que 1/12 del
+											el valor real anual se alcanzó en el punto medio del año real,
+											y 1/12 de los objetivos anuales se alcanzarán en el punto medio de cada año.
+											año objetivo. Luego, QAT interpola efectivamente entre esos puntos medios
+											calculando una tasa de cambio mensual lineal o exponencial. este mensual
+											Luego se aplica la tasa de cambio a ambos años: la segunda mitad del año.
+											primer año y la primera mitad del segundo año. Para lograr esto, QAT
+											calcula los siguientes campos:
+										</p>
+										<p>
+											* Estos valores no aparecen en la sección 'Calculadora de modelado', pero se
+											completan en el nodo superior de modelado/transferencia.
+											tabla después de que el usuario haga clic en "aceptar". <br>
+											** Estos valores no aparecen en la sección 'Calculadora de modelado', pero
+											completan
+											en los campos del nodo principal después de su uso, haga clic en "aceptar".
+										</p>
+										</p>
+
+
+										</p>
+
+
+
+										</li>
+										</ol>
+										</p>
+									</td>
+								</tr>
+
+
 							</table>
 						</td>
 					</tr>
-					
+
 				</table>
 			</td>
 		</tr>
 	</table>
 </body>
+
 </html>
