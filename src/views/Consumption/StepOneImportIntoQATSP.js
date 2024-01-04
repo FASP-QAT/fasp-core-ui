@@ -1,51 +1,41 @@
-
-
 import CryptoJS from 'crypto-js';
+import jexcel from 'jspreadsheet';
 import moment from "moment";
 import React, { Component } from 'react';
 import Picker from 'react-month-picker';
 import {
-    Card,
-    CardBody,
-    // CardFooter,
-    CardHeader,
-    Col,
-    Row,
-    CardFooter,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader, Button
+    Button,
+    FormGroup, Input, InputGroup,
+    Label,
+    Modal,
+    ModalBody,
+    ModalHeader,
+    Popover, PopoverBody
 } from 'reactstrap';
-import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html';
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html';
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, FORECAST_DATEPICKER_MONTH_DIFF, FORECAST_DATEPICKER_START_MONTH, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProgramService from '../../api/ProgramService';
 import TracerCategoryService from "../../api/TracerCategoryService";
-import getLabelText from '../../CommonComponent/getLabelText';
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import MonthBox from '../../CommonComponent/MonthBox.js';
-import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import csvicon from '../../assets/img/csv.png';
-import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
-import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
-import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.png';
-import ShowGuidanceScreenshot3 from '../../assets/img/importintoqatsupplyplanscreenshot-3.png';
-import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
-import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
-import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
-import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
 export default class StepOneImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
-
         var dt = new Date();
         dt.setMonth(dt.getMonth() - FORECAST_DATEPICKER_START_MONTH);
         this.state = {
@@ -77,7 +67,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPeriod: '',
             selSource1: [],
             selectedForecastProgramDesc: '',
-
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -97,27 +86,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
-
     }
-
     toggleProgramSetting() {
         this.setState({
             popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
         });
     }
-
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div12').style.display = 'none';
         }, 30000);
     }
-
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
-
     getPlanningUnitList(value) {
         if (value != 0) {
             localStorage.setItem("sesProgramId", value);
@@ -149,7 +133,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             name: getLabelText(programJson.regionList[i].label, this.state.lang),
@@ -157,13 +140,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             label: programJson.regionList[i].label
                         }
                         supplyPlanRegionList.push(regionJson)
-
                     }
-
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
                     planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
@@ -172,26 +152,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
-
                         var planningunitUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitUnitOs = planningunitUnitTransaction.objectStore('planningUnit');
                         var planningunitUnitRequest = planningunitUnitOs.getAll();
                         planningunitUnitRequest.onsuccess = function (e) {
                             var planningUnitListFromtable = planningunitUnitRequest.result;
-
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
                             myResult = planningunitRequest.result.filter(c => c.program.id == programId && c.active == true);
-
-                            // console.log("myResult----programId-->", programId)
-
-                            // let dupPlanningUnitObj = myResult.map(ele => ele.planningUnit);
-                            // console.log("dupPlanningUnitObj-------->2", dupPlanningUnitObj);
-
-                            // const ids = dupPlanningUnitObj.map(o => o.id)
-                            // const filtered = dupPlanningUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
-                            // console.log("programJson1-------->2", filtered);
-
                             let tempList = [];
                             if (myResult.length > 0) {
                                 for (var i = 0; i < myResult.length; i++) {
@@ -206,13 +174,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     tempList[i] = paJson
                                 }
                             }
-
                             tempList = tempList.sort(function (a, b) {
                                 a = a.name.toLowerCase();
                                 b = b.name.toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             })
-
                             tempList.unshift({
                                 name: i18n.t('static.quantimed.doNotImport'),
                                 id: -1,
@@ -234,12 +200,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 active: true,
                                 forecastingUnit: []
                             });
-                            // console.log("tempList===>", tempList)
-
                             this.setState({
                                 planningUnitList: myResult,
-                                // filteredForecastingUnit: filtered,
-                                // supplyPlanPlanignUnitListForNotDuplicate: filtered,
                                 planningUnitListAll: myResult,
                                 generalProgramJson: programJson,
                                 supplyPlanRegionList: supplyPlanRegionList.sort(function (a, b) {
@@ -251,7 +213,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             }, () => {
                                 this.filterData(true);
                             })
-
                         }.bind(this);
                     }.bind(this);
                 }.bind(this)
@@ -263,11 +224,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
         }
     }
-
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                // console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
@@ -278,13 +237,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -316,9 +273,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
-
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        changed(instance, cell, x, y, value)
         if (x == 2) {
             let supplyPlanPlanningUnitId = this.el.getValueFromCoords(2, y);
             if (supplyPlanPlanningUnitId != -1 && supplyPlanPlanningUnitId != null && supplyPlanPlanningUnitId != '') {
@@ -331,32 +288,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             } else {
                 this.el.setValueFromCoords(3, y, '', true);
             }
-
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
         }
-
-
-        //#Multiplier
-        if (x == 3) {
+        else if (x == 3) {
             let supplyPlanUnitId = this.el.getValueFromCoords(2, y);
             var col = ("D").concat(parseInt(y) + 1);
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,6}(\.\d{1,6})?$/;
             if (supplyPlanUnitId != -1) {
                 if (value == "") {
@@ -383,7 +319,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
         }
         if (!this.state.isChanged1) {
             this.setState({
@@ -391,26 +326,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
     componentDidMount() {
-        // console.log("inside compinen")
         document.getElementById("stepOneBtn").disabled = true;
         this.getProgramDetails();
     }
-
     getDatasetList() {
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
-
-                    // console.log("getDatasetList-------->", responseData[rd].currentVersion);
-
                     var json = {
                         programCode: responseData[rd].programCode,
                         programVersion: responseData[rd].version,
@@ -434,7 +362,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         a = a.programCode.toLowerCase();
                         b = b.programCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
-                      }),
+                    }),
                     loading: false
                 }, () => {
                     this.props.updateStepOneData("datasetList", datasetList);
@@ -451,10 +379,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             error => {
             }
         );
-
     }
-
-
     getProgramDetails() {
         var db1;
         getDatabase();
@@ -465,24 +390,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var programs = [];
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                // console.log("DATASET----------->", myResult);
-                // this.setState({
-                //     programs: myResult
-                // });
-
-
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
-
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
                     var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -496,7 +411,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         loading: false,
                     });
                 }
-                // console.log("DATASET-------->", programs);
                 this.setState({
                     programs: programs,
                     loading: false
@@ -507,7 +421,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
-
     getPrograms(value) {
         if (value != 0) {
             var programId = value.split("_")[0];
@@ -536,8 +449,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 programRequest1.onsuccess = function (e) {
                     var myResult = [];
                     myResult = programRequest1.result;
-                    // console.log("myResult--->", myResult)
-
                     this.setState({
                         programObj: myResult,
                         loading: false
@@ -550,11 +461,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 loading: false
             })
         }
-
     }
-
     handleRangeChange(value, text, listIndex) {
-        //
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value },
@@ -562,41 +470,32 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.filterData(false);
             })
     }
-
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
     filterData(loadJexcel) {
         this.setState({
             loading: true
         })
-
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let forecastProgramId = document.getElementById("forecastProgramId").value;
-
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var programIdSplit = programId != 0 ? programId.split("_")[0] : 0;
         if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '')) {
             let selectedSupplyPlanProgram = this.state.programObj;
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
-
             if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
-                // this.props.updateStepOneData("loading", true);
                 this.props.updateStepOneData("programId", programId);
                 this.props.updateStepOneData("versionId", versionId);
                 this.props.updateStepOneData("forecastProgramId", forecastProgramId);
                 this.props.updateStepOneData("startDate", startDate);
                 this.props.updateStepOneData("stopDate", stopDate);
-
-                // document.getElementById("stepOneBtn").disabled = false;
                 if (loadJexcel || loadJexcel == undefined) {
                     PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                         .then(response => {
@@ -621,13 +520,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        // message: 'static.unkownError',
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false, color: 'red'
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
@@ -666,10 +563,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     loading: false
                 },
                     () => {
-                        // this.hideSecondComponent();
                     })
             }
-
         } else if (forecastProgramId == 0) {
             this.setState({
                 programPlanningUnitList: [],
@@ -678,7 +573,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
@@ -689,7 +583,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
@@ -700,7 +593,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
@@ -712,35 +604,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-            // this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
-
     }
-
     buildJexcel() {
         var papuList = this.state.selSource;
-        // console.log("response.data,,,,", papuList)
-
         var data = [];
         var papuDataArr = [];
         var count = 0;
         var myVar = "";
-
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
-
                 let planningUnitObj = null;
                 planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].planningUnit.id)[0];
-                // Object.keys(papuList[j].selectedForecastMap).length == 0
                 let totalForecast = 0;
                 let check = (Object.keys(papuList[j].selectedForecastMap).length == 0)
-                let check1 = (Object.keys(papuList[j].selectedForecastMap).map(c => totalForecast += papuList[j].selectedForecastMap[c].totalForecast))
-
                 let isForecastBlank = (!check && totalForecast == 0)
-
-                // console.log("response.data,check,", isForecastBlank)
-
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
                 data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
@@ -751,28 +630,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[6] = papuList[j].planningUnit.id
                 data[7] = Object.keys(papuList[j].selectedForecastMap).length == 0 ? true : false
                 data[8] = isForecastBlank ? true : false
-
                 papuDataArr[count] = data;
                 count++;
             }
         }
-
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-
-
         this.el = jexcel(document.getElementById("mapRegion"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapRegion"), true);
-
-
         this.el = jexcel(document.getElementById("mapImport"), '');
-        // this.el.destroy();
         jexcel.destroy(document.getElementById("mapImport"), true);
-
-
-        var json = [];
         var papuList11 = this.state.selSource1;
         var data;
         if (papuList11 != "") {
@@ -780,94 +647,84 @@ export default class StepOneImportMapPlanningUnits extends Component {
         } else {
             data = papuDataArr
         }
-
         var options = {
             data: data,
             columnDrag: true,
             colWidths: [50, 100, 100, 100, 100, 50],
             columns: [
-
                 {
                     title: i18n.t('static.importIntoQAT.forecastTracerCategory'),
                     type: 'text',
-                    readOnly: true//0 A
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'text',
-                    readOnly: true//1 B
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'autocomplete',
-                    source: this.state.planningUnitListJexcel,//2 C
-                    filter: this.filterPlanningUnitBasedOnTracerCategory
+                    source: this.state.planningUnitListJexcel,
+                    filter: this.filterPlanningUnitBasedOnTracerCategory,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t('static.message.spacetext')
+                    }
                 },
                 {
                     title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
                     type: 'numeric',
                     decimal: '.',
-                    // readOnly: true,
-                    textEditor: true,//3 D
+                    textEditor: true,
                 },
                 {
                     title: 'Id',
                     type: 'hidden',
-                    // readOnly: true//4 E
                 },
                 {
                     title: 'Id',
                     type: 'hidden',
-                    // readOnly: true//5 F
                 },
                 {
                     title: 'Forcast planning unit id',
                     type: 'hidden',
-                    // readOnly: true//6 G
                 },
                 {
                     title: 'Selected Forecast Map',
                     type: 'hidden',
-                    // readOnly: true//7 H
                 },
                 {
                     title: 'No Forecast Selected',
                     type: 'hidden',
-                    // readOnly: true//8 I
                 }
-
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el;
-                    //left align
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
-
                     var match = rowData[6];
-                    if (match == 1) {// grade out
+                    if (match == 1) {
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else {
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     }
-
                     var doNotImport = rowData[2];
-                    if (doNotImport == -1) {// grade out
+                    if (doNotImport == -1) {
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-
                     } else {
                     }
-
                     var noForecastSelected = rowData[7];
-                    if (noForecastSelected) {// grade out
+                    if (noForecastSelected) {
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
@@ -876,12 +733,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         cell11.classList.add('readonly');
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-
                     } else {
                     }
-
                     var isForecastBlank = rowData[8];
-                    if (isForecastBlank) {// grade out
+                    if (isForecastBlank) {
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
@@ -890,86 +745,57 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         cell11.classList.add('readonly');
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-
                     } else {
                     }
-
-
                 }
-
             }.bind(this),
-            // selectionCopy: false,
-            // pagination: localStorage.getItem("sesRecordCount"),
             pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            // allowDeleteRow: true,
             onchange: this.changed,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            // text: {
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            // contextMenu: false
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
         };
-
         myVar = jexcel(document.getElementById("mapPlanningUnit"), options);
         this.el = myVar
         this.setState({
             loading: false,
             mapPlanningUnitEl: myVar
-            // forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
         this.props.updateStepOneData("loading", false);
         document.getElementById("stepOneBtn").disabled = false;
     }
-
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        // var value = (instance.jexcel.getJson(null, false)[r])[5];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[5];
-
-        // console.log("value--------->100", value);
-
         var mylist = this.state.planningUnitListJexcel;
-        // console.log("mylist--------->100", mylist);
         if (value > 0) {
             mylist = mylist.filter(c => (c.id == -1 ? c : c.tracerCategoryId == value && c.active.toString() == "true"));
         }
-
         return mylist;
-
     }.bind(this)
-
     setProgramId(e) {
         var progId = e.target.value
         this.setState({
             programId: progId,
-            // versionId: ''
         }, () => {
             this.getPrograms(progId)
             this.getPlanningUnitList(progId);
-            // this.filterData();
         })
-
     }
-
     filterVersion = () => {
         let forecastProgramId = this.state.forecastProgramId;
         if (forecastProgramId != 0) {
@@ -979,7 +805,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => {
                 var isForecastOver = false;
                 const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
-
                 const addMonths = (input, months) => {
                     const date = new Date(input)
                     date.setDate(1)
@@ -990,60 +815,42 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var formattedDate = addMonths(new Date(), -5);
                 this.setState({
                     selectedForecastProgram: forecastProgram,
-
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
                         let forecastStartDate = x.forecastStartDate;
                         let forecastStopDate = x.forecastStopDate;
-                        // console.log("forecastStartDate", forecastStartDate)
                         if (!(formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
                             isForecastOver = true;
                         }
-
                         if (x.versionType.id == 2 && isForecastOver) {
                             return a.indexOf(x) === i;
                         }
                     })).reverse()
                 }, () => { });
             });
-
         } else {
-
             this.setState({
                 versions: [],
-
             }, () => { })
-
         }
     }
-
     setVersionId(event) {
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
         let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY"));
         let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY"));
-        // console.log("forecastProgramVerisonList===>", forecastStartDate)
-        // console.log("forecastProgramVerisonList===>", forecastStopDate)
-
-
         let defaultForecastStartYear = forecastStartDate.getFullYear();
         let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
         let defaultForecastStopYear = forecastStopDate.getFullYear();
         let defaultForecastStopMonth = forecastStopDate.getMonth() + 1;
-
         let updatedForecastStartYear = forecastStartDate.getFullYear();
         let updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
-
         let updatedForecastStopYear = forecastStopDate.getFullYear();
         let updatedForecastStopMonth = forecastStopDate.getMonth() + 1;
-
         var isWithinLast6Months = false;
         var isForecastAlreadyStarted = false;
         var isForecastOver = false;
         var isFutureForecast = false;
-
         const monthsDiff = Math.round(moment(new Date()).diff(new Date(forecastStartDate), 'months', true) + 1);
-
         const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
-
         const addMonths = (input, months) => {
             const date = new Date(input)
             date.setDate(1)
@@ -1052,51 +859,35 @@ export default class StepOneImportMapPlanningUnits extends Component {
             return date
         }
         var formattedDate = addMonths(new Date(), -5);
-
         if ((new Date() > forecastStartDate && new Date() < forecastStopDate)) {
-            // console.log('✅ date is between the 2 dates');
             isForecastAlreadyStarted = true;
             isForecastOver = false;
             isWithinLast6Months = false;
             isFutureForecast = false;
-
         } else {
             if ((formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
-                // console.log('✅ formattedDate is between the 2 dates');
                 isForecastAlreadyStarted = false;
                 isForecastOver = false;
                 isWithinLast6Months = true;
                 isFutureForecast = false;
             } else if (monthsDiff < FORECAST_DATEPICKER_MONTH_DIFF) {
-                // console.log('✅ future forecast is between the 2 dates');
                 isForecastAlreadyStarted = false;
                 isForecastOver = false;
                 isWithinLast6Months = false;
                 isFutureForecast = true;
             }
             else {
-                // console.log('⛔️ date is not in the range');
                 isForecastAlreadyStarted = false;
                 isForecastOver = true;
                 isWithinLast6Months = false;
                 isFutureForecast = false;
             }
         }
-
-        // console.log("selectedForecastProgram.forecastStartDate-1->", forecastProgram[0].forecastStartDate);
-
-        // console.log("isWithinLast6Months-1->", isWithinLast6Months);
-        // console.log("isForecastOver-1->", isForecastOver);
-        // console.log("isForecastAlreadyStarted-1->", isForecastAlreadyStarted);
-        // console.log("isFutureForecast-1->", isFutureForecast);
-
         if (isWithinLast6Months) {
-
             defaultForecastStartYear = "";
             defaultForecastStartMonth = "";
             defaultForecastStopYear = "";
             defaultForecastStopMonth = "";
-
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
@@ -1105,35 +896,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
             defaultForecastStartMonth = "";
             defaultForecastStopYear = "";
             defaultForecastStopMonth = "";
-
             updatedForecastStartYear = "";
             updatedForecastStartMonth = "";
-
             updatedForecastStopYear = "";
             updatedForecastStopMonth = "";
         }
         if (isForecastAlreadyStarted) {
-
             defaultForecastStartYear = forecastStartDate.getFullYear();
             defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
             defaultForecastStopYear = forecastStopDate.getFullYear();;
             defaultForecastStopMonth = forecastStopDate.getMonth() + 1;
-
-            // updatedForecastStartYear = formattedDate.getFullYear();
-            // updatedForecastStartMonth = formattedDate.getMonth() + 1;
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
-            // console.log("defaultForecastStartYear-1->", defaultForecastStartYear);
-            // console.log("defaultForecastStartMonth-1->", defaultForecastStartMonth);
-
-
         }
         if (isFutureForecast) {
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
-
-        // console.log("forecast period already started", updatedForecastStopYear)
         this.setState({
             versionId: event.target.value,
             minDate: { year: updatedForecastStartYear, month: updatedForecastStartMonth },
@@ -1143,14 +922,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }, () => {
             this.filterData(true);
         })
-
     }
-
     setForecastProgramId(e) {
-
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
         var programListFilter = [];
-        if (e.target.value != "") {
+        if (e.target.value != 0) {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
         let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
@@ -1162,54 +938,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 a = a.programCode.toLowerCase();
                 b = b.programCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
-              }),
-
+            }),
         }, () => {
             this.filterVersion();
             this.filterData(true);
         })
     }
-
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(2, y);
             if (value != -1 && value != -2 && value != -3) {
-                //ForecastPlanningUnit
-                var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
-                // console.log("value-----", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
-                    valid = false;
-                } else {
-                    // for (var i = (json.length - 1); i >= 0; i--) {
-                    // var map = new Map(Object.entries(json[i]));
-
-                    // var planningUnitValue = map.get("2");
-                    // if (planningUnitValue == value && y != i && i > y) {
-                    //     this.el.setStyle(col, "background-color", "transparent");
-                    //     this.el.setStyle(col, "background-color", "yellow");
-                    //     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                    //     i = -1;
-                    //     valid = false;
-                    // } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                    // }
-                    // }
-                }
-
-                // multiplier
+                valid = checkValidation(this.el);
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 var reg = /^\d{1,6}(\.\d{1,6})?$/;
@@ -1234,24 +975,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         }
                     }
                 }
-
             }
-
         }
         return valid;
     }
-
-
     formSubmit = function () {
         var validation = this.checkValidation();
-        // console.log("validation------->", validation)
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             let supplyPlanPlanningUnitIds = [];
-
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 if (parseInt(map1.get("2")) != -1 && parseInt(map1.get("2")) != -2 && parseInt(map1.get("2")) != -3) {
@@ -1264,13 +998,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     supplyPlanPlanningUnitIds.push(json)
                 }
             }
-
             let json = {
                 supplyPlanRegionList: this.state.supplyPlanRegionList,
                 forecastRegionList: this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId)[0].forecastRegionList,
             }
             changedpapuList.push(json);
-
             this.setState({
                 stepOneData: changedpapuList,
                 regionList: changedpapuList,
@@ -1285,23 +1017,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("regionList", changedpapuList);
             this.props.updateStepOneData("supplyPlanPlanningUnitIds", supplyPlanPlanningUnitIds);
             this.props.updateStepOneData("selSource1", tableJson);
-
-
-            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         } else {
-            // console.log("Something went wrong");
         }
-        // this.props.finishedStepOne();
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         const { rangeValue } = this.state
-
         const { programListFilter } = this.state;
         let programList = programListFilter.length > 0
             && programListFilter.map((item, i) => {
@@ -1311,20 +1035,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     </option>
                 )
             }, this);
-
-
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {/* {item.versionId} */}
                         {(item.versionId + '*')} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
-
-
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
@@ -1334,25 +1053,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
                 <div>
                     <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
-                        {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
                         <PopoverBody>{i18n.t('static.importIntoSP.versionTitle')}</PopoverBody>
                     </Popover>
                 </div>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="Card-header-addicon pb-0">
                         <div className="card-header-actions" style={{ marginTop: '-25px' }}>
-                            {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
-                            {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
                     <Modal isOpen={this.state.showGuidance}
@@ -1371,203 +1086,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                                 listImportIntoQATSupplyPlanSp :
                                                 listImportIntoQATSupplyPlanPr
                                 }} />
-
-                                {/* <div>
-                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
-                                </div>
-                                <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.purpose')} :</span> {i18n.t('static.QATForecastImport.EnableUsers')}</p>
-                                </p>
-                                <p>
-                                    <p style={{ fontSize: '13px' }}><span className="UnderLineText">{i18n.t('static.listTree.useThisScreen')} :</span></p>
-                                    <p><b>{i18n.t('static.QATForecastImport.StepOne')}</b>
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.ForecastProgram')}</li>
-                                            <li>{i18n.t('static.QATForecastImport.ProgramToImport')} </li>
-                                            <li>{i18n.t('static.QATForecastImport.DateRange')}:
-                                                <ul>
-                                                    <li>{i18n.t('static.QATForecastImport.ForecastPeriod')}</li>
-                                                    <li>{i18n.t('static.QATForecastImport.OldestForecasted')} </li>
-                                                    <li>{i18n.t('static.QATForecastImport.EntireForecast')} </li>
-                                                </ul>
-                                            </li>
-                                            <li>{i18n.t('static.QATForecastImport.TableAppears')}
-                                                <ul>
-                                                    <li>{i18n.t('static.QATForecastImport.EveryForecasting')} </li>
-                                                    <li>{i18n.t('static.QATForecastImport.AllForecast')}</li>
-                                                    <br></br>
-                                                    <img className="img-fluid" src={ShowGuidanceScreenshot1} style={{ width: '971px' }} />
-                                                </ul>
-
-
-                                            </li>
-                                        </ul>
-                                    </p>
-                                    <p><b>{i18n.t('static.QATForecastImport.StepTwo')} </b>
-                                        {i18n.t('static.QATForecastImport.ForecastRegion')}:
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.NationalForecast')}
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.MultiRegion')}
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.MultiRegionSP')} -
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
-                                                            <td>100</td>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.ForecastToMultiRegion')}
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                            <td>20</td>
-                                                            <td>{i18n.t('static.QATForecastImport.North')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <br></br>
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                            <td>45</td>
-                                                            <td>{i18n.t('static.QATForecastImport.South')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <br></br>
-                                                <table className="table table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{i18n.t('static.QATForecastImport.ForecastRegion')}</th>
-                                                            <th>% {i18n.t('static.QATForecastImport.OfForecast')}</th>
-                                                            <th>{i18n.t('static.QATForecastImport.SPRegion')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>{i18n.t('static.QATForecastImport.National')}</td>
-                                                            <td>35</td>
-                                                            <td>{i18n.t('static.QATForecastImport.East')}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </li>
-                                        </ul>
-                                    </p>
-                                    <p><b>{i18n.t('static.QATForecastImport.StepThree')} </b><br></br>
-                                        {i18n.t('static.QATForecastImport.ListForecast')}
-                                        <ul>
-                                            <li>{i18n.t('static.QATForecastImport.ImportedFollows')}: </li>
-                                            <img className="formula-img-mr img-fluid mb-lg-0" src={ForecastedConsumptionimported} style={{ border: '1px solid #fff', marginLeft: '-20px' }} />
-                                            <p>
-                                                {i18n.t('static.QATForecastImport.FollowingExample')}:
-                                                <ul>
-                                                    <li>{i18n.t('static.QATForecastImport.SplitInto')}</li>
-                                                    <li>{i18n.t('static.QATForecastImport.ForecastPlanning')}</li>
-                                                    <li>{i18n.t('static.QATForecastImport.ForecastForMonth')}</li>
-                                                    <li>Forecast of 100 * 50% * 3 = 150  {i18n.t('static.QATForecastImport.ImportedIntoEach')}</li>
-                                                </ul>
-                                            </p>
-                                            <li>{i18n.t('static.QATForecastImport.ExistingForecasted')} </li>
-                                            <li>{i18n.t('static.QATForecastImport.ImportColumn')}</li>
-                                            <br></br>
-                                            <img className="img-fluid" src={ShowGuidanceScreenshot2} style={{ width: '971px' }} />
-                                        </ul>
-
-                                    </p>
-                                </p> */}
                             </ModalBody>
                         </div>
                     </Modal>
                     <div className="row ">
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label> */}
                             <Label htmlFor="appendedInputButton">{i18n.t('static.dataSet.dataSet')}</Label>
                             <div className="controls ">
                                 <InputGroup>
@@ -1582,14 +1105,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         <option value="0">{i18n.t('static.common.select')}</option>
                                         {datasets}
                                     </Input>
-
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
                         <FormGroup className="col-md-4">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQATSupplyPlan.forecastFinalVersion')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleProgramSetting} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                            {/* <Label htmlFor="appendedInputButton">Forecast version (Final Versions Only)</Label> */}
                             <div className="controls">
                                 <InputGroup>
                                     <Input
@@ -1601,16 +1121,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         value={this.state.versionId}
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
-                                        {/* <option value="1">1</option> */}
                                         {versionList}
                                     </Input>
-
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
                             <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
@@ -1624,37 +1140,29 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
                                         {programList}
-
                                     </Input>
-
                                 </InputGroup>
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQAT.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
-
                                 <Picker
                                     ref="pickRange"
                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                     value={rangeValue}
                                     lang={pickerLang}
                                     key={JSON.stringify(rangeValue)}
-                                    //theme="light"
                                     onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
                                 >
                                     <MonthBox value={this.makeText(rangeValue.from) + ' to ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
-
                             </div>
                         </FormGroup>
                     </div>
-
                 </div>
-
                 <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-
                     <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
@@ -1662,9 +1170,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div className="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                             <div className="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
@@ -1675,5 +1181,4 @@ export default class StepOneImportMapPlanningUnits extends Component {
             </>
         );
     }
-
 }

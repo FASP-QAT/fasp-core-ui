@@ -9534,6 +9534,7 @@ legend.scheduler-border {
   left: 90px !important;
   z-index: 4 !important;
   position: sticky !important;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px!important;
 
 }
 
@@ -9543,6 +9544,7 @@ legend.scheduler-border {
   z-index: 3 !important;
   position: sticky !important;
   background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px!important;
 }
 
 // .usageTemplateDataEntryTable .jss>thead>tr>td:nth-child(3)
@@ -10025,6 +10027,16 @@ legend.scheduler-border {
   position: absolute;
   right: 0px;
 }
+.jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageARU::after {
+  content: "";
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAASCAMAAACQGyXoAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAASlQTFRF////npu0f4q0j6bM7M/AVz5yHQBtIQB3RGC/37WZLwttNlq/usyzSwNtNB6s+f3///z1Sh5tLjiddIOTNQptPFjN+/er0wAezEHSv4N4KgCKg9n//dqPzQBn4c3I3wAv1pbe7XtVziS2gDtsQ2nh+v/JYQ1sU5Lv+sGP1B85wwBKywA6yxw6wwBE0kGtYRlsIA12SHrhRXPh7KGQ1h45wgAiwQBE02Cg/PX7cSRsSXzm/LNrxQAzzm6t3zZA1Y2n1AAoxACSoF9wIgB3a7L97qDe/v/y1wAd0mnf8cDv8LeYKQBtP13N3u37/v/65OW8UgBtNQCs7pqs+u76n2h0d3+rJgCBcrT4j2h6IQBtJQCBaqfp8eflb2KJMzFyIw12MTqKW3zD/P7/NhSGVQAAAMBJREFUeJxjYKAuYGRixiXFwsoGBOwcWCU5udjYuHl42dj4+DElBQSBGoWERYCkKFxQTFwCwpBkgwMpaYiQjKycvIKiEoipDBRWYVBVA0mrQ2Q1NLW0dXT1QEx9oKiBIUTWCGqwsYmpmbkFiGUJElaByFpBJK1tbO3sHRxBTCeErLMLVK+rm7sHgyeI5eXNxubj6+cfwMYWiPBJUDCUEQL0UGgo0Eth4diCIyIS7J+oaKyBxRATGxefkJiEXZJqAAAsLBYrUJJjawAAAABJRU5ErkJggg==') !important;
+  background-repeat: no-repeat !important;
+  background-position: top right !important;
+  width: 30px;
+  height: 25px;
+  position: absolute;
+  right: 12px;
+}
 
 .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImage {
   padding-right: 16px !important;
@@ -10107,7 +10119,7 @@ legend.scheduler-border {
 
 .jss_filters_options {
   height: auto !important;
-  max-height: 320px !important;
+  max-height: 206px!important;
 }
 
 .borderedBoxforformulae {
@@ -10621,9 +10633,9 @@ legend.scheduler-border {
   margin-left: 48px;
 }
 
-.chart-graph-report-forecastOutput {
-  min-height: 1000px !important;
-}
+// .chart-graph-report-forecastOutput {
+//   min-height: 1000px !important;
+// }
 
 // .fa-sort-down:before, .fa-sort-desc:before {
 //   content: "\f0dd";
@@ -10658,4 +10670,46 @@ legend.scheduler-border {
 
 .jss>tbody>tr>td.readonly.notLowestError {
   color: #000000 !important;
+}
+
+// .ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
+  .ForcastColumnFreeze .jss > thead> tr > td:nth-child(2),
+  .ForcastColumnFreeze .jss > thead > tr > td:nth-child(4)  {
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 2!important;
+}
+
+.ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  // top:65px!important;
+}
+.ForcastColumnFreeze .jss > thead{
+  z-index: 999;
+}
+@media screen and (min-width: 1025px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    // top:83px!important;
+  }
+}
+@media screen and (min-width: 1441px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    // top:83px!important;
+  }
+}
+.jss > tbody > tr > td.readonly.compareAndSelectRed {
+  color: #BA0C2F !important;
 }

@@ -1,102 +1,38 @@
+import { Formik } from 'formik';
 import React, { Component } from 'react';
+import {
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label
+} from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
+import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ProgramService from "../../api/ProgramService";
-import { Formik } from 'formik';
-import * as Yup from 'yup'
-import {
-    Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
-} from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL } from '../../Constants';
-
 const initialValuesTwo = {
     realmCountryId: ''
 }
-
 const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
     })
 }
-
-const validateTwo = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorTwo(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorTwo = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
 export default class PipelineProgramDataStepTwo extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             realmCountryList: []
         }
-
     }
-
-    touchAllTwo(setTouched, errors) {
-        setTouched({
-            realmCountryId: true
-        }
-        )
-        this.validateFormTwo(errors)
-    }
-    validateFormTwo(errors) {
-        this.findFirstErrorTwo('realmCountryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorTwo(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    // getRealmCountryList() {
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     ProgramService.getRealmCountryList(document.getElementById('realmId').value)
-    //         .then(response => {
-
-    //             console.log("response---->", response);
-    //             if (response.status == 200) {
-    //                 this.setState({
-    //                     realmCountryList: response.data
-    //                 })
-    //             } else {
-    //                 this.setState({
-    //                     message: response.data.messageCode
-    //                 })
-    //             }
-    //         })
-    // }
+    
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getRealmCountryList(realmId)
             .then(response => {
@@ -114,13 +50,11 @@ export default class PipelineProgramDataStepTwo extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -162,18 +96,15 @@ export default class PipelineProgramDataStepTwo extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <>
-                {/* <h3 className="red">{this.props.items.validationFailedMessage}</h3> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
                     initialValues={{ realmCountryId: this.props.items.program.realmCountry.realmCountryId }}
-                    validate={validateTwo(validationSchemaTwo)}
+                    validationSchema={validationSchemaTwo}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.endProgramInfoStepOne && this.props.endProgramInfoStepOne();
-
                     }}
                     render={
                         ({
@@ -193,7 +124,6 @@ export default class PipelineProgramDataStepTwo extends Component {
                                     <Input
                                         valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                         invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                        // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                         onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                         bsSize="sm"
                                         className="col-md-4"
@@ -206,20 +136,12 @@ export default class PipelineProgramDataStepTwo extends Component {
                                     <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                     <span className="red">{this.props.items.validationFailedMessage}</span>
                                 </FormGroup>
-
                                 <FormGroup>
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                    {/* <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp; */}
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                 </FormGroup>
                             </Form>
                         )} />
-
             </>
         );
     }
-
-
-
-
 }

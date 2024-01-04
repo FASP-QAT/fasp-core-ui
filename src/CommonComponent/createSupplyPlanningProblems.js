@@ -1,7 +1,5 @@
-import moment, { months } from 'moment';
-
-export default function createSupplyPlanningProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList,openProblemStatusObj) {
-
+import moment from 'moment';
+export default function createSupplyPlanningProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj) {
     var json = {
         problemReportId: 0,
         program: {
@@ -11,7 +9,6 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         },
         versionId: versionID,
         realmProblem: problemObj,
-
         dt: moment(Date.now()).utcOffset('-0500').format("YYYY-MM-DD"),
         region: {
             id: regionObj.regionId,
@@ -20,7 +17,6 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         planningUnit: {
             id: planningUnitObj.planningUnit.id,
             label: planningUnitObj.planningUnit.label,
-
         },
         shipmentId: '',
         data5: JSON.stringify(causeJson),
@@ -59,6 +55,4 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         ]
     }
     problemActionList.push(json);
-    // problemActionIndex++;
-
 }

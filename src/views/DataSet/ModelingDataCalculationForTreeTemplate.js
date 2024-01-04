@@ -1,20 +1,5 @@
-import moment from 'moment';
-
 export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
-    // console.log("modelling dataset---", dataset);
-    // console.log("modeling nodeId---", nodeId);
-    // console.log("modelling scenarioId---", scenarioId);
     nodeId = -1;
-
-    // var db1;
-    // getDatabase();
-    // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    // openRequest.onerror = function (event) {
-    // }.bind(this);
-    // openRequest.onsuccess = function (e) {
-    //     db1 = e.target.result;
-    //     var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
-    //     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
     var datasetJson = {};
     if (!isTemplate) {
         datasetJson = dataset.programData;
@@ -22,7 +7,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
         datasetJson = dataset;
     }
     var allNodeDataList = [];
-    // console.log("datasetJson modeling--->", datasetJson.treeList);
     var treeList = [];
     if (!isTemplate) {
         treeList = datasetJson.treeList;
@@ -51,16 +35,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
             flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
         }
         var transferToNodeList = [];
-        // if (nodeId != -1) {
-        //     var curNode = flatList.filter(c => c.id == nodeId)[0];
-        //     var currentNodeType = curNode.payload.nodeType.id;
-        //     var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
-        //     if (currentNodeType == 2 && parentNodeType == 1) {
-
-        //     } else {
-        //         flatList = flatList.filter(c => c.id == nodeId);
-        //     }
-        // }
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
             if (payload.nodeType.id != 1) {
@@ -73,9 +47,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     var nodeDataModelingListUnFiltered = (nodeDataMapForScenario.nodeDataModelingList);
                     var hasTransferNodeIdList = nodeDataModelingListUnFiltered.filter(c => c.transferNodeDataId != null);
-
                     for (var tnl = 0; tnl < hasTransferNodeIdList.length; tnl++) {
-                        // console.log("modeling datavalue 5---", hasTransferNodeIdList[tnl].dataValue)
                         transferToNodeList.push({
                             dataValue: 0 - hasTransferNodeIdList[tnl].dataValue,
                             modelingType: hasTransferNodeIdList[tnl].modelingType,
@@ -91,43 +63,28 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                             increaseDecrease: 1
                         })
                     }
-
-
                 }
             }
-
-
         }
-        // console.log("Transfer To Node list###@@@", transferToNodeList);
-        // console.log("FlatList###@@@", flatList)
         var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
         var sortedFlatList = [];
         var sortedFlatListId = [];
         var sortedFlatListNodeDataId = [];
         for (var ml = 0; ml <= maxLevel; ml++) {
-            // console.log("Level###@@@", ml);
             var flatListForLevel = flatList.filter(c => c.level == ml && c.payload.nodeType.id != 1);
             for (var fll = 0; fll < flatListForLevel.length; fll++) {
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                    // console.log("fll###@@@", fll);
-                    // Vo wali list lekar aao jiske calculations nhi hue hai
                     var filterFlatListWhoseCalculationsAreRemaining = flatListForLevel.filter(c => !sortedFlatListId.includes(c.id));
-                    // console.log("filterFlatListWhoseCalculationsAreRemaining###@@@", filterFlatListWhoseCalculationsAreRemaining)
                     var leaveLoop = false;
                     for (var v = 0; (v < filterFlatListWhoseCalculationsAreRemaining.length && !leaveLoop); v++) {
                         var listOfTransferTo = transferToNodeList.filter(c => (filterFlatListWhoseCalculationsAreRemaining[v].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId == c.nodeDataId);
-                        // console.log("Kya usme kuch transfer ho raha hai v###@@@", v)
-                        // console.log("ListOf transfer to###@@@", listOfTransferTo);
                         if (listOfTransferTo.length == 0) {
-                            // console.log("In if ###@@@");
                             sortedFlatList.push(filterFlatListWhoseCalculationsAreRemaining[v]);
                             sortedFlatListId.push(filterFlatListWhoseCalculationsAreRemaining[v].id);
                             sortedFlatListNodeDataId.push((filterFlatListWhoseCalculationsAreRemaining[v].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId);
                             leaveLoop = true;
                         } else {
-                            // console.log("###@@@in else")
                             var checkIfAllFromCalculationsAreDone = listOfTransferTo.filter(c => sortedFlatListId.includes(c.transferFromNodeDataId));
-                            // console.log("Check if all the calculations are done###@@@", checkIfAllFromCalculationsAreDone)
                             if (listOfTransferTo.length == checkIfAllFromCalculationsAreDone.length) {
                                 sortedFlatList.push(filterFlatListWhoseCalculationsAreRemaining[v]);
                                 sortedFlatListId.push(filterFlatListWhoseCalculationsAreRemaining[v].id);
@@ -135,18 +92,13 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                 leaveLoop = true;
                             }
                         }
-                        // var flatListWhichIsNotDepended = filterFlatListWhoseCalculationsAreRemaining
                     }
-
                 }
             }
         }
         var overallTransferList = [];
-        // console.log("sortedFlatList###", sortedFlatList);
         flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && !sortedFlatListId.includes(c.id)));
-        // console.log("FlatList$$$###", flatList);
         for (var fl = 0; fl < flatList.length; fl++) {
-            // console.log("FlatList$$$", flatList[fl]);
             var payload = flatList[fl].payload;
             if (payload.nodeType.id != 1 && (payload.extrapolation == undefined || payload.extrapolation.toString() == "false")) {
                 var nodeDataMap = payload.nodeDataMap;
@@ -154,9 +106,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 if (scenarioId != -1) {
                     scenarioList = scenarioList.filter(c => c.id == scenarioId);
                 }
-                // console.log("start date---", startDate);
-                // console.log("stop date---", stopDate);
-                // console.log("scenarioList---", scenarioList);
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     var nodeDataModelingListUnFiltered = (nodeDataMapForScenario.nodeDataModelingList);
@@ -168,17 +117,14 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     var calculatedValueForLag = [];
                     var countOfI = -1;
                     for (var i = curDate; i <= datasetJson.monthsInFuture; i++) {
-                        var test = 1;
                         if (i != 0) {
                             countOfI += 1;
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => i >= c.startDateNo && i <= c.stopDateNo);
                             nodeDataModelingList = nodeDataModelingList.filter(c => c.dataValue != "" && c.dataValue != "NaN" && c.dataValue != undefined && c.increaseDecrease != "");
                             var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                             var startValue = 0;
-                            // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
                             if (i == nodeDataMapForScenario.monthNo) {
                                 if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
-                                    // console.log("modeling datavalue 1---", nodeDataMapForScenario.dataValue)
                                     startValue = nodeDataMapForScenario.dataValue;
                                 } else {
                                     startValue = nodeDataMapForScenario.calculatedDataValue;
@@ -195,19 +141,15 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     startValue = 0;
                                 }
                             }
-                            // console.log("startValue---", startValue);
                             var difference = 0;
                             var differenceWMC = 0;
-                            var transferNodeValue = 0;
                             var endValue = Number(startValue);
                             var endValueWMC = Number(startValue);
                             var transfer = 0;
                             var transferWMC = 0;
-                            // console.log("nodeDataModelingList****", nodeDataModelingList);
                             for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                                 var nodeDataModeling = nodeDataModelingList[ndml];
                                 var nodeDataModelingValue = nodeDataModeling.increaseDecrease == 1 ? nodeDataModeling.dataValue : 0 - nodeDataModeling.dataValue;
-                                //Linear number
                                 if (nodeDataModeling.modelingType.id == 2 || nodeDataModeling.modelingType.id == 5) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
                                         transfer = Number(nodeDataModelingValue);
@@ -239,15 +181,12 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         endValue += Number(nodeDataModelingValue);
                                         endValueWMC += Number(nodeDataModelingValue);
                                     }
-
                                 }
-                                //Linear %
                                 else if (nodeDataModeling.modelingType.id == 3) {
                                     var dv = 0;
                                     var dvWMC = 0;
                                     if (nodeDataMapForScenario.monthNo == nodeDataModeling.startDateNo) {
                                         if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
-                                            // console.log("modeling datavalue 3---", nodeDataMapForScenario.dataValue)
                                             dv = nodeDataMapForScenario.dataValue;
                                             dvWMC = nodeDataMapForScenario.dataValue;
                                         } else {
@@ -267,7 +206,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     if (nodeDataModeling.transferNodeDataId > 0) {
                                         transfer = Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
                                         transferWMC = Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
-                                        // console.log("Transfer+++++++++++++@@@@@", transfer);
                                         if (endValue + Number((Number(dv) * Number(nodeDataModelingValue)) / 100) >= 0) {
                                             endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
                                             endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
@@ -275,7 +213,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                         } else {
-                                            // console.log("EndValue+++++++++++++@@@@@", endValue);
                                             difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
                                             differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
@@ -283,11 +220,8 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             endValueWMC = 0;
                                         }
                                     } else if (nodeDataModeling.transferNodeDataId == -1) {
-                                        // console.log("overallTransferList@@@@@@@@@@@@@@@@@###########", overallTransferList);
                                         var overallFilter = overallTransferList.filter(c => c.month == i && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
-                                        // console.log("overallFilter@@@@@@@@@@@@@@@@@###########", overallFilter);
                                         if (overallFilter.length > 0) {
-                                            // console.log("endValue@@@@@@@@@@@@@@@@@###########", endValue);
                                             difference += Number(0 - overallFilter[0].transfer);
                                             differenceWMC += Number(0 - overallFilter[0].transferWMC);
                                             endValue += Number(0 - overallFilter[0].transfer);
@@ -300,7 +234,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                     }
                                 }
-                                //Exponential %
                                 else if (nodeDataModeling.modelingType.id == 4) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
                                         transfer = Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
@@ -336,34 +269,24 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                             }
                             difference = endValue - startValue;
                             differenceWMC = endValueWMC - startValue;
-
                             var totalManualChange = 0;
                             var seasonalityPercTotal = 0;
                             var manualChangeTotal = 0;
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => c.monthNo == i) : [];
-                            // console.log("nodeDataOverrideListFiltered---", nodeDataOverrideListFiltered)
                             if (nodeDataOverrideListFiltered.length > 0) {
                                 var seasonalityNumber = (Number(endValue) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                                 seasonalityPercTotal += Number(nodeDataOverrideListFiltered[0].seasonalityPerc);
                                 totalManualChange = Number(seasonalityNumber) + Number(nodeDataOverrideListFiltered[0].manualChange);
                                 manualChangeTotal += Number(nodeDataOverrideListFiltered[0].manualChange);
                             }
-
                             endValue = endValue + totalManualChange;
                             if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
                                 if (endValue < 0) {
                                     endValue = 0;
                                 }
-                                // if (endValue > 100) {
-                                //     endValue = 100;
-                                // }
-
                                 if (endValueWMC < 0) {
                                     endValueWMC = 0;
                                 }
-                                // if (endValueWMC > 100) {
-                                //     endValueWMC = 100;
-                                // }
                             } else if (payload.nodeType.id == 2) {
                                 if (endValue < 0) {
                                     endValue = 0;
@@ -372,20 +295,14 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     endValueWMC = 0;
                                 }
                             }
-
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
                                 if (flatList[fl].level != 0) {
-                                    // Jo uske parent ki calculated value hai Uska endValue %
                                     var parent = flatList[fl].parent;
-                                    // console.log("parent---", parent);
-                                    // console.log("flatList---", flatList);
                                     var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                                    // console.log("parentFiltered---", parentFiltered);
                                     var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
-                                    // console.log("singleNodeData---", singleNodeData);
                                     if (singleNodeData != undefined && singleNodeData.length > 0) {
                                         var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => c.month == i);
                                         if (parentValueFilter.length > 0) {
@@ -401,7 +318,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     calculatedValue = 0;
                                 }
                             }
-
                             if (payload.nodeType.id == 4) {
                                 var fuPerMonth, totalValue, usageFrequency, convertToMonth;
                                 var noOfForecastingUnitsPerPerson = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson;
@@ -413,14 +329,11 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         convertToMonth = 0;
                                     }
-
                                 }
                                 if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
                                     fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
                                     totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
-
                                 } else {
-                                    // Need to change this logic
                                     var usagePeriodId;
                                     var usageTypeId;
                                     var usageFrequency;
@@ -442,10 +355,8 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             var div = (convertToMonth * usageFrequency);
                                             if (div != 0) {
                                                 noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                                                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                                             }
                                         } else {
-                                            // var noOfFUPatient = this.state.noOfFUPatient;
                                             var noOfFUPatient;
                                             if (payload.nodeType.id == 4) {
                                                 noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
@@ -470,7 +381,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         }
                                     }
-                                    // console.log("noFURequired@@@@@@@@@@@", noFURequired);
                                     if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
                                         var noOfPersons = nodeDataMapForScenario.fuNode.noOfPersons;
                                         if (nodeDataMapForScenario.fuNode.oneTimeUsage == "true" || nodeDataMapForScenario.fuNode.oneTimeUsage == true) {
@@ -487,13 +397,11 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                 calculatedValue = totalValue;
                                 calculatedValueForLag.push(calculatedValue);
                                 var lag = nodeDataMapForScenario.fuNode.lagInMonths;
-                                // console.log("Lag in months++++", lag);
                                 if (countOfI >= lag) {
                                     calculatedValue = calculatedValueForLag[countOfI - lag];
                                 } else {
                                     calculatedValue = 0;
                                 }
-
                             }
                             if (payload.nodeType.id == 5) {
                                 if (!isTemplate) {
@@ -507,19 +415,14 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     var fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     calculatedValue = calculatedValue / fuPerPu;
                                 }
-
                             }
                             var calculatedMmdValue = calculatedValue;
-                            // console.log("flatList[fl]$$$###", flatList[fl])
                             if (payload.nodeType.id == 5) {
                                 var parent = (flatList[fl].parent);
                                 var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                                 var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                 if (parentNodeNodeData.fuNode.usageType.id == 2
-                                    //  && nodeDataMapForScenario.puNode.refillMonths > 1
                                 ) {
-                                    var daysPerMonth = 365 / 12;
-
                                     var grandParent = parentFiltered.parent;
                                     var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
                                     var patients = 0;
@@ -527,7 +430,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     if (flatList[fl].level != 1) {
                                         grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                     }
-                                    // console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
                                         var minusNumber = (nodeDataMapForScenario.monthNo == 1 ? nodeDataMapForScenario.monthNo - 2 : nodeDataMapForScenario.monthNo - 1);
                                         var grandParentPrevMonthMMDValue = []
@@ -550,8 +452,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         patients = 0;
                                     }
-                                    // patients = 5432;
-                                    // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
                                     if (!isTemplate) {
                                         var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == (nodeDataMapForScenario.puNode.planningUnit.id));
                                         var fuPerPu = 1;
@@ -562,22 +462,11 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     }
-
                                     var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
                                     var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                     var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
-                                    var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
-                                    // console.log("daysPerMonth$$$%%%", daysPerMonth);
-                                    // console.log("patients$$$%%%", patients);
-                                    // console.log("fuPerPu$$$%%%", fuPerPu);
-                                    // console.log("monthsPerVisit$$$%%%", monthsPerVisit);
-                                    // console.log("noOfBottlesInOneVisit$$$%%%", noOfBottlesInOneVisit);
-                                    // console.log("puPerBaseMonth$$$%%%", puPerBaseMonth);
-                                    // console.log("puPerMonthBalance$$$%%%", puPerMonthBalance);
                                     var monthNo = countOfI;
-                                    // console.log("monthNo$$$%%%", monthNo);
                                     var cycle = Math.floor(monthNo / monthsPerVisit);
-                                    // console.log("cycle$$$%%%", cycle);
                                     var deltaPatients = 0;
                                     if (i == curDate) {
                                         var filter1 = [];
@@ -607,36 +496,17 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                                 val2 = filter2[0].calculatedValue;
                                             }
                                             deltaPatients = val1 - val2;
-                                            // deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
                                         }
                                     }
-                                    // console.log("deltaPatients$$$%%%", deltaPatients);
-                                    var noOfPatientsNew = 0;
                                     var noOfPatients = 0;
                                     if (cycle == 0) {
-                                        // var mod = monthNo % monthsPerVisit;
-                                        // console.log("mod$$$%%%", mod);
-                                        // if (mod == 0) {
-                                        //     noOfPatientsNew = puPerMonthBalance + deltaPatients;
-                                        // } else {
-                                        //     noOfPatientsNew = puPerBaseMonth + deltaPatients;
-                                        // }
-                                        // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
                                         noOfPatients = (patients / monthsPerVisit) + deltaPatients;
-                                        // console.log("noOfPatients@@@", noOfPatients);
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     } else {
-                                        // console.log("MonthsPer visit@@@@@@@@@@@", monthsPerVisit);
-                                        // console.log("I++++++++++@@@@@@@@@@@", i);
                                         var prevCycleValue = calculatedMMdPatients[countOfI - monthsPerVisit].value;
                                         noOfPatients = prevCycleValue + deltaPatients;
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     }
-                                    // console.log("noOfPus$$$%%%", noOfPus);
-                                    // calculatedMmdValue = noOfPus;
-                                    // var parent = (flatList[fl].parent);
-                                    // var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-
                                     var lag = parentNodeNodeData.fuNode.lagInMonths;
                                     var noOfFus = 0;
                                     if (countOfI >= lag) {
@@ -645,7 +515,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         if (nodeDataMomForParentPerc != undefined) {
                                             percentageToMultiply = nodeDataMomForParentPerc.endValue;
                                         }
-                                        // var diffForI = countOfI - lag == 0 ? 1 : countOfI - lag;
                                         noOfFus = (((calculatedMMdPatients[countOfI - lag].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
                                     } else {
                                         noOfFus = 0;
@@ -656,8 +525,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         calculatedMmdValue = 0;
                                     }
-
-                                    // console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
                                 } else {
                                     var usagePeriodId;
                                     var usageTypeId;
@@ -680,16 +547,10 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             var div = (convertToMonth * usageFrequency);
                                             if (div != 0) {
                                                 noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                                                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                                             }
                                         } else {
-                                            // var noOfFUPatient = this.state.noOfFUPatient;
                                             var noOfFUPatient;
-                                            // if (payload.nodeType.id == 4) {
                                                 noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
-                                            // } else {
-                                                // noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
-                                            // }
                                             noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                                         }
                                         if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
@@ -702,11 +563,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         }
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-                                        // if (payload.nodeType.id == 4) {
                                             noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
-                                        // } else {
-                                            // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                                        // }
                                     }
                                     var puMultiplier = 0;
                                     if (!isTemplate) {
@@ -718,17 +575,10 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         puMultiplier = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     }
-                                    // console.log("Pu Multiplier Test",puMultiplier)
-                                    // console.log("No Fu Required Test",noFURequired)
-                                    // console.log("Calculated Value Required Test",calculatedValue)
-                                    // console.log("Pu per visit Test",nodeDataMapForScenario.puNode.puPerVisit)
                                     calculatedValue = (calculatedValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
                                     calculatedMmdValue = (calculatedMmdValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
                                 }
                             }
-
-
-                            //Month For loop
                             nodeDataList.push({
                                 month: i,
                                 startValue: startValue,
@@ -740,22 +590,14 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                 manualChange: manualChangeTotal,
                                 calculatedMmdValue: calculatedMmdValue < 0 ? 0 : calculatedMmdValue
                             })
-                            // console.log("Node MOM List%%%", nodeDataList);
                         }
                     }
-
-                    // console.log("Node MOM List$$$", nodeDataList);
-                    // console.log("Before node data list all push 1")
                     allNodeDataList.push({
                         nodeId: flatList[fl].id,
                         nodeDataMomList: nodeDataList
                     })
-
                     nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                     nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
-                    // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                    // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
-                    // }
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
@@ -763,34 +605,21 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     flatListUnsorted[findIndex].payload = payload;
                     var findIndex1 = flatList.findIndex(c => c.id == flatList[fl].id);
                     flatList[findIndex1].payload = payload;
-
                 }
-                // payload.nodeDataMap = nodeDataMap;
-                // flatList[fl].payload = payload;
             } else {
-
             }
         }
-
         var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
-        // console.log("aggregateNodeList---", aggregateNodeList);
         for (var fl = aggregateNodeList.length; fl > 0; fl--) {
-            // console.log("fl---", fl)
-            // console.log("agg flatList[fl]---", aggregateNodeList[fl - 1])
             var payload = aggregateNodeList[fl - 1].payload;
-            // console.log("agg payload---", payload);
             if (payload.nodeType.id == 1) {
-                // console.log("agg nodeDataMap---", nodeDataMap);
                 var nodeDataMap = payload.nodeDataMap;
-                // console.log("agg nodeDataMap---", nodeDataMap);
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
                     scenarioList = scenarioList.filter(c => c.id == scenarioId);
                 }
-                // console.log("agg scenario---", scenarioList);
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                    // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
                     var monthList = [];
                     childNodeFlatList.map(d => {
@@ -801,9 +630,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                         }
                     })
                     var minMonth = Math.min(...monthList);
-                    // var minMonth = moment.min();
-                    // console.log("agg child&&&", childNodeFlatList);
-                    // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
                     var curDate = minMonth;
                     var nodeDataList = [];
                     for (var i = curDate; i <= datasetJson.monthsInFuture; i++) {
@@ -821,7 +647,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     var nodeDataListFilteredFilter = (childNodeMomData.filter(c => c.month == i));
                                     if (nodeDataListFilteredFilter.length > 0) {
                                         var nodeDataListFiltered = nodeDataListFilteredFilter[0];
-                                        // console.log("nodeDataListFiltered&&&", nodeDataListFiltered)
                                         aggregatedStartValue += Number(nodeDataListFiltered.startValue);
                                         aggregatedEndValue += Number(nodeDataListFiltered.endValue);
                                         aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
@@ -831,7 +656,6 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     }
                                 }
                             }
-                            // console.log("agg data---", aggregatedStartValue)
                             nodeDataList.push(
                                 {
                                     month: i,
@@ -846,46 +670,28 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                             );
                         }
                     }
-                    // console.log("Nodedatalist&&&", nodeDataList);
-                    // console.log("Before node data list all push 2")
                     allNodeDataList.push({
                         nodeId: aggregateNodeList[fl - 1].id,
                         nodeDataMomList: nodeDataList
                     })
-
                     nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                     nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
-                    // console.log("flatListUnsorted++++", flatListUnsorted)
-                    // console.log("flatListUnsorted++++", aggregateNodeList[fl - 1].id)
                     payload.nodeDataMap = nodeDataMap;
                     flatListUnsorted[findIndex].payload = payload;
-
                     var findIndex1 = flatList.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
                     flatList[findIndex1].payload = payload;
                 }
             }
         }
-
-        // Have list of ids having transer to and transfer from
-        // Then based on that work with each one
-
-
-        // treeList[tl].tree.flatList = flatList;
     }
-    // console.log("allNodeDataList---", allNodeDataList);
     props.updateState("nodeDataMomList", allNodeDataList);
     props.updateState("nodeId", nodeId);
     props.updateState("type", type);
     props.updateState("loading", false);
-    // console.log("here------------------------")
     props.updateState("modelingJexcelLoader", false);
     props.updateState("momJexcelLoader", false);
     props.updateState("message1", "Data updated successfully");
-    // treeList = treeList;
-    // datasetJson.treeList = treeList;
-    // var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
-    // dataset.programData = encryptedDatasetJson;
 }

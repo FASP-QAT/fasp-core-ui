@@ -1,46 +1,47 @@
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { DatePicker } from "antd";
+import "antd/dist/antd.css";
+import CryptoJS from 'crypto-js';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import jexcel from 'jspreadsheet';
+import moment from "moment";
 import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
+import Picker from 'react-month-picker';
 import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, PopoverBody, Popover, Label, Form
+    Form,
+    FormGroup, Input, InputGroup,
+    Label,
+    Popover,
+    PopoverBody
 } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import i18n from '../../i18n'
-import Picker from 'react-month-picker'
-import { DatePicker } from "antd";
-import "antd/dist/antd.css";
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
-import moment from "moment";
-import pdfIcon from '../../assets/img/pdf.png';
-import csvicon from '../../assets/img/csv.png'
-import "jspdf-autotable";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import getLabelText from '../../CommonComponent/getLabelText'
-import CryptoJS from 'crypto-js'
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
-import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import ProgramService from '../../api/ProgramService';
-import DatasetService from '../../api/DatasetService';
-import jsPDF from "jspdf";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, TITLE_FONT } from '../../Constants.js';
+import DatasetService from '../../api/DatasetService';
+import ProgramService from '../../api/ProgramService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const { RangePicker } = DatePicker;
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
-
 class ModelingValidation extends Component {
     constructor(props) {
         super(props);
@@ -88,7 +89,6 @@ class ModelingValidation extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.toggledata = this.toggledata.bind(this)
     }
-
     setNodeVal(e) {
         this.setState({ loading: true })
         var nodeIdArr = [];
@@ -106,7 +106,6 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
-
     setDisplayBy(e) {
         this.setState({ loading: true })
         var displayBy = e.target.value;
@@ -117,33 +116,32 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
-
     setXAxisDisplayBy(e) {
         this.setState({ loading: true })
         let displayBy = e.target.value;
         let val;
-        if(displayBy == 1){
+        if (displayBy == 1) {
             val = this.state.rangeValue;
-        }else if(displayBy == 2){
+        } else if (displayBy == 2) {
             val = {
-                from : {
-                    year : this.state.rangeValue.from.year,
-                    month : 1,
+                from: {
+                    year: this.state.rangeValue.from.year,
+                    month: 1,
                 },
-                to : {
-                    year : this.state.rangeValue.to.year,
-                    month : 12,
+                to: {
+                    year: this.state.rangeValue.to.year,
+                    month: 12,
                 }
             }
-        }else{
+        } else {
             val = {
-                from : {
-                    year : this.state.rangeValue.from.year,
-                    month : (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                from: {
+                    year: this.state.rangeValue.from.year,
+                    month: (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
                 },
-                to : {
-                    year : this.state.rangeValue.to.year,
-                    month : (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12 ,
+                to: {
+                    year: this.state.rangeValue.to.year,
+                    month: (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12,
                 }
             }
         }
@@ -155,12 +153,10 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
-
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-
     toggledata() {
         var show = this.state.show;
         this.setState({
@@ -172,7 +168,6 @@ class ModelingValidation extends Component {
             popoverOpenLevelFeild: !this.state.popoverOpenLevelFeild,
         });
     }
-
     setVersionId(e) {
         this.setState({ loading: true })
         var versionId = e.target.value;
@@ -199,13 +194,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 versionId: versionId,
                 datasetData: {},
@@ -223,11 +214,9 @@ class ModelingValidation extends Component {
                 nodeIdArr: [],
                 nodeLabelArr: [],
                 loading: false
-
             })
         }
     }
-
     getDatasetData() {
         this.setState({
             loading: true
@@ -286,13 +275,9 @@ class ModelingValidation extends Component {
             }).catch(
                 error => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
-                    // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
-
                     this.el = jexcel(document.getElementById("tableDiv2"), '');
-                    // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv2"), true);
-
                     this.setState({
                         datasetData: {},
                         treeList: [],
@@ -314,13 +299,9 @@ class ModelingValidation extends Component {
             );
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 datasetData: {},
                 treeList: [],
@@ -335,18 +316,15 @@ class ModelingValidation extends Component {
                 nodeIdArr: [],
                 nodeLabelArr: [],
                 dataEl: "",
-                dataEl2: "",  
+                dataEl2: "",
                 loading: false
             })
         }
     }
-
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
-        var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-        var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var rangeValue = { from: { year: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("M")) }, to: { year: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("M")) } }
         var treeId = "";
         var event = {
@@ -366,15 +344,9 @@ class ModelingValidation extends Component {
             rangeValue: rangeValue,
             loading: false
         }, () => {
-            // if (treeId != "") {
             this.setTreeId(event);
-            // }else{
-
-            // }
         })
-
     }
-
     setTreeId(e) {
         this.setState({ loading: true })
         var treeId = e.target.value;
@@ -388,13 +360,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 treeId: treeId,
                 scenarioList: [],
@@ -412,7 +380,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     getScenarioList() {
         this.setState({ loading: true })
         var treeList = this.state.treeList;
@@ -439,7 +406,6 @@ class ModelingValidation extends Component {
                 scenarioId = localStorage.getItem("sesScenarioId");
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
-
             var levelId = "";
             var levelEvent = {
                 target: {
@@ -453,30 +419,20 @@ class ModelingValidation extends Component {
                 levelId = localStorage.getItem("sesLevelId");
                 levelEvent.target.value = localStorage.getItem("sesLevelId");
             }
-
             this.setState({
                 scenarioList: treeListFiltered.scenarioList.filter(c => c.active.toString() == "true"),
                 levelList: levelList,
                 treeListFiltered: treeListFiltered,
                 loading: false
             }, () => {
-                // if (scenarioId != "") {
                 this.setScenarioId(event);
-                // }
-                // if (levelId != "") {
                 this.setLevelId(levelEvent);
-                // }
-
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 scenarioList: [],
                 scenarioId: "",
@@ -493,7 +449,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     setScenarioId(e) {
         this.setState({ loading: true })
         var scenarioId = e.target.value;
@@ -507,13 +462,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 scenarioId: scenarioId,
                 loading: false,
@@ -522,11 +473,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-
-    getOtherFiltersData() {
-
-    }
-
     setDatasetId(e) {
         this.setState({ loading: true })
         var datasetId = e.target.value;
@@ -540,13 +486,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-            
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 datasetId: datasetId,
                 scenarioList: [],
@@ -568,7 +510,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     getData() {
         if (this.state.scenarioId > 0 && this.state.levelId != "" && this.state.nodeVal.length > 0) {
             this.setState({
@@ -579,25 +520,20 @@ class ModelingValidation extends Component {
             var treeList = datasetData.treeList;
             var tree = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var flatList = tree.tree.flatList;
-            // var nodeDataModelingList = datasetData.nodeDataModelingList;
-            var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
             let startDate;
             let stopDate;
-            if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
-                startDate = rangeValue.from.year - 1  + '-' + rangeValue.from.month + '-01';
+            if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
+                startDate = rangeValue.from.year - 1 + '-' + rangeValue.from.month + '-01';
                 stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            }else if(this.state.xAxisDisplayBy > 8){
+            } else if (this.state.xAxisDisplayBy > 8) {
                 startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                 stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            }else{
+            } else {
                 startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                 stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             }
             var displayBy = this.state.displayBy;
-            
-            // var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
-            // var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
             var monthList = [];
             var curDate = startDate;
             for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
@@ -606,9 +542,8 @@ class ModelingValidation extends Component {
             }
             let columns = [];
             let columns2 = [];
-
             columns.push({ title: this.state.xAxisDisplayBy == 1 ? i18n.t('static.inventoryDate.inventoryReport') : this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : i18n.t('static.modelingValidation.fiscalYear'), type: 'calendar', options: { format: this.state.xAxisDisplayBy == 1 ? JEXCEL_MONTH_PICKER_FORMAT : "YYYY", type: 'year-month-picker' } });
-            columns2.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format:  JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
+            columns2.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
@@ -626,12 +561,10 @@ class ModelingValidation extends Component {
             var dataArr = [];
             var dataArr2 = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
-            // console.log("flatList###", flatList)
-            if(this.state.xAxisDisplayBy == 1){
+            if (this.state.xAxisDisplayBy == 1) {
                 for (var j = 0; j < monthList.length; j++) {
                     data = [];
                     data[0] = moment(monthList[j]).format("YYYY-MM-DD");
-                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                     var total = 0;
                     var totalPer = 0;
                     for (var k = 0; k < nodeVal.length; k++) {
@@ -650,7 +583,6 @@ class ModelingValidation extends Component {
                         total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
-
                     for (var k = 0; k < nodeVal.length; k++) {
                         var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
                         var calculatedValueTotal = 0;
@@ -673,16 +605,15 @@ class ModelingValidation extends Component {
                     data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                     dataArr.push(data);
                 }
-            }else{
-                let mL = this.state.xAxisDisplayBy == 9 ? monthList.length-12 : monthList.length; 
-                for (var j = 0; j < mL; j+=12) {
+            } else {
+                let mL = this.state.xAxisDisplayBy == 9 ? monthList.length - 12 : monthList.length;
+                for (var j = 0; j < mL; j += 12) {
                     data = [];
-                    if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+                    if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
                         data[0] = moment(monthList[j]).add(12, "months").format("YYYY-MM-DD");
-                    }else{
+                    } else {
                         data[0] = moment(monthList[j]).format("YYYY-MM-DD");
                     }
-                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                     var total = 0;
                     var totalPer = 0;
                     for (var k = 0; k < nodeVal.length; k++) {
@@ -701,7 +632,6 @@ class ModelingValidation extends Component {
                         total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
-                    
                     for (var k = 0; k < nodeVal.length; k++) {
                         var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
                         var calculatedValueTotal = 0;
@@ -724,11 +654,9 @@ class ModelingValidation extends Component {
                     data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                     dataArr.push(data);
                 }
-
                 for (var j = 0; j < monthList.length; j++) {
                     data = [];
                     data[0] = moment(monthList[j]).format("YYYY-MM-DD");
-                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                     var total = 0;
                     var totalPer = 0;
                     for (var k = 0; k < nodeVal.length; k++) {
@@ -747,7 +675,6 @@ class ModelingValidation extends Component {
                         total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
-
                     for (var k = 0; k < nodeVal.length; k++) {
                         var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
                         var calculatedValueTotal = 0;
@@ -772,33 +699,20 @@ class ModelingValidation extends Component {
                 }
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             var json = [];
             var options = {
                 data: dataArr,
                 columnDrag: true,
-                // colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns,
-                // text: {
-                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     show: '',
-                //     entries: '',
-                // },
                 onload: this.loaded,
                 pagination: false,
                 search: false,
                 defaultColWidth: 120,
                 columnSorting: false,
-                // tableOverflow: true,
-                // tableWidth: "100%",
                 editable: false,
                 wordWrap: true,
                 allowInsertColumn: false,
@@ -816,26 +730,16 @@ class ModelingValidation extends Component {
             };
             var dataEl = jexcel(document.getElementById("tableDiv"), options);
             this.el = dataEl;
-
             var options2 = {
                 data: dataArr2,
                 columnDrag: true,
-                // colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns2,
-                // text: {
-                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                //     show: '',
-                //     entries: '',
-                // },
                 onload: this.loaded,
                 pagination: false,
                 search: false,
                 defaultColWidth: 120,
                 columnSorting: false,
-                // tableOverflow: true,
-                // tableWidth: "100%",
                 editable: false,
                 wordWrap: true,
                 allowInsertColumn: false,
@@ -853,7 +757,6 @@ class ModelingValidation extends Component {
             };
             var dataEl2 = jexcel(document.getElementById("tableDiv2"), options2);
             this.el = dataEl2;
-
             this.setState({
                 nodeDataModelingList: [{}],
                 monthList: monthList,
@@ -866,13 +769,9 @@ class ModelingValidation extends Component {
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-            
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 nodeDataModelingList: [],
                 loading: false,
@@ -881,11 +780,9 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
-
     setLevelId(e) {
         this.setState({ loading: true })
         var levelId = e.target.value;
@@ -901,9 +798,7 @@ class ModelingValidation extends Component {
             } else {
                 flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             }
-
             var flatData = flatDataForLevel[0];
-            var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
             var levelListFilter = treeListFiltered.levelList != undefined ? treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0] : undefined;
             levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
             var nodeList = [];
@@ -939,7 +834,6 @@ class ModelingValidation extends Component {
             }, () => {
                 this.getData();
             })
-
         } else {
             this.setState({
                 levelId: levelId,
@@ -954,7 +848,6 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     getVersionList() {
         this.setState({
             loading: true
@@ -976,7 +869,7 @@ class ModelingValidation extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({versionId:newVList[v].versionId,createdDate:newVList[v].createdDate})
+                versionList.push({ versionId: newVList[v].versionId, createdDate: newVList[v].createdDate })
             }
             var versionId = "";
             var event = {
@@ -995,19 +888,13 @@ class ModelingValidation extends Component {
                 versionList: versionList,
                 loading: false
             }, () => {
-                // if (versionId != "") {
                 this.setVersionId(event)
-                // }
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
-
             this.el = jexcel(document.getElementById("tableDiv2"), '');
-            // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv2"), true);
-
             this.setState({
                 versionList: [],
                 versionId: "",
@@ -1028,14 +915,11 @@ class ModelingValidation extends Component {
             })
         }
     }
-
     componentDidMount() {
         this.setState({ loading: true });
-        // this.getOfflineDatasetList();
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                // console.log("responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
@@ -1065,7 +949,6 @@ class ModelingValidation extends Component {
             }
         );
     }
-
     getOfflineDatasetList() {
         this.setState({
             loading: true
@@ -1083,8 +966,6 @@ class ModelingValidation extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-
-
                 var unitTransaction = db1.transaction(['unit'], 'readwrite');
                 var unitOs = unitTransaction.objectStore('unit');
                 var unitRequest = unitOs.getAll();
@@ -1110,12 +991,12 @@ class ModelingValidation extends Component {
                                     id: myResult[mr].programId,
                                     name: getLabelText(programNameJson, this.state.lang),
                                     code: myResult[mr].programCode,
-                                    versionList: [{ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate }]
+                                    versionList: [{ versionId: myResult[mr].version + "  (Local)", createdDate: programData.currentVersion.createdDate }]
                                 }
                                 datasetList.push(json)
                             } else {
                                 var existingVersionList = datasetList[index].versionList;
-                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
+                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)", createdDate: programData.currentVersion.createdDate })
                                 datasetList[index].versionList = existingVersionList
                             }
                         }
@@ -1142,40 +1023,36 @@ class ModelingValidation extends Component {
                         unitList: unitList,
                         loading: false
                     }, () => {
-                        // if (datasetId != "") {
                         this.setDatasetId(event);
-                        // }
                     })
                 }.bind(this)
             }.bind(this)
         }.bind(this)
     }
-
     handleRangeChange(value, text, listIndex) {
-
     }
     handleYearRangeChange(value) {
         let val;
-        if(this.state.xAxisDisplayBy == 2){
+        if (this.state.xAxisDisplayBy == 2) {
             val = {
-                from : {
-                    year : value[0].year(),
+                from: {
+                    year: value[0].year(),
                     month: 1,
                 },
-                to : {
-                    year : value[1].year(),
-                    month : 12,
+                to: {
+                    year: value[1].year(),
+                    month: 12,
                 }
             }
-        }else{
+        } else {
             val = {
-                from : {
-                    year : value[0].year(),
+                from: {
+                    year: value[0].year(),
                     month: this.state.rangeValue.from.month,
                 },
-                to : {
-                    year : value[1].year(),
-                    month : this.state.rangeValue.to.month,
+                to: {
+                    year: value[1].year(),
+                    month: this.state.rangeValue.to.month,
                 }
             }
         }
@@ -1187,19 +1064,14 @@ class ModelingValidation extends Component {
         this.setState({ rangeValue: value }, () => {
             this.getData()
         })
-
     }
-
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
-
     formatter = value => {
-
         var cell1 = value
         cell1 += '';
         var x = cell1.split('.');
@@ -1211,17 +1083,13 @@ class ModelingValidation extends Component {
         }
         return x1 + x2;
     }
-
     exportPDF() {
         const addFooters = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -1229,28 +1097,15 @@ class ModelingValidation extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
-
             const pageCount = doc.internal.getNumberOfPages()
-
-
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(12)
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-
                 doc.setFontSize(8)
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
@@ -1270,10 +1125,6 @@ class ModelingValidation extends Component {
                     align: 'right'
                 })
                 doc.setFontSize(TITLE_FONT)
-
-                /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
-                });*/
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.modelingValidation'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
@@ -1284,98 +1135,73 @@ class ModelingValidation extends Component {
                     doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
                         align: 'left'
                     })
-
                 }
-
             }
         }
-
-
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal')
         doc.setTextColor("#002f6c");
-
-
         var y = 110;
         var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
         planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
         planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
         planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit1') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
         planningText = doc.splitTextToSize(i18n.t('static.common.node') + ' : ' + this.state.nodeLabelArr.join('; '), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
         planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.xAxisDisplay') + ' : ' + document.getElementById("xAxisDisplayBy").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
@@ -1383,51 +1209,24 @@ class ModelingValidation extends Component {
         let rVFrom = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.from) : this.state.rangeValue.from.year;
         let rVTo = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.to) : this.state.rangeValue.to.year;
         planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + rVFrom + ' ~ ' + rVTo, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
-
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-
-        // planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
-        // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        // y = y + 10;
-        // for (var i = 0; i < planningText.length; i++) {
-        //     if (y > doc.internal.pageSize.height - 100) {
-        //         doc.addPage();
-        //         y = 80;
-
-        //     }
-        //     doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-        //     y = y + 10;
-        // }
-
-
         y = y + 10;
         doc.text(i18n.t('static.modelingValidation.yAxisDisplay') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
         y = y + 10;
-
-
-
-
-
-        //   const title = i18n.t('static.dashboard.globalconsumption');
         var canvas = document.getElementById("cool-canvas");
-        //   //creates image
-
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
         let startY = y + 10
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
@@ -1455,7 +1254,7 @@ class ModelingValidation extends Component {
                             dataArr.push(this.formatter(ele[idx]));
                         }
                     } else if (item.type == 'calendar') {
-                        if(this.state.xAxisDisplayBy == 1)
+                        if (this.state.xAxisDisplayBy == 1)
                             dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
                         else
                             dataArr.push(moment(ele[idx]).format("YYYY"));
@@ -1463,7 +1262,6 @@ class ModelingValidation extends Component {
                         dataArr.push(ele[idx]);
                     }
                 }
-
             })
             dataArr1.push(dataArr);
         })
@@ -1475,14 +1273,9 @@ class ModelingValidation extends Component {
             head: [columns],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
-
         };
-
-
-        //doc.text(title, marginLeft, 40);
         doc.autoTable(content);
-
-        if(this.state.xAxisDisplayBy > 1){
+        if (this.state.xAxisDisplayBy > 1) {
             var columns2 = [];
             this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { columns2.push(item.title) });
             var dataArr = [];
@@ -1503,35 +1296,25 @@ class ModelingValidation extends Component {
                             dataArr.push(ele[idx]);
                         }
                     }
-
                 })
                 dataArr1.push(dataArr);
             })
             const data2 = dataArr1;
-            // doc.addPage()
             let content2 = {
                 margin: { top: 80, bottom: 50 },
                 startY: 40 + doc.autoTable.previous.finalY,
                 head: [columns2],
                 body: data2,
                 styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
-
             };
             doc.autoTable(content2);
         }
         addHeaders(doc)
         addFooters(doc)
         doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
-        //creates PDF from img
-        /*  var doc = new jsPDF('landscape');
-          doc.setFontSize(20);
-          doc.text(15, 15, "Cool Chart");
-          doc.save('canvas.pdf');*/
     }
-
     exportCSV() {
         var csvRow = [];
-
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
@@ -1542,7 +1325,6 @@ class ModelingValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-
         csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -1551,7 +1333,7 @@ class ModelingValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit1')  + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit1') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.nodeLabelArr.map(ele =>
             csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20').replaceAll('#', '%23') + '"'))
@@ -1562,29 +1344,13 @@ class ModelingValidation extends Component {
         let rVTo = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.to) : this.state.rangeValue.to.year;
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + rVFrom + ' ~ ' + rVTo).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        
-        // csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        // csvRow.push('')
-        
         csvRow.push('"' + (i18n.t('static.modelingValidation.yAxisDisplay') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
-
-
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
-        var columns = [];
-        // columns.push(i18n.t('static.common.level'));
-        // columns.push(i18n.t('static.supplyPlan.type'));
-        // columns.push(i18n.t('static.forecastingunit.forecastingunit'));
-        // columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
-        // columns.push(i18n.t('static.common.product'));
-        // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
-        // columns.push(i18n.t('static.productValidation.cost'));
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
-
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
@@ -1594,7 +1360,7 @@ class ModelingValidation extends Component {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else if (item.type == 'calendar') {
-                        if(this.state.xAxisDisplayBy == 1)
+                        if (this.state.xAxisDisplayBy == 1)
                             B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                         else
                             B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
@@ -1605,17 +1371,13 @@ class ModelingValidation extends Component {
             })
             A.push(this.addDoubleQuoteToRowContent(B));
         })
-
-
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
-
         csvRow.push('')
-        if(this.state.xAxisDisplayBy > 1){
+        if (this.state.xAxisDisplayBy > 1) {
             const headers2 = [];
             this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { headers2[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
-
             var A = [this.addDoubleQuoteToRowContent(headers2)];
             var B = []
             this.state.dataEl2.getJson(null, false).map(ele => {
@@ -1625,7 +1387,7 @@ class ModelingValidation extends Component {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
                             B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                         } else if (item.type == 'calendar') {
-                            if(this.state.xAxisDisplayBy == 1)
+                            if (this.state.xAxisDisplayBy == 1)
                                 B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                             else
                                 B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
@@ -1636,8 +1398,6 @@ class ModelingValidation extends Component {
                 })
                 A.push(this.addDoubleQuoteToRowContent(B));
             })
-
-
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
             }
@@ -1650,13 +1410,11 @@ class ModelingValidation extends Component {
         document.body.appendChild(a)
         a.click()
     }
-
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
-
         var chartOptions = {
             title: {
                 display: true,
@@ -1707,7 +1465,7 @@ class ModelingValidation extends Component {
                     {
                         id: 'xAxis2',
                         gridLines: {
-                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                            drawOnChartArea: false,
                         },
                         ticks: {
                             callback: function (label) {
@@ -1744,10 +1502,7 @@ class ModelingValidation extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
                         var cell1 = value
                         cell1 += '';
                         var x = cell1.split('.');
@@ -1766,7 +1521,6 @@ class ModelingValidation extends Component {
                 }
             },
         }
-
         let bar = {}
         var datasetListForGraph = [];
         var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
@@ -1789,47 +1543,28 @@ class ModelingValidation extends Component {
                 })
             }
         }
-        // var aggregatedData = [];
-        // for (var i = 0; i < datasetListForGraph.length; i++) {
-        //     var index = aggregatedData.findIndex(c => c.label == datasetListForGraph[i].label);
-        //     if (index == -1) {
-        //         var filter = datasetListForGraph.filter(c => c.label == datasetListForGraph[i].label);
-        //         var dataArr = filter[0].data;
-        //         for (var f = 1; f < filter.length; f++) {
-        //             filter[f].data.map(function (num, idx) {
-        //                 dataArr[idx] = (Number(num) + Number(dataArr[idx])).toFixed(2);
-        //             })
-        //         }
-        //         aggregatedData.push({
-        //             label: filter[0].label,
-        //             data: dataArr,
-        //             backgroundColor: filter[0].backgroundColor,
-        //             stack: filter[0].stack
-        //         })
-        //     }
-        // }
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
-            if(this.state.xAxisDisplayBy == 1){
+            if (this.state.xAxisDisplayBy == 1) {
                 bar = {
                     labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
                     datasets: datasetListForGraph
                 };
-            }else{
-                if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+            } else {
+                if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
                     let arr = [...new Set(this.state.monthList.map(ele => moment(ele).add(12, 'months').format("YYYY")))];
                     arr.pop();
                     bar = {
                         labels: arr,
                         datasets: datasetListForGraph
                     };
-                }else if(this.state.xAxisDisplayBy > 8){
+                } else if (this.state.xAxisDisplayBy > 8) {
                     let arr = [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))];
                     arr.pop();
                     bar = {
                         labels: arr,
                         datasets: datasetListForGraph
                     };
-                }else{
+                } else {
                     bar = {
                         labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))],
                         datasets: datasetListForGraph
@@ -1837,31 +1572,24 @@ class ModelingValidation extends Component {
                 }
             }
         }
-
-
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        const checkOnline = localStorage.getItem('sessionType');
-
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {/* {item.name} */}
                         {item.code}
                     </option>
                 )
             }, this);
-
         const { versionList } = this.state;
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
@@ -1871,7 +1599,6 @@ class ModelingValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { treeList } = this.state;
         let trees = treeList.length > 0
             && treeList.map((item, i) => {
@@ -1881,7 +1608,6 @@ class ModelingValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { scenarioList } = this.state;
         let scenarios = scenarioList.length > 0
             && scenarioList.map((item, i) => {
@@ -1891,7 +1617,6 @@ class ModelingValidation extends Component {
                     </option>
                 )
             }, this);
-
         const { levelList } = this.state;
         const levelListForNames = this.state.levelList.length > 0 && this.state.treeListFiltered.levelList != undefined ? this.state.treeListFiltered.levelList : [];
         let levels = levelList.length > 0
@@ -1901,7 +1626,7 @@ class ModelingValidation extends Component {
                     let levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? " (" + getLabelText(levelListFilter.unit.label, this.state.lang) + ")" : "";
                     return (
                         <option key={i} value={item}>
-                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + levelUnit : i18n.t("static.common.level") + " " + item }
+                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + levelUnit : i18n.t("static.common.level") + " " + item}
                         </option>
                     )
                 } else {
@@ -1912,40 +1637,23 @@ class ModelingValidation extends Component {
                     )
                 }
             }, this);
-
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/productValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.productValidation')}</a></span>
-                        {/* {this.state.dataList.length > 0 && */}
-                        {/* <div className="card-header-actions">
-                            <a className="card-header-action">
-
-                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
-
-
-                            </a>
-                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
-                        </div> */}
-                        {/* } */}
                     </div>
                     <div className="card-header-actions pr-lg-3">
                         {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         <a className="card-header-action" style={{ float: 'right' }}>
-
                             {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
-
-
                         </a>
-
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
@@ -1962,15 +1670,12 @@ class ModelingValidation extends Component {
                                                             name="datasetId"
                                                             id="datasetId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setDatasetId(e); }}
                                                             value={this.state.datasetId}
-
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {datasets}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -1983,15 +1688,12 @@ class ModelingValidation extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setVersionId(e); }}
                                                             value={this.state.versionId}
-
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {versions}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2004,15 +1706,12 @@ class ModelingValidation extends Component {
                                                             name="treeId"
                                                             id="treeId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setTreeId(e); }}
                                                             value={this.state.treeId}
-
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {trees}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2025,15 +1724,12 @@ class ModelingValidation extends Component {
                                                             name="scenarioId"
                                                             id="scenarioId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setScenarioId(e); }}
                                                             value={this.state.scenarioId}
-
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {scenarios}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2051,10 +1747,8 @@ class ModelingValidation extends Component {
                                                             name="levelId"
                                                             id="levelId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setLevelId(e); }}
                                                             value={this.state.levelId}
-
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {levels}
@@ -2062,37 +1756,18 @@ class ModelingValidation extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            {/* <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.levelUnit')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="text"
-                                                            disabled
-                                                            name="levelUnit"
-                                                            id="levelUnit"
-                                                            bsSize="sm"
-                                                            value={this.state.levelUnit}
-                                                        >
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup> */}
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.node')}</Label>
                                                 <span className="reportdown-box-icon fa fa-angle-down ml-1"></span>
                                                 <div className="controls svgdropdown">
-                                                    {/* <InputGroup className="box"> */}
                                                     <MultiSelect
                                                         name="nodeId"
                                                         id="nodeId"
                                                         options={this.state.nodeList && this.state.nodeList.length > 0 ? this.state.nodeList : []}
                                                         value={this.state.nodeVal}
                                                         onChange={(e) => { this.setNodeVal(e) }}
-                                                        // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
-
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
@@ -2122,7 +1797,6 @@ class ModelingValidation extends Component {
                                                             <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
                                                             <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2138,7 +1812,6 @@ class ModelingValidation extends Component {
                                                             value={rangeValue}
                                                             lang={pickerLang}
                                                             key={JSON.stringify(rangeValue)}
-                                                            //theme="light"
                                                             onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
@@ -2153,7 +1826,6 @@ class ModelingValidation extends Component {
                                                             allowClear={false}
                                                             id="date"
                                                             name="date"
-                                                            //  style={{ width: '450px', marginLeft:'20px'}}
                                                             onChange={this.handleYearRangeChange}
                                                             value={[
                                                                 moment(rangeValue.from.year.toString()),
@@ -2169,7 +1841,6 @@ class ModelingValidation extends Component {
                                                             allowClear={false}
                                                             id="date"
                                                             name="date"
-                                                            //  style={{ width: '450px', marginLeft:'20px'}}
                                                             onChange={this.handleYearRangeChange}
                                                             value={[
                                                                 moment(rangeValue.from.year.toString()),
@@ -2194,7 +1865,6 @@ class ModelingValidation extends Component {
                                                             <option value="1">{i18n.t('static.modelingValidation.number')}</option>
                                                             <option value="2">{i18n.t('static.whatIf.percentage')}</option>
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2210,7 +1880,6 @@ class ModelingValidation extends Component {
                                                     <div className="chart-wrapper chart-graph-report">
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                         <div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2218,52 +1887,27 @@ class ModelingValidation extends Component {
                                                     <button className="mr-1 mb-2 float-right btn btn-info btn-md" onClick={this.toggledata}>
                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                     </button>
-
                                                 </div>
                                             </div>}
-
-
-
-
                                     </div>
-
-
-
-                                    {/* {this.state.show && */}
                                     <div className="row">
                                         <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
-
-                                            {/* // <div className="table-scroll">
-                                                    // <div className="table-wrap table-responsive"> */}
                                             <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                             </div>
-                                            {/* // </div>
-                                                // </div> */}
-
                                         </div>
                                     </div>
-
                                     <div className="row displayBlock">
                                         <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
-
-                                            {/* // <div className="table-scroll">
-                                                    // <div className="table-wrap table-responsive"> */}
                                             <div id="tableDiv2" className="jexcelremoveReadonlybackground consumptionDataEntryTable TableWidth100" style={{ display: this.state.show && !this.state.loading && this.state.xAxisDisplayBy > 1 ? "block" : "none" }}>
                                             </div>
-                                            {/* // </div>
-                                                // </div> */}
-
                                         </div>
                                     </div>
-                                    {/* } */}
                                 </Col>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
                                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                             <div class="spinner-border blue ml-4" role="status">
-
                                             </div>
                                         </div>
                                     </div>
@@ -2276,5 +1920,4 @@ class ModelingValidation extends Component {
         );
     }
 }
-
 export default ModelingValidation;

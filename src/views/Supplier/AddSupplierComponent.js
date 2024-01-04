@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormText, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import SupplierService from "../../api/SupplierService";
-import RealmService from "../../api/RealmService";
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { API_URL } from '../../Constants';
-
+import RealmService from "../../api/RealmService";
+import SupplierService from "../../api/SupplierService";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 let initialValues = {
   realmId: [],
   supplier: ""
@@ -23,30 +21,7 @@ const validationSchema = function (values) {
     supplier: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
       .required(i18n.t('static.supplier.suppliertext'))
-
   })
-}
-
-const validate = (getValidationSchema) => {
-  return (values) => {
-    const validationSchema = getValidationSchema(values)
-    try {
-      validationSchema.validateSync(values, { abortEarly: false })
-      return {}
-    } catch (error) {
-      return getErrorsFromValidationError(error)
-    }
-  }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-  const FIRST_ERROR = 0
-  return validationError.inner.reduce((errors, error) => {
-    return {
-      ...errors,
-      [error.path]: error.errors[FIRST_ERROR],
-    }
-  }, {})
 }
 class AddSupplierComponent extends Component {
   constructor(props) {
@@ -82,7 +57,6 @@ class AddSupplierComponent extends Component {
       return "";
     }
   }
-
   dataChange(event) {
     let { supplier } = this.state;
     if (event.target.name == "realmId") {
@@ -96,38 +70,14 @@ class AddSupplierComponent extends Component {
     },
       () => { });
   };
-
-  touchAll(setTouched, errors) {
-    setTouched({
-      realmId: true,
-      supplier: true
-    }
-    );
-    this.validateForm(errors);
-  }
-  validateForm(errors) {
-    this.findFirstError('supplierForm', (fieldName) => {
-      return Boolean(errors[fieldName])
-    })
-  }
-  findFirstError(formName, hasError) {
-    const form = document.forms[formName]
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus()
-        break
-      }
-    }
-  }
-
+  
   componentDidMount() {
-    // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
         var listArray = response.data;
         listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
           return itemLabelA > itemLabelB ? 1 : -1;
         });
         this.setState({
@@ -137,13 +87,11 @@ class AddSupplierComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              // message: 'static.unkownError',
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
             switch (error.response ? error.response.status : "") {
-
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
                 break;
@@ -174,14 +122,11 @@ class AddSupplierComponent extends Component {
           }
         }
       );
-
     let realmId = AuthenticationService.getRealmId();
     if (realmId != -1) {
-      // document.getElementById('realmId').value = realmId;
       initialValues = {
         realmId: realmId
       }
-
       let { supplier } = this.state;
       supplier.realm.id = realmId;
       document.getElementById("realmId").disabled = true;
@@ -189,11 +134,9 @@ class AddSupplierComponent extends Component {
         supplier
       },
         () => {
-
         })
     }
   }
-
   render() {
     const { realms } = this.state;
     let realmList = realms.length > 0
@@ -211,21 +154,16 @@ class AddSupplierComponent extends Component {
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
-              {/* <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-              </CardHeader> */}
               <Formik
                 enableReinitialize={true}
                 initialValues={initialValues}
-                validate={validate(validationSchema)}
+                validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   this.setState({
                     loading: true
                   })
-                  // console.log("Submit clicked");
                   SupplierService.addSupplier(this.state.supplier)
                     .then(response => {
-                      // console.log("Response->", response);
                       if (response.status == 200) {
                         this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {
@@ -240,13 +178,11 @@ class AddSupplierComponent extends Component {
                       error => {
                         if (error.message === "Network Error") {
                           this.setState({
-                            // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                           });
                         } else {
                           switch (error.response ? error.response.status : "") {
-
                             case 401:
                               this.props.history.push(`/login/static.message.sessionExpired`)
                               break;
@@ -332,9 +268,7 @@ class AddSupplierComponent extends Component {
                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                           <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                           </div>
                         </div>
@@ -343,43 +277,31 @@ class AddSupplierComponent extends Component {
                         <FormGroup>
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                           <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                          <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                          <Button type="submit" size="md" color="success" className="float-right mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                           &nbsp;
                         </FormGroup>
                       </CardFooter>
                     </Form>
-
                   )} />
-
             </Card>
           </Col>
         </Row>
-
-        {/* <div>
-          <h6>{i18n.t(this.state.message)}</h6>
-          <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div> */}
       </div>
     );
   }
   cancelClicked() {
     this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
-
   resetClicked() {
     let { supplier } = this.state;
-
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
       supplier.realm.id = ''
     }
-
     supplier.label.label_en = ''
-
     this.setState({
       supplier
     },
       () => { });
   }
 }
-
 export default AddSupplierComponent;
