@@ -335,7 +335,101 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         onsearch: function (el) {
                         },
                         onfilter: function (el) {
-                        },
+                            var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+                        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                var lastEditableDate = "";
+                if (rowData[2] == 1) {
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+                } else {
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+                }
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[15] > 0) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    }
+                }else{
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
+                } else {
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[10] == false) {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                            cell.classList.add('shipmentEntryDoNotInclude');
+                        }
+                    } else {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                            cell.classList.remove('shipmentEntryDoNotInclude');
+                        }
+                    }
+                }
+            } else {
+                if (rowData[2] == 2) {
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.remove('readonly');
+                }
+                if (rowData[15] > 0) {
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.remove('readonly');
+                }
+                if (rowData[10] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
+            }
+                    } catch (err) {
+                    }
+                }
+                        }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y != null) {
