@@ -878,7 +878,15 @@ class ShipmentGlobalDemandView extends Component {
         })
         this.setState({
             countryValues: countrysId.map(ele => ele),
-            countryLabels: countrysId.map(ele => ele.label)
+            countryLabels: countrysId.map(ele => ele.label),
+            programValues: [],
+            programLabels: [],
+            data: [],
+            fundingSourceSplit: [],
+            planningUnitSplit: [],
+            procurementAgentSplit: [],
+            table1Headers: [],
+            programLst:[]
         }, () => {
             this.getPrograms();
         })
@@ -1068,6 +1076,7 @@ class ShipmentGlobalDemandView extends Component {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
+            if(newCountryList.length>0){
             DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
                 .then(response => {
                     var listArray = response.data;
@@ -1121,6 +1130,7 @@ class ShipmentGlobalDemandView extends Component {
                         }
                     }
                 );
+            }
         } else {
             this.consolidatedProgramList()
         }
@@ -1442,7 +1452,6 @@ class ShipmentGlobalDemandView extends Component {
                     </option>
                 )
             }, this);
-        
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
@@ -1482,7 +1491,6 @@ class ShipmentGlobalDemandView extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >

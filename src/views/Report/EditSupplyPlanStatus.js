@@ -3713,8 +3713,8 @@ class EditSupplyPlanStatus extends Component {
             sorting: function (direction, column) {
                 if(column!=19){
                 return function (a, b) {
-                    var valueA = this.el.getValueFromCoords(column, a[0], true);
-                    var valueB = this.el.getValueFromCoords(column, b[0], true);
+                    var valueA = this.el.getValueFromCoords(column, a[0], true).toLowerCase();
+                    var valueB = this.el.getValueFromCoords(column, b[0], true).toLowerCase();
 
                     // Consider blank rows in the sorting
                     if (!direction) {

@@ -2049,7 +2049,7 @@ export default class ManualTagging extends Component {
             budgetId: -1
         })
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
-            let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+            let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? [] : this.state.productCategoryValues.map(ele => (ele.value).toString()))
             let planningUnitIdList = (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
             var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.payload.productCategoryId.toString()));
             var sortOrderList = [];
