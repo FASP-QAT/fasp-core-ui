@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Dropdown, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import imageHelp from '../../assets/img/help-icon.png';
+import BranchTemplateTicketComponent from './BranchTemplateTicketComponent';
 import BudgetTicketComponent from './BudgetTicketComponent';
 import BugReportTicketComponent from './BugReportTicketComponent';
 import DataSourceTicketComponent from './DataSourceTicketComponent';
@@ -12,6 +13,7 @@ import OrganisationTicketComponent from './OrganisationTicketComponent';
 import OrganisationTypeTicketComponent from './OrganisationTypeTicketComponent';
 import PlanningUnitTicketComponent from './PlanningUnitTicketComponent';
 import ProcurementAgentTicketComponent from './ProcurementAgentTicketComponent';
+import ProcurementAgentTypeTicketComponent from './ProcurementAgentTypeTicketComponent';
 import ProductCategoryTicketComponent from './ProductCategoryTicketComponent';
 import ProgramTicketComponent from './ProgramTicketComponent';
 import RealmCountryRegionTicketComponent from './RealmCountryRegionTicketComponent';
@@ -19,6 +21,7 @@ import RealmCountryTicketComponent from './RealmCountryTicketComponent';
 import RealmTicketComponent from './RealmTicketComponent';
 import TechnicalAreaTicketComponent from './TechnicalAreaTicketComponent';
 import TracerCategoryTicketComponent from './TracerCategoryTicketComponent';
+import TreeTemplateTicketComponent from './TreeTemplateTicketComponent';
 import UsagePeriodTicketComponent from './UsagePeriodTicketComponent';
 import UserTicketComponent from './UserTicketComponent';
 import { confirmAlert } from 'react-confirm-alert'; 
@@ -37,6 +40,7 @@ import EditOrganisationTicketComponent from './EditOrganisationTicketComponent';
 import EditOrganisationTypeTicketComponent from './EditOrganisationTypeTicketComponent';
 import EditPlanningUnitTicketComponent from './EditPlanningUnitTicketComponent';
 import EditProcurementAgentTicketComponent from './EditProcurementAgentTicketComponent';
+import EditProcurementAgentTypeTicketComponent from './EditProcurementAgentTypeTicketComponent';
 import EditProductCategoryTicketComponent from './EditProductCategoryTicketComponent';
 import EditProgramTicketComponent from './EditProgramTicketComponent';
 import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
@@ -45,6 +49,8 @@ import EditRealmTicketComponent from './EditRealmTicketComponent';
 import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
 import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
 import EditUsagePeriodTicketComponent from './EditUsagePeriodTicketComponent';
+import EditBranchTemplateTicketComponent from './EditBranchTemplateTicketComponent';
+import EditTreeTemplateTicketComponent from './EditTreeTemplateTicketComponent';
 export default class InitialTicketPageComponent extends Component {
   constructor(props) {
     super(props);
@@ -63,6 +69,7 @@ export default class InitialTicketPageComponent extends Component {
       showOnlyProgramMaster: 0,
       showOnlyRealmMaster: 0,
       showOnlyApplicationMaster: 0,
+      showBranchTemplateData: 0,
       showBugReport: 0,
       showPlanningUnitData: 0,
       showForecastingUnitData: 0,
@@ -74,6 +81,7 @@ export default class InitialTicketPageComponent extends Component {
       showDataSourceData: 0,
       showFundingSourceData: 0,
       showProcurementAgentData: 0,
+      showProcurementAgentTypeData: 0,
       showSupplierData: 0,
       showTechnicalAreaData: 0,
       showOrganizationData: 0,
@@ -102,10 +110,13 @@ export default class InitialTicketPageComponent extends Component {
       showEditPlanningUnitData: 0,
       showEditProductCategoryData: 0,
       showEditProcurementAgentData: 0,
+      showEditProcurementAgentTypeData: 0,
       showEditProgramData: 0,
       showEditRealmData: 0,
       showEditRealmCountryData: 0,
       showEditRealmCountryRegionData: 0,
+      showEditBranchTemplateData: 0,
+      showEditTreeTemplateData: 0,
       showEditTechnicalAreaData: 0,
       showEditTracerCategoryData: 0,
       showEditOrganisationTypeData: 0,
@@ -142,6 +153,7 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyProgramMaster: 0,
         showOnlyRealmMaster: 0,
         showOnlyApplicationMaster: 0,
+        showBranchTemplateData: 0,
         showBugReport: 0,
         showPlanningUnitData: 0,
         showForecastingUnitData: 0,
@@ -153,6 +165,7 @@ export default class InitialTicketPageComponent extends Component {
         showDataSourceData: 0,
         showFundingSourceData: 0,
         showProcurementAgentData: 0,
+        showProcurementAgentTypeData: 0,
         showSupplierData: 0,
         showTechnicalAreaData: 0,
         showOrganizationData: 0,
@@ -181,10 +194,13 @@ export default class InitialTicketPageComponent extends Component {
         showEditPlanningUnitData: 0,
         showEditProductCategoryData: 0,
         showEditProcurementAgentData: 0,
+        showEditProcurementAgentTypeData: 0,
         showEditProgramData: 0,
         showEditRealmData: 0,
         showEditRealmCountryData: 0,
         showEditRealmCountryRegionData: 0,
+        showEditBranchTemplateData: 0,
+        showEditTreeTemplateData: 0,
         showEditTechnicalAreaData: 0,
         showEditTracerCategoryData: 0,
         showEditOrganisationTypeData: 0,
@@ -343,6 +359,14 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyProgramMaster: 0,
         showProcurementAgentData: 1
       });
+    } else if (formNo == 24) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showProcurementAgentTypeData: 1
+      });
     } else if (formNo == 9) {
       this.setState({
         changeadditional: !this.state.changeadditional,
@@ -455,6 +479,14 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyProgramMaster: 0,
         showTreeTemplateData: 1
       });
+    } else if (formNo == 23) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showOnlyMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showBranchTemplateData: 1
+      });
     }
   }
   backFromAddMasterForms(masterFormNo) {
@@ -496,6 +528,11 @@ export default class InitialTicketPageComponent extends Component {
     } else if (masterFormNo == 8) {
       this.setState({
         showProcurementAgentData: 0,
+        showOnlyMaster: 1
+      });
+    } else if (masterFormNo == 24) {
+      this.setState({
+        showProcurementAgentTypeData: 0,
         showOnlyMaster: 1
       });
     } else if (masterFormNo == 9) {
@@ -568,6 +605,11 @@ export default class InitialTicketPageComponent extends Component {
         showTreeTemplateData: 0,
         showOnlyMaster: 1
       });
+    } else if (masterFormNo == 23) {
+      this.setState({
+        showBranchTemplateData: 0,
+        showOnlyMaster: 1
+      });
     }
   }
   showOnlyEditMasterForms(formNo) {
@@ -634,6 +676,14 @@ export default class InitialTicketPageComponent extends Component {
         showBugReport: 0,
         showOnlyProgramMaster: 0,
         showEditProcurementAgentData: 1
+      });
+    } else if (formNo == 24) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditProcurementAgentTypeData: 1
       });
     } else if (formNo == 9) {
       this.setState({
@@ -715,6 +765,22 @@ export default class InitialTicketPageComponent extends Component {
         showOnlyProgramMaster: 0,
         showEditModelingTypeData: 1
       });
+    } else if (formNo == 22) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditTreeTemplateData: 1
+      });
+    } else if (formNo == 23) {
+      this.setState({
+        changeadditional: !this.state.changeadditional,
+        showEditMaster: 0,
+        showBugReport: 0,
+        showOnlyProgramMaster: 0,
+        showEditBranchTemplateData: 1
+      });
     }
   }
   backFromEditMasterForms(masterFormNo) {
@@ -756,6 +822,11 @@ export default class InitialTicketPageComponent extends Component {
     } else if (masterFormNo == 8) {
       this.setState({
         showEditProcurementAgentData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 24) {
+      this.setState({
+        showEditProcurementAgentTypeData: 0,
         showEditMaster: 1
       });
     } else if (masterFormNo == 9) {
@@ -808,6 +879,16 @@ export default class InitialTicketPageComponent extends Component {
         showEditModelingTypeData: 0,
         showEditMaster: 1
       });
+    } else if (masterFormNo == 22) {
+      this.setState({
+        showEditTreeTemplateData: 0,
+        showEditMaster: 1
+      });
+    } else if (masterFormNo == 23) {
+      this.setState({
+        showEditBranchTemplateData: 0,
+        showEditMaster: 1
+      });
     }
   }
   render() {
@@ -847,6 +928,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showOnlyMaster == 1 && <div className="mt-2 mb-2">
                   <div><h4>{i18n.t('static.ticket.requestNewTo')}</h4></div><br></br>
                   <ListGroup>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(23) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dataset.BranchTreeTemplate')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -856,12 +938,14 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(24) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.procurementagenttype')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(10) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(11) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.realmcountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(12) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(13) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(14) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(22) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dataset.TreeTemplate')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(16) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Usage Period'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(17) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Forecast Method'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyAddMasterForms(18) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Modeling Type'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -873,6 +957,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showEditMaster == 1 && <div className="mt-2 mb-2">
                   <div><h4>{i18n.t('static.ticket.requestUpdateTo')}</h4></div><br></br>
                   <ListGroup>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(23) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dataset.BranchTreeTemplate')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(1) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.budget')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(2) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.datasource.datasource')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(4) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.forecastingunit.forecastingunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -882,12 +967,14 @@ export default class InitialTicketPageComponent extends Component {
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(6) }} action><i className="icon-note  icons helpclickicon mr-2"></i> {i18n.t('static.planningunit.planningunit')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(7) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.product.productcategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(8) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.procurementagent.procurementagent')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(24) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboard.procurementagenttype')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(9) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.program.programMaster')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(10) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.realm.realm')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(11) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.realmcountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(12) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dashboad.regioncountry')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(13) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.healtharea.healtharea')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(14) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.tracercategory.tracercategory')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                    <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(22) }} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.dataset.TreeTemplate')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(16) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Usage Period'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(17) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Forecast Method'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
                     <ListGroupItem className="list-group-item-help" tag="a" onClick={() => { this.showOnlyEditMasterForms(18) }} action><i className="icon-note icons helpclickicon mr-2"></i> {'Modeling Type'} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
@@ -898,6 +985,7 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
                 {this.state.showUserData == 1 && <UserTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showChangeRequest == 1 && <ChangeRequestTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
+                {this.state.showBranchTemplateData == 1 && <BranchTemplateTicketComponent toggleMaster={() => this.backFromAddMasterForms(23)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={() => this.backFromAddMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showFundingSourceData == 1 && <FundingSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(3)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
@@ -906,12 +994,14 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showPlanningUnitData == 1 && <PlanningUnitTicketComponent toggleMaster={() => this.backFromAddMasterForms(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showProductCategoryData == 1 && <ProductCategoryTicketComponent toggleMaster={() => this.backFromAddMasterForms(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showProcurementAgentData == 1 && <ProcurementAgentTicketComponent toggleMaster={() => this.backFromAddMasterForms(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
+                {this.state.showProcurementAgentTypeData == 1 && <ProcurementAgentTypeTicketComponent toggleMaster={() => this.backFromAddMasterForms(24)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showProgramData == 1 && <ProgramTicketComponent toggleMaster={() => this.backFromAddMasterForms(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showRealmData == 1 && <RealmTicketComponent toggleMaster={() => this.backFromAddMasterForms(10)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showRealmCountryData == 1 && <RealmCountryTicketComponent toggleMaster={() => this.backFromAddMasterForms(11)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showRealmCountryRegionData == 1 && <RealmCountryRegionTicketComponent toggleMaster={() => this.backFromAddMasterForms(12)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showTechnicalAreaData == 1 && <TechnicalAreaTicketComponent toggleMaster={() => this.backFromAddMasterForms(13)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showTracerCategoryData == 1 && <TracerCategoryTicketComponent toggleMaster={() => this.backFromAddMasterForms(14)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
+                {this.state.showTreeTemplateData == 1 && <TreeTemplateTicketComponent toggleMaster={() => this.backFromAddMasterForms(22)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showOrganisationTypeData == 1 && <OrganisationTypeTicketComponent toggleMaster={() => this.backFromAddMasterForms(15)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showUsagePeriodData == 1 && <UsagePeriodTicketComponent toggleMaster={() => this.backFromAddMasterForms(16)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showForecastMethodData == 1 && <ForecastMethodTicketComponent toggleMaster={() => this.backFromAddMasterForms(17)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
@@ -924,6 +1014,7 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showEditPlanningUnitData == 1 && <EditPlanningUnitTicketComponent toggleMaster={() => this.backFromEditMasterForms(6)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showEditProductCategoryData == 1 && <EditProductCategoryTicketComponent toggleMaster={() => this.backFromEditMasterForms(7)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state} />}
                 {this.state.showEditProcurementAgentData == 1 && <EditProcurementAgentTicketComponent toggleMaster={() => this.backFromEditMasterForms(8)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditProcurementAgentTypeData == 1 && <EditProcurementAgentTypeTicketComponent toggleMaster={() => this.backFromEditMasterForms(24)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditProgramData == 1 && <EditProgramTicketComponent toggleMaster={() => this.backFromEditMasterForms(9)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditRealmData == 1 && <EditRealmTicketComponent toggleMaster={() => this.backFromEditMasterForms(10)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditRealmCountryData == 1 && <EditRealmCountryTicketComponent toggleMaster={() => this.backFromEditMasterForms(11)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
@@ -934,6 +1025,8 @@ export default class InitialTicketPageComponent extends Component {
                 {this.state.showEditUsagePeriodData == 1 && <EditUsagePeriodTicketComponent toggleMaster={() => this.backFromEditMasterForms(16)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditForecastMethodData == 1 && <EditForecastMethodTicketComponent toggleMaster={() => this.backFromEditMasterForms(17)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
                 {this.state.showEditModelingTypeData == 1 && <EditModelingTypeTicketComponent toggleMaster={() => this.backFromEditMasterForms(18)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditBranchTemplateData == 1 && <EditBranchTemplateTicketComponent toggleMaster={() => this.backFromEditMasterForms(23)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
+                {this.state.showEditTreeTemplateData == 1 && <EditTreeTemplateTicketComponent toggleMaster={() => this.backFromEditMasterForms(22)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} />}
               </ModalBody>
             </div>
           </ModalBody>
