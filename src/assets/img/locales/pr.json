@@ -2862,7 +2862,7 @@
     "static.common.loading": "A carregar …",
     "static.country.currencytext": "Selecione a moeda",
     "static.mt.parentShipmentId": "Nº principal de embarque",
-    "static.tree.Change(#)": "Mudança (#)",
+    "static.tree.Change(#)": "Mudança Alvo (#)",
     "static.supplyPlan.artmisShipmentsDetails": "Detalhes de Embarques ARTMIS",
     "static.validation.selectTreeName": "Por favor insira o nome da árvore de previsão",
     "static.mt.selectPlanninfUnit": "Selecione a unidade de planeamento, por favor.",

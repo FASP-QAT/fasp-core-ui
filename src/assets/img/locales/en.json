@@ -2863,7 +2863,7 @@
     "static.common.loading": "Loading...",
     "static.country.currencytext": "Select currency",
     "static.mt.parentShipmentId": "Parent Shipment Id",
-    "static.tree.Change(#)": "Change (#)",
+    "static.tree.Change(#)": "Target Change (#)",
     "static.supplyPlan.artmisShipmentsDetails": "ARTMIS Shipment Details",
     "static.validation.selectTreeName": "Please enter tree name",
     "static.mt.selectPlanninfUnit": "Please select planning unit",

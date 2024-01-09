@@ -2863,7 +2863,7 @@
     "static.common.loading": "Chargement...",
     "static.country.currencytext": "Sélectionner la devise",
     "static.mt.parentShipmentId": "ID de lenvoi parent",
-    "static.tree.Change(#)": "Variation (#)",
+    "static.tree.Change(#)": "Variation cible (#)",
     "static.supplyPlan.artmisShipmentsDetails": "Détails de l`envoi ARTMIS",
     "static.validation.selectTreeName": "Veuillez saisir le nom de l'arbre de prévision",
     "static.mt.selectPlanninfUnit": "Veuillez sélectionner lunité de planification",
