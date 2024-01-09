@@ -2862,7 +2862,7 @@
     "static.common.loading": "Cargando...",
     "static.country.currencytext": "Seleccionar divisa",
     "static.mt.parentShipmentId": "ID de envío principal",
-    "static.tree.Change(#)": "Cambio (#)",
+    "static.tree.Change(#)": "Cambio objectivo(#)",
     "static.supplyPlan.artmisShipmentsDetails": "Detalles de pedidos de ARTMIS",
     "static.validation.selectTreeName": "Por favor ingrese el nombre del árbol de estimación",
     "static.mt.selectPlanninfUnit": "Seleccione el producto",

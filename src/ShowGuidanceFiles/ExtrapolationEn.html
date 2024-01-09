@@ -163,7 +163,39 @@
 						<p class="pl-lg-3" style="font-size: 13px;">QAT automatically calculates forecast error metrics using several 
 							methods. These include:
 							<ul style="font-size: 13px;">
-								<li>MAPE (Mean Absolute Percentage Error)</li>
+								<li>MAPE (Mean Absolute Percentage Error): can be interpreted as the average percentage
+									difference between predictions and their intended targets in the dataset. For example, if
+									MAPE is 15% then your predictions are on average 15% away from the actual values.</li>
+									<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MAPE.png"><br>
+
+									<li style="margin-top: 20px;">WAPE (Weighted Absolute Percentage Error): WAPE is an appropriate metric for when the
+										dataset used has low or intermittent values. A WAPE percentage of 5 means that the
+										forecast was off by 5% over the entire dataset for a certain evaluation period. Depending on
+										the use case, it is recommended to choose a model that gives the least WAPE value.</li>
+										<br><img class="img-fluid" src="../ShowGuidanceFiles/img/WAPE.png"><br>
+
+										<li style="margin-top: 20px;">RMSE (Root Mean Squared Error): RMSE can be interpreted as the average error that the
+											model's predictions have in comparison with the actual, with extra weight added to larger
+											prediction errors. Generally, the closer RMSE is to zero, the more accurate the model.</li>
+											<br><img class="img-fluid" src="../ShowGuidanceFiles/img/RMSE.png"><br>
+
+											<li style="margin-top: 20px;">MSE (Mean Squared Error): MSE is the aggregated mean of the squared difference between
+												the actuals and predictions. Large errors are highlighted due to this squaring. MSE is useful
+												when working on models where occasional large errors must be minimized. Generally, the
+												closer it is to 0, the more accurate the model.</li>
+												<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MSE.png"><br>
+											<li style="margin-top: 20px;">R 2 (the squared correlation between the dependent variable and the fitted values):
+													R 2 = 1 - [sum squared regression (SSR) / total sum of squares (SST)], where the sum
+													squared of the residuals for the regression (SSR) is the sum of its residuals squared, and the
+													total sum of squares (SST) is the sum of the distance the data is away from the mean, all
+													squared. The R 2 value is always a number between 0 and 1. R 2 is a measure the fit of a
+													regression line to a series of historical observations with values closer to 1 indicating a
+													stronger correspondence between the actual and predicted (regression model) values. It is
+													not a measure of error and should not be used by itself to assess the fitness of a prediction,
+													but in combination with other error metrics and the user's knowledge of the program.</li>
+													<br><img class="img-fluid" src="../ShowGuidanceFiles/img/r2.png">
+													<br>
+								<!-- <li>MAPE (Mean Absolute Percentage Error)</li>
 								<li>WAPE (Weighted Absolute Percentage Error)</li>
 								<li>RMSE (Root Mean Squared Error)</li>
 								<li>MSE (Mean Squared Error)<br>In general, the lower the error score, 
@@ -173,11 +205,16 @@
 									select a preferred extrapolation method, and QAT will highlight these 
 									best fits in a table. However, if substantial changes are anticipated, 
 									the best fit extrapolation may not be the forecast the user selects.
-								</li>
+								</li> -->
 								<br>
+								<p>Apart from R 2 the lower the score, the more closely the forecast method result fits the historical
+									data. In models where historical patterns in a data set are expected to be reflected in the future
+									values, a low error value could be used to help select a preferred extrapolation method, and QAT
+									will highlight these best fits in a table. However, if substantial changes which do not fit the historical
+									data are anticipated, the best fit extrapolation may not be the most appropriate forecast to select.</p>
 								<p>To make the best selection between extrapolation methods for your purpose, 
 									the most important thing is first understanding which method of 
-									extrapolation is most appropriate for the expected pattern in the data. 
+									extrapolation is most appropriate for the expected pattern in the data. <br>
 									Forecast methods in QAT are organized from simple to sophisticated. In 
 									general,
 									<ul style="font-size: 13px;">

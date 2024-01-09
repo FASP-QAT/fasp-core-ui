@@ -588,6 +588,8 @@ export default class SupplyPlanComponent extends React.Component {
             deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
             inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
             var canv = document.getElementById("cool-canvas" + count)
+            var canvasImg1 = canv.toDataURL("image/png", 1.0);
+            doc.addImage(canvasImg1, 'png', 50, 160, 750, 290, "a" + count, 'CANVAS');
             count++
             let content = {
                 margin: { top: 80, bottom: 70 },

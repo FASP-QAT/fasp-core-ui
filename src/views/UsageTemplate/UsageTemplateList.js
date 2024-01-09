@@ -687,20 +687,15 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width: '90',
-                    filter: this.filterDataset,
-                    required: true,
-                    regex: {
-                        ex: /^\S+(?: \S+)*$/,
-                        text: i18n.t('static.message.spacetext')
-                    }
+                    width: '120',
+                    filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width: '180',
-                    textEditor: true,
-                    required: true
+                    width: '150',
+                    textEditor: true,//2 C
+                  
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
@@ -2606,7 +2601,7 @@ class usageTemplate extends Component {
                                 {this.state.isChanged1 &&
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 }
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         }
