@@ -31,6 +31,7 @@ import {
   INDEXED_DB_VERSION,
   JEXCEL_PAGINATION_OPTION,
   JEXCEL_PRO_KEY,
+  MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
   PROGRAM_TYPE_SUPPLY_PLAN,
   REPORT_DATEPICKER_END_MONTH,
   REPORT_DATEPICKER_START_MONTH,
@@ -98,7 +99,7 @@ class ProcurementAgentExport extends Component {
         month: new Date().getMonth() + 1,
       },
       maxDate: {
-        year: new Date().getFullYear() + 10,
+        year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
         month: new Date().getMonth() + 1,
       },
       loading: true,
