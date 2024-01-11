@@ -5260,7 +5260,9 @@ export default class BuildTree extends Component {
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
-                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                myResult = getRequest.result.filter(c=>c.userId==userId);
                 this.setState({
                     datasetList: myResult,
                     programId: this.state.programId != null ? this.state.programId : (myResult.length == 1 ? myResult[0].id : "")
