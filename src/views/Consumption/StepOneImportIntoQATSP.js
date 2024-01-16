@@ -500,6 +500,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                         .then(response => {
                             if (response.status == 200) {
+                                console.log("Response Data Test@123",response.data);
                                 var planningUnitList = response.data.filter(c => c.active)
                                 this.setState({
                                     programPlanningUnitList: planningUnitList,
@@ -619,6 +620,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].planningUnit.id)[0];
                 let totalForecast = 0;
                 let check = (Object.keys(papuList[j].selectedForecastMap).length == 0)
+                let check1 = (Object.keys(papuList[j].selectedForecastMap).map(c => totalForecast += papuList[j].selectedForecastMap[c].totalForecast))
                 let isForecastBlank = (!check && totalForecast == 0)
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
