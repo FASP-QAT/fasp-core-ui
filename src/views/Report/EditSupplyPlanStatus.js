@@ -277,7 +277,7 @@ class EditSupplyPlanStatus extends Component {
                 }
                 this.setState({
                     criticalitiesList: problemCriticalities,
-                    loading: false
+                    // loading: false
                 })
             }.bind(this);
         }.bind(this);
@@ -2077,6 +2077,9 @@ class EditSupplyPlanStatus extends Component {
         }.bind(this);
     }
     componentDidMount() {
+        this.setState({
+            loading:true
+        })
         this.getPlanningUnit();
         this.getProblemCriticality();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
@@ -2118,7 +2121,8 @@ class EditSupplyPlanStatus extends Component {
                     programId: program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
-                    editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false
+                    editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
+                    loading:false
                 }, () => {
                     this.getPlanningUnit()
                     this.fetchData();
@@ -3743,7 +3747,8 @@ class EditSupplyPlanStatus extends Component {
         var problemEl = jexcel(document.getElementById("problemListDiv"), options);
         this.el = problemEl;
         this.setState({
-            problemEl: problemEl
+            problemEl: problemEl,
+            loading:false
         })
     }
     loaded = function (instance, cell, x, y, value) {
@@ -3767,6 +3772,7 @@ class EditSupplyPlanStatus extends Component {
         this.getProblemCriticality();
         this.setState({
             isModalOpen: !this.state.isModalOpen,
+            loading:false
         }, () => {
         });
     }
@@ -3968,6 +3974,7 @@ class EditSupplyPlanStatus extends Component {
                             </div>
                         </div>
                         <CardBody>
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <Formik
                                 render={
                                     ({
@@ -4017,6 +4024,16 @@ class EditSupplyPlanStatus extends Component {
                                     </TabContent>
                                 </Col>
                             </Row>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </CardBody>
                         <Modal isOpen={this.state.consumption}
                             className={'modal-lg modalWidth ' + this.props.className} >
@@ -4922,6 +4939,7 @@ class EditSupplyPlanStatus extends Component {
                                 }) => (
                                     <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
                                         <CardBody className="pt-lg-0">
+                                        <div style={{ display: this.state.loading ? "none" : "block" }}>
                                             <Col md="12 pl-0">
                                                 <div className="row">
                                                     <FormGroup className="col-md-3">
@@ -4970,6 +4988,7 @@ class EditSupplyPlanStatus extends Component {
                                                     />
                                                 </div>
                                             </Col>
+                                            </div>
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
