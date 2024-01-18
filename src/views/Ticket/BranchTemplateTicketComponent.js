@@ -17,7 +17,7 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         templateName: Yup.string()
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tree.templateNameRequired')),
         details: Yup.string()
             .required(i18n.t('static.report.updateDetails')),
@@ -182,7 +182,7 @@ export default class BranchTemplateTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmName: this.props.items.userRealmId,
+                            realmName: this.state.realmId,
                             templateName: this.state.branchTemplate.templateName,
                             details: this.state.branchTemplate.details,
                         }}
@@ -301,7 +301,7 @@ export default class BranchTemplateTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="templateName">{i18n.t('static.listTreeTemp.templateName')}<span className="red Reqasterisk">*</span></Label>
+                                        <Label for="templateName">{i18n.t('static.dataset.BranchTreeTemplate')} {i18n.t('static.user.username')}<span className="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             bsSize="sm"
                                             name="templateName"

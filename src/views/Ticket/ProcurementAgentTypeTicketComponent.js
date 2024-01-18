@@ -175,7 +175,7 @@ export default class ProcurementAgentTypeTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmName: this.props.items.userRealmId,
+                            realmName: this.state.realmId,
                             procurementAgentTypeName: this.state.procurementAgentType.procurementAgentTypeName,
                             procurementAgentTypeCode: this.state.procurementAgentType.procurementAgentTypeCode,
                         }}

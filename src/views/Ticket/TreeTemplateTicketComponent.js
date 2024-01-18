@@ -17,7 +17,7 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         templateName: Yup.string()
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tree.templateNameRequired')),
         details: Yup.string()
             .required(i18n.t('static.report.updateDetails')),
@@ -182,7 +182,7 @@ export default class TreeTemplateTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmName: this.props.items.userRealmId,
+                            realmName: this.state.realmId,
                             templateName: this.state.treeTemplate.templateName,
                             details: this.state.treeTemplate.details,
                         }}
