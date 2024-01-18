@@ -7,7 +7,7 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import DatasetService from '../../api/DatasetService';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.dataset.TreeTemplate"))
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.common.TreeTemplate"))
 let summaryText_2 = "Edit Tree Template"
 const initialValues = {
     summary: summaryText_1,
@@ -20,7 +20,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         templateName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.dataset.TreeTemplate')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.listTreeTemp.templateName'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.common.TreeTemplate')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.listTreeTemp.templateName'))))),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -158,7 +158,7 @@ export default class EditTreeTemplateTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.dataset.TreeTemplate')}</h4>
+                <h4>{i18n.t('static.common.TreeTemplate')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
