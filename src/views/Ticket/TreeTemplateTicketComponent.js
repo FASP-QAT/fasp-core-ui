@@ -7,7 +7,7 @@ import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constant
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dataset.TreeTemplate"))
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.common.TreeTemplate"))
 let summaryText_2 = "Add Tree Template"
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -175,7 +175,7 @@ export default class TreeTemplateTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.dataset.TreeTemplate')}</h4>
+                <h4>{i18n.t('static.common.TreeTemplate')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
