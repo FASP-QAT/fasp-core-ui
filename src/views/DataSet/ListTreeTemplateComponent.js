@@ -110,7 +110,7 @@ export default class ListTreeTemplate extends Component {
         this.saveMissingPUs = this.saveMissingPUs.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.hideThirdComponent=this.hideThirdComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
     }
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
@@ -138,7 +138,7 @@ export default class ListTreeTemplate extends Component {
             treeTemplate: {}
         })
     }
-   
+
     getTreeTemplateList() {
         DatasetService.getTreeTemplateList().then(response => {
             var treeTemplateList = response.data.sort((a, b) => {
@@ -1152,7 +1152,7 @@ export default class ListTreeTemplate extends Component {
                         "consumptionDataType": 2,
                         "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
                         "selectedForecastMap": map1.get("14"),
-                        "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
+                        "createdBy": map1.get("16") == "" ? { "userId": curUser } : map1.get("16"),
                         "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
                         "active": true,
                     }
@@ -1247,37 +1247,82 @@ export default class ListTreeTemplate extends Component {
             this.setState({ regionList });
         })
     }
-   
+
     copyDeleteTree(treeTemplateId) {
-        var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
-        treeTemplate.label.label_en = this.state.treeTemplateName;
-        DatasetService.addTreeTemplate(treeTemplate)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        message: i18n.t('static.message.addTreeTemplate'),
-                        color: 'green',
-                        loading: false,
-                        isSubmitClicked: false
-                    }, () => {
-                        this.getTreeTemplateList();
-                        this.hideSecondComponent();
-                    });
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
+        // Call API
+        DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
+            var treeTemplate=response.data;
+            treeTemplate.label.label_en = this.state.treeTemplateName;
+            DatasetService.addTreeTemplate(treeTemplate)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            message: i18n.t('static.message.addTreeTemplate'),
+                            color: 'green',
+                            loading: false,
+                            isSubmitClicked: false
+                        }, () => {
+                            this.getTreeTemplateList();
                             this.hideSecondComponent();
-                        })
-                }
-            }).catch(
+                        });
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false,
+                                isSubmitClicked: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false,
-                            isSubmitClicked: false
+                            loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1292,22 +1337,19 @@ export default class ListTreeTemplate extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                         }
@@ -1333,7 +1375,7 @@ export default class ListTreeTemplate extends Component {
             data[2] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
-            data[5] = getLabelText(treeTemplateList[j].flatList[0].payload.nodeType.label, this.state.lang);
+            data[5] = getLabelText(treeTemplateList[j].rootNodeType.label, this.state.lang);
             data[6] = treeTemplateList[j].notes;
             data[7] = treeTemplateList[j].active;
             data[8] = treeTemplateList[j].lastModifiedBy.username;
@@ -1444,33 +1486,75 @@ export default class ListTreeTemplate extends Component {
                                 }.bind(this)
                             });
                         }
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id == 2)) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 2)) {
                             items.push({
                                 title: "Create tree from this template",
                                 onclick: function () {
-                                    this.setState({
-                                        isModalCreateTree: !this.state.isModalCreateTree,
-                                        treeTemplate: this.state.treeEl.getValueFromCoords(10, y),
-                                        treeName: this.state.treeEl.getValueFromCoords(10, y).label.label_en,
-                                        active: this.state.treeEl.getValueFromCoords(10, y).active,
-                                        forecastMethod: this.state.treeEl.getValueFromCoords(10, y).forecastMethod,
-                                        regionId: '',
-                                        regionList: [],
-                                        regionValues: [],
-                                        notes: this.state.treeEl.getValueFromCoords(10, y).notes,
-                                        missingPUList: [],
-                                        datasetIdModal: ""
-                                    }, () => {
-                                        if (this.state.programList.length == 1) {
-                                            var event = {
-                                                target: {
-                                                    name: "datasetIdModal",
-                                                    value: this.state.programList[0].id,
+                                    var treeTemplateId=this.state.treeEl.getValueFromCoords(0, y);
+                                    DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
+                                        this.setState({
+                                            isModalCreateTree: !this.state.isModalCreateTree,
+                                            treeTemplate: response.data,
+                                            treeName: response.data.label.label_en,
+                                            active: response.data.active,
+                                            forecastMethod: response.data.forecastMethod,
+                                            regionId: '',
+                                            regionList: [],
+                                            regionValues: [],
+                                            notes: response.data.notes,
+                                            missingPUList: [],
+                                            datasetIdModal: ""
+                                        }, () => {
+                                            if (this.state.programList.length == 1) {
+                                                var event = {
+                                                    target: {
+                                                        name: "datasetIdModal",
+                                                        value: this.state.programList[0].id,
+                                                    }
+                                                }
+                                                this.dataChange(event)
+                                            }
+                                        })
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
                                                 }
                                             }
-                                            this.dataChange(event)
                                         }
-                                    })
+                                    );
                                 }.bind(this)
                             });
                         }
@@ -2029,9 +2113,9 @@ export default class ListTreeTemplate extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <h5 className="green" style={{display:"none"}} id="div3">
-                                                    {this.state.missingPUList.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
-                                                    {this.state.missingPUList.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
+                                                    <h5 className="green" style={{ display: "none" }} id="div3">
+                                                        {this.state.missingPUList.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
+                                                        {this.state.missingPUList.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
                                                     </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
