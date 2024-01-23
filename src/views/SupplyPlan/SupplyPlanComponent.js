@@ -1529,7 +1529,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </Table>
                                 {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" useLocalData={1} />}
                                 <div className=" mt-3">
-                                    <div id="consumptionTable" />
+                                    <div id="consumptionTable" className="TableWidth100"/>
                                 </div>
                                 <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                                 <div className="">
