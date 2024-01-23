@@ -9870,6 +9870,63 @@ legend.scheduler-border {
   top: -1px;
 }
 
+.Secondcolum {
+  // position: sticky;
+  // left: 61px;
+  // left:53px;
+  // z-index: 999;
+  width: 100px;
+  left: 53px;
+  z-index: 3;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.Thirdcolum {
+  // position: sticky;
+  // left: 128px;
+  // z-index: 999;
+
+  left: 142px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 153px;
+  // position: -webkit-sticky;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 150px;
+  max-width: 150px;
+  /* left: 200px;*/
+}
+.fourthcolum {
+  // position: sticky;
+  // left: 128px;
+  // z-index: 999;
+
+  left: 291px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  // position: -webkit-sticky;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px;*/
+}
+
+
+.MonthlyForecastdWidth {
+  overflow: hidden !important;
+  // min-width: 167px !important;
+  word-wrap: break-word !important;
+  // z-index: 100;
+  // position: sticky;
+  /* border: none !important; */
+}
+
 .BadgeSymbol {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -12548,6 +12605,9 @@ label.arrow_label:before {
 }
 .ForcastColumnFreeze .jss > thead{
   z-index: 999;
+}
+.BorderTopForcastOutput{
+  border-top: 1px solid #c8ced3!important;
 }
 @media screen and (min-width: 1025px) {
   .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
