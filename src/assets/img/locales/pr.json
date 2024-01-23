@@ -1843,6 +1843,7 @@
     "static.dashboard.add.problem": "Adicionar problema",
     "static.supplyPlan.planningUnitQty": "Quantidade da unidade de planeamento",
     "static.currency.currencyconversiontext": "Insira a taxa de câmbio para 1 USD",
+    "static.common.TreeTemplate": "Modelo de árvore",
     "static.user.org&CountryText": "Insira Organização e País",
     "static.procurementUnit.unitsPerPallet": "Unidades por palete",
     "static.planningUnit.associatedForecastingUnit": "Unidade de previsão associada",
