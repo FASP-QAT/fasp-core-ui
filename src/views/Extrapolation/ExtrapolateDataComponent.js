@@ -495,17 +495,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
-                        type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                        type: this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
-                        type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                        type: this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
-                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        type: this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -515,7 +515,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
-                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        type: this.state.smoothingId && (tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -525,7 +525,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
-                        type: this.state.arimaId ? 'numeric' : 'hidden',
+                        type: this.state.arimaId && (arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -1687,19 +1687,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('')
         var columns = [];
         columns.push(i18n.t('static.common.errors'));
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.movingAverages'))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.semiAverages'))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             columns.push(i18n.t('static.extrapolation.linearRegression'))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             columns.push(i18n.t('static.extrapolation.tes'))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             columns.push(i18n.t('static.extrapolation.arima'))
         }
         let headers = [];
@@ -1707,19 +1707,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var B = [];
         B.push(i18n.t('static.extrapolation.rmse'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             B.push(Number(this.state.movingAvgError.rmse).toFixed(3))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             B.push(Number(this.state.semiAvgError.rmse).toFixed(3))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             B.push(Number(this.state.linearRegressionError.rmse).toFixed(3))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             B.push(Number(this.state.tesError.rmse).toFixed(3))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             B.push(Number(this.state.arimaError.rmse).toFixed(3))
         }
         if (this.state.arimaId) {
@@ -1728,19 +1728,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         A.push(this.addDoubleQuoteToRowContent(B));
         B = [];
         B.push(i18n.t('static.extrapolation.mape'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             B.push(Number(this.state.movingAvgError.mape).toFixed(3))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             B.push(Number(this.state.semiAvgError.mape).toFixed(3))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             B.push(Number(this.state.linearRegressionError.mape).toFixed(3))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             B.push(Number(this.state.tesError.mape).toFixed(3))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             B.push(Number(this.state.arimaError.mape).toFixed(3))
         }
         if (this.state.arimaId) {
@@ -1749,19 +1749,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         A.push(this.addDoubleQuoteToRowContent(B));
         B = [];
         B.push(i18n.t('static.extrapolation.mse'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             B.push(Number(this.state.movingAvgError.mse).toFixed(3))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             B.push(Number(this.state.semiAvgError.mse).toFixed(3))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             B.push(Number(this.state.linearRegressionError.mse).toFixed(3))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             B.push(Number(this.state.tesError.mse).toFixed(3))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             B.push(Number(this.state.arimaError.mse).toFixed(3))
         }
         if (this.state.arimaId) {
@@ -1770,19 +1770,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         A.push(this.addDoubleQuoteToRowContent(B));
         B = [];
         B.push(i18n.t('static.extrapolation.wape'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             B.push(Number(this.state.movingAvgError.wape).toFixed(3))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             B.push(Number(this.state.semiAvgError.wape).toFixed(3))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             B.push(Number(this.state.linearRegressionError.wape).toFixed(3))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             B.push(Number(this.state.tesError.wape).toFixed(3))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             B.push(Number(this.state.arimaError.wape).toFixed(3))
         }
         if (this.state.arimaId) {
@@ -1791,19 +1791,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         A.push(this.addDoubleQuoteToRowContent(B));
         B = [];
         B.push(i18n.t('static.extrapolation.rSquare'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             B.push(Number(this.state.movingAvgError.rSqd).toFixed(3))
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             B.push(Number(this.state.semiAvgError.rSqd).toFixed(3))
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             B.push(Number(this.state.linearRegressionError.rSqd).toFixed(3))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             B.push(Number(this.state.tesError.rSqd).toFixed(3))
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             B.push(Number(this.state.arimaError.rSqd).toFixed(3))
         }
         if (this.state.arimaId) {
@@ -1819,16 +1819,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         var columns = [];
         columns.push(i18n.t('static.inventoryDate.inventoryReport'))
         columns.push(i18n.t('static.extrapolation.adjustedActuals'))
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.movingAverages'))
-        } if (this.state.semiAvgId) {
+        } if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.semiAverages'))
-        } if (this.state.linearRegressionId) {
+        } if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             columns.push(i18n.t('static.extrapolation.linearRegression'))
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             columns.push(i18n.t('static.extrapolation.tes'))
-        } if (this.state.arimaId) {
+        } if (this.state.arimaId && this.state.arimaData.length > 0) {
             columns.push(i18n.t('static.extrapolation.arima'))
         }
         headers = [];
@@ -1844,11 +1844,11 @@ export default class ExtrapolateDataComponent extends React.Component {
         for (var j = 0; j < monthArray.length; j++) {
             B = [];
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-            var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var arimaDataFilter = this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var movingAvgDataFilter = this.state.movingAvgData.length > 0 ? this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
+            var semiAvgDataFilter = this.state.semiAvgData.length > 0 ? this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
+            var linearRegressionDataFilter = this.state.linearRegressionData.length > 0 ? this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
+            var tesDataFilter = this.state.tesData.length > 0 ? this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
+            var arimaDataFilter = this.state.arimaData.length > 0 ? this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
                 consumptionData.length > 0 ? consumptionData[0].puAmount : "")
@@ -2419,7 +2419,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         stopDate = moment(stopDate).format("YYYY-MM-DD");
         let startDate = this.state.rangeValue1.from.year + '-' + (this.state.rangeValue1.from.month) + '-01'
         startDate = moment(startDate).format("YYYY-MM-DD");
-        if (this.state.movingAvgId) {
+        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             datasets.push(
                 {
                     type: "line",
@@ -2439,7 +2439,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     data: json.map((item, c) => c >= count && item[2] !== "" ? item[2] : null)
                 })
         }
-        if (this.state.semiAvgId) {
+        if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -2458,7 +2458,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 data: json.map((item, c) => c >= count && item[3] !== "" ? item[3] : null)
             })
         }
-        if (this.state.linearRegressionId) {
+        if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -2516,7 +2516,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 data: json.map((item, c) => c >= count && item[10] !== "" ? item[10] : null)
             })
         }
-        if (this.state.smoothingId) {
+        if (this.state.smoothingId && this.state.tesData.length > 0) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -2536,8 +2536,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 yValueFormatString: "###,###,###,###",
                 data: json.map((item, c) => c >= count && item[5] !== "" ? item[5] : null)
             })
-        }
-        if (this.state.smoothingId) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -2555,8 +2553,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 yValueFormatString: "###,###,###,###",
                 data: json.map((item, c) => c >= count && item[6] !== "" ? item[6] : null)
             })
-        }
-        if (this.state.smoothingId) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -2577,7 +2573,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 data: json.map((item, c) => c >= count && item[7] !== "" ? item[7] : null)
             })
         }
-        if (this.state.arimaId) {
+        if (this.state.arimaId && this.state.arimaData.length > 0) {
             datasets.push({
                 type: "line",
                 pointRadius: 0,
@@ -3296,10 +3292,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         {this.state.linearRegressionId &&
                                                                             <td width="160px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td width="160px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td width="160px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                         }
                                                                     </tr>
@@ -3307,91 +3303,91 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 <tbody>
                                                                     <tr>
                                                                         <td>{i18n.t('static.extrapolation.rmse')}</td>
-                                                                        {this.state.movingAvgId &&
+                                                                        {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse !== "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.semiAvgId &&
+                                                                        {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse !== "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.linearRegressionId &&
+                                                                        {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse !== "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse !== "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.arimaError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.arimaError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rmse !== "" ? this.state.arimaError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{i18n.t('static.extrapolation.mape')}</td>
-                                                                        {this.state.movingAvgId &&
+                                                                        {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape !== "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.semiAvgId &&
+                                                                        {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape !== "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.linearRegressionId &&
+                                                                        {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape !== "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape !== "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.arimaError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.arimaError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mape !== "" ? this.state.arimaError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{i18n.t('static.extrapolation.mse')}</td>
-                                                                        {this.state.movingAvgId &&
+                                                                        {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse !== "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.semiAvgId &&
+                                                                        {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse !== "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.linearRegressionId &&
+                                                                        {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse !== "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse !== "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.arimaError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.arimaError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mse !== "" ? this.state.arimaError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{i18n.t('static.extrapolation.wape')}</td>
-                                                                        {this.state.movingAvgId &&
+                                                                        {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape !== "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.semiAvgId &&
+                                                                        {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape !== "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.linearRegressionId &&
+                                                                        {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape !== "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape !== "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.arimaError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.arimaError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.wape !== "" ? this.state.arimaError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{i18n.t('static.extrapolation.rSquare')}</td>
-                                                                        {this.state.movingAvgId &&
+                                                                        {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd !== "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.semiAvgId &&
+                                                                        {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd !== "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.linearRegressionId &&
+                                                                        {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd !== "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.smoothingId &&
+                                                                        {this.state.smoothingId && this.state.tesData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd !== "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
-                                                                        {this.state.arimaId &&
+                                                                        {this.state.arimaId && this.state.arimaData.length > 0 &&
                                                                             <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd !== "" ? this.state.arimaError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                         }
                                                                     </tr>
