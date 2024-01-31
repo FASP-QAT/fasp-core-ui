@@ -3048,7 +3048,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }
             datasetListForGraph.push({
                 label: 'Error',
-                data: this.state.dataList.map(item => (item.errorPerc !== "" ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
+                data: this.state.dataList.map(item => (item.errorPerc !== "" && item.errorPerc!=null ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
                 type: 'line',
                 yAxisID: 'B',
                 // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
