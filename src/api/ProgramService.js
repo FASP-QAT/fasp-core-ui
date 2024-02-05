@@ -90,7 +90,7 @@ class ProgramService {
         );
     }
     checkNewerVersions(json) {
-        return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
+        return axios.post(`${API_URL}/api/programData/checkNewerVersions`, json, {}
         );
     }
     getHealthAreaListByRealmCountryId(json) {

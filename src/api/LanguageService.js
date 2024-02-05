@@ -10,7 +10,7 @@ class LanguageService {
         });
     }
     getLanguageListActive() {
-        return axios.get(`${API_URL}/api/language/`, {
+        return axios.get(`${API_URL}/api/language`, {
         });
     }
     editLanguage(json) {

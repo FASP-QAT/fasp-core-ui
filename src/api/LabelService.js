@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class LabelsService {
     getDatabaseLabelsList() {
-        return axios.get(`${API_URL}/api/getDatabaseLabelsListAll/`, {
+        return axios.get(`${API_URL}/api/getDatabaseLabelsListAll`, {
         });
     }
     getStaticLabelsList(){
