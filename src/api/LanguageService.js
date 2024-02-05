@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class LanguageService {
     addLanguage(json) {
-        return axios.post(`${API_URL}/api/language/`, json, {
+        return axios.post(`${API_URL}/api/language`, json, {
         });
     }
     getLanguageList() {
@@ -14,7 +14,7 @@ class LanguageService {
         });
     }
     editLanguage(json) {
-        return axios.put(`${API_URL}/api/language/`, json, {
+        return axios.put(`${API_URL}/api/language`, json, {
         });
     }
     getLanguageById(json) {

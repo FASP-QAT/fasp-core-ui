@@ -14,7 +14,7 @@ class MasterSyncService {
         });
     }
     getNewShipmentSyncApi(json){
-        return axios.post(`${API_URL}/api/erpLinking/shipmentSync/`,json, {
+        return axios.post(`${API_URL}/api/erpLinking/shipmentSync`,json, {
         });
     }
 }
