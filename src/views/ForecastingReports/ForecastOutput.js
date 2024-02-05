@@ -2454,15 +2454,15 @@ class ForecastOutput extends Component {
                                         <div className="col-md-12 pl-3 pr-3">
                                             {this.state.show &&
                                                 <div className="table-scroll1">
-                                                    <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
+                                                    <div className="table-wrap table-responsive fixTableHeadSupplyPlan BorderTopForcastOutput">
                                                         {this.state.consumptionData.length > 0 &&
-                                                            <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options} id="forecastOutputId">
+                                                            <Table className="table-bordered table-bordered1 text-center mt-0 overflowhide main-table " bordered size="sm" options={this.options} id="forecastOutputId">
                                                                 <thead>
                                                                     <tr>
                                                                         <th className='whitebg_inforecastOutput sticky-col Firstcolum'>{i18n.t('static.forecastReport.display')}</th>
-                                                                        <th className='whitebg_inforecastOutput sticky-col'>{i18n.t('static.program.region')}</th>
-                                                                        <th className='whitebg_inforecastOutput sticky-col Secondcolum'>{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit')}</th>
-                                                                        <th className='whitebg_inforecastOutput sticky-col MonthlyForecastdWidth Thirdcolum'>{i18n.t('static.consumption.forcast')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col Secondcolum'>{i18n.t('static.program.region')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col Thirdcolum'>{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col MonthlyForecastdWidth fourthcolum'>{i18n.t('static.consumption.forcast')}</th>
                                                                         {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
                                                                             <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
                                                                         ))}
@@ -2475,9 +2475,9 @@ class ForecastOutput extends Component {
                                                                     {this.state.xaxis == 2 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
-                                                                            <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
+                                                                            <td className="Secondcolum sticky-col first-col clone" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
+                                                                            <td className="sticky-col first-col clone Thirdcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Number(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toFixed(2)} /> : ""}</td>
                                                                             ))}
@@ -2487,9 +2487,9 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum"></td>
-                                                                            <td className=""></td>
-                                                                            <td style={{ textAlign: 'left' }} className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'></td>
+                                                                            <td className="Secondcolum sticky-col first-col clone"></td>
+                                                                            <td style={{ textAlign: 'left' }} className="sticky-col first-col clone Thirdcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td><b>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</b></td>
                                                                             ))}
@@ -2498,9 +2498,9 @@ class ForecastOutput extends Component {
                                                                     {this.state.xaxis == 1 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
-                                                                            <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
+                                                                            <td className="Secondcolum sticky-col first-col clone" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
+                                                                            <td className="sticky-col first-col clone Thirdcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Number(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toFixed(2)} /> : ""}</td>
                                                                             ))}
@@ -2510,9 +2510,9 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum"></td>
-                                                                            <td className=""></td>
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'></td>
+                                                                            <td className="Secondcolum sticky-col first-col clone"></td>
+                                                                            <td className="sticky-col first-col clone Thirdcolum" style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
