@@ -399,8 +399,8 @@ class CompareAndSelectScenario extends Component {
         });
         higherThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[sortedArray.length - 1] != "" && sortedArray[sortedArray.length - 1] != null && sortedArray[sortedArray.length - 1] != undefined ? sortedArray[sortedArray.length - 1] : 0;
         lowerThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[0] != "" && sortedArray[0] != null && sortedArray[0] != undefined ? sortedArray[0] : 0;
-        higherThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].higherThenConsumptionThreshold;
-        lowerThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].lowerThenConsumptionThreshold;
+        higherThenConsumptionThresholdPU = this.state.datasetJson.currentVersion.forecastThresholdHighPerc;
+        lowerThenConsumptionThresholdPU = this.state.datasetJson.currentVersion.forecastThresholdLowPerc;
         var finalData = [];
         var min = Math.min(...actualDiff.filter(c => c != 0))
         var treeScenarioList = this.state.treeScenarioList;
