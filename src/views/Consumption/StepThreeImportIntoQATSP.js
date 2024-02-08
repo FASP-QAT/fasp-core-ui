@@ -260,7 +260,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
                                                 consumptionDataList[index].notes = "Imported on " + moment(curDate).format("DD-MMM-YYYY") + " by " + curUserName + " from " + finalImportQATDataFilter[i].v17;
-                                            }else if(indexWithoutMultiplier1!=1){
+                                            }else if(indexWithoutMultiplier1!=-1){
                                                 consumptionDataList[indexWithoutMultiplier1].consumptionQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[indexWithoutMultiplier1].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[indexWithoutMultiplier1].dataSource.id = QAT_DATASOURCE_ID;
