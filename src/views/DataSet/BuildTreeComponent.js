@@ -668,7 +668,7 @@ export default class BuildTree extends Component {
             modelingChangedOrAdded: false,
             addNodeError: false,
             currentNodeTypeId: "",
-            deleteChildNodes:false
+            deleteChildNodes: false
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -2121,6 +2121,26 @@ export default class BuildTree extends Component {
         maxNodeDataId = parseInt(maxNodeDataId + 1);
         return maxNodeDataId;
     }
+
+    validation1 = function () {
+
+        var nodeTypeId = document.getElementById("nodeTypeId").value;
+        var nodeTitle = document.getElementById("nodeTitle").value;
+        var nodeUnitId = document.getElementById("nodeUnitId").value;
+        var nodeValue = document.getElementById("nodeValue").value;
+        var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && nodeUnitId == "") {
+            return false;
+        } else if (nodeTitle == "" || testTitle == false) {
+            return false;
+        } else if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     formSubmitLoader() {
         this.setState({
             modelingJexcelLoader: true
@@ -3616,7 +3636,7 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
@@ -3658,7 +3678,7 @@ export default class BuildTree extends Component {
                             });
                         }
                     } else {
-                        if ((this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
+                        if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
                             this.setState({
