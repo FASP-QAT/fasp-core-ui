@@ -1843,6 +1843,7 @@
     "static.dashboard.add.problem": "Agregar problema",
     "static.supplyPlan.planningUnitQty": "Cantidad del producto",
     "static.currency.currencyconversiontext": "Ingresar la tasa de conversión a 1 USD",
+    "static.common.TreeTemplate": "Plantilla de árbol",
     "static.user.org&CountryText": "Ingrese Organización y País",
     "static.procurementUnit.unitsPerPallet": "Unidades por palet",
     "static.planningUnit.associatedForecastingUnit": "Producto (estimación) asociado",
