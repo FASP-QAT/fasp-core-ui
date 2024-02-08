@@ -3037,7 +3037,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0;
+            data[3] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0;
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -3232,7 +3232,7 @@ export default class BuildTree extends Component {
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
+            data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
             data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentScenario.manualChangesEffectFuture;
@@ -3329,8 +3329,8 @@ export default class BuildTree extends Component {
                 return false;
             }.bind(this),
         };
-        console.log("Options Test@123",options)
-        console.log("Mom Jexcel Test@123",document.getElementById("momJexcel"));
+        console.log("Options Test@123", options)
+        console.log("Mom Jexcel Test@123", document.getElementById("momJexcel"));
         if (document.getElementById("momJexcel") != null) {
             console.log("In if Test@123");
             var momEl = jexcel(document.getElementById("momJexcel"), options);
@@ -5262,7 +5262,7 @@ export default class BuildTree extends Component {
                 var myResult = [];
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                myResult = getRequest.result.filter(c=>c.userId==userId);
+                myResult = getRequest.result.filter(c => c.userId == userId);
                 this.setState({
                     datasetList: myResult,
                     programId: this.state.programId != null ? this.state.programId : (myResult.length == 1 ? myResult[0].id : "")
@@ -7535,9 +7535,9 @@ export default class BuildTree extends Component {
         items = filtered;
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
-                if(itemConfig.payload.nodeType.id==2){
+                if (itemConfig.payload.nodeType.id == 2) {
                     this.calculateMOMData(itemConfig.parent, 2);
-                }else{
+                } else {
                     this.calculateMOMData(itemConfig.id, 2);
                 }
             }, 0);
@@ -8360,14 +8360,14 @@ export default class BuildTree extends Component {
                                 if (cf == true) {
                                     save = true;
                                     this.setState({
-                                        deleteChildNodes:true
+                                        deleteChildNodes: true
                                     })
                                 } else {
                                 }
                             } else {
                                 save = true;
                                 this.setState({
-                                    deleteChildNodes:false
+                                    deleteChildNodes: false
                                 })
                             }
                             if (save) {
@@ -10015,7 +10015,7 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({ showMomData: false,isChanged: false,viewMonthlyData: true })
+                                        this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
@@ -10622,7 +10622,7 @@ export default class BuildTree extends Component {
                                     this.setState({
                                         modelingEl: "",
                                         modelingTabChanged: false,
-                                        currentNodeTypeId:""
+                                        currentNodeTypeId: ""
                                     }, () => {
                                         try {
                                             jexcel.destroy(document.getElementById('modelingJexcel'), true);
@@ -10690,7 +10690,7 @@ export default class BuildTree extends Component {
                                         }
                                         this.setState({
                                             addNodeError: true,
-                                            isValidError: true,
+                                            isValidError: "true",
                                             showMomDataPercent: false,
                                             showMomData: false,
                                             viewMonthlyData: true,
