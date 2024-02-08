@@ -22,7 +22,7 @@ class TracerCategoryService {
         );
     }
     getTracerCategoryByProgramIds(realmId, programIds) {
-        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds/`, programIds, {}
+        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds`, programIds, {}
         );
     }
 }
