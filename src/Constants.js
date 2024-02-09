@@ -1,6 +1,6 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
 // export const API_URL='https://api-mod2.altius.cc'
-// export const API_URL = 'http://localhost:8084'
+export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
@@ -9,7 +9,6 @@
 
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
-export const API_URL = 'https://uatqatapi.altius.cc'
 
 export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
 export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
