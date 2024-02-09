@@ -2,11 +2,11 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class RealmCountryService {
     addRealmCountry(json) {
-        return axios.post(`${API_URL}/api/realmCountry/`, json, {}
+        return axios.post(`${API_URL}/api/realmCountry`, json, {}
         );
     }
     getRealmCountryListAll() {
-        return axios.get(`${API_URL}/api/realmCountry/`, {
+        return axios.get(`${API_URL}/api/realmCountry`, {
         });
     }
     getRealmCountryById(realmCountryId) {
