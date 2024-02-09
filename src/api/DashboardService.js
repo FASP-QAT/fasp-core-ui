@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DashboardService {
     applicationLevelDashboard() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboard/`, {}
+        return axios.get(`${API_URL}/api/applicationLevelDashboard`, {}
         );
     }
     realmLevelDashboard(realmId) {
@@ -11,7 +11,7 @@ class DashboardService {
         });
     }
     applicationLevelDashboardUserList() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboardUserList/`, {
+        return axios.get(`${API_URL}/api/applicationLevelDashboardUserList`, {
         });
     }
     realmLevelDashboardUserList(realmId) {
@@ -20,11 +20,11 @@ class DashboardService {
         });
     }
     openIssues() {
-        return axios.get(`${API_URL}/api/ticket/openIssues/`, {
+        return axios.get(`${API_URL}/api/ticket/openIssues`, {
         });
     }
     supplyPlanReviewerLevelDashboard() {
-        return axios.get(`${API_URL}/api/supplyPlanReviewerLevelDashboard/`, {
+        return axios.get(`${API_URL}/api/supplyPlanReviewerLevelDashboard`, {
         });
     }
 }

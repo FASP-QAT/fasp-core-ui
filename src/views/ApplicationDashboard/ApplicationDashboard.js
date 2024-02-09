@@ -381,6 +381,7 @@ class ApplicationDashboard extends Component {
     }
     this.getPrograms();
     this.getDataSetList();
+    if (localStorage.getItem('sessionType') === 'Online') {
     DashboardService.openIssues()
       .then(response => {
         this.setState({
@@ -388,6 +389,7 @@ class ApplicationDashboard extends Component {
           addressedIssues: response.data.addressedIssues
         })
       })
+    }
     this.hideFirstComponent();
   }
   onExiting() {
