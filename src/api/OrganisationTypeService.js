@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class OrganisationTypeService {
     addOrganisationType(json) {
-        return axios.post(`${API_URL}/api/organisationType/`, json, {}
+        return axios.post(`${API_URL}/api/organisationType`, json, {}
         );
     }
     getOrganisationTypeList() {
@@ -10,7 +10,7 @@ class OrganisationTypeService {
         });
     }
     editOrganisationType(json) {
-        return axios.put(`${API_URL}/api/organisationType/`, json, {}
+        return axios.put(`${API_URL}/api/organisationType`, json, {}
         );
     }
     getOrganisationTypeByRealmId(json) {
