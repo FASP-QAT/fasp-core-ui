@@ -6,7 +6,7 @@ class PipelineService {
         );
     }
     getPipelineProgramList() {
-        return axios.get(`${API_URL}/api/pipeline/`, {
+        return axios.get(`${API_URL}/api/pipeline`, {
         });
     }
     getPipelineProgramDataById(json) {

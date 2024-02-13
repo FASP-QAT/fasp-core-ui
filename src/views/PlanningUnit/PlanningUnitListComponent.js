@@ -398,15 +398,13 @@ export default class PlanningUnitListComponent extends Component {
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
+                    if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                         items.push({
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
                                     })
-                                }
                             }.bind(this)
                         });
                     }

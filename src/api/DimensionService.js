@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DimensionSerice {
     addDimension(json) {
-        return axios.post(`${API_URL}/api/dimension/`, json, {
+        return axios.post(`${API_URL}/api/dimension`, json, {
         });
     }
     getDimensionListAll() {
@@ -10,7 +10,7 @@ class DimensionSerice {
         });
     }
     updateDimension(json) {
-        return axios.put(`${API_URL}/api/dimension/`, json, {
+        return axios.put(`${API_URL}/api/dimension`, json, {
         });
     }
     getDiamensionById(json) {

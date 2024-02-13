@@ -169,7 +169,11 @@ class Login extends Component {
         } else {
         }
       }).catch(error => {
-        apiVersionForDisplay = "Offline"
+        if(window.navigator.onLine){
+          apiVersionForDisplay = "The System is currently offline please come back after sometime."
+        }else{
+          apiVersionForDisplay = "Offline"
+        }
         this.setState({
           apiVersionForDisplay: apiVersionForDisplay
         })
