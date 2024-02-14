@@ -9,6 +9,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService.js';
 const entityname = i18n.t('static.planningunit.planningunit');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -107,9 +108,9 @@ export default class AddPlanningUnit extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        units: listArray, loading: false
+                        units: listArray
                     })
-                    ForecastingUnitService.getForecastingUnitList().then(response => {
+                    DropdownService.getForecastingUnitDropDownList().then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
@@ -225,7 +226,7 @@ export default class AddPlanningUnit extends Component {
         let forecastingUnitList = forecastingUnits.length > 0
             && forecastingUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.forecastingUnitId}>
+                    <option key={i} value={item.id}>
                         {item.label.label_en + "-" + item.unit.label.label_en}
                     </option>
                 )
