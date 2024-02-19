@@ -690,6 +690,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                         if (x == 20) {
                                                             return false
                                                         }
+                                                        if (x == 10) {
+                                                            return ""
+                                                        }
                                                     }
                                                 },
                                                 editable: true,
