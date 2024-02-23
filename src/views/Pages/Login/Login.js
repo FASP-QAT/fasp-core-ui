@@ -172,7 +172,7 @@ class Login extends Component {
         if(window.navigator.onLine){
           apiVersionForDisplay = "QAT is currently undergoing maintenance and you can continue to use it offline. For Online operations please check back in a few hours."
         }else{
-          apiVersionForDisplay = "Offline"
+          apiVersionForDisplay = "QAT is currently undergoing maintenance and you can continue to use it offline. For Online operations please check back in a few hours."
         }
         this.setState({
           apiVersionForDisplay: apiVersionForDisplay
