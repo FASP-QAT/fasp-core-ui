@@ -6,6 +6,7 @@ class LoginService {
     }
     getApiVersion() {
         return axios.get(`${API_URL}/actuator/info`, {
+            timeout:10000
         });
     }
 }
