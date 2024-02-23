@@ -1158,11 +1158,11 @@ export default class ShipmentDetails extends React.Component {
                         </div>
                         <h6 className="red" id="div4">{this.state.shipmentDatesError}</h6>
                         <div className="">
-                            <div id="shipmentDatesTable"></div>
+                            <div id="shipmentDatesTable" className='TableWidth100'></div>
                         </div>
                         <h6 className="red" id="div5">{this.state.shipmentBatchInfoDuplicateError || this.state.shipmentValidationBatchError}</h6>
                         <div className="">
-                            <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
+                            <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight TableWidth100"></div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
