@@ -10,11 +10,11 @@ class MasterSyncService {
         });
     }
     getSyncAllMastersForProgram(lastSyncDate, programIds) {
-        return axios.post(`${API_URL}/api/sync/allMasters/forPrograms/${lastSyncDate}/`, programIds, {
+        return axios.post(`${API_URL}/api/sync/allMasters/forPrograms/${lastSyncDate}`, programIds, {
         });
     }
     getNewShipmentSyncApi(json){
-        return axios.post(`${API_URL}/api/erpLinking/shipmentSync/`,json, {
+        return axios.post(`${API_URL}/api/erpLinking/shipmentSync`,json, {
         });
     }
 }

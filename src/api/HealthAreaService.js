@@ -6,11 +6,11 @@ class HealthAreaService {
         });
     }
     addHealthArea(json) {
-        return axios.post(`${API_URL}/api/healthArea/`, json, {}
+        return axios.post(`${API_URL}/api/healthArea`, json, {}
         );
     }
     getHealthAreaList() {
-        return axios.get(`${API_URL}/api/healthArea/`, {
+        return axios.get(`${API_URL}/api/healthArea`, {
         });
     }
     getRealmCountryList(json) {
@@ -18,7 +18,7 @@ class HealthAreaService {
         );
     }
     editHealthArea(json) {
-        return axios.put(`${API_URL}/api/healthArea/`, json, {
+        return axios.put(`${API_URL}/api/healthArea`, json, {
         });
     }
     getHealthAreaById(json) {

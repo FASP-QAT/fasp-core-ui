@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class IntegrationSerice {
     addIntegration(json) {
-        return axios.post(`${API_URL}/api/integration/`, json, {
+        return axios.post(`${API_URL}/api/integration`, json, {
         });
     }
     getIntegrationListAll() {
@@ -14,7 +14,7 @@ class IntegrationSerice {
         });
     }
     editIntegration(json) {
-        return axios.put(`${API_URL}/api/integration/`, json, {
+        return axios.put(`${API_URL}/api/integration`, json, {
         });
     }
     getIntegrationById(json) {
@@ -22,7 +22,7 @@ class IntegrationSerice {
         );
     }
     addprogramIntegration(json) {
-        return axios.put(`${API_URL}/api/integrationProgram/`, json, {}
+        return axios.put(`${API_URL}/api/integrationProgram`, json, {}
         );
     }
     getProgramIntegrationByProgramId(programId) {
@@ -30,11 +30,11 @@ class IntegrationSerice {
         });
     }
     addManualJson(json) {
-        return axios.post(`${API_URL}/api/integrationProgram/manualJson/`, json, {
+        return axios.post(`${API_URL}/api/integrationProgram/manualJson`, json, {
         });
     }
     reportForManualIntegration(json) {
-        return axios.post(`${API_URL}/api/report/manualJson/`, json, {
+        return axios.post(`${API_URL}/api/report/manualJson`, json, {
         });
     }
 }
