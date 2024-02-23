@@ -265,7 +265,6 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent();
         this.getCountrylist();
         this.getVersionTypeList()
-        this.getStatusList()
     }
     show() {
     }
@@ -512,11 +511,14 @@ class SupplyPlanVersionAndReview extends Component {
         );
     }
     fetchData() {
+        this.setState({
+            loading:true
+        })
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
-        if (this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined) {
-            document.getElementById("versionStatusId").value = this.props.match.params.statusId;
-        }
+        // if (this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined) {
+        //     document.getElementById("versionStatusId").value = this.props.match.params.statusId;
+        // }
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
