@@ -170,7 +170,7 @@ class Login extends Component {
         }
       }).catch(error => {
         if(window.navigator.onLine){
-          apiVersionForDisplay = "The System is currently offline please come back after sometime."
+          apiVersionForDisplay = "QAT is currently undergoing maintenance and you can continue to use it offline. For Online operations please check back in a few hours."
         }else{
           apiVersionForDisplay = "Offline"
         }
