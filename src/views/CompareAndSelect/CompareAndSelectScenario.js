@@ -399,8 +399,8 @@ class CompareAndSelectScenario extends Component {
         });
         higherThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[sortedArray.length - 1] != "" && sortedArray[sortedArray.length - 1] != null && sortedArray[sortedArray.length - 1] != undefined ? sortedArray[sortedArray.length - 1] : 0;
         lowerThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[0] != "" && sortedArray[0] != null && sortedArray[0] != undefined ? sortedArray[0] : 0;
-        higherThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].higherThenConsumptionThreshold;
-        lowerThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].lowerThenConsumptionThreshold;
+        higherThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdHighPerc);
+        lowerThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdLowPerc);
         var finalData = [];
         var min = Math.min(...actualDiff.filter(c => c != 0))
         var treeScenarioList = this.state.treeScenarioList;
@@ -425,7 +425,7 @@ class CompareAndSelectScenario extends Component {
                             && higherThenConsumptionThreshold != ""
                             && lowerThenConsumptionThreshold > 0
                             && higherThenConsumptionThreshold > 0 ?
-                            totalArray[tsList] < lowerThenConsumptionThreshold ? (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) > lowerThenConsumptionThresholdPU && (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) < higherThenConsumptionThresholdPU ? "" : "red" : totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) > lowerThenConsumptionThresholdPU && (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) < higherThenConsumptionThresholdPU ? "" : "red" : "" : "" : "",
+                            totalArray[tsList] < lowerThenConsumptionThreshold ? (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) > lowerThenConsumptionThresholdPU ? "red" : "" : totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) > higherThenConsumptionThresholdPU ? "red" : "" : "" : "" : "",
                 compareToConsumptionForecast:
                     treeScenarioList[tsList].type == 'T' ?
                         !treeScenarioList[tsList].readonly
@@ -1132,7 +1132,7 @@ class CompareAndSelectScenario extends Component {
             }
             if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
                 var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass=="red"?"compareAndSelectRed":this.state.finalData[j].compareToConsumptionForecastClass);
+                cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
             }
         }
     }
@@ -1230,7 +1230,7 @@ class CompareAndSelectScenario extends Component {
         }
     }
     setDatasetId(event) {
-        var datasetId=event.target.value;
+        var datasetId = event.target.value;
         this.setState({ loading: true })
         this.setState({
             datasetId: datasetId,
@@ -1360,7 +1360,7 @@ class CompareAndSelectScenario extends Component {
                     equivalencyUnitList: [],
                     loading: false,
                     showAllData: false,
-                    datasetId:""
+                    datasetId: ""
                 })
             }
         })
