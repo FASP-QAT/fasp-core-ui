@@ -497,8 +497,11 @@ class LoadDeleteDataSet extends Component {
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
-                                                                    this.state.prgList.filter(c =>
-                                                                        c.realmCountry.id == item.realmCountry.id)
+                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).sort(function (a, b) {
+                                                                        a = getLabelText(a.program.label, this.state.lang).toLowerCase();
+                                                                        b = getLabelText(b.program.label, this.state.lang).toLowerCase();
+                                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                                    }.bind(this))
                                                                         .map(item2 => (
                                                                             <li>
                                                                                 <span className="tree_label">
