@@ -85,6 +85,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance).getValue(`AB${parseInt(data[i].y) + 1}`, true);
+                console.log("index===>", data, "====", instance);
+
                 (instance).setValueFromCoords(25, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*M${parseInt(data[i].y) + 1},2)`, true);
                 (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*N${parseInt(data[i].y) + 1},0)`, true);
@@ -570,9 +572,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[24] = shipmentList[i].notes;
                                                 data[25] = shipmentList[i].createdDate;
                                                 data[26] = shipmentList[i].shipmentStatus.id;
-                                                data[27] = index; 
-                                                data[28] = shipmentList[i].batchInfoList; 
-                                                data[29] = totalShipmentQty; 
+                                                data[27] = index;
+                                                data[28] = shipmentList[i].batchInfoList;
+                                                data[29] = totalShipmentQty;
                                                 data[30] = shipmentDatesJson;
                                                 data[31] = shipmentList[i].suggestedQty;
                                                 data[32] = 0;
@@ -711,6 +713,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     if (y != null) {
                                                         if (x == 20) {
                                                             return false
+                                                        }
+                                                        if (x == 10) {
+                                                            return ""
                                                         }
                                                     }
                                                 },
@@ -2461,7 +2466,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             shipmentInstance.setValueFromCoords(12, rowNumber, shipmentQty, true);
             if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
-            }else{
+            } else {
                 shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
             }
             this.props.updateState("shipmentQtyChangedFlag", 0);
@@ -2554,10 +2559,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         if (x == 2) {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
-            var batchInfoList=elInstance.getJson(null,false);
-            var batchQtyTotalForPopup=0;
-            batchInfoList.map((item,count)=>{
-                var qty=elInstance.getValue(`C${parseInt(count) + 1}`, true).toString().replaceAll("\,", "");
+            var batchInfoList = elInstance.getJson(null, false);
+            var batchQtyTotalForPopup = 0;
+            batchInfoList.map((item, count) => {
+                var qty = elInstance.getValue(`C${parseInt(count) + 1}`, true).toString().replaceAll("\,", "");
                 batchQtyTotalForPopup += Number(qty)
             })
             this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
@@ -3457,7 +3462,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                         this.props.hideSecondComponent();
                     } else {
-                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != ""  && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != 0) {
+                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != 0) {
                             positiveValidation("M", y, elInstance);
                         } else {
                             if (rowData[1].toString() == "false" && rowData[0].toString() == "true") {
