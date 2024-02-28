@@ -626,7 +626,7 @@ class EquivalancyUnit extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##',
+                    mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     required: true,
                     number: true,

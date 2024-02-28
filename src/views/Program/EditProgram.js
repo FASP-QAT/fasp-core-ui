@@ -99,7 +99,7 @@ const validationSchema = function (values) {
         programCode1: Yup.string()
             .test('programCode', i18n.t('static.programValidation.programCode'),
                 function (value) {
-                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                    if (parseInt(document.getElementById("programCode").value.length + (value ? value.length : 0)) > MAX_PROGRAM_CODE_LENGTH) {
                         return false;
                     } else {
                         return true;
