@@ -668,7 +668,8 @@ export default class BuildTree extends Component {
             modelingChangedOrAdded: false,
             addNodeError: false,
             currentNodeTypeId: "",
-            deleteChildNodes: false
+            deleteChildNodes: false,
+            branchTemplateNotes: ""
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -6606,7 +6607,15 @@ export default class BuildTree extends Component {
             items[findNodeIndex].level = parseInt(parentLevel + 1);
             parentLevel++;
         }
+        let { curTreeObj } = this.state;
+        if (treeTemplateId != "") {
+            var branchTemplateDesc = document.getElementById("branchTemplateId").selectedOptions[0].text;
+            var branchTemplateNotes = document.getElementById("branchTemplateNotes").value;
+            var notes = "Branch Note for " + branchTemplateDesc + ": " + branchTemplateNotes;
+            curTreeObj.notes = curTreeObj.notes != "" ? curTreeObj.notes + " | " + notes : notes;
+        }
         this.setState({
+            curTreeObj,
             items,
             isBranchTemplateModalOpen: false,
             branchTemplateId: "",
@@ -7050,6 +7059,9 @@ export default class BuildTree extends Component {
             this.setState({ branchTemplateId: event.target.value }, () => {
                 this.getMissingPuListBranchTemplate();
             });
+        }
+        if (event.target.name === "branchTemplateNotes") {
+            this.setState({ branchTemplateNotes: event.target.value });
         }
         if (event.target.name === "currentEndValue") {
             this.setState({
@@ -11369,6 +11381,15 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <FormGroup className="col-md-5">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <Input type="textarea"
+                                                                    id="branchTemplateNotes"
+                                                                    name="branchTemplateNotes"
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                    value={this.state.branchTemplateNotes != "" ? this.state.branchTemplateNotes : ""}
+                                                                ></Input>
+                                                            </FormGroup>
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
