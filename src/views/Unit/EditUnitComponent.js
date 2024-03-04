@@ -11,6 +11,11 @@ let initialValues = {
     unit: ""
 }
 const entityname = i18n.t('static.unit.unit');
+/**
+ * This const is used to define the validation schema for unit
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         unitName: Yup.string()
@@ -22,6 +27,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.unit.unitcodetext'))
     })
 }
+/**
+ * This component is used to display the unit details in a form and allow user to edit the details
+ */
 export default class EditUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -52,11 +60,18 @@ export default class EditUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { unit } = this.state
         if (event.target.name == "unitName") {
@@ -73,7 +88,9 @@ export default class EditUnitComponent extends Component {
             () => { }
         );
     };
-    
+    /**
+     * This function is used to get the unit details
+     */
     componentDidMount() {
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             if (response.status == 200) {
@@ -129,12 +146,20 @@ export default class EditUnitComponent extends Component {
             }
         );
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { unit } = this.state
             unit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This returns unit details form
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -331,9 +356,15 @@ export default class EditUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to list unit screen
+     */
     cancelClicked() {
         this.props.history.push(`/unit/listUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when reset button is clicked to reset the unit details
+     */
     resetClicked() {
         UnitService.getUnitById(this.props.match.params.unitId).then(response => {
             this.setState({
