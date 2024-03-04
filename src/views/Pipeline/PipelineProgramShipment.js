@@ -926,7 +926,7 @@ export default class PipelineProgramShipment extends Component {
             moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 150, 150, 150, 150, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100, 100, 100, 100, 180],
             columns: [
                 {

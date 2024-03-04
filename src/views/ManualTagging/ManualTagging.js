@@ -215,7 +215,7 @@ export default class ManualTagging extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.manualTagging.erpPlanningUnit'), type: 'text', width: 200 },
@@ -285,7 +285,7 @@ export default class ManualTagging extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
@@ -2692,7 +2692,7 @@ export default class ManualTagging extends Component {
                     jexcel.destroy(document.getElementById("tab1"), true);
                     var options = {
                         data: dataArray1,
-                        columnDrag: true,
+                        columnDrag: false,
                         colHeaderClasses: ["Reqasterisk"],
                         columns: [
                             {
@@ -2869,7 +2869,7 @@ export default class ManualTagging extends Component {
                     var data = erpDataArray;
                     var options = {
                         data: data,
-                        columnDrag: true,
+                        columnDrag: false,
                         colHeaderClasses: ["Reqasterisk"],
                         columns: [
                             {
@@ -3188,7 +3188,7 @@ export default class ManualTagging extends Component {
             if (this.state.active1) {
                 var options = {
                     data: data,
-                    columnDrag: true,
+                    columnDrag: false,
                     colHeaderClasses: ["Reqasterisk"],
                     columns: [
                         {
@@ -3276,7 +3276,7 @@ export default class ManualTagging extends Component {
             else if (this.state.active2) {
                 var options = {
                     data: data,
-                    columnDrag: true,
+                    columnDrag: false,
                     colHeaderClasses: ["Reqasterisk"],
                     columns: [
                         {
@@ -3681,7 +3681,7 @@ export default class ManualTagging extends Component {
             else if (this.state.active3) {
                 var options = {
                     data: data,
-                    columnDrag: true,
+                    columnDrag: false,
                     colHeaderClasses: ["Reqasterisk"],
                     columns: [
                         {

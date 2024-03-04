@@ -55,7 +55,7 @@ class ListTracerCategoryComponent extends Component {
         var data = tracerCategory;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

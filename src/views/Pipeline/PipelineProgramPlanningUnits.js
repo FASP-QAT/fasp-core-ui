@@ -605,7 +605,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             var data = productDataArr;
                                             var options = {
                                                 data: data,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 colWidths: [160, 190, 190, 190, 80, 80, 80, 80, 80, 80, 120, 120, 80, 80],
                                                 columns: [
                                                     {

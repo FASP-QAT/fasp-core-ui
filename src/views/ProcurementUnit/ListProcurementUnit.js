@@ -87,7 +87,7 @@ export default class ListProcurementUnit extends Component {
     var data = procurementUnitArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [0, 150, 150, 80, 60, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [

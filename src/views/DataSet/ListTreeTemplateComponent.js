@@ -453,7 +453,7 @@ export default class ListTreeTemplate extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -1396,7 +1396,7 @@ export default class ListTreeTemplate extends Component {
         var data = treeTemplateArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

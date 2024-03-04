@@ -126,7 +126,7 @@ export default class DataSourceListComponent extends Component {
         var data = dataSourceArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

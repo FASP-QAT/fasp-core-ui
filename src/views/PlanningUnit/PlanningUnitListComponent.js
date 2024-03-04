@@ -336,7 +336,7 @@ export default class PlanningUnitListComponent extends Component {
         var data = planningUnitArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [70, 150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

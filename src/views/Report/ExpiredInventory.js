@@ -833,7 +833,7 @@ export default class ExpiredInventory extends Component {
         var data = outPutListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 60, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

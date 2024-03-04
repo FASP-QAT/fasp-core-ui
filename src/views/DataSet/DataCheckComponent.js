@@ -387,7 +387,7 @@ export function buildJxl(props) {
             treeScenarioListFilter[tsl].dataArray = childrenArray;
             var options = {
                 data: childrenArray,
-                columnDrag: true,
+                columnDrag: false,
                 colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columnsArray,

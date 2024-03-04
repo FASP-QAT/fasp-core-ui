@@ -306,7 +306,7 @@ class AddprogramPlanningUnit extends Component {
                                                         var data = productDataArr;
                                                         var options = {
                                                             data: data,
-                                                            columnDrag: true,
+                                                            columnDrag: false,
                                                             columns: [
                                                                 {
                                                                     title: i18n.t('static.productCategory.productCategory'),
