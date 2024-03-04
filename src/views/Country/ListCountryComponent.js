@@ -101,7 +101,7 @@ export default class CountryListComponent extends Component {
         var data = countryArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 120, 150, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

@@ -708,7 +708,7 @@ export default class CommitTreeComponent extends React.Component {
                             data[9] = 4;
                             var options = {
                                 data: [data],
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.program.forecastStart'),
@@ -875,7 +875,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedPlanningUnitListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.productCategory.productCategory'),
@@ -1049,7 +1049,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedConsumptionListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.dashboard.planningunitheader'),
@@ -1240,7 +1240,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedTreeListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t("static.commitVersion.localV") + programDataLocal.currentVersion.versionId,
@@ -1571,7 +1571,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: dataArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: columns,
                                 nestedHeaders: nestedHeaders,
                                 onload: this.loadedFunctionForSelectedForecast,

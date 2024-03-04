@@ -856,7 +856,7 @@ class VersionSettingsComponent extends Component {
         var data = versionSettingsArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 120, 60, 80, 100, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

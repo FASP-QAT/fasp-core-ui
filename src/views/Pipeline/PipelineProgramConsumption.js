@@ -351,7 +351,7 @@ export default class PipelineProgramConsumption extends Component {
                                     var data = consumptionDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [150, 150, 150, 150, 90, 90, 90, 90, 150, 90],
                                         columns: [
                                             {
