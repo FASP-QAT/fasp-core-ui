@@ -34,7 +34,7 @@ const validationSchema = function (values) {
     })
 }
 /**
- * This component is used to display the unit details in a form and allow user to edit the details
+ * This component is used to display the unit details in a form and allow user to add the details
  */
 class AddUnitComponent extends Component {
     constructor(props) {

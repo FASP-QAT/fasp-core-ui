@@ -14,6 +14,11 @@ const initialValues = {
     templateName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for tree template ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the tree template form and allow user to submit the update master request in jira
+ */
 export default class EditTreeTemplateTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -44,6 +52,10 @@ export default class EditTreeTemplateTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { treeTemplate } = this.state
         if (event.target.name == "summary") {
@@ -67,7 +79,9 @@ export default class EditTreeTemplateTicketComponent extends Component {
             treeTemplate
         }, () => { })
     };
-    
+    /**
+     * This function is used to get tree template list on page load
+     */
     componentDidMount() {
         DatasetService.getTreeTemplateList()
             .then(response => {
@@ -130,11 +144,17 @@ export default class EditTreeTemplateTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the tree template details
+     */
     resetClicked() {
         let { treeTemplate } = this.state;
         treeTemplate.templateName = '';
@@ -145,6 +165,10 @@ export default class EditTreeTemplateTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns tree template details form
+     */
     render() {
         const { templates } = this.state;
         let templateList = templates.length > 0
