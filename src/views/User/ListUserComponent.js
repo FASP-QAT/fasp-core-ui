@@ -461,7 +461,7 @@ class ListUserComponent extends Component {
             );
     }
     /**
-     * This function is used to display the user details in tabular format
+     * This function is used to display the user details list in jexcel tabular format
      */
     buildJExcel1() {
         let userList = this.state.selUserList;

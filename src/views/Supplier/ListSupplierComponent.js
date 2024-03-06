@@ -14,6 +14,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.supplier.supplier');
+/**
+ * This component is used to show list of suppliers
+ */
 class SupplierListComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,36 +28,45 @@ class SupplierListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang')
         }
-        this.editSupplier = this.editSupplier.bind(this);
         this.addSupplier = this.addSupplier.bind(this);
         this.filterData = this.filterData.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when component is about to change to clear the timeout
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    editSupplier(supplier) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER')) {
-            this.props.history.push({
-                pathname: `/supplier/editSupplier/${supplier.supplierId}`,
-            });
-        }
-    }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * This function is called when user click on the row to edit the supplier and is redirected to edit supplier screen
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -67,11 +79,17 @@ class SupplierListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * This function is called when user clicks on add new supplier button and is redirected to add supplier screen
+     */
     addSupplier(supplier) {
         this.props.history.push({
             pathname: "/supplier/addSupplier"
         });
     }
+    /**
+     * This function is used to filter the supplier list based on the realm Id
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -87,6 +105,9 @@ class SupplierListComponent extends Component {
                 () => { this.buildJexcel() })
         }
     }
+    /**
+     * This function is used to display the supplier list in jexcel tabular format
+     */
     buildJexcel() {
         let supplierList = this.state.selSource;
         let supplierArray = [];
@@ -167,6 +188,9 @@ class SupplierListComponent extends Component {
             supplierEl: supplierEl, loading: false
         })
     }
+    /**
+     * This function is used to get realm and supplier list on page load
+     */
     componentDidMount() {
         this.hideFirstComponent();
         RealmService.getRealmListAll()
@@ -276,6 +300,10 @@ class SupplierListComponent extends Component {
                 }
             );
     }
+    /**
+     * This is used to display the content
+     * @returns The supplier list data in tabular format with filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

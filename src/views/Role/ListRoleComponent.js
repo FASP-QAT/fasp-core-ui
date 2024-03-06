@@ -14,7 +14,11 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.role.role');
+/**
+ * Component for list of role details.
+ */
 class ListRoleComponent extends Component {
     constructor(props) {
         super(props);
@@ -31,6 +35,9 @@ class ListRoleComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJexcel() {
         let roleList = this.state.selSource;
         let roleArray = [];
@@ -93,29 +100,38 @@ class ListRoleComponent extends Component {
             roleEl: roleEl, loading: false
         })
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Redirects to the add role screen.
+     */
     addNewRole() {
         this.props.history.push("/role/addRole");
     }
-    editRole(role) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
-            this.props.history.push({
-                pathname: `/role/editRole/${role.roleId}`,
-            });
-        }
-    }
+    /**
+     * Redirects to the edit role screen on row click.
+     * @param {Object} role - The role object to be edited.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -130,6 +146,9 @@ class ListRoleComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Fetches the role list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
         UserService.getRoleList()
@@ -189,9 +208,18 @@ class ListRoleComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the role list.
+     * @returns {JSX.Element} - Role list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

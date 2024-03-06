@@ -10,12 +10,19 @@ import { API_URL } from '../../Constants.js';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     roleName: "",
     businessFunctions: [],
     canCreateRoles: []
 }
+// Localized entity name
 const entityname = i18n.t('static.role.role');
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
@@ -27,6 +34,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.role.cancreateroletext'))
     })
 }
+/**
+ * Component for adding role details.
+ */
 class AddRoleComponent extends Component {
     constructor(props) {
         super(props);
@@ -56,6 +66,11 @@ class AddRoleComponent extends Component {
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Capitalizes the first letter of the role name.
+     * @param {string} str - The role name.
+     * @returns {string} - Capitalized role name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -63,6 +78,10 @@ class AddRoleComponent extends Component {
             return "";
         }
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { role } = this.state;
         if (event.target.name == "roleName") {
@@ -73,6 +92,10 @@ class AddRoleComponent extends Component {
         },
             () => { });
     };
+    /**
+     * Handles change in selected business functions.
+     * @param {Array} businessFunctionId - Selected business function IDs.
+     */
     businessFunctionChange(businessFunctionId) {
         let { role } = this.state;
         this.setState({ businessFunctionId });
@@ -86,6 +109,10 @@ class AddRoleComponent extends Component {
         },
             () => { });
     }
+    /**
+     * Handles change in selected can create roles.
+     * @param {Array} canCreateRoleId - Selected can create role IDs.
+     */
     canCreateRoleChange(canCreateRoleId) {
         let { role } = this.state;
         this.setState({ canCreateRoleId });
@@ -99,13 +126,19 @@ class AddRoleComponent extends Component {
         },
             () => { });
     }
-    
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Fetches business function and role list on component mount.
+     */
     componentDidMount() {
+        // Fetch business function list
         UserService.getBusinessFunctionList()
             .then(response => {
                 if (response.status == 200) {
@@ -171,6 +204,7 @@ class AddRoleComponent extends Component {
                     }
                 }
             );
+        // Fetch role list
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
@@ -237,6 +271,10 @@ class AddRoleComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the role details form.
+     * @returns {JSX.Element} - Role details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -413,9 +451,15 @@ class AddRoleComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list role screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/role/listRole/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the role details when reset button is clicked.
+     */
     resetClicked() {
         let { role } = this.state;
         role.label.label_en = '';
