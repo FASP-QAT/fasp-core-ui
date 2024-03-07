@@ -18,7 +18,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -3350,14 +3350,10 @@ export default class BuildTree extends Component {
                 return false;
             }.bind(this),
         };
-        console.log("Options Test@123", options)
-        console.log("Mom Jexcel Test@123", document.getElementById("momJexcel"));
         if (document.getElementById("momJexcel") != null) {
-            console.log("In if Test@123");
             var momEl = jexcel(document.getElementById("momJexcel"), options);
             this.el = momEl;
         } else {
-            console.log("In else Test@123")
             var momEl = "";
         }
         this.setState({
@@ -3788,7 +3784,7 @@ export default class BuildTree extends Component {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
                 if (rowData[4] != "") {
-                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
@@ -3799,8 +3795,14 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                     if (rowData[4] == 2) {
@@ -3813,8 +3815,14 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                 }
@@ -4822,12 +4830,18 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
-                    if (rowData[4] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                        if (rowData[4] != 5) {
+                            calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                        } else {
+                            calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        }
                     }
                 }
             }
@@ -4854,8 +4868,14 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                    }
                 }
             }
         }

@@ -2854,7 +2854,7 @@ export default class CreateTreeTemplate extends Component {
                     this.state.modelingEl.setComments(col, "");
                 }
                 if (rowData[4] != "") {
-                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
@@ -2865,8 +2865,14 @@ export default class CreateTreeTemplate extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                     if (rowData[4] == 2) {
@@ -2879,8 +2885,14 @@ export default class CreateTreeTemplate extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                 }
@@ -4641,12 +4653,18 @@ export default class CreateTreeTemplate extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
-                    if (rowData[4] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed();
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                        if (rowData[4] != 5) {
+                            calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                        } else {
+                            calculatedChangeForMonth = parseFloat(value).toFixed();
+                        }
                     }
                 }
             }
@@ -4673,8 +4691,14 @@ export default class CreateTreeTemplate extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                    }
                 }
             }
         }
