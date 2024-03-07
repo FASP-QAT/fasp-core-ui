@@ -12615,6 +12615,9 @@ label.arrow_label:before {
 .BorderTopForcastOutput{
   border-top: 1px solid #c8ced3!important;
 }
+.jss_container{
+  width: 100%;
+}
 @media screen and (min-width: 1025px) {
   .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
     position: sticky;
