@@ -10677,6 +10677,9 @@ legend.scheduler-border {
   min-width: 150px;
   // top:65px!important;
 }
+.jss_container{
+  width: 100%;
+}
 @media screen and (min-width: 1025px) {
   .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
     position: sticky;
