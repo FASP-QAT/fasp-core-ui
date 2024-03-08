@@ -13,7 +13,6 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -26,11 +25,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 const entityname = ""
-const pickerLang = {
-    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-    from: 'From', to: 'To',
-}
 /**
  * Component for Supply Plan Version and Review Report.
  */
@@ -68,8 +65,6 @@ class SupplyPlanVersionAndReview extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -114,22 +109,6 @@ class SupplyPlanVersionAndReview extends Component {
         }, () => {
             this.fetchData();
         })
-    }
-    /**
-     * Hides the message in div1 after 30 seconds.
-     */
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
-    /**
-     * Hides the message in div2 after 30 seconds.
-     */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     /**
      * Clears the timeout when the component unmounts.
@@ -229,7 +208,7 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }
             ],
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -277,28 +256,13 @@ class SupplyPlanVersionAndReview extends Component {
         }
     }.bind(this);
     /**
-     * Callback function triggered when the Jexcel instance is loaded to format the table.
-     */
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
-    /**
-     * Formats the selected month and year into text.
-     * @param {object} m - The selected month and year object.
-     * @returns {string} - The formatted text representing the selected month and year.
-     */
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    /**
      * This function is used to call either function for country list and version type list on page load
      */
     componentDidMount() {
         if (this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined) {
             document.getElementById("versionStatusId").value = this.props.match.params.statusId;
         }
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getCountrylist();
         this.getVersionTypeList()
     }
@@ -407,7 +371,7 @@ class SupplyPlanVersionAndReview extends Component {
                                 programs: [], loading: false
                             },
                                 () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 })
                             if (error.message === "Network Error") {
                                 this.setState({
@@ -659,20 +623,12 @@ class SupplyPlanVersionAndReview extends Component {
         }
     }
     /**
-     * Adds double quotes to each element in the array.
-     * @param {array} arr - The array to which double quotes need to be added.
-     * @returns {array} - The modified array with double quotes added to each element.
-     */
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
-    /**
      * Exports the data to a CSV file.
      * @param {array} columns - The columns to be exported.
      */
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -685,8 +641,8 @@ class SupplyPlanVersionAndReview extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = item.text.replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`).replaceAll(' ', '%20') : '') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`).replaceAll(' ', '%20') : '') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
         ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(','))
@@ -733,7 +689,7 @@ class SupplyPlanVersionAndReview extends Component {
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {

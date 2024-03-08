@@ -28,6 +28,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const options = {
     title: {
         display: true,
@@ -101,10 +102,6 @@ const options = {
         }
     }
 }
-const pickerLang = {
-    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-    from: 'From', to: 'To',
-}
 /**
  * Component for Stock Status Overtime Report.
  */
@@ -150,106 +147,6 @@ class StockStatusOverTime extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-        this.roundAMC = this.roundAMC.bind(this);
-    }
-    /**
-     * Rounds the AMC (Average Monthly Consumption) value to a specific decimal place based on its magnitude.
-     * @param {number} amc - The AMC value to be rounded.
-     * @returns {number|null} - The rounded AMC value or null if the input is null.
-     */
-    roundAMC(amc) {
-        if (amc != null) {
-            if (Number(amc).toFixed(0) >= 100) {
-                return Number(amc).toFixed(0);
-            } else if (Number(amc).toFixed(1) >= 10) {
-                return Number(amc).toFixed(1);
-            } else if (Number(amc).toFixed(2) >= 1) {
-                return Number(amc).toFixed(2);
-            } else {
-                return Number(amc).toFixed(3);
-            }
-        } else {
-            return null;
-        }
-    }
-    /**
-     * Formats the selected month and year into text.
-     * @param {object} m - The selected month and year object.
-     * @returns {string} - The formatted text representing the selected month and year.
-     */
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    /**
-     * Rounds a number to 1 decimal place.
-     * @param {number} num - The number to be rounded.
-     * @returns {string} - The rounded number with 1 decimal place as a string.
-     */
-    roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-    }
-    /**
-     * Formats a date value into the format 'MMM YY' (e.g., 'Jan 22').
-     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
-     * @returns {string} - The formatted date string in the 'MMM YY' format.
-     */
-    dateFormatter = value => {
-        return moment(value).format('MMM YY')
-    }
-    /**
-     * Formats a date value into a localized month and year format (e.g., 'Jan 22').
-     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
-     * @returns {string} - The formatted date string with the month name in the user's preferred language and the year in two digits.
-     */
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
-    /**
-     * Formats a numerical value into a string with thousands separators.
-     * @param {number} value - The numerical value to be formatted.
-     * @returns {string} - The formatted string with thousands separators.
-     */
-    formatter = value => {
-        if (value != null) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
-        }
-        else {
-            return ''
-        }
     }
     /**
      * Handles the change event for planning units.
@@ -912,7 +809,7 @@ class StockStatusOverTime extends Component {
                                             "consumptionQty": list[0].consumptionQty,
                                             "amc": amcCalcualted,
                                             "amcMonthCount": countAMC,
-                                            "mos": mos != null ? this.roundN(mos) : null
+                                            "mos": mos != null ? roundN(mos) : null
                                         }
                                         data.push(json)
                                     } else {
@@ -1016,19 +913,11 @@ class StockStatusOverTime extends Component {
         }
     }
     /**
-     * Adds double quotes to each element in an array.
-     * @param {array} arr - The array to which double quotes will be added.
-     * @returns {array} - The modified array with double quotes added to each element.
-     */
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
-    /**
      * Exports the data to a CSV file.
      */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -1043,8 +932,8 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         csvRow.push('')
         var re;
-        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.roundAMC(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        var A = [addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? roundAMC(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1089,7 +978,7 @@ class StockStatusOverTime extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -1134,7 +1023,7 @@ class StockStatusOverTime extends Component {
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 230, 'CANVAS');
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.roundAMC(elt.amc)), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1189,8 +1078,8 @@ class StockStatusOverTime extends Component {
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
             '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         ]
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
-        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+        var dts = Array.from(new Set(this.state.matricsList.map(ele => (dateFormatterLanguage(ele.dt)))))
         const bar = {
             labels: dts,
             datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor[index] }))
@@ -1389,24 +1278,24 @@ class StockStatusOverTime extends Component {
                                                     &&
                                                     this.state.matricsList.map(item =>
                                                         <tr id="addr0" >
-                                                            <td>{this.dateFormatter(item.dt)}</td>
+                                                            <td>{dateFormatter(item.dt)}</td>
                                                             <td>
                                                                 {getLabelText(item.planningUnit.label, this.state.lang)}
                                                             </td>
                                                             <td>
-                                                                {this.formatter(item.stock)}
+                                                                {formatter(item.stock,0)}
                                                             </td>
                                                             <td>
-                                                                {this.formatter(item.consumptionQty)}
+                                                                {formatter(item.consumptionQty,0)}
                                                             </td>
                                                             <td>
-                                                                {this.formatter(this.roundAMC(item.amc))}
+                                                                {formatter(roundAMC(item.amc,0))}
                                                             </td>
                                                             <td>
-                                                                {this.formatter(item.amcMonthCount)}
+                                                                {formatter(item.amcMonthCount,0)}
                                                             </td>
                                                             <td>
-                                                                {item.mos != null ? this.roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
+                                                                {item.mos != null ? roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
                                                             </td>
                                                         </tr>)}
                                             </tbody>

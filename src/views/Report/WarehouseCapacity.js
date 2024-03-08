@@ -14,7 +14,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -25,6 +24,8 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 /**
  * Component for Warehouse Capacity Report.
  */
@@ -74,14 +75,6 @@ class warehouseCapacity extends Component {
         }
     }
     /**
-     * Adds double quotes to each element in the array.
-     * @param {array} arr - The array to which double quotes need to be added.
-     * @returns {array} - The modified array with double quotes added to each element.
-     */
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
-    /**
      * Exports the data to CSV format.
      */
     exportCSV() {
@@ -100,10 +93,10 @@ class warehouseCapacity extends Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
-        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
+        var A = [addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
         re = this.state.data;
         for (var item = 0; item < re.length; item++) {
-            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
+            A.push(addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -621,7 +614,7 @@ class warehouseCapacity extends Component {
                 }
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -646,12 +639,6 @@ class warehouseCapacity extends Component {
         this.setState({
             regionEl: regionEl, loading: false
         })
-    }
-    /**
-     * Callback function triggered when the Jexcel instance is loaded to format the table.
-     */
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
     }
     /**
      * Renders the warehouse capacity report table.

@@ -10,6 +10,7 @@ import { API_URL } from '../../Constants.js';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 // Initial values for form fields
 const initialValues = {
     roleName: "",
@@ -61,22 +62,8 @@ class AddRoleComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-    }
-    /**
-     * Capitalizes the first letter of the role name.
-     * @param {string} str - The role name.
-     * @returns {string} - Capitalized role name.
-     */
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
     }
     /**
      * Handles data change in the form.
@@ -127,14 +114,6 @@ class AddRoleComponent extends Component {
             () => { });
     }
     /**
-     * Hides the message in div2 after 30 seconds.
-     */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    /**
      * Fetches business function and role list on component mount.
      */
     componentDidMount() {
@@ -161,7 +140,7 @@ class AddRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -227,7 +206,7 @@ class AddRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -300,7 +279,7 @@ class AddRoleComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -373,7 +352,7 @@ class AddRoleComponent extends Component {
                                                         onBlur={handleBlur}
                                                         required
                                                         maxLength={45}
-                                                        value={this.Capitalize(this.state.role.label.label_en)}
+                                                        value={Capitalize(this.state.role.label.label_en)}
                                                     /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">

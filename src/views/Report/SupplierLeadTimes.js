@@ -16,7 +16,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -27,6 +26,8 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 /**
  * Component for Supplier Lead Times Report.
  */
@@ -164,7 +165,7 @@ class SupplierLeadTimes extends Component {
                 ],
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -191,14 +192,6 @@ class SupplierLeadTimes extends Component {
         })
     }
     /**
-     * Adds double quotes to each element in an array.
-     * @param {array} arr - The array to which double quotes will be added.
-     * @returns {array} - The modified array with double quotes added to each element.
-     */ 
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
-    /**
      * Exports the data to a CSV file.
      * @param {array} columns - The columns to be exported.
      */
@@ -216,9 +209,9 @@ class SupplierLeadTimes extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var A = [addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
-            ele => A.push(this.addDoubleQuoteToRowContent([
+            ele => A.push(addDoubleQuoteToRowContent([
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -754,12 +747,6 @@ class SupplierLeadTimes extends Component {
                 })
             }.bind(this);
         }.bind(this);
-    }
-    /**
-     * Callback function triggered when the Jexcel instance is loaded to format the table.
-     */
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
     }
     /**
      * Fetches data based on selected programs, planning units, and procurement agents.

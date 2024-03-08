@@ -39,25 +39,8 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+import { addDoubleQuoteToRowContent, formatter, roundAMC, roundN } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
-const pickerLang = {
-  months: [
-    i18n.t("static.month.jan"),
-    i18n.t("static.month.feb"),
-    i18n.t("static.month.mar"),
-    i18n.t("static.month.apr"),
-    i18n.t("static.month.may"),
-    i18n.t("static.month.jun"),
-    i18n.t("static.month.jul"),
-    i18n.t("static.month.aug"),
-    i18n.t("static.month.sep"),
-    i18n.t("static.month.oct"),
-    i18n.t("static.month.nov"),
-    i18n.t("static.month.dec"),
-  ],
-  from: "From",
-  to: "To",
-};
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
   { text: i18n.t("static.report.lowstock"), color: "#f48521", value: 1 },
@@ -340,105 +323,105 @@ export default class StockStatusMatrix extends React.Component {
         var reorderFrequency = ele.reorderFrequency;
         if (stockStatusId == 0) {
           if (
-            (ele.jan != null && this.roundN(ele.jan) == 0) ||
-            (ele.feb != null && this.roundN(ele.feb) == 0) ||
-            (ele.mar != null && this.roundN(ele.mar) == 0) ||
-            (ele.apr != null && this.roundN(ele.apr) == 0) ||
-            (ele.may != null && this.roundN(ele.may) == 0) ||
-            (ele.jun != null && this.roundN(ele.jun) == 0) ||
-            (ele.jul != null && this.roundN(ele.jul) == 0) ||
-            (ele.aug != null && this.roundN(ele.aug) == 0) ||
-            (ele.sep != null && this.roundN(ele.sep) == 0) ||
-            (ele.oct != null && this.roundN(ele.oct) == 0) ||
-            (ele.nov != null && this.roundN(ele.nov) == 0) ||
-            (ele.dec != null && this.roundN(ele.dec) == 0)
+            (ele.jan != null && roundN(ele.jan) == 0) ||
+            (ele.feb != null && roundN(ele.feb) == 0) ||
+            (ele.mar != null && roundN(ele.mar) == 0) ||
+            (ele.apr != null && roundN(ele.apr) == 0) ||
+            (ele.may != null && roundN(ele.may) == 0) ||
+            (ele.jun != null && roundN(ele.jun) == 0) ||
+            (ele.jul != null && roundN(ele.jul) == 0) ||
+            (ele.aug != null && roundN(ele.aug) == 0) ||
+            (ele.sep != null && roundN(ele.sep) == 0) ||
+            (ele.oct != null && roundN(ele.oct) == 0) ||
+            (ele.nov != null && roundN(ele.nov) == 0) ||
+            (ele.dec != null && roundN(ele.dec) == 0)
           ) {
             filteredData.push(ele);
           }
         } else if (stockStatusId == 1) {
           if (
             (ele.jan != null &&
-              this.roundN(ele.jan) != 0 &&
-              this.roundN(ele.jan) < min) ||
+              roundN(ele.jan) != 0 &&
+              roundN(ele.jan) < min) ||
             (ele.feb != null &&
-              this.roundN(ele.feb) != 0 &&
-              this.roundN(ele.feb) < min) ||
+              roundN(ele.feb) != 0 &&
+              roundN(ele.feb) < min) ||
             (ele.mar != null &&
-              this.roundN(ele.mar) != 0 &&
-              this.roundN(ele.mar) < min) ||
+              roundN(ele.mar) != 0 &&
+              roundN(ele.mar) < min) ||
             (ele.apr != null &&
-              this.roundN(ele.apr) != 0 &&
-              this.roundN(ele.apr) < min) ||
+              roundN(ele.apr) != 0 &&
+              roundN(ele.apr) < min) ||
             (ele.may != null &&
-              this.roundN(ele.may) != 0 &&
-              this.roundN(ele.may) < min) ||
+              roundN(ele.may) != 0 &&
+              roundN(ele.may) < min) ||
             (ele.jun != null &&
-              this.roundN(ele.jun) != 0 &&
-              this.roundN(ele.jun) < min) ||
+              roundN(ele.jun) != 0 &&
+              roundN(ele.jun) < min) ||
             (ele.jul != null &&
-              this.roundN(ele.jul) != 0 &&
-              this.roundN(ele.jul) < min) ||
+              roundN(ele.jul) != 0 &&
+              roundN(ele.jul) < min) ||
             (ele.aug != null &&
-              this.roundN(ele.aug) != 0 &&
-              this.roundN(ele.aug) < min) ||
+              roundN(ele.aug) != 0 &&
+              roundN(ele.aug) < min) ||
             (ele.sep != null &&
-              this.roundN(ele.sep) != 0 &&
-              this.roundN(ele.sep) < min) ||
+              roundN(ele.sep) != 0 &&
+              roundN(ele.sep) < min) ||
             (ele.oct != null &&
-              this.roundN(ele.oct) != 0 &&
-              this.roundN(ele.oct) < min) ||
+              roundN(ele.oct) != 0 &&
+              roundN(ele.oct) < min) ||
             (ele.nov != null &&
-              this.roundN(ele.nov) != 0 &&
-              this.roundN(ele.nov) < min) ||
+              roundN(ele.nov) != 0 &&
+              roundN(ele.nov) < min) ||
             (ele.dec != null &&
-              this.roundN(ele.dec) != 0 &&
-              this.roundN(ele.dec) < min)
+              roundN(ele.dec) != 0 &&
+              roundN(ele.dec) < min)
           ) {
             filteredData.push(ele);
           }
         } else if (stockStatusId == 3) {
           if (
-            this.roundN(ele.jan) > min + reorderFrequency ||
-            this.roundN(ele.feb) > min + reorderFrequency ||
-            this.roundN(ele.mar) > min + reorderFrequency ||
-            this.roundN(ele.apr) > min + reorderFrequency ||
-            this.roundN(ele.may) > min + reorderFrequency ||
-            this.roundN(ele.jun) > min + reorderFrequency ||
-            this.roundN(ele.jul) > min + reorderFrequency ||
-            this.roundN(ele.aug) > min + reorderFrequency ||
-            this.roundN(ele.sep) > min + reorderFrequency ||
-            this.roundN(ele.oct) > min + reorderFrequency ||
-            this.roundN(ele.nov) > min + reorderFrequency ||
-            this.roundN(ele.dec) > min + reorderFrequency
+            roundN(ele.jan) > min + reorderFrequency ||
+            roundN(ele.feb) > min + reorderFrequency ||
+            roundN(ele.mar) > min + reorderFrequency ||
+            roundN(ele.apr) > min + reorderFrequency ||
+            roundN(ele.may) > min + reorderFrequency ||
+            roundN(ele.jun) > min + reorderFrequency ||
+            roundN(ele.jul) > min + reorderFrequency ||
+            roundN(ele.aug) > min + reorderFrequency ||
+            roundN(ele.sep) > min + reorderFrequency ||
+            roundN(ele.oct) > min + reorderFrequency ||
+            roundN(ele.nov) > min + reorderFrequency ||
+            roundN(ele.dec) > min + reorderFrequency
           ) {
             filteredData.push(ele);
           }
         } else if (stockStatusId == 2) {
           if (
-            (this.roundN(ele.jan) < min + reorderFrequency &&
-              this.roundN(ele.jan) > min) ||
-            (this.roundN(ele.feb) < min + reorderFrequency &&
-              this.roundN(ele.feb) > min) ||
-            (this.roundN(ele.mar) < min + reorderFrequency &&
-              this.roundN(ele.mar) > min) ||
-            (this.roundN(ele.apr) < min + reorderFrequency &&
-              this.roundN(ele.apr) > min) ||
-            (this.roundN(ele.may) < min + reorderFrequency &&
-              this.roundN(ele.may) > min) ||
-            (this.roundN(ele.jun) < min + reorderFrequency &&
-              this.roundN(ele.jun) > min) ||
-            (this.roundN(ele.jul) < min + reorderFrequency &&
-              this.roundN(ele.jul) > min) ||
-            (this.roundN(ele.aug) < min + reorderFrequency &&
-              this.roundN(ele.aug) > min) ||
-            (this.roundN(ele.sep) < min + reorderFrequency &&
-              this.roundN(ele.sep) > min) ||
-            (this.roundN(ele.oct) < min + reorderFrequency &&
-              this.roundN(ele.act) > min) ||
-            (this.roundN(ele.nov) < min + reorderFrequency &&
-              this.roundN(ele.nov) > min) ||
-            (this.roundN(ele.dec) < min + reorderFrequency &&
-              this.roundN(ele.dec) > min)
+            (roundN(ele.jan) < min + reorderFrequency &&
+              roundN(ele.jan) > min) ||
+            (roundN(ele.feb) < min + reorderFrequency &&
+              roundN(ele.feb) > min) ||
+            (roundN(ele.mar) < min + reorderFrequency &&
+              roundN(ele.mar) > min) ||
+            (roundN(ele.apr) < min + reorderFrequency &&
+              roundN(ele.apr) > min) ||
+            (roundN(ele.may) < min + reorderFrequency &&
+              roundN(ele.may) > min) ||
+            (roundN(ele.jun) < min + reorderFrequency &&
+              roundN(ele.jun) > min) ||
+            (roundN(ele.jul) < min + reorderFrequency &&
+              roundN(ele.jul) > min) ||
+            (roundN(ele.aug) < min + reorderFrequency &&
+              roundN(ele.aug) > min) ||
+            (roundN(ele.sep) < min + reorderFrequency &&
+              roundN(ele.sep) > min) ||
+            (roundN(ele.oct) < min + reorderFrequency &&
+              roundN(ele.act) > min) ||
+            (roundN(ele.nov) < min + reorderFrequency &&
+              roundN(ele.nov) > min) ||
+            (roundN(ele.dec) < min + reorderFrequency &&
+              roundN(ele.dec) > min)
           ) {
             filteredData.push(ele);
           }
@@ -1468,56 +1451,6 @@ export default class StockStatusMatrix extends React.Component {
     }
   }
   /**
-   * Formats the given value by rounding and adding commas for thousands separator.
-   * @param {number} value - The value to be formatted.
-   * @returns {string} - The formatted value.
-   */
-  formatter = (value) => {
-    if (value != null) {
-      var cell1 = this.roundN(value);
-      cell1 += "";
-      var x = cell1.split(".");
-      var x1 = x[0];
-      var x2 = x.length > 1 ? "." + x[1] : "";
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, "$1" + "," + "$2");
-      }
-      return x1 + x2;
-    } else {
-      return "";
-    }
-  };
-  /**
-   * Formats the given value by adding commas for thousands separator.
-   * @param {number} value - The value to be formatted.
-   * @returns {string} - The formatted value.
-   */
-  formatterMaxQty = (value) => {
-    if (value != null) {
-      var cell1 = value;
-      cell1 += "";
-      var x = cell1.split(".");
-      var x1 = x[0];
-      var x2 = x.length > 1 ? "." + x[1] : "";
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, "$1" + "," + "$2");
-      }
-      return x1 + x2;
-    } else {
-      return "";
-    }
-  };
-  /**
-   * Adds double quotes to each element in an array.
-   * @param {array} arr - The array to which double quotes will be added.
-   * @returns {array} - The modified array with double quotes added to each element.
-   */
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map((ele) => '"' + ele + '"');
-  };
-  /**
    * Exports the data to a CSV file.
    * @param {array} columns - The columns to be exported.
    */
@@ -1598,10 +1531,10 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => {
       headers[idx] = item.text.replaceAll(" ", "%20").replaceAll("#", "%23");
     });
-    var A = [this.addDoubleQuoteToRowContent(headers)];
+    var A = [addDoubleQuoteToRowContent(headers)];
     this.state.data.map((ele) =>
       A.push(
-        this.addDoubleQuoteToRowContent([
+        addDoubleQuoteToRowContent([
           ele.planningUnit.id,
           getLabelText(ele.planningUnit.label, this.state.lang)
             .replaceAll(",", " ")
@@ -1612,139 +1545,139 @@ export default class StockStatusMatrix extends React.Component {
           ele.minMonthsOfStock,
           ele.planBasedOn == 1
             ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
-            : this.roundAMC(ele.maxStock),
+            : roundAMC(ele.maxStock),
           ele.year,
           ele.planBasedOn == 1
             ? ele.jan != null
               ? isNaN(ele.jan)
                 ? ""
-                : this.roundN(ele.jan)
+                : roundN(ele.jan)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.janStock != null
               ? isNaN(ele.janStock)
                 ? ""
-                : this.roundN(ele.janStock)
+                : roundN(ele.janStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.feb != null
               ? isNaN(ele.feb)
                 ? ""
-                : this.roundN(ele.feb)
+                : roundN(ele.feb)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.febStock != null
               ? isNaN(ele.febStock)
                 ? ""
-                : this.roundN(ele.febStock)
+                : roundN(ele.febStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.mar != null
               ? isNaN(ele.mar)
                 ? ""
-                : this.roundN(ele.mar)
+                : roundN(ele.mar)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.marStock != null
               ? isNaN(ele.marStock)
                 ? ""
-                : this.roundN(ele.marStock)
+                : roundN(ele.marStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.apr != null
               ? isNaN(ele.apr)
                 ? ""
-                : this.roundN(ele.apr)
+                : roundN(ele.apr)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.aprStock != null
               ? isNaN(ele.aprStock)
                 ? ""
-                : this.roundN(ele.aprStock)
+                : roundN(ele.aprStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.may != null
               ? isNaN(ele.may)
                 ? ""
-                : this.roundN(ele.may)
+                : roundN(ele.may)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.mayStock != null
               ? isNaN(ele.mayStock)
                 ? ""
-                : this.roundN(ele.mayStock)
+                : roundN(ele.mayStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.jun != null
               ? isNaN(ele.jun)
                 ? ""
-                : this.roundN(ele.jun)
+                : roundN(ele.jun)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.junStock != null
               ? isNaN(ele.junStock)
                 ? ""
-                : this.roundN(ele.junStock)
+                : roundN(ele.junStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.jul != null
               ? isNaN(ele.jul)
                 ? ""
-                : this.roundN(ele.jul)
+                : roundN(ele.jul)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.julStock != null
               ? isNaN(ele.julStock)
                 ? ""
-                : this.roundN(ele.julStock)
+                : roundN(ele.julStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.aug != null
               ? isNaN(ele.aug)
                 ? ""
-                : this.roundN(ele.aug)
+                : roundN(ele.aug)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.augStock != null
               ? isNaN(ele.augStock)
                 ? ""
-                : this.roundN(ele.augStock)
+                : roundN(ele.augStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.sep != null
               ? isNaN(ele.sep)
                 ? ""
-                : this.roundN(ele.sep)
+                : roundN(ele.sep)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.sepStock != null
               ? isNaN(ele.sepStock)
                 ? ""
-                : this.roundN(ele.sepStock)
+                : roundN(ele.sepStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.oct != null
               ? isNaN(ele.oct)
                 ? ""
-                : this.roundN(ele.oct)
+                : roundN(ele.oct)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.octStock != null
               ? isNaN(ele.octStock)
                 ? ""
-                : this.roundN(ele.octStock)
+                : roundN(ele.octStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.nov != null
               ? isNaN(ele.nov)
                 ? ""
-                : this.roundN(ele.nov)
+                : roundN(ele.nov)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.novStock != null
               ? isNaN(ele.novStock)
                 ? ""
-                : this.roundN(ele.novStock)
+                : roundN(ele.novStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.dec != null
               ? isNaN(ele.dec)
                 ? ""
-                : this.roundN(ele.dec)
+                : roundN(ele.dec)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.decStock != null
               ? isNaN(ele.decStock)
                 ? ""
-                : this.roundN(ele.decStock)
+                : roundN(ele.decStock)
               : i18n.t("static.supplyPlanFormula.na"),
         ])
       )
@@ -1766,23 +1699,6 @@ export default class StockStatusMatrix extends React.Component {
     document.body.appendChild(a);
     a.click();
   }
-  /**
-   * Formats the given value by adding commas for thousands separator.
-   * @param {number} value - The value to be formatted.
-   * @returns {string} - The formatted value.
-   */
-  formatterDouble = (value) => {
-    var cell1 = this.roundN(value);
-    cell1 += "";
-    var x = cell1.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  };
   /**
    * Exports the data to a PDF file.
    * @param {array} columns - The columns to be exported.
@@ -2048,144 +1964,144 @@ export default class StockStatusMatrix extends React.Component {
       ele.planBasedOn == 1
         ? i18n.t("static.report.mos")
         : i18n.t("static.report.qty"),
-      this.formatterDouble(ele.minMonthsOfStock),
+      formatter(ele.minMonthsOfStock,1),
       ele.planBasedOn == 1
-        ? this.formatterMaxQty(
+        ? formatter(
           Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
-        )
-        : this.formatterMaxQty(this.roundAMC(ele.maxStock)),
+        ,0)
+        : formatter(roundAMC(ele.maxStock),0),
       ele.year,
       ele.planBasedOn == 1
         ? ele.jan != null
           ? isNaN(ele.jan)
             ? ""
-            : this.formatter(ele.jan)
+            : formatter(ele.jan,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.janStock != null
           ? isNaN(ele.janStock)
             ? ""
-            : this.formatter(ele.janStock)
+            : formatter(ele.janStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.feb != null
           ? isNaN(ele.feb)
             ? ""
-            : this.formatter(ele.feb)
+            : formatter(ele.feb,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.febStock != null
           ? isNaN(ele.febStock)
             ? ""
-            : this.formatter(ele.febStock)
+            : formatter(ele.febStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.mar != null
           ? isNaN(ele.mar)
             ? ""
-            : this.formatter(ele.mar)
+            : formatter(ele.mar,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.marStock != null
           ? isNaN(ele.marStock)
             ? ""
-            : this.formatter(ele.marStock)
+            : formatter(ele.marStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.apr != null
           ? isNaN(ele.apr)
             ? ""
-            : this.formatter(ele.apr)
+            : formatter(ele.apr,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.aprStock != null
           ? isNaN(ele.aprStock)
             ? ""
-            : this.formatter(ele.aprStock)
+            : formatter(ele.aprStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.may != null
           ? isNaN(ele.may)
             ? ""
-            : this.formatter(ele.may)
+            : formatter(ele.may,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.mayStock != null
           ? isNaN(ele.mayStock)
             ? ""
-            : this.formatter(ele.mayStock)
+            : formatter(ele.mayStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.jun != null
           ? isNaN(ele.jun)
             ? ""
-            : this.formatter(ele.jun)
+            : formatter(ele.jun,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.junStock != null
           ? isNaN(ele.junStock)
             ? ""
-            : this.formatter(ele.junStock)
+            : formatter(ele.junStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.jul != null
           ? isNaN(ele.jul)
             ? ""
-            : this.formatter(ele.jul)
+            : formatter(ele.jul,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.julStock != null
           ? isNaN(ele.julStock)
             ? ""
-            : this.formatter(ele.julStock)
+            : formatter(ele.julStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.aug != null
           ? isNaN(ele.aug)
             ? ""
-            : this.formatter(ele.aug)
+            : formatter(ele.aug,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.augStock != null
           ? isNaN(ele.augStock)
             ? ""
-            : this.formatter(ele.augStock)
+            : formatter(ele.augStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.sep != null
           ? isNaN(ele.sep)
             ? ""
-            : this.formatter(ele.sep)
+            : formatter(ele.sep,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.sepStock != null
           ? isNaN(ele.sepStock)
             ? ""
-            : this.formatter(ele.sepStock)
+            : formatter(ele.sepStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.oct != null
           ? isNaN(ele.oct)
             ? ""
-            : this.formatter(ele.oct)
+            : formatter(ele.oct,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.octStock != null
           ? isNaN(ele.octStock)
             ? ""
-            : this.formatter(ele.octStock)
+            : formatter(ele.octStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.nov != null
           ? isNaN(ele.nov)
             ? ""
-            : this.formatter(ele.nov)
+            : formatter(ele.nov,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.novStock != null
           ? isNaN(ele.novStock)
             ? ""
-            : this.formatter(ele.novStock)
+            : formatter(ele.novStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.dec != null
           ? isNaN(ele.dec)
             ? ""
-            : this.formatter(ele.dec)
+            : formatter(ele.dec,1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.decStock != null
           ? isNaN(ele.decStock)
             ? ""
-            : this.formatter(ele.decStock)
+            : formatter(ele.decStock,1)
           : i18n.t("static.supplyPlanFormula.na"),
     ]);
     const cellStyle = (
@@ -2198,7 +2114,7 @@ export default class StockStatusMatrix extends React.Component {
       var actualValue = planBasedOn == 1 ? value : valueStock;
       var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
       if (actualValue != null) {
-        actualValue = this.roundN(actualValue);
+        actualValue = roundN(actualValue);
         if (actualValue == 0) {
           return legendcolor[0].color;
         } else if (min > actualValue) {
@@ -2325,20 +2241,6 @@ export default class StockStatusMatrix extends React.Component {
     doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
   };
   /**
-   * Rounds the given number to one decimal place.
-   * @param {number} num - The number to be rounded.
-   * @returns {string} - The rounded number with one decimal place.
-   */
-  roundN = (num) => {
-    if (num == null) {
-      return "";
-    } else {
-      return parseFloat(
-        Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)
-      ).toFixed(1);
-    }
-  };
-  /**
    * Determines the cell background color based on the provided parameters.
    * @param {number} planBasedOn - Indicates whether the plan is based on months of stock or maximum stock.
    * @param {number} min - The minimum months of stock or quantity.
@@ -2351,7 +2253,7 @@ export default class StockStatusMatrix extends React.Component {
     var actualValue = planBasedOn == 1 ? value : valueStock;
     var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
     if (actualValue != null) {
-      actualValue = this.roundN(actualValue);
+      actualValue = roundN(actualValue);
       if (actualValue == 0) {
         return { backgroundColor: legendcolor[0].color };
       } else if (min > actualValue) {
@@ -2365,26 +2267,6 @@ export default class StockStatusMatrix extends React.Component {
       return { backgroundColor: legendcolor[4].color };
     }
   };
-  /**
-   * Rounds the average monthly consumption (AMC) to a suitable decimal precision.
-   * @param {number} amc - The average monthly consumption value to be rounded.
-   * @returns {number|null} - The rounded AMC value or null if the input is null.
-   */
-  roundAMC(amc) {
-    if (amc != null) {
-      if (Number(amc).toFixed(0) >= 100) {
-        return Number(amc).toFixed(0);
-      } else if (Number(amc).toFixed(1) >= 10) {
-        return Number(amc).toFixed(1);
-      } else if (Number(amc).toFixed(2) >= 1) {
-        return Number(amc).toFixed(2);
-      } else {
-        return Number(amc).toFixed(3);
-      }
-    } else {
-      return null;
-    }
-  }
   /**
    * Renders the Stock Status Overtime report table.
    * @returns {JSX.Element} - Stock Status Overtime report table.
@@ -2824,17 +2706,17 @@ export default class StockStatusMatrix extends React.Component {
                                 : i18n.t("static.report.qty")}
                             </td>
                             <td className="text-center">
-                              {this.formatterMaxQty(ele.minMonthsOfStock)}
+                              {formatter(ele.minMonthsOfStock,0)}
                             </td>
                             <td className="text-center">
                               {ele.planBasedOn == 1
-                                ? this.formatterMaxQty(
+                                ? formatter(
                                   Number(ele.minMonthsOfStock) +
                                   Number(ele.reorderFrequency)
-                                )
-                                : this.formatterMaxQty(
-                                  this.roundAMC(ele.maxStock)
-                                )}
+                                ,0)
+                                : formatter(
+                                  roundAMC(ele.maxStock)
+                                ,0)}
                             </td>
                             <td className="text-center">{ele.year}</td>
                             <td
@@ -2851,12 +2733,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jan)
                                   ? ""
                                   : ele.jan != null
-                                    ? this.formatter(ele.jan)
+                                    ? formatter(ele.jan,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.janStock)
                                   ? ""
                                   : ele.janStock != null
-                                    ? this.formatter(ele.janStock)
+                                    ? formatter(ele.janStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2874,12 +2756,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.feb)
                                   ? ""
                                   : ele.feb != null
-                                    ? this.formatter(ele.feb)
+                                    ? formatter(ele.feb,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.febStock)
                                   ? ""
                                   : ele.febStock != null
-                                    ? this.formatter(ele.febStock)
+                                    ? formatter(ele.febStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2897,12 +2779,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.mar)
                                   ? ""
                                   : ele.mar != null
-                                    ? this.formatter(ele.mar)
+                                    ? formatter(ele.mar,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.marStock)
                                   ? ""
                                   : ele.marStock != null
-                                    ? this.formatter(ele.marStock)
+                                    ? formatter(ele.marStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2920,12 +2802,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.apr)
                                   ? ""
                                   : ele.apr != null
-                                    ? this.formatter(ele.apr)
+                                    ? formatter(ele.apr,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.aprStock)
                                   ? ""
                                   : ele.aprStock != null
-                                    ? this.formatter(ele.aprStock)
+                                    ? formatter(ele.aprStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2943,12 +2825,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.may)
                                   ? ""
                                   : ele.may != null
-                                    ? this.formatter(ele.may)
+                                    ? formatter(ele.may,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.mayStock)
                                   ? ""
                                   : ele.mayStock != null
-                                    ? this.formatter(ele.mayStock)
+                                    ? formatter(ele.mayStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2966,12 +2848,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jun)
                                   ? ""
                                   : ele.jun != null
-                                    ? this.formatter(ele.jun)
+                                    ? formatter(ele.jun,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.junStock)
                                   ? ""
                                   : ele.junStock != null
-                                    ? this.formatter(ele.junStock)
+                                    ? formatter(ele.junStock,1)
                                     : ""}
                             </td>
                             <td
@@ -2989,12 +2871,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jul)
                                   ? ""
                                   : ele.jul != null
-                                    ? this.formatter(ele.jul)
+                                    ? formatter(ele.jul,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.julStock)
                                   ? ""
                                   : ele.julStock != null
-                                    ? this.formatter(ele.julStock)
+                                    ? formatter(ele.julStock,1)
                                     : ""}
                             </td>
                             <td
@@ -3012,12 +2894,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.aug)
                                   ? ""
                                   : ele.aug != null
-                                    ? this.formatter(ele.aug)
+                                    ? formatter(ele.aug,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.augStock)
                                   ? ""
                                   : ele.augStock != null
-                                    ? this.formatter(ele.augStock)
+                                    ? formatter(ele.augStock,1)
                                     : ""}
                             </td>
                             <td
@@ -3035,12 +2917,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.sep)
                                   ? ""
                                   : ele.sep != null
-                                    ? this.formatter(ele.sep)
+                                    ? formatter(ele.sep,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.sepStock)
                                   ? ""
                                   : ele.sepStock != null
-                                    ? this.formatter(ele.sepStock)
+                                    ? formatter(ele.sepStock,1)
                                     : ""}
                             </td>
                             <td
@@ -3058,12 +2940,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.oct)
                                   ? ""
                                   : ele.oct != null
-                                    ? this.formatter(ele.oct)
+                                    ? formatter(ele.oct,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.octStock)
                                   ? ""
                                   : ele.octStock != null
-                                    ? this.formatter(ele.octStock)
+                                    ? formatter(ele.octStock,1)
                                     : ""}
                             </td>
                             <td
@@ -3081,12 +2963,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.nov)
                                   ? ""
                                   : ele.nov != null
-                                    ? this.formatter(ele.nov)
+                                    ? formatter(ele.nov,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.novStock)
                                   ? ""
                                   : ele.novStock != null
-                                    ? this.formatter(ele.novStock)
+                                    ? formatter(ele.novStock,1)
                                     : ""}
                             </td>
                             <td
@@ -3104,12 +2986,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.dec)
                                   ? ""
                                   : ele.dec != null
-                                    ? this.formatter(ele.dec)
+                                    ? formatter(ele.dec,1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.decStock)
                                   ? ""
                                   : ele.decStock != null
-                                    ? this.formatter(ele.decStock)
+                                    ? formatter(ele.decStock,1)
                                     : ""}
                             </td>
                           </tr>

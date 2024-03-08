@@ -7,13 +7,14 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = i18n.t('static.role.role');
 /**
@@ -29,10 +30,7 @@ class ListRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editRole = this.editRole.bind(this);
         this.addNewRole = this.addNewRole.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
     /**
@@ -74,7 +72,7 @@ class ListRoleComponent extends Component {
                 }
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -101,26 +99,10 @@ class ListRoleComponent extends Component {
         })
     }
     /**
-     * Hides the message in div1 after 30 seconds.
-     */
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
-    /**
      * Clears the timeout when the component is unmounted.
      */
     componentWillUnmount() {
         clearTimeout(this.timeout);
-    }
-    /**
-     * Hides the message in div2 after 30 seconds.
-     */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
     }
     /**
      * Redirects to the add role screen.
@@ -149,7 +131,7 @@ class ListRoleComponent extends Component {
      * Fetches the role list from the server and builds the jexcel component on component mount.
      */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
@@ -163,7 +145,7 @@ class ListRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent()
                         })
                 }
             })
@@ -206,14 +188,6 @@ class ListRoleComponent extends Component {
                     }
                 }
             );
-    }
-    /**
-     * This function is used to format the table like add asterisk or info to the table headers
-     * @param {*} instance This is the DOM Element where sheet is created
-     * @param {*} cell This is the object of the DOM element
-     */
-    loaded = function (instance, cell) {
-        jExcelLoadedFunction(instance);
     }
     /**
      * Renders the role list.
