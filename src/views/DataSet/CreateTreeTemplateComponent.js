@@ -2869,6 +2869,7 @@ export default class CreateTreeTemplate extends Component {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setStyle(col, "background-color", "yellow");
                                 this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
                             } else {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setComments(col, "");
@@ -2889,6 +2890,7 @@ export default class CreateTreeTemplate extends Component {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setStyle(col, "background-color", "yellow");
                                 this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
                             } else {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setComments(col, "");
