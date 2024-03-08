@@ -1628,7 +1628,7 @@
     "static.report.orders": "Orders",
     "static.showFormula.endingBalance6": "= 0 – Projected Inventory*  – Demand during Stockout (* if Projected Inventory is <0)",
     "static.dashboard.procurementagenttype": "Procurement Agent Type",
-    "static.showFormula.endingBalance1": "= Opening balance + Adjustments + Shipments - Consumption – Projected Expired Stock",
+    "static.showFormula.endingBalance1": "= Opening Balance - Projected Expired Stock + Shipments - Consumption + Adjustments",
     "static.showFormula.endingBalance3": "= Max (Projected Inventory, 0)",
     "static.common.download": "Download",
     "static.masterDataSync.confirmSyncMessage": "Are you sure you want to continue?",
