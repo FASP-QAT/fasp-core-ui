@@ -3798,6 +3798,7 @@ export default class BuildTree extends Component {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setStyle(col, "background-color", "yellow");
                                 this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
                             } else {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setComments(col, "");
@@ -3818,6 +3819,7 @@ export default class BuildTree extends Component {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setStyle(col, "background-color", "yellow");
                                 this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
                             } else {
                                 this.state.modelingEl.setStyle(col, "background-color", "transparent");
                                 this.state.modelingEl.setComments(col, "");
@@ -4338,7 +4340,6 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
-                    textEditor: true,
                     decimal: '.',
                     mask: '#,##0.0000%',
                     disabledMaskOnEdition: true
@@ -4347,7 +4348,6 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.MonthlyChange#'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
                     mask: '#,##0.0000', decimal: '.',
-                    textEditor: true,
                     disabledMaskOnEdition: true
                 },
                 {
