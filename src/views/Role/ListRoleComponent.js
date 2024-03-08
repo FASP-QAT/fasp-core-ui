@@ -130,7 +130,6 @@ class ListRoleComponent extends Component {
     }
     /**
      * Redirects to the edit role screen on row click.
-     * @param {Object} role - The role object to be edited.
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {

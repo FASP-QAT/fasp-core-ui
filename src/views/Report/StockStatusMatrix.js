@@ -67,6 +67,9 @@ const legendcolor = [
 ];
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t("static.dashboard.productCatalog");
+/**
+ * Component for Stock Status Matrix Report.
+ */
 export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
@@ -106,6 +109,11 @@ export default class StockStatusMatrix extends React.Component {
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
+  /**
+   * Retrieves tracer categories based on the selected program and version.
+   * Fetches from local IndexedDB if version is local, or from server API.
+   * Updates component state with fetched data and handles errors.
+   */
   getTracerCategoryList() {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -286,6 +294,11 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   }
+  /**
+   * Updates startYear and endYear in component state based on the selected range of years.
+   * Triggers data filtering after updating the state.
+   * @param {Array} value - Array containing start and end dates selected by the user.
+   */
   onYearChange = (value) => {
     this.setState(
       {
@@ -297,6 +310,10 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   };
+  /**
+   * Handles the change event for planning units.
+   * @param {Array} event - An array containing the selected planning unit IDs.
+   */
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -311,6 +328,9 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   };
+  /**
+   * Filters data based on the selected stock status and updates the component state.
+   */
   filterDataAsperstatus = () => {
     let stockStatusId = document.getElementById("stockStatusId").value;
     var filteredData = [];
@@ -448,6 +468,9 @@ export default class StockStatusMatrix extends React.Component {
       data: filteredData,
     });
   };
+  /**
+   * Filters data based on selected parameters and updates component state accordingly.
+   */
   filterData() {
     let startDate = this.state.startYear + "-01-01";
     let endDate =
@@ -777,6 +800,9 @@ export default class StockStatusMatrix extends React.Component {
       });
     }
   }
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -860,6 +886,9 @@ export default class StockStatusMatrix extends React.Component {
       this.consolidatedProgramList();
     }
   };
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state;
     var proList = programs;
@@ -929,6 +958,12 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -1038,6 +1073,13 @@ export default class StockStatusMatrix extends React.Component {
       });
     }
   };
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state;
     var verList = versions;
@@ -1120,6 +1162,10 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Handles the change event for tracer categories.
+   * @param {Array} tracerCategoryIds - An array containing the selected tracer category IDs.
+   */
   handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1135,6 +1181,9 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   };
+  /**
+   * Retrieves the list of planning units for a selected program and selected version.
+   */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -1369,9 +1418,16 @@ export default class StockStatusMatrix extends React.Component {
       });
     }
   };
+  /**
+   * Calls the get programs function on page load
+   */
   componentDidMount() {
     this.getPrograms();
   }
+  /**
+   * Sets the selected program ID selected by the user.
+   * @param {object} event - The event object containing information about the program selection.
+   */
   setProgramId(event) {
     this.setState(
       {
@@ -1385,6 +1441,10 @@ export default class StockStatusMatrix extends React.Component {
       }
     );
   }
+  /**
+   * Sets the version ID and updates the tracer category list.
+   * @param {Object} event - The event object containing the version ID value.
+   */
   setVersionId(event) {
     if (this.state.versionId != "" || this.state.versionId != undefined) {
       this.setState(
@@ -1407,6 +1467,11 @@ export default class StockStatusMatrix extends React.Component {
       );
     }
   }
+  /**
+   * Formats the given value by rounding and adding commas for thousands separator.
+   * @param {number} value - The value to be formatted.
+   * @returns {string} - The formatted value.
+   */
   formatter = (value) => {
     if (value != null) {
       var cell1 = this.roundN(value);
@@ -1423,6 +1488,11 @@ export default class StockStatusMatrix extends React.Component {
       return "";
     }
   };
+  /**
+   * Formats the given value by adding commas for thousands separator.
+   * @param {number} value - The value to be formatted.
+   * @returns {string} - The formatted value.
+   */
   formatterMaxQty = (value) => {
     if (value != null) {
       var cell1 = value;
@@ -1439,9 +1509,18 @@ export default class StockStatusMatrix extends React.Component {
       return "";
     }
   };
+  /**
+   * Adds double quotes to each element in an array.
+   * @param {array} arr - The array to which double quotes will be added.
+   * @returns {array} - The modified array with double quotes added to each element.
+   */
   addDoubleQuoteToRowContent = (arr) => {
     return arr.map((ele) => '"' + ele + '"');
   };
+  /**
+   * Exports the data to a CSV file.
+   * @param {array} columns - The columns to be exported.
+   */
   exportCSV(columns) {
     var csvRow = [];
     csvRow.push(
@@ -1687,6 +1766,11 @@ export default class StockStatusMatrix extends React.Component {
     document.body.appendChild(a);
     a.click();
   }
+  /**
+   * Formats the given value by adding commas for thousands separator.
+   * @param {number} value - The value to be formatted.
+   * @returns {string} - The formatted value.
+   */
   formatterDouble = (value) => {
     var cell1 = this.roundN(value);
     cell1 += "";
@@ -1699,6 +1783,10 @@ export default class StockStatusMatrix extends React.Component {
     }
     return x1 + x2;
   };
+  /**
+   * Exports the data to a PDF file.
+   * @param {array} columns - The columns to be exported.
+   */
   exportPDF = (columns) => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -2236,6 +2324,11 @@ export default class StockStatusMatrix extends React.Component {
     addFooters(doc);
     doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
   };
+  /**
+   * Rounds the given number to one decimal place.
+   * @param {number} num - The number to be rounded.
+   * @returns {string} - The rounded number with one decimal place.
+   */
   roundN = (num) => {
     if (num == null) {
       return "";
@@ -2245,6 +2338,15 @@ export default class StockStatusMatrix extends React.Component {
       ).toFixed(1);
     }
   };
+  /**
+   * Determines the cell background color based on the provided parameters.
+   * @param {number} planBasedOn - Indicates whether the plan is based on months of stock or maximum stock.
+   * @param {number} min - The minimum months of stock or quantity.
+   * @param {number} reorderFrequency - The reorder frequency.
+   * @param {number} value - The value to be compared with the minimum and maximum.
+   * @param {number} valueStock - The value for stock-based plan.
+   * @returns {object} - The style object with the background color determined based on the provided values.
+   */
   cellStyle = (planBasedOn, min, reorderFrequency, value, valueStock) => {
     var actualValue = planBasedOn == 1 ? value : valueStock;
     var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
@@ -2263,6 +2365,11 @@ export default class StockStatusMatrix extends React.Component {
       return { backgroundColor: legendcolor[4].color };
     }
   };
+  /**
+   * Rounds the average monthly consumption (AMC) to a suitable decimal precision.
+   * @param {number} amc - The average monthly consumption value to be rounded.
+   * @returns {number|null} - The rounded AMC value or null if the input is null.
+   */
   roundAMC(amc) {
     if (amc != null) {
       if (Number(amc).toFixed(0) >= 100) {
@@ -2278,6 +2385,10 @@ export default class StockStatusMatrix extends React.Component {
       return null;
     }
   }
+  /**
+   * Renders the Stock Status Overtime report table.
+   * @returns {JSX.Element} - Stock Status Overtime report table.
+   */
   render() {
     const { planningUnits } = this.state;
     let planningUnitList =

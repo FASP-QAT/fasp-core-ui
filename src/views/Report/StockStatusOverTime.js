@@ -105,6 +105,9 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Stock Status Overtime Report.
+ */
 class StockStatusOverTime extends Component {
     constructor(props) {
         super(props);
@@ -143,13 +146,17 @@ class StockStatusOverTime extends Component {
             versionId: ''
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
     }
+    /**
+     * Rounds the AMC (Average Monthly Consumption) value to a specific decimal place based on its magnitude.
+     * @param {number} amc - The AMC value to be rounded.
+     * @returns {number|null} - The rounded AMC value or null if the input is null.
+     */
     roundAMC(amc) {
         if (amc != null) {
             if (Number(amc).toFixed(0) >= 100) {
@@ -165,16 +172,36 @@ class StockStatusOverTime extends Component {
             return null;
         }
     }
+    /**
+     * Formats the selected month and year into text.
+     * @param {object} m - The selected month and year object.
+     * @returns {string} - The formatted text representing the selected month and year.
+     */
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
+    /**
+     * Rounds a number to 1 decimal place.
+     * @param {number} num - The number to be rounded.
+     * @returns {string} - The rounded number with 1 decimal place as a string.
+     */
     roundN = num => {
         return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
+    /**
+     * Formats a date value into the format 'MMM YY' (e.g., 'Jan 22').
+     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
+     * @returns {string} - The formatted date string in the 'MMM YY' format.
+     */
     dateFormatter = value => {
         return moment(value).format('MMM YY')
     }
+    /**
+     * Formats a date value into a localized month and year format (e.g., 'Jan 22').
+     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
+     * @returns {string} - The formatted date string with the month name in the user's preferred language and the year in two digits.
+     */
     dateFormatterLanguage = value => {
         if (moment(value).format('MM') === '01') {
             return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
@@ -202,6 +229,11 @@ class StockStatusOverTime extends Component {
             return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
         }
     }
+    /**
+     * Formats a numerical value into a string with thousands separators.
+     * @param {number} value - The numerical value to be formatted.
+     * @returns {string} - The formatted string with thousands separators.
+     */
     formatter = value => {
         if (value != null) {
             var cell1 = value
@@ -219,6 +251,10 @@ class StockStatusOverTime extends Component {
             return ''
         }
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} event - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (event) => {
         var planningUnitIds = event
         planningUnitIds = planningUnitIds.sort(function (a, b) {
@@ -233,16 +269,25 @@ class StockStatusOverTime extends Component {
     }
     unCheck = () => {
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => { this.fetchData(); })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -307,6 +352,9 @@ class StockStatusOverTime extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -364,6 +412,11 @@ class StockStatusOverTime extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Updates the months for AMC calculations based on the selected program.
+     * Resets the months in the past for AMC and sets the months in the future for AMC to 0.
+     * Fetches data after updating the state.
+     */
     updateMonthsforAMCCalculations = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -376,6 +429,12 @@ class StockStatusOverTime extends Component {
             }
         }
     }
+    /**
+     * Updates the months for AMC calculations based on the user input.
+     * If the event target name is "monthsInPastForAmc", updates the months in the past for AMC and fetches data.
+     * If the event target name is "monthsInFutureForAmc", updates the months in the future for AMC and fetches data.
+     * @param {Event} event - The event object containing information about the changed input field.
+     */
     changeMonthsForamc = (event) => {
         if (event.target.name === "monthsInPastForAmc") {
             this.setState({ monthsInPastForAmc: event.target.value }, () => { this.fetchData() })
@@ -386,6 +445,12 @@ class StockStatusOverTime extends Component {
             }, () => { this.fetchData() })
         }
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -480,6 +545,13 @@ class StockStatusOverTime extends Component {
             }, () => { this.unCheck(); })
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -539,6 +611,9 @@ class StockStatusOverTime extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves the list of planning units for a selected program.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -649,6 +724,10 @@ class StockStatusOverTime extends Component {
             }
         });
     }
+    /**
+     * Sets the program ID and resets the version ID.
+     * @param {Object} event - The event object containing the program ID value.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -659,6 +738,12 @@ class StockStatusOverTime extends Component {
             this.updateMonthsforAMCCalculations()
         })
     }
+    /**
+     * Sets the selected version ID in the component state and updates local storage.
+     * If the version ID is not empty or undefined, it triggers data fetching.
+     * If the version ID is empty or undefined, it triggers fetching of planning units.
+     * @param {Object} event - The event object representing the version selection
+     */
     setVersionId(event) {
         if (this.state.versionId != '' || this.state.versionId != undefined) {
             this.setState({
@@ -675,10 +760,20 @@ class StockStatusOverTime extends Component {
             })
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Toggles the value of the 'show' state variable.
+     */
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+    /**
+     * Fetches data based on the provided parameters.
+     * Retrieves data either from a local database (IndexedDB) or a remote server.
+     */
     fetchData() {
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
         let programId = document.getElementById("programId").value;
@@ -920,9 +1015,17 @@ class StockStatusOverTime extends Component {
             this.setState({ message: i18n.t('static.realm.monthInFutureForAmcText'), matricsList: [] });
         }
     }
+    /**
+     * Adds double quotes to each element in an array.
+     * @param {array} arr - The array to which double quotes will be added.
+     * @returns {array} - The modified array with double quotes added to each element.
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
@@ -953,6 +1056,9 @@ class StockStatusOverTime extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -1046,6 +1152,10 @@ class StockStatusOverTime extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.stockstatusovertimeReport').concat('.pdf'));
     }
+    /**
+     * Renders the Stock Status Overtime report table.
+     * @returns {JSX.Element} - Stock Status Overtime report table.
+     */
     render() {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
@@ -1128,7 +1238,6 @@ class StockStatusOverTime extends Component {
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
-                                                    onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

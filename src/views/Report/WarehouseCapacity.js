@@ -25,6 +25,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for Warehouse Capacity Report.
+ */
 class warehouseCapacity extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +52,10 @@ class warehouseCapacity extends Component {
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
+    /**
+     * Sets the program id in the component state on change and fetches data accordingly.
+     * @param {object} event - The event object containing the target value.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value
@@ -56,6 +63,9 @@ class warehouseCapacity extends Component {
             this.fetchData();
         })
     }
+    /**
+     * This function is used to call either function for country list or program list based on online and offline status
+     */
     componentDidMount() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrylist();
@@ -63,9 +73,17 @@ class warehouseCapacity extends Component {
             this.getPrograms();
         }
     }
+    /**
+     * Adds double quotes to each element in the array.
+     * @param {array} arr - The array to which double quotes need to be added.
+     * @returns {array} - The modified array with double quotes added to each element.
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * Exports the data to CSV format.
+     */
     exportCSV() {
         var csvRow = [];
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -98,6 +116,10 @@ class warehouseCapacity extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to PDF format.
+     * @param {array} columns - The columns to be included in the PDF.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -183,8 +205,12 @@ class warehouseCapacity extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.warehouseCapacity') + ".pdf")
     }
+    /**
+     * Retrieves the list of countries.
+     */
     getCountrylist() {
         let realmId = AuthenticationService.getRealmId();
+        // Implementation for getting country list
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -243,6 +269,10 @@ class warehouseCapacity extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for country selection.
+     * @param {array} countrysId - The array of selected country IDs.
+     */
     handleChange(countrysId) {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -254,6 +284,10 @@ class warehouseCapacity extends Component {
             this.getPrograms();
         })
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -265,6 +299,9 @@ class warehouseCapacity extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map(ele => ele.value);
@@ -337,6 +374,9 @@ class warehouseCapacity extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         var db1;
         getDatabase();
@@ -389,6 +429,9 @@ class warehouseCapacity extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Fetches report data based on the selected program and country.
+     */ 
     fetchData(e) {
         if (localStorage.getItem("sessionType") === 'Online') {
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
@@ -531,6 +574,9 @@ class warehouseCapacity extends Component {
             }
         }
     }
+    /**
+     * Builds the Jexcel table with the fetched data.
+     */
     buildJexcel = () => {
         let regionList = this.state.data;
         let regionListArray = [];
@@ -601,9 +647,16 @@ class warehouseCapacity extends Component {
             regionEl: regionEl, loading: false
         })
     }
+    /**
+     * Callback function triggered when the Jexcel instance is loaded to format the table.
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the warehouse capacity report table.
+     * @returns {JSX.Element} - Warehouse capacity report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
