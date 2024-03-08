@@ -4342,14 +4342,12 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
                     decimal: '.',
-                    mask: '#,##0.0000%',
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000%'
                 },
                 {
                     title: i18n.t('static.tree.MonthlyChange#'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000', decimal: '.'
                 },
                 {
                     title: i18n.t('static.tree.modelingCalculater'),
