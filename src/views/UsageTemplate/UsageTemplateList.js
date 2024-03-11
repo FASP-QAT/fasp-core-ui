@@ -677,7 +677,7 @@ class usageTemplate extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 {
                     type: 'text',

@@ -86,7 +86,7 @@ class ListProcurementAgentComponent extends Component {
         var data = procurementAgentTypeArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 80, 100, 130, 80, 80, 80, 0, 80, 100, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

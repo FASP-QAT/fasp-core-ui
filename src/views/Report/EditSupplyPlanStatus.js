@@ -3368,7 +3368,7 @@ class EditSupplyPlanStatus extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 {
                     title: i18n.t('static.report.problemStatus'),
@@ -3453,7 +3453,7 @@ class EditSupplyPlanStatus extends Component {
         var data = problemArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 {
                     title: 'A',

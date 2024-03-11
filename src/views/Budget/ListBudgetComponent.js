@@ -184,7 +184,7 @@ class ListBudgetComponent extends Component {
     var data = budgetArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [150, 60, 60, 60, 100,],
       colHeaderClasses: ["Reqasterisk"],
       columns: [

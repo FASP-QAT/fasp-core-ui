@@ -807,7 +807,7 @@ export default class PlanningUnitSetting extends Component {
         this.setState({ dropdownList: dropdownList })
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

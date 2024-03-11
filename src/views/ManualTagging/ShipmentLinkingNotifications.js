@@ -457,7 +457,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var data = manualTaggingArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -675,7 +675,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var data = notificationSummaryArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [10, 10],
             columns: [
                 {
@@ -883,7 +883,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.manualTagging.erpPlanningUnit'), type: 'text', width: 200 },
@@ -950,7 +950,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },

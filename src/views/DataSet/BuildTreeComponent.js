@@ -1606,7 +1606,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3116,7 +3116,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3270,7 +3270,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 80, 80, 80, 80, 80, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -4298,7 +4298,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -7867,7 +7867,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 80, 80, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

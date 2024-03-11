@@ -444,7 +444,7 @@ class CompareAndSelectScenario extends Component {
         }
         var options = {
             data: dataArr,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 150, 150, 150, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
@@ -498,7 +498,7 @@ class CompareAndSelectScenario extends Component {
             var data = dataArray;
             var options = {
                 data: data,
-                columnDrag: true,
+                columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {

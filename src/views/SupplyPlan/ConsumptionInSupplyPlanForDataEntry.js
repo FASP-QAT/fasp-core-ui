@@ -287,7 +287,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
                         var options = {
                             data: consumptionDataArr,
-                            columnDrag: true,
+                            columnDrag: false,
                             columns: [
                                 { type: 'autocomplete', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
                                 { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
@@ -574,7 +574,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },

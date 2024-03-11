@@ -414,7 +414,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [200, 290, 170, 170, 170, 170, 200, 50],
                                         columns: [
                                             {
