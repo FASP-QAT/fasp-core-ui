@@ -12,7 +12,7 @@ import { Card, CardBody, FormGroup, Input, InputGroup, Label } from 'reactstrap'
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -24,7 +24,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -469,29 +469,28 @@ class StockAdjustmentComponent extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData()
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    formatter = (value) => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
@@ -509,8 +508,8 @@ class StockAdjustmentComponent extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -522,6 +521,10 @@ class StockAdjustmentComponent extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -574,7 +577,7 @@ class StockAdjustmentComponent extends Component {
         doc.setFontSize(8);
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(ele.stockAdjustemntQty,0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let startY = 150 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -593,6 +596,9 @@ class StockAdjustmentComponent extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.stockAdjustment') + ".pdf")
     }
+    /**
+     * Builds the jexcel table based on the data list.
+     */
     buildJExcel() {
         let stockAdjustmentList = this.state.data;
         let stockAdjustmentArray = [];
@@ -649,7 +655,7 @@ class StockAdjustmentComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -676,9 +682,9 @@ class StockAdjustmentComponent extends Component {
             loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
@@ -864,9 +870,16 @@ class StockAdjustmentComponent extends Component {
             });
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms()
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -876,6 +889,10 @@ class StockAdjustmentComponent extends Component {
             this.filterVersion();
         })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         if (this.state.versionId != '' || this.state.versionId != undefined) {
             this.setState({
@@ -892,6 +909,10 @@ class StockAdjustmentComponent extends Component {
             })
         }
     }
+    /**
+     * Renders the Stock Adjustment table.
+     * @returns {JSX.Element} - Stock Adjustment table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -967,8 +988,7 @@ class StockAdjustmentComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: this.formatter
+                style: { width: '80px' }
             },
             {
                 dataField: 'lastModifiedBy.username',

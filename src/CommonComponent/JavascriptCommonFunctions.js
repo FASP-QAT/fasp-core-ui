@@ -147,6 +147,7 @@ export function isCompress(str) {
  * Hides the message in div1 after 30 seconds.
  */
 export function hideFirstComponent() {
+  document.getElementById('div1').style.display = 'block';
   setTimeout(function () {
     document.getElementById('div1').style.display = 'none';
   }, 30000);
@@ -155,6 +156,7 @@ export function hideFirstComponent() {
  * Hides the message in div2 after 30 seconds.
  */
 export function hideSecondComponent() {
+  document.getElementById('div2').style.display = 'block';
   setTimeout(function () {
     document.getElementById('div2').style.display = 'none';
   }, 30000);
@@ -223,11 +225,23 @@ export function roundN(num) {
   }
 }
 /**
+ * Rounds a number to 2 decimal place.
+ * @param {number} num - The number to be rounded.
+ * @returns {string} - The rounded number with 2 decimal place as a string.
+ */
+export function roundN2(num) {
+  if (num != '') {
+    return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+  } else {
+    return ''
+  }
+}
+/**
  * Rounds a number.
  * @param {number} num - The number to be rounded.
  * @returns {string} - The rounded number with 1 decimal place as a string.
  */
-export function round(num){
+export function round(num) {
   return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
 };
 /**
@@ -275,9 +289,9 @@ export function dateFormatterLanguage(value) {
  * @param {number} value - The numerical value to be formatted.
  * @returns {string} - The formatted string with thousands separators.
  */
-export function formatter(value,withRoundN) {
+export function formatter(value, withRoundN) {
   if (value != null) {
-    var cell1 = withRoundN?roundN(value):value;
+    var cell1 = withRoundN ? roundN(value) : value;
     cell1 += '';
     var x = cell1.split('.');
     var x1 = x[0];
@@ -299,6 +313,18 @@ export function formatter(value,withRoundN) {
  */
 export function dateFormatterCSV(value) {
   return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
+}
+/**
+ * Rounds a number to 2 decimal place and appends % sign.
+ * @param {number} num - The number to be rounded.
+ * @returns {string} - The rounded number with 2 decimal place as a string.
+ */
+export function PercentageFormatter(num) {
+  if (num != '' && num != null) {
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2) + '%';
+  } else {
+    return ''
+  }
 }
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],

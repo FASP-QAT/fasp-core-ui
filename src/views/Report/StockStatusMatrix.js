@@ -295,7 +295,7 @@ export default class StockStatusMatrix extends React.Component {
   };
   /**
    * Handles the change event for planning units.
-   * @param {Array} event - An array containing the selected planning unit IDs.
+   * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
    */
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
