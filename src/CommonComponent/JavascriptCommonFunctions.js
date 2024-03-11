@@ -1,6 +1,6 @@
 import pako from 'pako';
 import moment from 'moment';
-import { APPLICATION_STATUS_URL, COMPRESS_LIMIT_SIZE } from "../Constants";
+import { APPLICATION_STATUS_URL, COMPRESS_LIMIT_SIZE, DATE_FORMAT_CAP_FOUR_DIGITS } from "../Constants";
 import i18n from '../i18n';
 /**
  * This function is used for padding a particular character till specified length
@@ -223,6 +223,14 @@ export function roundN(num) {
   }
 }
 /**
+ * Rounds a number.
+ * @param {number} num - The number to be rounded.
+ * @returns {string} - The rounded number with 1 decimal place as a string.
+ */
+export function round(num){
+  return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
+};
+/**
  * Formats a date value into the format 'MMM YY' (e.g., 'Jan 22').
  * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
  * @returns {string} - The formatted date string in the 'MMM YY' format.
@@ -283,6 +291,14 @@ export function formatter(value,withRoundN) {
   else {
     return ''
   }
+}
+/**
+ * Formats a date value into the format 'DD-MMM-YYYY' (e.g., '20 Jan 2022').
+ * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
+ * @returns {string} - The formatted date string in the 'DD-MMM-YYYY' format.
+ */
+export function dateFormatterCSV(value) {
+  return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
 }
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],

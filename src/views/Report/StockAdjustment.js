@@ -24,10 +24,14 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Stock Adjustment Report.
+ */
 class StockAdjustmentComponent extends Component {
     constructor(props) {
         super(props);
@@ -55,16 +59,14 @@ class StockAdjustmentComponent extends Component {
             versionId: ''
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -129,6 +131,9 @@ class StockAdjustmentComponent extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -185,6 +190,12 @@ class StockAdjustmentComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -262,6 +273,13 @@ class StockAdjustmentComponent extends Component {
         }
         this.fetchData();
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -321,6 +339,9 @@ class StockAdjustmentComponent extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves the list of planning units for a selected program and version.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -433,6 +454,10 @@ class StockAdjustmentComponent extends Component {
             }
         });
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} event - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -443,8 +468,6 @@ class StockAdjustmentComponent extends Component {
         }, () => {
             this.fetchData()
         })
-    }
-    handleRangeChange(value, text, listIndex) {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
@@ -471,7 +494,7 @@ class StockAdjustmentComponent extends Component {
     }
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -529,7 +552,7 @@ class StockAdjustmentComponent extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -1001,10 +1024,9 @@ class StockAdjustmentComponent extends Component {
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
-                                            onChange={this.handleRangeChange}
                                             onDismiss={this.handleRangeDissmis}
                                         >
-                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
