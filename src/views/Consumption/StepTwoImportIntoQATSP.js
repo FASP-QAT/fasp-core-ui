@@ -205,7 +205,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100],
             columns: [
                 {

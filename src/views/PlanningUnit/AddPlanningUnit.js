@@ -32,6 +32,7 @@ export default class AddPlanningUnit extends Component {
         this.state = {
             units: [],
             forecastingUnits: [],
+            forecastingUnitList: [],
             message: '',
             planningUnit:
             {
@@ -117,7 +118,16 @@ export default class AddPlanningUnit extends Component {
                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
+                        let forecastingUnitList = listArray.length > 0
+                            && listArray.map((item, i) => {
+                                return (
+                                    <option key={i} value={item.id}>
+                                        {item.label.label_en + "-" + item.unit.label.label_en}
+                                    </option>
+                                )
+                            }, this);
                         this.setState({
+                            forecastingUnitList: forecastingUnitList,
                             forecastingUnits: listArray, loading: false
                         })
                     }).catch(
@@ -222,15 +232,7 @@ export default class AddPlanningUnit extends Component {
                     </option>
                 )
             }, this);
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>
-                        {item.label.label_en + "-" + item.unit.label.label_en}
-                    </option>
-                )
-            }, this);
+                    
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -333,7 +335,7 @@ export default class AddPlanningUnit extends Component {
                                                         value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                        {forecastingUnitList}
+                                                        {this.state.forecastingUnitList}
                                                     </Input>
                                                     <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                                 </FormGroup>

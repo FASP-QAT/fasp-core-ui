@@ -62,7 +62,7 @@ export default class ForecastingUnitListComponent extends Component {
         var data = forecastingUnitListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [60, 150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

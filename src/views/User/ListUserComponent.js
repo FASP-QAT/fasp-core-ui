@@ -447,7 +447,7 @@ class ListUserComponent extends Component {
         var data = userArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 50, 50, 50, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -559,7 +559,7 @@ class ListUserComponent extends Component {
         var data = userArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 50, 50, 50, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

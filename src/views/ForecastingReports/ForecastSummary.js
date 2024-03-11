@@ -1085,7 +1085,7 @@ class ForecastSummary extends Component {
                                     })
                                     var options = {
                                         data: dataArray,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         columns: columns,
                                         nestedHeaders: [nestedHeaders],
                                         updateTable: function (el, cell, x, y, source, value, id) {
@@ -1313,7 +1313,7 @@ class ForecastSummary extends Component {
                             })
                             var options = {
                                 data: dataArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: columns,
                                 nestedHeaders: [nestedHeaders],
                                 updateTable: function (el, cell, x, y, source, value, id) {

@@ -260,7 +260,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 70],
             columns: [
                 {
@@ -567,7 +567,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 50],
             columns: [
                 {
