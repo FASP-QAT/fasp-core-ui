@@ -80,7 +80,7 @@ export default class ReactListComponent extends Component {
                         var data = realmArray;
                         var options = {
                             data: data,
-                            columnDrag: true,
+                            columnDrag: false,
                             colWidths: [0, 100, 90, 90, 90, 90, 100, 120, 90],
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [

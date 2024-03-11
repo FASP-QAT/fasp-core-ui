@@ -49,7 +49,7 @@ class ListRoleComponent extends Component {
         var data = roleArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

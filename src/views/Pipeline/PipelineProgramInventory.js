@@ -373,7 +373,7 @@ export default class PipelineProgramInventory extends Component {
                                 var data = inventoryDataArr;
                                 var options = {
                                     data: data,
-                                    columnDrag: true,
+                                    columnDrag: false,
                                     colWidths: [190, 130, 100, 120, 100, 150, 100, 130, 100],
                                     columns: [
                                         {

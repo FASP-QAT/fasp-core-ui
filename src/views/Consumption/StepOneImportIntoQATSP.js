@@ -651,7 +651,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 100, 100, 100, 100, 50],
             columns: [
                 {

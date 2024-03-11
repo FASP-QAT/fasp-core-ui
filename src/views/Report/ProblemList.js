@@ -501,7 +501,7 @@ export default class ConsumptionDetails extends React.Component {
         var qplEditable = this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [10, 10, 10, 10, 10, 100, 10, 50, 180, 180, 50, 100, 10, 10, 10, 10, 10, 50, 100, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

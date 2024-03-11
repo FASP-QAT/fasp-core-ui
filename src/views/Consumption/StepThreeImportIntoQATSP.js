@@ -589,7 +589,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         planningUnitListJexcel.splice(0, 1);
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             columns: [
                 {

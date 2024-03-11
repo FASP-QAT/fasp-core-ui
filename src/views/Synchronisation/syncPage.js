@@ -1804,7 +1804,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedConsumptionJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -1963,7 +1963,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedInventoryJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -2106,7 +2106,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedShipmentJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -2291,7 +2291,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedShipmentLinkedJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 nestedHeaders: [
                                                   [{
                                                     title: '',
@@ -4350,7 +4350,7 @@ export default class syncPage extends Component {
         }
         var options = {
           data: mergedProblemListJexcel,
-          columnDrag: true,
+          columnDrag: false,
           colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
           colHeaderClasses: ["Reqasterisk"],
           columns: [

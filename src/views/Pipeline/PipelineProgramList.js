@@ -64,7 +64,7 @@ export default class PipelineProgramList extends Component {
         var data = pipelineProgramArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

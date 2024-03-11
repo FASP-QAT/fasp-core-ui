@@ -189,7 +189,7 @@ export default class PipelineProgramDataSource extends Component {
                                             var data = productDataArr;
                                             var options = {
                                                 data: data,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 colWidths: [160, 190, 190, 190],
                                                 columns: [
                                                     {

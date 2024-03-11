@@ -705,7 +705,7 @@ class ModelingValidation extends Component {
             var json = [];
             var options = {
                 data: dataArr,
-                columnDrag: true,
+                columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns,
                 onload: this.loaded,
@@ -732,7 +732,7 @@ class ModelingValidation extends Component {
             this.el = dataEl;
             var options2 = {
                 data: dataArr2,
-                columnDrag: true,
+                columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns2,
                 onload: this.loaded,

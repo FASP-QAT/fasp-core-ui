@@ -78,6 +78,7 @@ class ForecastOutput extends Component {
             forecastingUnitLabels: [],
             downloadedProgramData: [],
             equivalencyUnitList: [],
+            equivalencyUnitListFull: [],
             programEquivalencyUnitList: [],
             equivalencyUnitLabel: '',
             calculateEquivalencyUnitTotal: [],
@@ -213,6 +214,7 @@ class ForecastOutput extends Component {
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
+                                equivalencyUnitListFull:filteredEQUnit,
                                 programEquivalencyUnitList: filteredEquList,
                             }, () => {
                                 this.filterData();
@@ -257,6 +259,7 @@ class ForecastOutput extends Component {
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
+                                equivalencyUnitListFull:listArray,
                                 programEquivalencyUnitList: filteredEquList,
                             }, () => {
                                 this.filterData();
@@ -779,7 +782,7 @@ class ForecastOutput extends Component {
                                                             if (yaxisEquUnitId != -1) {
                                                                 for (var rt = 0; rt < resultTrue.length; rt++) {
                                                                     let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUniObj.planningUnit.forecastingUnit.id)[0].convertToEu;
-                                                                    resultTrue[rt].consumptionQty = Number(resultTrue[rt].consumptionQty) / Number(convertToEu);
+                                                                    resultTrue[rt].consumptionQty = (Number(resultTrue[rt].consumptionQty) * Number(planningUniObj.planningUnit.multiplier)) / Number(convertToEu);
                                                                 }
                                                             }
                                                             if (resultTrue.length > 0) {
@@ -799,7 +802,7 @@ class ForecastOutput extends Component {
                                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: (m.amount == null ? 0 : (m.amount / convertToEu))
+                                                                    consumptionQty: (m.amount == null ? 0 : (m.amount * Number(planningUniObj.planningUnit.multiplier) / convertToEu))
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0], graphId: 0 }
@@ -1070,11 +1073,15 @@ class ForecastOutput extends Component {
                     .then(response => {
                         let primaryConsumptionData = response.data;
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
+                            var convertToEU=1;
+                            if(yaxisEquUnitId != -1){
+                                convertToEU=this.state.equivalencyUnitListFull.filter(c=>c.equivalencyUnit.equivalencyUnitId==yaxisEquUnitId && c.forecastingUnit.id==primaryConsumptionData[i].forecastingUnit.id)[0].convertToEu;
+                            }
                             if (primaryConsumptionData[i].selectedForecast != null) {
                                 let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: viewById == 1 ? m.consumptionQty : Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)
+                                        consumptionQty: viewById == 1 ? (yaxisEquUnitId != -1?Number(m.consumptionQty)*Number(primaryConsumptionData[i].planningUnit.multiplier)/Number(convertToEU):m.consumptionQty) : yaxisEquUnitId != -1?Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)/Number(convertToEU):Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)
                                     }
                                 });
                                 let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList, region: primaryConsumptionData[i].region, graphId: 0 }
@@ -1083,7 +1090,7 @@ class ForecastOutput extends Component {
                                 let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: viewById == 1 ? m.consumptionQty : Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)
+                                        consumptionQty: viewById == 1 ? (yaxisEquUnitId != -1?Number(m.consumptionQty)*Number(primaryConsumptionData[i].planningUnit.multiplier)/Number(convertToEU):m.consumptionQty) : yaxisEquUnitId != -1?Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)/Number(convertToEU):Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)                                        
                                     }
                                 });
                                 let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 0, label: 'No forecast selected' }, display: false, color: "#ba0c2f", consumptionList: consumptionList, region: primaryConsumptionData[i].region, graphId: 0 }
@@ -1193,9 +1200,9 @@ class ForecastOutput extends Component {
                     );
             }
         } else if (programId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+            this.setState({ message: i18n.t('static.common.selectProgram'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
         } else if (versionId == -1) {
-            this.setState({ message: i18n.t('static.program.validversion'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+            this.setState({ message: i18n.t('static.program.validversion'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
         } else if (viewById == 1 && planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         } else if (viewById == 2 && forecastingUnitIds.length == 0) {

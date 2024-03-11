@@ -912,7 +912,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                                             json.push(data);
                                                                             var options = {
                                                                                 data: json,
-                                                                                columnDrag: true,
+                                                                                columnDrag: false,
                                                                                 colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
                                                                                 columns: [
                                                                                     {
@@ -1588,7 +1588,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 150, 100],
             columns: [
                 {
@@ -3930,7 +3930,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             json.push(data)
             var options = {
                 data: json,
-                columnDrag: true,
+                columnDrag: false,
                 columns: [
                     { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'hidden', textEditor: true, mask: '#,##', width: 120, readOnly: true },
@@ -3998,7 +3998,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 json1.push(data1)
                 var options1 = {
                     data: json1,
-                    columnDrag: true,
+                    columnDrag: false,
                     columns: [
                         { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120 },
                         { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120 },
