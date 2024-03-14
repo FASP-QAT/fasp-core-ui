@@ -1018,8 +1018,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     setVersionId(event) {
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
-        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY"));
-        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY"));
+        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY")+"-01");
+        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY")+"-01");
         // console.log("forecastProgramVerisonList===>", forecastStartDate)
         // console.log("forecastProgramVerisonList===>", forecastStopDate)
 
