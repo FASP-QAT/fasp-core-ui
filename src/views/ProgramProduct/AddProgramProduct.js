@@ -312,6 +312,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     title: i18n.t('static.productCategory.productCategory'),
                                                                     type: 'dropdown',
                                                                     source: productCategoryListNew,
+                                                                    width:150,
                                                                     required: true
                                                                 },
                                                                 {
@@ -319,6 +320,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'autocomplete',
                                                                     source: list,
                                                                     filter: this.dropdownFilter,
+                                                                    width:150,
                                                                     required: true
                                                                 },
                                                                 {
@@ -1351,7 +1353,7 @@ class AddprogramPlanningUnit extends Component {
                             </Col>
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                     </div>
                                 </div>
