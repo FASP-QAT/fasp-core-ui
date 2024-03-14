@@ -417,7 +417,7 @@ export default class AddPlanningUnit extends Component {
                                                                 });
                                                             }
                                                         }} 
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.startTyping')} {...params} variant="outlined"
                                                             onChange={(e) => {
                                                                 this.getAutocompleteForecastingUnit(e.target.value)
                                                             }} />}
@@ -526,7 +526,6 @@ export default class AddPlanningUnit extends Component {
         planningUnit.multiplier = ''
         let autocompleteData = []
         let searchedValue = ''
-        
         this.setState(
             {
                 planningUnit,
