@@ -584,7 +584,7 @@ class ModelingValidation extends Component {
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     for (var k = 0; k < nodeVal.length; k++) {
-                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                         var calculatedValueTotal = 0;
                         for (var fl = 0; fl < flatListFiltered.length; fl++) {
                             var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -633,7 +633,7 @@ class ModelingValidation extends Component {
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     for (var k = 0; k < nodeVal.length; k++) {
-                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                         var calculatedValueTotal = 0;
                         for (var fl = 0; fl < flatListFiltered.length; fl++) {
                             var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -689,6 +689,8 @@ class ModelingValidation extends Component {
                         }
                         var val = ""
                         if (calculatedValueTotal != "") {
+                            console.log("calculatedValueTotal Test@123",calculatedValueTotal);
+                            console.log("Total Test@123",total);
                             val = (Number(calculatedValueTotal) / Number(total)) * 100;
                         }
                         data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
