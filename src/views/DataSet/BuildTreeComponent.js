@@ -2126,12 +2126,12 @@ export default class BuildTree extends Component {
     validation1 = function () {
 
         var nodeTypeId = document.getElementById("nodeTypeId").value;
+        console.log("nodeTypeId", nodeTypeId)
         var nodeTitle = document.getElementById("nodeTitle").value;
-        var nodeUnitId = document.getElementById("nodeUnitId").value;
         var nodeValue = document.getElementById("nodeValue").value;
         var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
         var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
-        if ((nodeTypeId == 3 || nodeTypeId == 2) && nodeUnitId == "") {
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
             return false;
         } else if (nodeTitle == "" || testTitle == false) {
             return false;
@@ -3636,11 +3636,13 @@ export default class BuildTree extends Component {
                         if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
-                                firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
-                                yearsOfTarget: this.state.yearsOfTarget,
-                                actualOrTargetValueList: this.state.actualOrTargetValueList
-                            };
+                            if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                                (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
+                                    firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
+                                    yearsOfTarget: this.state.yearsOfTarget,
+                                    actualOrTargetValueList: this.state.actualOrTargetValueList
+                                };
+                            }
                             if (this.state.lastRowDeleted == true) {
                                 (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                             }
