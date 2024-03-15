@@ -698,3 +698,11 @@ export function changed(worksheets, cell, x, y, value) {
         worksheets.setComments(col, "");
     }
 };
+/**
+ * This function is used to format the table like add asterisk or info to the table headers
+ * @param {*} instance This is the DOM Element where sheet is created
+ * @param {*} cell This is the object of the DOM element
+ */
+export function loadedForNonEditableTables(instance, cell) {
+    jExcelLoadedFunction(instance);
+}

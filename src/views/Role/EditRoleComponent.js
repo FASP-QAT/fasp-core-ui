@@ -10,12 +10,7 @@ import { API_URL } from '../../Constants.js';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-// Initial values for form fields
-const initialValues = {
-    roleName: "",
-    businessFunctions: [],
-    canCreateRole: []
-}
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = i18n.t('static.role.role');
 /**
@@ -60,31 +55,9 @@ class EditRoleComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-    }
-    /**
-     * Hides the message in div2 after 30 seconds.
-     */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    /**
-     * Capitalizes the first letter of the role name.
-     * @param {string} str - The role name.
-     * @returns {string} - Capitalized role name.
-     */
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
     }
     /**
      * Handles data change in the form.
@@ -160,7 +133,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent()
                         })
                 }
             })
@@ -226,7 +199,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -283,7 +256,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -360,7 +333,7 @@ class EditRoleComponent extends Component {
                                                     message: response.data.messageCode, loadig: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -432,7 +405,7 @@ class EditRoleComponent extends Component {
                                                         onBlur={handleBlur}
                                                         maxLength={45}
                                                         required
-                                                        value={this.Capitalize(this.state.role.label.label_en)}
+                                                        value={Capitalize(this.state.role.label.label_en)}
                                                     />
                                                     <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                 </FormGroup>
