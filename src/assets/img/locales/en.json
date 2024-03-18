@@ -363,7 +363,7 @@
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
     "static.PUSettingList.notes": "User does not have business function to modify this screen. Please consult program admin for assistance.",
     "static.dashboard.realm": "Realms",
-    "static.loadDelDataset.selectAtleastOneDataset": "Select atleast one dataset to download",
+    "static.loadDelDataset.selectAtleastOneDataset": "Select at least one program to download",
     "static.common.selecttracercategory": "Select Tracer Category",
     "static.organisation.realmcountry": "Country",
     "static.tree.createTree": "Create Tree",
