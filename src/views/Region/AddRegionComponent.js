@@ -8,11 +8,19 @@ import RealmCountryService from "../../api/RealmCountryService.js";
 import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.region.region');
+// Initial values for form fields
 const initialValues = {
   realmCountryId: [],
   region: ""
 }
+/**
+ * Defines the validation schema for region details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmCountryId: Yup.string()
@@ -21,6 +29,9 @@ const validationSchema = function (values) {
       .required(i18n.t('static.region.validregion'))
   })
 }
+/**
+ * Component for adding region details.
+ */
 class AddRegionComponent extends Component {
   constructor(props) {
     super(props);
@@ -42,9 +53,12 @@ class AddRegionComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
-    this.Capitalize = this.Capitalize.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
   }
+  /**
+   * Handles data change in the form.
+   * @param {Event} event - The change event.
+   */
   dataChange(event) {
     let { region } = this.state;
     if (event.target.name == "realmCountryId") {
@@ -58,7 +72,9 @@ class AddRegionComponent extends Component {
     },
       () => { });
   };
-  
+  /**
+   * Fetches realm country list on component mount.
+   */
   componentDidMount() {
     RealmCountryService.getRealmCountryListAll()
       .then(response => {
@@ -111,9 +127,10 @@ class AddRegionComponent extends Component {
         }
       );
   }
-  Capitalize(str) {
-    this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  /**
+   * Renders the region details form.
+   * @returns {JSX.Element} - Region details form.
+   */
   render() {
     const { realmCountries } = this.state;
     let realmCountryList = realmCountries.length > 0
@@ -229,7 +246,7 @@ class AddRegionComponent extends Component {
                             bsSize="sm"
                             valid={!errors.region && this.state.region.label.label_en != ''}
                             invalid={touched.region && !!errors.region}
-                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                            onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                             onBlur={handleBlur}
                             value={this.state.region.label.label_en}
                             required />
@@ -252,9 +269,15 @@ class AddRegionComponent extends Component {
       </div>
     );
   }
+  /**
+   * Redirects to the list region screen when cancel button is clicked.
+   */
   cancelClicked() {
     this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
   }
+  /**
+   * Resets the region details when reset button is clicked.
+   */
   resetClicked() {
     let { region } = this.state;
     region.realmCountry.realmCountryId = ''
