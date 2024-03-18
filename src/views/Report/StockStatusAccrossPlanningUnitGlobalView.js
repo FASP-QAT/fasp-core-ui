@@ -37,7 +37,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, formatter, makeText, round } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { addDoubleQuoteToRowContent, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const ref = React.createRef();
 const pickerLang = {
   months: [

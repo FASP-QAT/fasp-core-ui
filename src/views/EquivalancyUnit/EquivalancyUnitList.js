@@ -32,7 +32,11 @@ import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
+/**
+ * Component for list of equivalency unit details.
+ */
 class EquivalancyUnit extends Component {
     constructor(props) {
         super(props);
@@ -91,6 +95,14 @@ class EquivalancyUnit extends Component {
         this.checkValidation1 = this.checkValidation1.bind(this);
         this.onchangepage = this.onchangepage.bind(this)
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
     loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
@@ -99,11 +111,27 @@ class EquivalancyUnit extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when cell value is edited & mark change in row.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     oneditionend1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
         elInstance.setValueFromCoords(9, y, 1, true);
     }
+    /**
+     * Validate cell values on change.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     changed1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
@@ -159,18 +187,30 @@ class EquivalancyUnit extends Component {
         }
         this.setState({ isChanged1: true })
     }.bind(this);
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Hides the message in div3 after 30 seconds i.e inside Manage Equivalency Unit popup.
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * On page change
+     * @param {*} el 
+     * @param {*} pageNo 
+     * @param {*} oldPageNo 
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -231,6 +271,9 @@ class EquivalancyUnit extends Component {
             }
         }
     }
+    /**
+     * Builds the jexcel component to display Equivalency Unit list on popup.
+     */
     buildJexcel1() {
         var papuList = this.state.equivalancyUnitAllList;
         var data = [];
