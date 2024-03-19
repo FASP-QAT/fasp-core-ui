@@ -85,7 +85,6 @@ export default class EditForecastingUnitComponent extends Component {
             units: []
         }
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -230,14 +229,6 @@ export default class EditForecastingUnitComponent extends Component {
             }
         );
     }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { forecastingUnit } = this.state
-            forecastingUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -378,7 +369,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.forecastingUnit.label.label_en}
                                                         required />
