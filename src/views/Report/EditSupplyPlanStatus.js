@@ -2125,6 +2125,7 @@ class EditSupplyPlanStatus extends Component {
                     loading:false
                 }, () => {
                     this.getPlanningUnit()
+                    this.getProblemCriticality();
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
