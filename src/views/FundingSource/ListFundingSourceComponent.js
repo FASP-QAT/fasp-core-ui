@@ -16,7 +16,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 // Localized entity name
 const entityname = i18n.t('static.fundingsource.fundingsource');
 /**
- * Component for list of funding source details.
+ * Component for listing funding source details.
  */
 class FundingSourceListComponent extends Component {
     constructor(props) {
@@ -58,7 +58,7 @@ class FundingSourceListComponent extends Component {
         }, 30000);
     }
     /**
-     * Filters the funding source list according to the realmId.
+     * Filters the funding source list according to the realmId & builds jexcel.
      */
     filterData() {
         let realmId = document.getElementById("realmId").value;

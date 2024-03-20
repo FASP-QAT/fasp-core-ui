@@ -339,7 +339,7 @@ export default class AddHealthAreaComponent extends Component {
     }, 30000);
   }
   /**
-   * Handles change event on country dropdown & filters the dropdown list
+   * Handles change event on realm country dropdown & filters the dropdown list
    * @param {Event} value - The change event.
    */
   updateFieldData(value) {

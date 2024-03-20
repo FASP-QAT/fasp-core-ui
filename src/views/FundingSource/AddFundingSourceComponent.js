@@ -64,7 +64,7 @@ class AddFundingSourceComponent extends Component {
     this.getDisplayName = this.getDisplayName.bind(this);
   }
   /**
-   * Fetch funding source display name on blur event
+   * Fetch funding source display name on blur event of funding source field
    */
   getDisplayName() {
     let realmId = document.getElementById("realmId").value;
@@ -198,6 +198,7 @@ class AddFundingSourceComponent extends Component {
   /**
    * Capitalizes the first letter of the funding source & display name.
    * @param {string} str - The funding source/display name.
+   * @returns {string} - Capitalized funding source/display name.
    */
   Capitalize(str) {
     var reg = /^[1-9]\d*(\.\d+)?$/
@@ -287,7 +288,7 @@ class AddFundingSourceComponent extends Component {
   }
   /**
    * Renders the funding source details form.
-   * @returns {JSX.Element} - Budget details form.
+   * @returns {JSX.Element} - funding source details form.
    */
   render() {
     const { realms } = this.state;

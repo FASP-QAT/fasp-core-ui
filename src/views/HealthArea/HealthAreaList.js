@@ -17,7 +17,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 // Localized entity name
 const entityname = i18n.t('static.healtharea.healtharea');
 /**
- * Component for list of health/technical area details.
+ * Component for listing health/technical area details.
  */
 export default class HealthAreaListComponent extends Component {
     constructor(props) {
@@ -146,7 +146,7 @@ export default class HealthAreaListComponent extends Component {
         }, 30000);
     }
     /**
-     * Filters the health area list according to the realmId.
+     * Filters the health area list according to the realmId & builds the jexcel.
      */
     filterData() {
         let realmId = document.getElementById("realmId").value;

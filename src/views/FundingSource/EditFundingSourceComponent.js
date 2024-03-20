@@ -154,9 +154,9 @@ class EditFundingSourceComponent extends Component {
             () => { });
     };
     /**
-   * Capitalizes the first letter of the funding source name.
-   * @param {string} str - The budget name.
-   */
+     * Capitalizes the first letter of the funding source name.
+     * @param {string} str - The funding source name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { fundingSource } = this.state
@@ -165,7 +165,7 @@ class EditFundingSourceComponent extends Component {
     }
     /**
      * Renders the funding source details form.
-     * @returns {JSX.Element} - Budget details form.
+     * @returns {JSX.Element} - Funding source form.
      */
     render() {
         return (
