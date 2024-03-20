@@ -58,7 +58,7 @@ class FundingSourceListComponent extends Component {
         }, 30000);
     }
     /**
-     * Filters the funding source list according to the realmId filter
+     * Filters the funding source list according to the realmId.
      */
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -175,13 +175,13 @@ class FundingSourceListComponent extends Component {
         })
     }
     /**
-   * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
-   * @param {*} instance - This is the DOM Element where sheet is created
-   * @param {*} cell - This is the object of the DOM element
-   * @param {*} x - Row Number
-   * @param {*} y - Column Number
-   * @param {*} value - Cell Value
-   */
+     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -341,7 +341,7 @@ class FundingSourceListComponent extends Component {
     }
     /**
      * Renders the funding source list with filters.
-     * @returns {JSX.Element} - Budget list.
+     * @returns {JSX.Element} - funding source list.
      */
     render() {
         jexcel.setDictionary({

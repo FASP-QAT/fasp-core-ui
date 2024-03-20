@@ -197,7 +197,7 @@ class AddFundingSourceComponent extends Component {
   };
   /**
    * Capitalizes the first letter of the funding source & display name.
-   * @param {string} str - The budget name.
+   * @param {string} str - The funding source/display name.
    */
   Capitalize(str) {
     var reg = /^[1-9]\d*(\.\d+)?$/
