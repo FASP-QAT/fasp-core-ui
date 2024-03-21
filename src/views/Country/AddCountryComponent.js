@@ -104,7 +104,7 @@ export default class AddCountryComponent extends Component {
         }, 30000);
     }
     /**
-     * Fetches active currency list on component mount & stops the loader
+     * Fetches active currency list & stops the loader on component mount 
      */
     componentDidMount() {
         CurrencyService.getCurrencyListActive().then(response => {
