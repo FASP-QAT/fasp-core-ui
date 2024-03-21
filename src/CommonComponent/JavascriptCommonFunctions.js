@@ -187,6 +187,10 @@ export function addDoubleQuoteToRowContent(arr) {
  * @returns {string} - The formatted text representing the selected month and year.
  */
 export function makeText(m) {
+  const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+  }
   if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
   return '?'
 }
@@ -325,8 +329,4 @@ export function PercentageFormatter(num) {
   } else {
     return ''
   }
-}
-const pickerLang = {
-  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-  from: 'From', to: 'To',
 }
