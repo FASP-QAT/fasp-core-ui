@@ -108,8 +108,8 @@ export default class RealmCountryPlanningUnitList extends Component {
     this.oneditionend = this.oneditionend.bind(this);
   }
   /**
-     * Redirects to the application dashboard screen when cancel button is clicked.
-     */
+   * Redirects to the application dashboard screen when cancel button is clicked.
+   */
   cancelClicked() {
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(

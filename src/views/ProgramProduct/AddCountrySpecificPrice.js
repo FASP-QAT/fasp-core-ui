@@ -16,7 +16,12 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.countrySpecificPrices.countrySpecificPrices')
+/**
+ * Component used for taking country specific price
+ */
 class CountrySpecificPrices extends Component {
     constructor(props) {
         super(props);
@@ -47,19 +52,25 @@ class CountrySpecificPrices extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to filter active programs
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterProgram = function (instance, cell, c, r, source) {
         return this.state.procurementAgentArr.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     componentDidMount() {
         ProcurementAgentService.getCountrySpecificPricesList(this.props.match.params.programPlanningUnitId).then(response => {
             if (response.status == 200) {
@@ -199,8 +210,6 @@ class CountrySpecificPrices extends Component {
                                     allowManualInsertColumn: false,
                                     allowDeleteRow: true,
                                     onchange: this.changed,
-                                    onblur: this.blur,
-                                    onfocus: this.focus,
                                     oneditionend: this.oneditionend,
                                     copyCompatibility: true,
                                     onpaste: this.onPaste,
@@ -302,7 +311,7 @@ class CountrySpecificPrices extends Component {
                                     message: response.data.messageCode
                                 },
                                     () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     })
                             }
                         })
@@ -350,7 +359,7 @@ class CountrySpecificPrices extends Component {
                             message: response.data.messageCode
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -398,7 +407,7 @@ class CountrySpecificPrices extends Component {
                     message: response.data.messageCode
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -442,6 +451,14 @@ class CountrySpecificPrices extends Component {
                 }
             );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -450,6 +467,9 @@ class CountrySpecificPrices extends Component {
         }
         elInstance.setValueFromCoords(7, y, 1, true);
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var data = [];
         data[0] = this.state.programPlanningUnit.program.label.label_en;
@@ -464,6 +484,11 @@ class CountrySpecificPrices extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -479,6 +504,9 @@ class CountrySpecificPrices extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -515,7 +543,7 @@ class CountrySpecificPrices extends Component {
                             message: response.data.messageCode
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -561,17 +589,26 @@ class CountrySpecificPrices extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-    blur = function (instance) {
-    }
-    focus = function (instance) {
-    }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -607,6 +644,10 @@ class CountrySpecificPrices extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -647,6 +688,10 @@ class CountrySpecificPrices extends Component {
         }
         return valid;
     }
+    /**
+     * Renders the country specific price list.
+     * @returns {JSX.Element} - Country specific price list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -687,6 +732,9 @@ class CountrySpecificPrices extends Component {
             </div>
         )
     }
+    /**
+     * Redirects to the add program planning unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         let programId = this.props.match.params.programId;
         this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
