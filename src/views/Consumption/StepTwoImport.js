@@ -274,7 +274,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-                    <div id="mapRegion">
+                    <div id="mapRegion" style={{width:'100%'}}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
