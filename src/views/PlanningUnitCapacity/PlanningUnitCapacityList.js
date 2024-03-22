@@ -96,7 +96,7 @@ export default class PlanningUnitCapacityList extends Component {
                     ]
                 },
             ],
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
