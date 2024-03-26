@@ -50,7 +50,6 @@ export default class AddPlanningUnit extends Component {
             },
             loading: true
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -218,10 +217,6 @@ export default class AddPlanningUnit extends Component {
                 }
             );
     }
-    Capitalize(str) {
-        let { planningUnit } = this.state
-        planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -361,7 +356,7 @@ export default class AddPlanningUnit extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label && this.state.planningUnit.label.label_en != ''}
                                                         invalid={touched.label && !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.planningUnit.label.label_en}
                                                         required />
