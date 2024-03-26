@@ -3630,6 +3630,14 @@ export default class SupplyPlanComponent extends React.Component {
                 id: rcpuFilter[0].realmCountryPlanningUnitId,
                 multiplier: rcpuFilter[0].multiplier
             }
+        }else if(rcpuFilter.length>1){
+            var rcpuFilterForMultiplerOne=rcpuFilter.filter(c=>c.multiplier==1);
+            if(rcpuFilterForMultiplerOne.length>=1){
+                rcpuObject = {
+                    id: rcpuFilterForMultiplerOne[0].realmCountryPlanningUnitId,
+                    multiplier: rcpuFilterForMultiplerOne[0].multiplier
+                }
+            }
         }
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
