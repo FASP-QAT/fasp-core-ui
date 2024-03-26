@@ -276,6 +276,19 @@ class PlanningUnitCapacity extends Component {
             onpaste: this.onPaste,
             oneditionend: this.oneditionend,
             onload: this.loaded,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el;
+                    var rowData = elInstance.getRowData(y);
+                    if(rowData[6]==0){
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                    }else{
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    }
+                }
+            },
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
