@@ -63,7 +63,7 @@ class QuantimedImportStepFour extends Component {
             <>
                 <div className="animated fadeIn">
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
-                        <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                        <Form className="needs-validation" noValidate name='healthAreaForm'>
                             <CardBody className="pb-lg-2 pt-lg-2">
                                 <div className="pl-0">
                                     <div className="row">
