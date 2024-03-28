@@ -54,7 +54,6 @@ export default class EditPlanningUnitComponent extends Component {
             },
             loading: true
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -96,12 +95,6 @@ export default class EditPlanningUnitComponent extends Component {
         )
     };
     
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { planningUnit } = this.state
-            planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
@@ -350,7 +343,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.label.label_en}
                                                             required

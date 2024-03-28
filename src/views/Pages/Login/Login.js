@@ -360,6 +360,7 @@ class Login extends Component {
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
+                                  localStorage.setItem("lastFocus", new Date());
                                   i18n.changeLanguage(user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   if (AuthenticationService.syncExpiresOn() == true) {

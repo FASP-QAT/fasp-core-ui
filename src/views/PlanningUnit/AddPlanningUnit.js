@@ -1,3 +1,5 @@
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Formik } from 'formik';
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
@@ -30,6 +32,7 @@ export default class AddPlanningUnit extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             units: [],
             forecastingUnits: [],
             forecastingUnitList: [],
@@ -48,9 +51,12 @@ export default class AddPlanningUnit extends Component {
                 },
                 multiplier: ''
             },
+            autocompleteData: [],
+            searchedValue: '',
+            autocompleteError: true,
             loading: true
         }
-        this.Capitalize = this.Capitalize.bind(this);
+        this.submitClicked = this.submitClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -93,7 +99,8 @@ export default class AddPlanningUnit extends Component {
         }
         this.setState(
             {
-                planningUnit
+                planningUnit,
+                autocompleteError: false
             }
         )
     };
@@ -218,9 +225,75 @@ export default class AddPlanningUnit extends Component {
                 }
             );
     }
-    Capitalize(str) {
-        let { planningUnit } = this.state
-        planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    getAutocompleteForecastingUnit = (term) => {
+        var language = this.state.lang;
+        var autocompletejson = {
+            "searchText": term,
+            "language": language
+        }
+        DropdownService.getAutocompleteForecastingUnit(autocompletejson)
+            .then(response => {
+                var forecastingUnitList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    var label = response.data[i].label.label_en + '|' + response.data[i].id;
+                    forecastingUnitList[i] = { value: response.data[i].id, label: label }
+                }
+                var listArray = forecastingUnitList;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase(); 
+                    var itemLabelB = b.label.toUpperCase(); 
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    autocompleteData: listArray,
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        }, () => {
+                            this.hideSecondComponent()
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent()
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent()
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent()
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     render() {
         const { units } = this.state;
@@ -322,22 +395,29 @@ export default class AddPlanningUnit extends Component {
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="forecastingUnitId">{i18n.t('static.planningUnit.associatedForecastingUnit')}<span className="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="forecastingUnitId"
+                                                    <Autocomplete
                                                         id="forecastingUnitId"
-                                                        bsSize="sm"
-                                                        valid={!errors.forecastingUnitId && this.state.planningUnit.forecastingUnit.forecastingUnitId != ''}
-                                                        invalid={touched.forecastingUnitId && !!errors.forecastingUnitId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.changePlanningUnit(e); }}
-                                                        onBlur={handleBlur}
-                                                        required
-                                                        value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {this.state.forecastingUnitList}
-                                                    </Input>
-                                                    <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
+                                                        name="forecastingUnitId"
+                                                        options={this.state.autocompleteData}
+                                                        getOptionLabel={(option) => option.label || ""}
+                                                        onChange={(event, value) => {
+                                                            if (value != null) {
+                                                                let { planningUnit } = this.state;
+                                                                planningUnit.forecastingUnit.forecastingUnitId = value.value;
+                                                                this.setState({ planningUnit, searchedValue: value.label, }, () => { })
+                                                            } else {
+                                                                this.setState({
+                                                                    searchedValue: '',
+                                                                    autocompleteData: []
+                                                                });
+                                                            }
+                                                        }} 
+                                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.startTyping')} {...params} variant="outlined"
+                                                            onChange={(e) => {
+                                                                this.getAutocompleteForecastingUnit(e.target.value)
+                                                            }} />}
+                                                    />
+                                                    {this.state.autocompleteError ? <span className='red12'>{errors.forecastingUnitId}</span> : ""}
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="multiplier">{i18n.t('static.planningUnit.labelMultiplier')}<span className="red Reqasterisk">*</span></Label>
@@ -361,7 +441,7 @@ export default class AddPlanningUnit extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label && this.state.planningUnit.label.label_en != ''}
                                                         invalid={touched.label && !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.planningUnit.label.label_en}
                                                         required />
@@ -402,7 +482,7 @@ export default class AddPlanningUnit extends Component {
                                                 <FormGroup>
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.submitClicked}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -425,6 +505,11 @@ export default class AddPlanningUnit extends Component {
             </div>
         );
     }
+    submitClicked() {
+        if(this.state.planningUnit.forecastingUnit.forecastingUnitId == ""){
+            this.setState({ autocompleteError: true});
+        }
+    }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
@@ -434,10 +519,15 @@ export default class AddPlanningUnit extends Component {
         planningUnit.forecastingUnit.forecastingUnitId = ''
         planningUnit.unit.id = ''
         planningUnit.multiplier = ''
+        let autocompleteData = []
+        let searchedValue = ''
         this.setState(
             {
-                planningUnit
+                planningUnit,
+                autocompleteData,
+                searchedValue
             }
         )
+        window.location.reload(false);
     }
 }

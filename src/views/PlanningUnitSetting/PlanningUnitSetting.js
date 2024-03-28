@@ -815,7 +815,8 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
-                    required: true,
+                    width:150,
+                    required: true
                     // readOnly: true// 0A
                 },
                 {
@@ -843,7 +844,7 @@ export default class PlanningUnitSetting extends Component {
                         }.bind(this),
                     },
                     filter: this.filterPlanningUnitList,
-                    width: '170',
+                    width: '150',
                     required: true
                     // readOnly: true //1B
                 },
@@ -1895,7 +1896,7 @@ export default class PlanningUnitSetting extends Component {
                                 </i>
                             </p>
                         }
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className='TableWidth100'>
                             </div>
                         </div>
