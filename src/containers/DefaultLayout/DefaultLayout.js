@@ -74,7 +74,6 @@ const AddBudgetComponent = React.lazy(() => import('../../views/Budget/AddBudget
 const ListBudgetComponent = React.lazy(() => import('../../views/Budget/ListBudgetComponent'));
 const EditBudgetComponent = React.lazy(() => import('../../views/Budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('../../views/ProgramProduct/AddProgramProduct'));
-const AddProgram = React.lazy(() => import('../../views/Program/AddProgram'));
 const Programs = React.lazy(() => import('../../views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('../../views/Program/EditProgram'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
@@ -238,7 +237,6 @@ const routes = [
   { path: '/realm/listRealm', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
   { path: '/realm/updateRealm/:realmId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.realmheader', component: EditRealm },
   { path: '/realm/listRealm/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
-  { path: '/program/addProgram', name: 'static.breadcrum.add', entityname: 'static.programHead.program', component: AddProgram },
   { path: '/program/listProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/listProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/editProgram/:programId', name: 'static.programHead.program', entityname: 'static.programHead.program', component: EditProgram },

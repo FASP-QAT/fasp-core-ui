@@ -20,11 +20,15 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     programId: ''
 }
-
+// Localized entity name
 const entityname = i18n.t('static.dashboard.exportprogram')
+/**
+ * Component for exporting the program into zip.
+ */
 export default class ExportProgram extends Component {
     constructor(props) {
         super(props);
@@ -39,12 +43,19 @@ export default class ExportProgram extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
     }
+    /**
+     * Handles the change in the encrypt check state.
+     * @param {Event} e - The change event.
+     */
     setEncryptCheck(e) {
         var encryptCheck = e.target.checked;
         this.setState({
             encryptCheck: encryptCheck,
         })
     }
+    /**
+     * Reterives programs from indexed db on component mount
+     */
     componentDidMount() {
         const lan = 'en'
         var db1;
@@ -83,6 +94,9 @@ export default class ExportProgram extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Handles form submission, processing data from indexedDB and generating a downloadable zip file.
+     */
     formSubmit() {
         this.setState({ loading: true });
         var zip = new JSZip();
@@ -297,7 +311,10 @@ export default class ExportProgram extends Component {
             this.setState({ loading: false });
         }
     }
-    
+    /**
+     * Updates the field data and sets the program ID in the component state.
+     * @param {string} value - The value to be set as the program ID.
+     */
     updateFieldData(value) {
         if (value != "" && value != undefined) {
             this.setState({
@@ -310,6 +327,10 @@ export default class ExportProgram extends Component {
         }
         this.setState({ programId: value });
     }
+    /**
+     * Renders the export program screen.
+     * @returns {JSX.Element} - Export Program screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -383,10 +404,16 @@ export default class ExportProgram extends Component {
             </div>
         )
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the export details when reset button is clicked.
+     */
     resetClicked() {
         this.state.programId = '';
         this.setState({ programId: '' });
