@@ -30,7 +30,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 var data = dataArray;
                 var options = {
                     data: data,
-                    columnDrag: true,
+                    columnDrag: false,
                     colWidths: [300, 70],
                     columns: [
                         {

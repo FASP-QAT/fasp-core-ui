@@ -303,7 +303,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 70],
             columns: [
                 {
@@ -456,7 +456,8 @@ class EquivalancyUnit extends Component {
                 if (y == null) {
                 } else {
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT_MAPPING')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                        || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -610,7 +611,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 50],
             columns: [
                 {
@@ -755,7 +756,8 @@ class EquivalancyUnit extends Component {
                 if (y == null) {
                 } else {
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                        || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {

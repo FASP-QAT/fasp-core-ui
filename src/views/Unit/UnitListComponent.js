@@ -126,7 +126,7 @@ export default class UnitListComponent extends Component {
         var data = unitListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

@@ -620,7 +620,7 @@ class StockAdjustmentComponent extends Component {
         var data = stockAdjustmentArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 80, 60, 90, 90, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

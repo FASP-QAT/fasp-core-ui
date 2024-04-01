@@ -690,7 +690,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 100, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

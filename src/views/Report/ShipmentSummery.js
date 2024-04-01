@@ -1131,7 +1131,7 @@ class ShipmentSummery extends Component {
     var data = shipmentDetailsListArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [
         150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
       ],

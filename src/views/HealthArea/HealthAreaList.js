@@ -59,7 +59,7 @@ export default class HealthAreaListComponent extends Component {
         var data = healthAreasArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 100, 200, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

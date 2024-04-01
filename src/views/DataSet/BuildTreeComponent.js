@@ -18,7 +18,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -668,7 +668,8 @@ export default class BuildTree extends Component {
             modelingChangedOrAdded: false,
             addNodeError: false,
             currentNodeTypeId: "",
-            deleteChildNodes: false
+            deleteChildNodes: false,
+            branchTemplateNotes: ""
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -1606,7 +1607,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -2125,12 +2126,12 @@ export default class BuildTree extends Component {
     validation1 = function () {
 
         var nodeTypeId = document.getElementById("nodeTypeId").value;
+        console.log("nodeTypeId", nodeTypeId)
         var nodeTitle = document.getElementById("nodeTitle").value;
-        var nodeUnitId = document.getElementById("nodeUnitId").value;
         var nodeValue = document.getElementById("nodeValue").value;
         var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
         var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
-        if ((nodeTypeId == 3 || nodeTypeId == 2) && nodeUnitId == "") {
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
             return false;
         } else if (nodeTitle == "" || testTitle == false) {
             return false;
@@ -3116,7 +3117,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3270,7 +3271,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 80, 80, 80, 80, 80, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3349,14 +3350,10 @@ export default class BuildTree extends Component {
                 return false;
             }.bind(this),
         };
-        console.log("Options Test@123", options)
-        console.log("Mom Jexcel Test@123", document.getElementById("momJexcel"));
         if (document.getElementById("momJexcel") != null) {
-            console.log("In if Test@123");
             var momEl = jexcel(document.getElementById("momJexcel"), options);
             this.el = momEl;
         } else {
-            console.log("In else Test@123")
             var momEl = "";
         }
         this.setState({
@@ -3639,11 +3636,13 @@ export default class BuildTree extends Component {
                         if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
-                                firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
-                                yearsOfTarget: this.state.yearsOfTarget,
-                                actualOrTargetValueList: this.state.actualOrTargetValueList
-                            };
+                            if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                                (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
+                                    firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
+                                    yearsOfTarget: this.state.yearsOfTarget,
+                                    actualOrTargetValueList: this.state.actualOrTargetValueList
+                                };
+                            }
                             if (this.state.lastRowDeleted == true) {
                                 (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                             }
@@ -3787,7 +3786,7 @@ export default class BuildTree extends Component {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
                 if (rowData[4] != "") {
-                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
@@ -3798,8 +3797,15 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                     if (rowData[4] == 2) {
@@ -3812,8 +3818,15 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                 }
@@ -4288,7 +4301,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -4330,17 +4343,13 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
-                    textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000%',
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000%'
                 },
                 {
                     title: i18n.t('static.tree.MonthlyChange#'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
-                    textEditor: true,
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000', decimal: '.'
                 },
                 {
                     title: i18n.t('static.tree.modelingCalculater'),
@@ -4821,12 +4830,18 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
-                    if (rowData[4] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                        if (rowData[4] != 5) {
+                            calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                        } else {
+                            calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        }
                     }
                 }
             }
@@ -4853,8 +4868,14 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                    }
                 }
             }
         }
@@ -6606,7 +6627,15 @@ export default class BuildTree extends Component {
             items[findNodeIndex].level = parseInt(parentLevel + 1);
             parentLevel++;
         }
+        let { curTreeObj } = this.state;
+        if (treeTemplateId != "") {
+            var branchTemplateDesc = document.getElementById("branchTemplateId").selectedOptions[0].text;
+            var branchTemplateNotes = document.getElementById("branchTemplateNotes").value;
+            var notes = "Branch Note for " + branchTemplateDesc + ": " + branchTemplateNotes;
+            curTreeObj.notes = curTreeObj.notes != "" ? curTreeObj.notes + " | " + notes : notes;
+        }
         this.setState({
+            curTreeObj,
             items,
             isBranchTemplateModalOpen: false,
             branchTemplateId: "",
@@ -7050,6 +7079,9 @@ export default class BuildTree extends Component {
             this.setState({ branchTemplateId: event.target.value }, () => {
                 this.getMissingPuListBranchTemplate();
             });
+        }
+        if (event.target.name === "branchTemplateNotes") {
+            this.setState({ branchTemplateNotes: event.target.value });
         }
         if (event.target.name === "currentEndValue") {
             this.setState({
@@ -7849,7 +7881,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 80, 80, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -11369,6 +11401,15 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <FormGroup className="col-md-5">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <Input type="textarea"
+                                                                    id="branchTemplateNotes"
+                                                                    name="branchTemplateNotes"
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                    value={this.state.branchTemplateNotes != "" ? this.state.branchTemplateNotes : ""}
+                                                                ></Input>
+                                                            </FormGroup>
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>

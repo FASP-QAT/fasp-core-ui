@@ -346,7 +346,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         jexcel.destroy(document.getElementById('tableDiv'), true);
         var options = {
           data: dataArray,
-          columnDrag: true,
+          columnDrag: false,
           columns: columns,
           colWidths: [10, 50, 100, 100, 100, 100, 50, 100],
           updateTable: function (el, cell, x, y, source, value, id) {
@@ -2929,7 +2929,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var data = dataArray1;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       columns: [
         { title: ' ', type: 'radio' },
         { title: ' ', type: 'text', readOnly: true },

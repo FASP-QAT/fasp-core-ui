@@ -114,7 +114,7 @@ class RealmCountryRegion extends Component {
                         var data = papuDataArr;
                         var options = {
                             data: data,
-                            columnDrag: true,
+                            columnDrag: false,
                             colWidths: [100, 100, 100, 100, 100],
                             columns: [
                                 {

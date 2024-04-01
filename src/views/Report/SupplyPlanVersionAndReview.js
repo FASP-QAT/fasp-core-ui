@@ -146,7 +146,7 @@ class SupplyPlanVersionAndReview extends Component {
         var data = matricsArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 180],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

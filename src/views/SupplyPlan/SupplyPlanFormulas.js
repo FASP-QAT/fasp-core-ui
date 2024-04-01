@@ -551,6 +551,7 @@ class SupplyPlanFormulas extends Component {
                             <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L21")}</td>
                             <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L22")}</td>
                             <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L23")}</td>
+                            <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L24")}</td>
                           </tr>
                           <tr>
                             <td>12</td>
@@ -567,6 +568,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>78</td>
+                            <td>6.5</td>
                           </tr>
                           <tr>
                             <td>11</td>
@@ -583,6 +585,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>67</td>
+                            <td>5.6</td>
                           </tr>
                           <tr>
                             <td>10</td>
@@ -599,8 +602,9 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>58</td>
+                            <td>4.8</td>
                           </tr>
-                          <tr>
+                          <tr style={{fontWeight:'bold'}}>
                             <td>9</td>
                             <td>3</td>
                             <td>2</td>
@@ -615,6 +619,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>51</td>
+                            <td>4.3</td>
                           </tr>
                           <tr>
                             <td>8</td>
@@ -631,6 +636,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>46</td>
+                            <td>3.8</td>
                           </tr>
                           <tr>
                             <td>7</td>
@@ -647,6 +653,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>43</td>
+                            <td>3.6</td>
                           </tr>
                           <tr>
                             <td>6</td>
@@ -663,6 +670,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>42</td>
+                            <td>3.5</td>
                           </tr>
                           <tr>
                             <td>5</td>
@@ -679,6 +687,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>33</td>
+                            <td>2.8</td>
                           </tr>
                           <tr>
                             <td>4</td>
@@ -695,6 +704,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>30</td>
+                            <td>2.5</td>
                           </tr>
                           <tr>
                             <td>3</td>
@@ -711,6 +721,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>24</td>
+                            <td>2.0</td>
                           </tr>
                           <tr>
                             <td>2</td>
@@ -727,6 +738,7 @@ class SupplyPlanFormulas extends Component {
                             <td>2</td>
                             <td>1</td>
                             <td>18</td>
+                            <td>1.5</td>
                           </tr>
                           <tr>
                             <td>1</td>
@@ -743,6 +755,7 @@ class SupplyPlanFormulas extends Component {
                             <td>1</td>
                             <td>1</td>
                             <td>12</td>
+                            <td>1.0</td>
                           </tr>
                         </table>
                       </div>

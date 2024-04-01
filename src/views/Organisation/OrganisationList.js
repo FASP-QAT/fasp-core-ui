@@ -101,7 +101,7 @@ export default class OrganisationListComponent extends Component {
         var data = organisationsArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

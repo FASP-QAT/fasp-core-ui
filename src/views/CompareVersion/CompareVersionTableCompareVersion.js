@@ -312,7 +312,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var options = {
             data: dataArray,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
             nestedHeaders: nestedHeaders,

@@ -651,7 +651,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 100, 100, 100, 100, 50],
             columns: [
                 {
@@ -837,8 +837,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
     setVersionId(event) {
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
-        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY"));
-        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY"));
+        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY")+"-01");
+        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY")+"-01");
         let defaultForecastStartYear = forecastStartDate.getFullYear();
         let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
         let defaultForecastStopYear = forecastStopDate.getFullYear();

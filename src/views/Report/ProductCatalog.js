@@ -602,7 +602,7 @@ class ProductCatalog extends Component {
         var data = outPutArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [80, 80, 90, 60, 80, 80, 80, 0, 0, 90, 80, 80, 70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

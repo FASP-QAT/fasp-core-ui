@@ -101,7 +101,7 @@ class FundingSourceListComponent extends Component {
         var data = fundingSourceArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

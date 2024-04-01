@@ -540,7 +540,7 @@ class ProductValidation extends Component {
             jexcel.destroy(document.getElementById("tableDiv"), true);
             var options = {
                 data: dataArray,
-                columnDrag: true,
+                columnDrag: false,
                 colWidths: [150, 80, 100, 150, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [

@@ -707,7 +707,7 @@ export default class MapPlanningUnits extends Component {
                                 var data = productDataArr;
                                 var options = {
                                     data: data,
-                                    columnDrag: true,
+                                    columnDrag: false,
                                     colWidths: [250, 250, 90, 90, 90, 90, 90, 90, 90],
                                     columns: [
                                         {
