@@ -6,12 +6,20 @@ import { API_URL } from '../../Constants.js';
 import DataSourceService from '../../api/DataSourceService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+// Localized entity name
 const entityname = i18n.t('static.datasource.datasource');
+// Initial values for form fields
 let initialValues = {
     label: '',
     dataSourceTypeId: '',
     dataSourceTypeList: []
 }
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -21,6 +29,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.datasource.datasourcetypetext'))
     })
 }
+/**
+ * Component for editing data source details.
+ */
 export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -65,17 +76,14 @@ export default class UpdateDataSourceComponent extends Component {
             },
             loading: true
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+   * Handles data change in the form.
+   * @param {Event} event - The change event.
+   */
     dataChange(event) {
         let { dataSource } = this.state
         if (event.target.name === "label") {
@@ -92,7 +100,9 @@ export default class UpdateDataSourceComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Fetches data source details on component mount.
+     */
     componentDidMount() {
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             if (response.status == 200) {
@@ -105,7 +115,7 @@ export default class UpdateDataSourceComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -149,14 +159,16 @@ export default class UpdateDataSourceComponent extends Component {
                 }
             );
     }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
+    /**
+     * Redirects to the list data source screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSource/listDataSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Renders the data source details form.
+     * @returns {JSX.Element} - Data source details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -185,7 +197,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -288,7 +300,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={touched.label && !!errors.label || this.state.dataSource.label.label_en == ''}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.dataSource.label.label_en}
                                                         required
@@ -361,6 +373,9 @@ export default class UpdateDataSourceComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the data source details when reset button is clicked.
+     */
     resetClicked() {
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             this.setState({
