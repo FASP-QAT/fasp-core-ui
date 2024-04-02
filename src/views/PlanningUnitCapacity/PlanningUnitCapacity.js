@@ -173,7 +173,7 @@ class PlanningUnitCapacity extends Component {
     /**
      * Filters the supplier/manufacturer list while searching.
      * @param {*} instance - This is the instance of the jExcel spreadsheet
-     * @param {*} cell - This is the the current cell object being filtered
+     * @param {*} cell - This is the current cell object being filtered
      * @param {*} c - The column index.
      * @param {*} r - The row index
      * @param {*} source - The source data for the dropdown list (Supplier list) associated with the current cell.
