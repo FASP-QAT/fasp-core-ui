@@ -1631,6 +1631,10 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * Disable planning unit consumption data
+     * @param {*} listOfDisablePuNode - list of disable planning unit node
+     */
     disablePUConsumptionData(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
         for (var i = 0; i < datasetList1.length; i++) {
@@ -1691,6 +1695,10 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Disables planning unit node
+     * @param {*} listOfDisablePuNode - list to disable planning unit node
+     */
     disablePUNode(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
         for (var i = 0; i < datasetList1.length; i++) {
