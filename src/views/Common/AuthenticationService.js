@@ -547,11 +547,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/program/addProgram":
-                        if (bfunction.includes("ROLE_BF_CREATE_A_PROGRAM")) {
-                            return true;
-                        }
-                        break;
                     case "/program/editProgram/:programId":
                         if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
                             return true;

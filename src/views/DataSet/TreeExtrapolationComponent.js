@@ -1341,7 +1341,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         var options = {
             data: dataArray,
-            columnDrag: true,
+            columnDrag: false,
             nestedHeaders: [nestedHeaders],
             columns: [
                 {

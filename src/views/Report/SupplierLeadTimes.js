@@ -94,7 +94,7 @@ class SupplierLeadTimes extends Component {
         var data = outPutArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

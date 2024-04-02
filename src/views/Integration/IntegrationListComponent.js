@@ -44,7 +44,7 @@ export default class IntegrationListComponent extends Component {
         var data = integrationArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [

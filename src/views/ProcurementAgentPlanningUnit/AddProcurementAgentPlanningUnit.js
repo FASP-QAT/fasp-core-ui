@@ -166,7 +166,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
-                                                        columnDrag: true,
+                                                        columnDrag: false,
                                                         colWidths: [200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
                                                             {

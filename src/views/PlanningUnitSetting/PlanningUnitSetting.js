@@ -897,7 +897,7 @@ export default class PlanningUnitSetting extends Component {
         this.setState({ dropdownList: dropdownList })
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -905,7 +905,8 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
-                    required: true,
+                    width:150,
+                    required: true
                     // readOnly: true// 0A
                 },
                 {
@@ -933,7 +934,7 @@ export default class PlanningUnitSetting extends Component {
                         }.bind(this),
                     },
                     filter: this.filterPlanningUnitList,
-                    width: '170',
+                    width: '150',
                     required: true
                     // readOnly: true //1B
                 },
@@ -2026,8 +2027,8 @@ export default class PlanningUnitSetting extends Component {
                                 </i>
                             </p>
                         }
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div style={{ width: '100%' }} id="tableDiv">
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className='TableWidth100'>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

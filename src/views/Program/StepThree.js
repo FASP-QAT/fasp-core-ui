@@ -15,15 +15,24 @@ import { API_URL } from '../../Constants';
 import DropdownService from '../../api/DropdownService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesThree = {
     healthAreaId: []
 }
+/**
+ * Defines the validation schema for step three of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaThree = function (values) {
     return Yup.object().shape({
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
     })
 }
+/**
+ * Component for program Onboarding step three for taking the realm country details for the program
+ */
 export default class StepThree extends Component {
     constructor(props) {
         super(props);
@@ -33,7 +42,10 @@ export default class StepThree extends Component {
         }
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
-   
+    /**
+     * Generates a health area code based on the selected health ID.
+     * @param {Event} event - The change event containing the selected health area ID.
+     */
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -42,6 +54,9 @@ export default class StepThree extends Component {
         }
         this.props.generateHealthAreaCode(healthAreaCode.slice(0, -1));
     }
+    /**
+     * Reterives health area list from server
+     */
     getHealthAreaList() {
         DropdownService.getHealthAreaDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
@@ -106,8 +121,10 @@ export default class StepThree extends Component {
                 }
             );
     }
-    componentDidMount() {
-    }
+    /**
+     * Renders the program onboarding step three screen.
+     * @returns {JSX.Element} - Program onboarding step three screen.
+     */
     render() {
         return (
             <>

@@ -57,7 +57,7 @@ export default class PlanningUnitCapacityList extends Component {
         var data = planningUnitCapacityArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -103,7 +103,7 @@ export default class PlanningUnitCapacityList extends Component {
                     ]
                 },
             ],
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,

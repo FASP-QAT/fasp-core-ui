@@ -482,7 +482,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         } catch (error) { }
         var options = {
             data: dataArray,
-            columnDrag: true,
+            columnDrag: false,
             columns:
                 [
                     {

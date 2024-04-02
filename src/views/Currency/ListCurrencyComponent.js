@@ -85,7 +85,7 @@ export default class CurrencyListComponent extends Component {
                         var data = currencyArray;
                         var options = {
                             data: data,
-                            columnDrag: true,
+                            columnDrag: false,
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
                                 {

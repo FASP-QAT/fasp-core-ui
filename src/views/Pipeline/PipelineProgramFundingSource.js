@@ -138,7 +138,7 @@ export default class PipelineProgramFundingSource extends Component {
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [250, 250],
                                         columns: [
                                             {

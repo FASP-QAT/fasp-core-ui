@@ -97,7 +97,7 @@ export default class LanguageListComponent extends Component {
                             var data = languageArray;
                             var options = {
                                 data: data,
-                                columnDrag: true,
+                                columnDrag: false,
                                 colWidths: [0, 150, 150, 150, 100, 100, 100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [

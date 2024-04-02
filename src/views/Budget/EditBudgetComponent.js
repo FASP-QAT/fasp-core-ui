@@ -267,9 +267,17 @@ class EditBudgetComponent extends Component {
                             proramListArray[i] = { value: budgetObj.programs[i].id, label: getLabelText(budgetObj.programs[i].label, this.state.lang) }
                         }
                     }
+                    const [year, month, day] = startDate.split("-");
+                    const startDateObject = new Date(year, month - 1, day); // month - 1 because month is 0-indexed in JavaScript
+
+                    const [stopYear, stopMonth, stopDay] = stopDate.split("-");
+                    const stopDateObject = new Date(stopYear, stopMonth - 1, stopDay); // month - 1 because month is 0-indexed in JavaScript
+                    console.log("startDateObject", startDateObject, "==", startDate)
+                    console.log("stopDateObject", stopDateObject, "==", stopDate)
+
                     this.setState({
                         budget: budgetObj, loading: false, programId: proramListArray,
-                        rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                        rangeValue: { from: { year: startDateObject.getFullYear(), month: startDateObject.getMonth() + 1 }, to: { year: stopDateObject.getFullYear(), month: stopDateObject.getMonth() + 1 } }
                     });
                 }
                 else {

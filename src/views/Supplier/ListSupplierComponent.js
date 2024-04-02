@@ -128,7 +128,7 @@ class SupplierListComponent extends Component {
         var data = supplierArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

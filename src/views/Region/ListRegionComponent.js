@@ -193,7 +193,7 @@ class RegionListComponent extends Component {
         var data = regionListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

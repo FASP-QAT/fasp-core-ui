@@ -74,7 +74,6 @@ const AddBudgetComponent = React.lazy(() => import('../../views/Budget/AddBudget
 const ListBudgetComponent = React.lazy(() => import('../../views/Budget/ListBudgetComponent'));
 const EditBudgetComponent = React.lazy(() => import('../../views/Budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('../../views/ProgramProduct/AddProgramProduct'));
-const AddProgram = React.lazy(() => import('../../views/Program/AddProgram'));
 const Programs = React.lazy(() => import('../../views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('../../views/Program/EditProgram'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
@@ -238,7 +237,6 @@ const routes = [
   { path: '/realm/listRealm', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
   { path: '/realm/updateRealm/:realmId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.realmheader', component: EditRealm },
   { path: '/realm/listRealm/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
-  { path: '/program/addProgram', name: 'static.breadcrum.add', entityname: 'static.programHead.program', component: AddProgram },
   { path: '/program/listProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/listProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/editProgram/:programId', name: 'static.programHead.program', entityname: 'static.programHead.program', component: EditProgram },
@@ -579,7 +577,7 @@ class DefaultLayout extends Component {
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
     var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
-    if((temp_time > this.state.timeout) || (temp_time_token > this.state.timeout_token)){
+    if((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)){
       console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
       console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')
@@ -590,7 +588,7 @@ class DefaultLayout extends Component {
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
     var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
-    if((temp_time > this.state.timeout) || (temp_time_token > this.state.timeout_token)){
+    if((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)){
       console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
       console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')

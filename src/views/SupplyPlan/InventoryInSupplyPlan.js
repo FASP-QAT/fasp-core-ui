@@ -330,7 +330,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     })
                     var options = {
                         data: inventoryDataArr,
-                        columnDrag: true,
+                        columnDrag: false,
                         columns: [
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
@@ -565,7 +565,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },

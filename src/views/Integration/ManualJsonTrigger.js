@@ -155,7 +155,7 @@ export default class ConsumptionDetails extends Component {
     jexcel.destroy(document.getElementById("tableDiv"), true);
     var options = {
       data: tableData,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [100, 100, 100],
       columns: [
         {
@@ -996,7 +996,7 @@ export default class ConsumptionDetails extends Component {
               jexcel.destroy(document.getElementById("tableDivReport"), true);
               var options = {
                 data: tableData,
-                columnDrag: true,
+                columnDrag: false,
                 colWidths: [100, 100, 100],
                 columns: [
                   {
