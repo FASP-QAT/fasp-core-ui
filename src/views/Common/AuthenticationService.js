@@ -1240,8 +1240,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/forecastReport/compareScenario":
-                        return true;
                     default:
                         return false;
                 }

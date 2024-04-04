@@ -1334,7 +1334,7 @@ class AddprogramPlanningUnit extends Component {
      * @param {*} instance This is the DOM Element where sheet is created
      * @param {*} cell This is the object of the DOM element
      */
-    loaded = function (instance, cell, x, y, value) {
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1433,6 +1433,9 @@ class AddprogramPlanningUnit extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
