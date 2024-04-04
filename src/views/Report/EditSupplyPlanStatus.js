@@ -2,6 +2,8 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { Formik } from 'formik';
 import moment from "moment";
 import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
 import { Bar } from 'react-chartjs-2';
 import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
@@ -74,6 +76,9 @@ class EditSupplyPlanStatus extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             problemTransList: [],
             transView: false,
             data: [],
@@ -208,6 +213,10 @@ class EditSupplyPlanStatus extends Component {
             planningUnitDropdownList: [],
             temp_currentVersion_id: ''
         }
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -2078,7 +2087,7 @@ class EditSupplyPlanStatus extends Component {
     }
     componentDidMount() {
         this.setState({
-            loading:true
+            loading: true
         })
         this.getPlanningUnit();
         this.getProblemCriticality();
@@ -2122,7 +2131,7 @@ class EditSupplyPlanStatus extends Component {
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
-                    loading:false
+                    loading: false
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -2363,7 +2372,32 @@ class EditSupplyPlanStatus extends Component {
             activeTab: newArray,
         });
     }
+    _handleClickRangeBox(e) {
+        this.pickRange.current.show()
+    }
+    handleRangeChange(value, text, listIndex) {
+    }
+    handleRangeDissmis(value) {
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if (value.month <= 9) {
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+        this.setState({ startDate: value, monthCount: monthDifference });
+        localStorage.setItem("sesStartDate", JSON.stringify(value));
+        this.formSubmit(monthDifference);
+    }
     tabPane() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
+
         const chartOptions = {
             title: {
                 display: true,
@@ -2743,7 +2777,22 @@ class EditSupplyPlanStatus extends Component {
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
-                                <div className="table-responsive RemoveStriped">
+                                <div className="row">
+                                    <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <div className="controls edit">
+                                            <Picker
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                ref={this.pickRange}
+                                                value={this.state.startDate}
+                                                lang={pickerLang}
+                                                onChange={this.handleRangeChange}
+                                                onDismiss={this.handleRangeDissmis}
+                                            >
+                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                            </Picker>
+                                        </div>
+                                    </FormGroup>
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
@@ -2762,6 +2811,9 @@ class EditSupplyPlanStatus extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
+                                </div>
+
+                                <div className="table-responsive RemoveStriped">
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
@@ -3716,40 +3768,40 @@ class EditSupplyPlanStatus extends Component {
                 return items1;
             }.bind(this),
             sorting: function (direction, column) {
-                if(column!=19){
-                return function (a, b) {
-                    var valueA = this.el.getValueFromCoords(column, a[0], true).toLowerCase();
-                    var valueB = this.el.getValueFromCoords(column, b[0], true).toLowerCase();
+                if (column != 19) {
+                    return function (a, b) {
+                        var valueA = this.el.getValueFromCoords(column, a[0], true).toLowerCase();
+                        var valueB = this.el.getValueFromCoords(column, b[0], true).toLowerCase();
 
-                    // Consider blank rows in the sorting
-                    if (!direction) {
-                        return (valueA > valueB) ? 1 : (valueA < valueB) ? -1 : 0;
-                    } else {
-                        return (valueA > valueB) ? -1 : (valueA < valueB) ? 1 : 0;
-                    }
+                        // Consider blank rows in the sorting
+                        if (!direction) {
+                            return (valueA > valueB) ? 1 : (valueA < valueB) ? -1 : 0;
+                        } else {
+                            return (valueA > valueB) ? -1 : (valueA < valueB) ? 1 : 0;
+                        }
 
-                }.bind(this)
-            }else{
-                return function (a, b) {
-                    var valueA = this.el.getValueFromCoords(column, a[0], true);
-                    var valueB = this.el.getValueFromCoords(column, b[0], true);
+                    }.bind(this)
+                } else {
+                    return function (a, b) {
+                        var valueA = this.el.getValueFromCoords(column, a[0], true);
+                        var valueB = this.el.getValueFromCoords(column, b[0], true);
 
-                    // Consider blank rows in the sorting
-                    if (!direction) {
-                        return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? 1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? -1 : 0;
-                    } else {
-                        return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? -1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? 1 : 0;
-                    }
+                        // Consider blank rows in the sorting
+                        if (!direction) {
+                            return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? 1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? -1 : 0;
+                        } else {
+                            return (moment(valueA).format("YYYY-MM-DD") > moment(valueB).format("YYYY-MM-DD")) ? -1 : (moment(valueA).format("YYYY-MM-DD") < moment(valueB).format("YYYY-MM-DD")) ? 1 : 0;
+                        }
 
-                }.bind(this)
-            }
+                    }.bind(this)
+                }
             }.bind(this)
         };
         var problemEl = jexcel(document.getElementById("problemListDiv"), options);
         this.el = problemEl;
         this.setState({
             problemEl: problemEl,
-            loading:false
+            loading: false
         })
     }
     loaded = function (instance, cell, x, y, value) {
@@ -3773,7 +3825,7 @@ class EditSupplyPlanStatus extends Component {
         this.getProblemCriticality();
         this.setState({
             isModalOpen: !this.state.isModalOpen,
-            loading:false
+            loading: false
         }, () => {
         });
     }
@@ -3976,55 +4028,55 @@ class EditSupplyPlanStatus extends Component {
                         </div>
                         <CardBody>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
-                            <Formik
-                                render={
-                                    ({
-                                    }) => (
-                                        <Form name='simpleForm'>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input type="text"
-                                                                    name="programId"
-                                                                    id="programId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.program.label.label_en}
-                                                                    disabled />
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                </div>
-                                            </Col>
-                                        </Form>
-                                    )} />
-                            <Row>
-                                <Col xs="12" md="12" className="mb-4">
-                                    <Nav tabs>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '1'}
-                                                onClick={() => { this.toggle(0, '1'); }}
-                                            >
-                                                {i18n.t('static.dashboard.supplyPlan')}
-                                            </NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '2'}
-                                                onClick={() => { this.toggle(0, '2'); }}
-                                            >
-                                                {i18n.t('static.dashboard.qatProblemList')}
-                                            </NavLink>
-                                        </NavItem>
-                                    </Nav>
-                                    <TabContent activeTab={this.state.activeTab[0]}>
-                                        {this.tabPane()}
-                                    </TabContent>
-                                </Col>
-                            </Row>
+                                <Formik
+                                    render={
+                                        ({
+                                        }) => (
+                                            <Form name='simpleForm'>
+                                                <Col md="12 pl-0">
+                                                    <div className="row">
+                                                        <FormGroup className="col-md-3">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                            <div className="controls">
+                                                                <InputGroup>
+                                                                    <Input type="text"
+                                                                        name="programId"
+                                                                        id="programId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.program.label.label_en}
+                                                                        disabled />
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </div>
+                                                </Col>
+                                            </Form>
+                                        )} />
+                                <Row>
+                                    <Col xs="12" md="12" className="mb-4">
+                                        <Nav tabs>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '1'}
+                                                    onClick={() => { this.toggle(0, '1'); }}
+                                                >
+                                                    {i18n.t('static.dashboard.supplyPlan')}
+                                                </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '2'}
+                                                    onClick={() => { this.toggle(0, '2'); }}
+                                                >
+                                                    {i18n.t('static.dashboard.qatProblemList')}
+                                                </NavLink>
+                                            </NavItem>
+                                        </Nav>
+                                        <TabContent activeTab={this.state.activeTab[0]}>
+                                            {this.tabPane()}
+                                        </TabContent>
+                                    </Col>
+                                </Row>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -4940,55 +4992,55 @@ class EditSupplyPlanStatus extends Component {
                                 }) => (
                                     <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
                                         <CardBody className="pt-lg-0">
-                                        <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                            <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <Col md="12 pl-0">
+                                                    <div className="row">
+                                                        <FormGroup className="col-md-3">
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                            <Input
+                                                                type="textarea"
+                                                                maxLength={65535}
+                                                                name="versionNotes"
+                                                                id="versionNotes"
+                                                                value={this.state.program.currentVersion.notes}
+                                                                bsSize="sm"
+                                                                valid={!errors.versionNotes}
+                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                readOnly={!this.state.editable}
+                                                                required
+                                                            />
+                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-3">
+                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="versionStatusId"
+                                                                id="versionStatusId"
+                                                                bsSize="sm"
+                                                                valid={!errors.versionStatusId}
+                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.program.currentVersion.versionStatus.id}
+                                                                disabled={!this.state.editable}
+                                                                required
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {statusList}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                        </FormGroup>
                                                         <Input
-                                                            type="textarea"
-                                                            maxLength={65535}
-                                                            name="versionNotes"
-                                                            id="versionNotes"
-                                                            value={this.state.program.currentVersion.notes}
-                                                            bsSize="sm"
-                                                            valid={!errors.versionNotes}
-                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            readOnly={!this.state.editable}
-                                                            required
+                                                            type="hidden"
+                                                            name="needNotesValidation"
+                                                            id="needNotesValidation"
+                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
                                                         />
-                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="versionStatusId"
-                                                            id="versionStatusId"
-                                                            bsSize="sm"
-                                                            valid={!errors.versionStatusId}
-                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.program.currentVersion.versionStatus.id}
-                                                            disabled={!this.state.editable}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {statusList}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <Input
-                                                        type="hidden"
-                                                        name="needNotesValidation"
-                                                        id="needNotesValidation"
-                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
-                                                    />
-                                                </div>
-                                            </Col>
+                                                    </div>
+                                                </Col>
                                             </div>
                                         </CardBody>
                                         <CardFooter>
