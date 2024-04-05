@@ -14,6 +14,11 @@ const initialValues = {
     realmCountryRegionName: '',
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for realm country region ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the realm country region form and allow user to submit the update master request in jira
+ */
 export default class EditRealmCountryRegionTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -44,6 +52,10 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realmCountryRegion } = this.state
         if (event.target.name == "summary") {
@@ -65,7 +77,9 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
             realmCountryRegion
         }, () => { })
     };
-    
+    /**
+     * This function is used to get region lists on page load
+     */
     componentDidMount() {
         RegionService.getRegionList()
             .then(response => {
@@ -130,11 +144,17 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the realm country region details
+     */
     resetClicked() {
         let { realmCountryRegion } = this.state;
         realmCountryRegion.realmCountryRegionName = '';
@@ -145,6 +165,10 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns realm country region details form
+     */
     render() {
         const { realmCountryRegionList } = this.state;
         let realmCountryRegions = realmCountryRegionList.length > 0

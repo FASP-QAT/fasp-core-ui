@@ -8,6 +8,11 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.usagePeriod.usagePeriod"))
 let summaryText_2 = "Add Usage Period"
+/**
+ * This const is used to define the validation schema for usage period ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -21,6 +26,9 @@ const validationSchema = function (values) {
             .required('Enter conversion factor to month').min(0, i18n.t('static.program.validvaluetext')),
     })
 }
+/**
+ * This component is used to display the usage period form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -42,6 +50,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { usagePeriod } = this.state
         if (event.target.name == "summary") {
@@ -60,18 +72,30 @@ export default class OrganisationTypeTicketComponent extends Component {
             usagePeriod
         }, () => { })
     };
-   
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.usagePeriod.usagePeriodName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to set loading screen off on page load
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the usage period details
+     */
     resetClicked() {
         let { usagePeriod } = this.state;
         usagePeriod.usagePeriodName = '';
@@ -82,6 +106,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns usage period details form
+     */
     render() {
         return (
             <div className="col-md-12">

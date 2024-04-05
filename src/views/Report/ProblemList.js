@@ -31,7 +31,10 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProblemListDashboard from '../Report/ProblemListDashboard';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js';
 const entityname = i18n.t('static.report.problem');
-export default class ConsumptionDetails extends React.Component {
+/**
+ * This component is used to display the Problem List for multiple planning units
+ */
+export default class ProblemList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -74,20 +77,34 @@ export default class ConsumptionDetails extends React.Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(key, value) {
         this.setState({
             [key]: value
         })
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.showUpdateButton == true) {
             window.onbeforeunload = () => true
@@ -95,6 +112,9 @@ export default class ConsumptionDetails extends React.Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used to fetch list all the offline programs, problem status and problem category that the user have downloaded
+     */
     componentDidMount = function () {
         document.getElementById("tableDiv").closest('.card').classList.add("removeCardwrap");
         this.hideFirstComponent();
@@ -253,6 +273,9 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this);
         }.bind(this);
     };
+    /**
+     * This function is used to filter the problem status list based on reviewer role and for in-compliance status
+     */
     filterProblemStatus = function (instance, cell, c, r, source) {
         var hasRole = false;
         AuthenticationService.getLoggedInUserRole().map(c => {
@@ -265,6 +288,10 @@ export default class ConsumptionDetails extends React.Component {
         mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
         return mylist;
     }.bind(this)
+    /**
+     * This function is called before saving the problem data to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -292,6 +319,14 @@ export default class ConsumptionDetails extends React.Component {
         }
         return valid;
     }
+    /**
+     * This function is called when something in the problem list table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     rowChanged = function (instance, cell, x, y, value) {
         this.setState({ showUpdateButton: true });
         var elInstance = this.state.languageEl;
@@ -320,6 +355,9 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }.bind(this)
+    /**
+     * This function is called when submit button of the problem list is clicked and is used to save problem list if all the data is successfully validated.
+     */
     updateChangedProblems = function () {
         this.setState({
             showUpdateButton: false
@@ -425,6 +463,11 @@ export default class ConsumptionDetails extends React.Component {
             }
         });
     }.bind(this)
+    /**
+     * This function is used to toggle the modal for problem trans list
+     * @param {*} problemReportId This is the problem report Id for which you want to see the transcation
+     * @param {*} problemActionIndex This is the index for the problem for which you want to see the transcation
+     */
     toggleLarge(problemReportId, problemActionIndex) {
         var problemTransList = [];
         var problemType = "";
@@ -447,20 +490,9 @@ export default class ConsumptionDetails extends React.Component {
             problemCreatedDate: problemCreatedDate
         });
     }
-    toggleProblemDetails(problemReportId, problemActionIndex) {
-        var problemDetail = ''
-        if (problemReportId != undefined) {
-            if (problemReportId != 0) {
-                problemDetail = this.state.problemList.filter(c => c.problemReportId == problemReportId)[0];
-            } else {
-                problemDetail = this.state.problemList.filter(c => c.problemActionIndex == problemActionIndex)[0];
-            }
-        }
-        this.setState({
-            problemDetailsModal: !this.state.problemDetailsModal,
-            problemDetail: problemDetail
-        });
-    }
+    /**
+     * This function is used to build the table for problem list display
+     */
     buildJExcel() {
         let problemList = this.state.data;
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
@@ -672,9 +704,17 @@ export default class ConsumptionDetails extends React.Component {
             loading: false, languageEl: languageEl
         })
     }
+    /**
+     * This function is used to add the double quotes to the row
+     * @param {*} arr This is the arr of the row elements
+     * @returns This function returns the row with double quotes
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * This function is used to export the data in CSV format
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
@@ -725,6 +765,9 @@ export default class ConsumptionDetails extends React.Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * This function is used to export the data in PDF format
+     */
     exportPDF() {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -823,6 +866,9 @@ export default class ConsumptionDetails extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.qatProblemActionReport') + '.pdf')
     }
+    /**
+     * This function is called on row click and is used to redirect user to screen which can resolve this problem
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (y == 5 || y == 7 || y == 8 || y == 9) {
@@ -842,7 +888,12 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
@@ -874,6 +925,9 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to call the rebuild function to rebuild the problem list
+     */
     getProblemListAfterCalculation() {
         this.setState({
             data: [],
@@ -893,6 +947,9 @@ export default class ConsumptionDetails extends React.Component {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }
     }
+    /**
+     * This function is used to fetch the problem list data
+     */
     fetchData() {
         var cont = false;
         if (this.state.showUpdateButton == true) {
@@ -1003,6 +1060,12 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to show the notes of the problem
+     * @param {*} row This is instance of the row for which notes should be visible
+     * @param {*} lang This is the name of the language in which notes should be displayed
+     * @returns Returns the latest notes for a problem
+     */
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
         if (transList.length == 0) {
@@ -1012,6 +1075,10 @@ export default class ConsumptionDetails extends React.Component {
             return transList[listLength - 1].notes;
         }
     }
+    /**
+     * This function is called when status filter is changed
+     * @param {*} event This is the on change event
+     */
     handleProblemStatusChange = (event) => {
         var cont = false;
         if (this.state.showUpdateButton == true) {
@@ -1038,6 +1105,10 @@ export default class ConsumptionDetails extends React.Component {
             })
         }
     }
+    /**
+     * This is used to display the content
+     * @returns The problem list data in tabular format along with the different filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1349,40 +1420,13 @@ export default class ConsumptionDetails extends React.Component {
                         </ModalFooter>
                     </div>
                 </Modal>
-                <Modal isOpen={this.state.problemDetailsModal}
-                    className={'modal-md modalWidthExpiredStock'}>
-                    <ModalHeader toggle={() => this.toggleProblemDetails()} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.report.problemDescription')}</strong>
-                    </ModalHeader>
-                    <div>
-                        <ModalBody>
-                            {this.state.problemDetailsModal && <div className="row">
-                                <FormGroup className="col-md-6 ">
-                                    <Label for="program">{i18n.t('static.program.program')}</Label>
-                                    <Input type="text"
-                                        readOnly
-                                        value={this.state.problemDetail.program.code}
-                                    />
-                                </FormGroup>
-                                <FormGroup className="col-md-6 ">
-                                    <Label for="planningunit">{i18n.t('static.planningunit.planningunit')}</Label>
-                                    <Input type="text"
-                                        bsSize="sm"
-                                        readOnly
-                                        value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
-                                    />
-                                </FormGroup>
-                            </div>
-                            }
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleProblemDetails()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                        </ModalFooter>
-                    </div>
-                </Modal>
             </div >
         );
     }
+    /**
+     * This function is called when cancel button is clicked
+     * @param {*} id Id is based on role so that it can be redirected to specific dashboard
+     */
     cancelClicked(id) {
         this.props.history.push(`/ApplicationDashboard/` + id + '/red/' + i18n.t('static.message.cancelled', { entityname }));
     }

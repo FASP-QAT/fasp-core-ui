@@ -14,12 +14,19 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.healtharea.healtharea');
+// Initial values for form fields
 let initialValues = {
   realmId: '',
   healthAreaName: '',
   realmCountryId: [],
 }
+/**
+ * Defines the validation schema for health/technical area details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -35,6 +42,9 @@ const validationSchema = function (values) {
       .required(i18n.t('static.program.validcountrytext'))
   })
 }
+/**
+ * Component for adding health area details.
+ */
 export default class AddHealthAreaComponent extends Component {
   constructor(props) {
     super(props);
@@ -67,6 +77,9 @@ export default class AddHealthAreaComponent extends Component {
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.getDisplayName = this.getDisplayName.bind(this);
   }
+  /**
+   * Fetch health area display name on blur event
+   */
   getDisplayName() {
     let realmId = document.getElementById("realmId").value;
     let healthAreaValue = document.getElementById("healthAreaName").value;
@@ -75,6 +88,7 @@ export default class AddHealthAreaComponent extends Component {
     if (realmId != 0 && healthAreaValue.length != 0) {
       if (healthAreaValue.length >= 6) {
         healthAreaValue = healthAreaValue.slice(0, 4);
+        //Fetch health area display name
         HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
           .then(response => {
             let { healthArea } = this.state
@@ -122,6 +136,7 @@ export default class AddHealthAreaComponent extends Component {
             }
           );
       } else {
+        //Fetch health area display name
         HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
           .then(response => {
             let { healthArea } = this.state
@@ -171,6 +186,10 @@ export default class AddHealthAreaComponent extends Component {
       }
     }
   }
+  /**
+   * Handles data change in the health area form.
+   * @param {Event} event - The change event.
+   */
   dataChange(event) {
     let { healthArea } = this.state
     if (event.target.name === "healthAreaName") {
@@ -186,8 +205,11 @@ export default class AddHealthAreaComponent extends Component {
     ) => {
     })
   }
-  
+  /**
+   * Fetches all Country list, Realm list, RealmId & realm country list on component mount.
+   */
   componentDidMount() {
+    //Fetch all country list
     CountryService.getCountryListAll()
       .then(response => {
         if (response.status == 200) {
@@ -242,6 +264,7 @@ export default class AddHealthAreaComponent extends Component {
           }
         }
       );
+    //Fetch Realm list
     UserService.getRealmList()
       .then(response => {
         var listArray = response.data;
@@ -292,6 +315,7 @@ export default class AddHealthAreaComponent extends Component {
           }
         }
       );
+    //Fetch realmId  
     let realmId = AuthenticationService.getRealmId();
     if (realmId != -1) {
       let { healthArea } = this.state
@@ -301,15 +325,23 @@ export default class AddHealthAreaComponent extends Component {
         healthArea
       },
         () => {
+          //Fetch realm Country list
           this.getRealmCountryList()
         })
     }
   }
+  /**
+   * Hides the message in div2 after 30 seconds.
+   */
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
+  /**
+   * Handles change event on realm country dropdown & filters the dropdown list
+   * @param {Event} value - The change event.
+   */
   updateFieldData(value) {
     var selectedArray = [];
     for (var p = 0; p < value.length; p++) {
@@ -332,9 +364,14 @@ export default class AddHealthAreaComponent extends Component {
     healthArea.realmCountryArray = realmCountryIdArray;
     this.setState({ healthArea: healthArea });
   }
+  /**
+   * Fetches realm country list on change of realm dropdown value
+   * @param {Event} e - The change event.
+   */
   getRealmCountryList(e) {
     let realmId = this.state.healthArea.realm.id;
     if (realmId != "") {
+      //Fetch realm country list by realmId
       DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
           if (response.status == 200) {
@@ -406,9 +443,17 @@ export default class AddHealthAreaComponent extends Component {
       })
     }
   }
+  /**
+   * Capitalizes the first letter of the health area name.
+   * @param {string} str - The health area name.
+   */
   Capitalize(str) {
     this.state.healthArea.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
   }
+  /**
+   * Renders the health/technical area details form.
+   * @returns {JSX.Element} - health area details form.
+   */
   render() {
     const { realms } = this.state;
     let realmList = realms.length > 0
@@ -605,9 +650,15 @@ export default class AddHealthAreaComponent extends Component {
       </div>
     );
   }
+  /**
+   * Redirects to the list technical/health area when cancel button is clicked.
+   */
   cancelClicked() {
     this.props.history.push(`/healthArea/listHealthArea/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
+  /**
+   * Resets the health area details form when reset button is clicked.
+   */
   resetClicked() {
     let { healthArea } = this.state;
     healthArea.label.label_en = ''

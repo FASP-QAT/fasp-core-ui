@@ -9,7 +9,14 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.procurementagenttype')
+/**
+ * Defines the validation schema for procurement agent type details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -22,6 +29,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgenTtype.procurementagenttypenametext'))
     })
 }
+/**
+ * Component for adding procurement agent type details.
+ */
 class AddProcurementAgentTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -48,22 +58,12 @@ class AddProcurementAgentTypeComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { procurementAgentType } = this.state;
         if (event.target.name == "procurementAgentTypeCode") {
@@ -77,7 +77,9 @@ class AddProcurementAgentTypeComponent extends Component {
         },
             () => { });
     };
-    
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -96,7 +98,7 @@ class AddProcurementAgentTypeComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -150,6 +152,10 @@ class AddProcurementAgentTypeComponent extends Component {
                 })
         }
     }
+    /**
+     * Renders the procurement agent type details form.
+     * @returns {JSX.Element} - Procurement agent type details form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -189,7 +195,7 @@ class AddProcurementAgentTypeComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -278,7 +284,7 @@ class AddProcurementAgentTypeComponent extends Component {
                                                         onBlur={(e) => { handleBlur(e); this.dataChange(e) }}
                                                         maxLength={255}
                                                         required
-                                                        value={this.Capitalize(this.state.procurementAgentType.label.label_en)}
+                                                        value={Capitalize(this.state.procurementAgentType.label.label_en)}
                                                     />
                                                     <FormFeedback className="red">{errors.procurementAgentTypeName}</FormFeedback>
                                                 </FormGroup>
@@ -324,9 +330,15 @@ class AddProcurementAgentTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement agent type screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgentType/listProcurementAgentType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the procurement agent type details when reset button is clicked.
+     */
     resetClicked() {
         let { procurementAgentType } = this.state;
         procurementAgentType.procurementAgentTypeCode = ''

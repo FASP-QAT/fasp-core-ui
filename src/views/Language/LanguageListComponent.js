@@ -13,7 +13,11 @@ import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.language.language');
+/**
+ * Component for listing language details.
+ */
 export default class LanguageListComponent extends Component {
     constructor(props) {
         super(props);
@@ -27,19 +31,32 @@ export default class LanguageListComponent extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Redirects to the add language screen
+     * @param {*} fundingSource 
+     */
     addLanguage() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/language/addLanguage`)
@@ -47,8 +64,12 @@ export default class LanguageListComponent extends Component {
             alert(i18n.t('static.common.online'))
         }
     }
+    /**
+     * Fetches language list and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
+        //Fetch language list
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
@@ -189,6 +210,15 @@ export default class LanguageListComponent extends Component {
                 }
             );
     }
+    /**
+     * Redirects to the edit language screen on row click with languageId for editing.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     * @param {Event} e - The selected event.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -201,9 +231,21 @@ export default class LanguageListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the language list.
+     * @returns {JSX.Element} - language list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

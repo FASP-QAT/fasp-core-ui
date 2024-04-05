@@ -14,6 +14,11 @@ const initialValues = {
     modelingTypeName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for modeling type ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the modeling type form and allow user to submit the update master request in jira
+ */
 export default class EditTracerCategoryTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -44,6 +52,10 @@ export default class EditTracerCategoryTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { modelingType } = this.state
         if (event.target.name == "summary") {
@@ -67,7 +79,9 @@ export default class EditTracerCategoryTicketComponent extends Component {
             modelingType
         }, () => { })
     };
-   
+    /**
+     * This function is used to get list of modeling types on page load
+     */
     componentDidMount() {
         ModelingTypeService.getModelingTypeList()
             .then(response => {
@@ -120,11 +134,17 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the modeling type details
+     */
     resetClicked() {
         let { modelingType } = this.state;
         modelingType.modelingTypeName = '';
@@ -135,6 +155,10 @@ export default class EditTracerCategoryTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns modeling type details form
+     */
     render() {
         const { modelingTypes } = this.state;
         let modelingTypeList = modelingTypes.length > 0

@@ -22,10 +22,16 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
 import AuthenticationService from '../../Common/AuthenticationService.js';
+// Initial values for form fields
 const initialValues = {
   emailId: "",
   password: ""
 }
+/**
+ * Defines the validation schema for login page.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     emailId: Yup.string()
@@ -35,6 +41,9 @@ const validationSchema = function (values) {
       .required(i18n.t('static.login.passwordtext'))
   })
 }
+/**
+ * Component for Login screen.
+ */
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -61,6 +70,9 @@ class Login extends Component {
     this.getAllLanguages = this.getAllLanguages.bind(this);
     this.dataChangeCheckbox = this.dataChangeCheckbox.bind(this);
   }
+  /**
+   * Reterives language list from indexed db
+   */
   getAllLanguages() {
     var db1;
     getDatabase();
@@ -93,6 +105,9 @@ class Login extends Component {
       }.bind(this);
     }.bind(this);
   }
+  /**
+   * Sync language from server
+   */
   getLanguageList() {
     var db1;
     getDatabase();
@@ -122,6 +137,13 @@ class Login extends Component {
         });
     }.bind(this)
   }
+  /**
+   * Changes the language of the application.
+   * Sets the selected language in local storage for persistence.
+   * @param {*} lang The selected language code.
+   * @param {*} icon The icon representing the selected language.
+   * @param {*} staticLabel The static labels in the selected language.
+   */
   changeLanguage(lang, icon, staticLabel) {
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     localStorage.setItem('lastLoggedInUsersLanguageChanged', true);
@@ -129,7 +151,9 @@ class Login extends Component {
     i18n.changeLanguage(lang)
     window.location.reload();
   }
-  
+  /**
+   * Calls getLanguageList and other functions on component mount
+   */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
@@ -140,6 +164,9 @@ class Login extends Component {
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
     this.checkIfApiIsActive();
   }
+  /**
+   * Function to check if API server is online
+   */
   checkIfApiIsActive() {
     var apiVersionForDisplay = "";
     LoginService.getApiVersion()
@@ -181,6 +208,9 @@ class Login extends Component {
       apiVersionForDisplay: apiVersionForDisplay
     })
   }
+  /**
+   * Redirect to forgot password screen after click on forgot password
+   */
   forgotPassword() {
     if (isSiteOnline()) {
       this.props.history.push(`/forgotPassword`)
@@ -195,6 +225,9 @@ class Login extends Component {
       });
     }
   }
+  /**
+   * Hides message after 30 seconds
+   */
   incorrectPassmessageHide() {
     setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 30000);
     var incorrectPassword = document.getElementById('div2');
@@ -206,11 +239,18 @@ class Login extends Component {
         document.getElementById('div2').style.display = 'block';
       });
   }
+  /**
+   * Handles data change in the form.
+   * @param {Event} event - The change event.
+   */
   dataChangeCheckbox(event) {
     this.setState({
       loginOnline: (event.target.checked ? true : false)
     })
   }
+  /**
+   * Hides message after 30 seconds
+   */
   logoutMessagehide() {
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 30000);
     var logoutMessage = document.getElementById('div1');
@@ -232,12 +272,20 @@ class Login extends Component {
         document.getElementById('div2').style.display = 'block';
       });
   }
+  /**
+   * Toggles the dropdown state at the specified index in the component's state.
+   * @param {number} i - The index of the dropdown to toggle.
+   */
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
     this.setState({
       dropdownOpen: newArray,
     });
   }
+  /**
+   * Renders the login form.
+   * @returns {JSX.Element} - Login form.
+   */
   render() {
     return (
       <div className="main-content flex-row align-items-center bg-height">

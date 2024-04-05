@@ -13,7 +13,9 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.procurementagent.procurementagent');
+// Initial values for form fields
 const initialValues = {
     procurementAgentName: "",
     submittedToApprovedLeadTime: "",
@@ -21,6 +23,11 @@ const initialValues = {
     procurementAgentTypeId: [],
     programId: []
 }
+/**
+ * Defines the validation schema for procurement agent details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeId: Yup.string()
@@ -41,6 +48,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
+/**
+ * Component for editing procurement agent details.
+ */
 class EditProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -95,12 +105,22 @@ class EditProcurementAgentComponent extends Component {
         this.programChange = this.programChange.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
+    /**
+     * Handles click event on color code picker. Toggle color picker according to displayColorPicker value. 
+     */
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
+    /**
+     * Close color picker.
+     */
     handleClose = () => {
         this.setState({ displayColorPicker: false })
     };
+    /**
+     * Handles color change in color picker.
+     * @param {*} color - selected color.
+     */
     handleChangeColor = (color) => {
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
@@ -113,11 +133,19 @@ class EditProcurementAgentComponent extends Component {
             () => {
             });
     };
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Capitalizes the first letter of the procurement agent name
+     * @param {*} str - The procurement agent name
+     * @returns {string} - Capitalized procurement agent name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { procurementAgent } = this.state;
@@ -126,6 +154,10 @@ class EditProcurementAgentComponent extends Component {
             return "";
         }
     }
+    /**
+     * Handles data change in the procurement agent form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
@@ -160,6 +192,10 @@ class EditProcurementAgentComponent extends Component {
         },
             () => { });
     };
+    /**
+     * Handles change in Program dropdown & filters the program list
+     * @param {*} programId - The change event.
+     */
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -187,7 +223,10 @@ class EditProcurementAgentComponent extends Component {
         },
             () => { });
     }
-    
+    /**
+     * Fetch program list by realmId
+     * @param {*} e - The realmId
+     */
     getProgramByRealmId(e) {
         if (e != 0) {
             ProgramService.getProgramList(e)
@@ -261,7 +300,11 @@ class EditProcurementAgentComponent extends Component {
             })
         }
     }
+    /**
+     * Fetches Procurement agent details, RealmId, Procurement agent type list & Program list on component mount.
+     */
     componentDidMount() {
+        //Fetch procurement agent details by Id
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -324,7 +367,9 @@ class EditProcurementAgentComponent extends Component {
                 }
             }
         );
+        //Fetch realmId
         let realmId = AuthenticationService.getRealmId();
+        //Fetch all procurement agent type list
         ProcurementAgentService.getProcurementAgentTypeListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -337,6 +382,7 @@ class EditProcurementAgentComponent extends Component {
                     this.setState({
                         procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
                     }, () => {
+                        //Fetch program list by realmId
                         this.getProgramByRealmId(realmId)
                     })
                 } else {
@@ -387,6 +433,10 @@ class EditProcurementAgentComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the procurement agent details form.
+     * @returns {JSX.Element} - the procurement agent details form.
+     */
     render() {
         const styles = reactCSS({
             'default': {
@@ -714,10 +764,17 @@ class EditProcurementAgentComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement agent when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the procurement agent details form when reset button is clicked.
+     */
     resetClicked() {
+        //Fetch procurement agent details by id.
         ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
             this.setState({
                 procurementAgent: response.data, loading: false
