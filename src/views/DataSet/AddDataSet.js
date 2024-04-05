@@ -27,14 +27,20 @@ import ProgramService from "../../api/ProgramService";
 import i18n from "../../i18n";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+// Localized entity name
 const entityname = i18n.t('static.program.programMaster');
-
+/**
+ * Defines the validation schema for forecast program details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
@@ -55,6 +61,9 @@ const validationSchema = function (values) {
             .required('Enter forecast period (months)'),
     })
 }
+/**
+ * Component for adding forecast program details.
+ */
 export default class AddForecastProgram extends Component {
     constructor(props) {
         super(props);
@@ -140,10 +149,8 @@ export default class AddForecastProgram extends Component {
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
@@ -161,6 +168,11 @@ export default class AddForecastProgram extends Component {
         this.calculateForecastProgramInMonth = this.calculateForecastProgramInMonth.bind(this);
         this.calculateForecastEndDate = this.calculateForecastEndDate.bind(this);
     }
+    /**
+     * Validates and calculates the forecast period in months based on the input value.
+     * If the input value is valid, it updates the state with the calculated stop date.
+     * If the input value is invalid, it sets an error message in the state.
+     */
     calculateForecastProgramInMonth() {
         let value = this.state.forecastProgramInMonth;
         if (value == '') {
@@ -168,21 +180,21 @@ export default class AddForecastProgram extends Component {
                 message1: 'Forecast period (Months) should not be character/null value'
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
         } else if (!Number.isInteger(Number(value))) {
             this.setState({
                 message1: 'Forecast period (Months) should not be decimal value'
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
         } else if (Number(value) < 0) {
             this.setState({
                 message1: 'Forecast period (Months) should not be negative value'
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
         } else {
             let stopDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
@@ -194,6 +206,11 @@ export default class AddForecastProgram extends Component {
             });
         }
     }
+    /**
+     * Calculates the forecast end date based on the selected start and end months.
+     * The start and end months are retrieved from the component state.
+     * The calculated forecast period in months is updated in the component state.
+     */
     calculateForecastEndDate() {
         let d1 = new Date(moment(new Date(this.state.singleValue1.year + '/' + this.state.singleValue1.month + '/01')).utc().format("YYYY-MM-DD"));
         let d2 = new Date(moment(new Date(this.state.singleValue2.year + '/' + this.state.singleValue2.month + '/01')).utc().format("YYYY-MM-DD"));
@@ -205,6 +222,11 @@ export default class AddForecastProgram extends Component {
             forecastProgramInMonth: months,
         });
     }
+    /**
+     * Updates the health area field data in the component state.
+     * Sets the selected health area ID in the component state and updates the program object with the selected health area IDs.
+     * @param {array} value - An array containing the selected health area IDs.
+     */
     updateFieldDataHealthArea(value) {
         let { program } = this.state;
         this.setState({ healthAreaId: value });
@@ -216,31 +238,46 @@ export default class AddForecastProgram extends Component {
         program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox2 = (e) => {
         this.pickRange.current.show()
     }
-    handleAMonthChange2 = (value, text) => {
-    }
+    /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
             this.calculateForecastEndDate();
         })
     }
+    /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
     handleAMonthDissmis1 = (value) => {
         this.setState({ singleValue1: value, }, () => {
             this.calculateForecastEndDate();
         }, () => {
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox1 = (e) => {
         this.pickRange1.current.show()
     }
-    handleAMonthChange1 = (value, text) => {
-    }
+    /**
+     * Reterives region list from server
+     */
     getRegionList() {
         ProgramService.getRegionList(document.getElementById('realmCountryId').value)
             .then(response => {
@@ -308,22 +345,23 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Change message state
+     * @param {String} message Message that needs to be changed
+     */
     changeMessage(message) {
         this.setState({ message: message })
     }
+    /**
+     * Change loading state
+     * @param {String} message loading state new value
+     */
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        let { program } = this.state
-        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Reterives realm list from server
+     */
     realmList() {
         HealthAreaService.getRealmList()
             .then(response => {
@@ -383,6 +421,9 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Reterives realm country list
+     */
     getRealmCountryList() {
         DropdownService.getRealmCountryDropdownList(this.state.program.realm.realmId)
             .then(response => {
@@ -441,6 +482,9 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Reterives health area list
+     */
     getHealthAreaList() {
         ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
             .then(response => {
@@ -510,6 +554,10 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for regions.
+     * @param {Array} event - An array containing the selected region IDs.
+     */
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -521,6 +569,9 @@ export default class AddForecastProgram extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
+    /**
+     * Reterives organisation list
+     */
     getOrganisationList() {
         DropdownService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
             .then(response => {
@@ -581,6 +632,9 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Reterives program manager list
+     */
     getProgramManagerList() {
         ProgramService.getProgramManagerList(this.state.program.realm.realmId)
             .then(response => {
@@ -640,10 +694,17 @@ export default class AddForecastProgram extends Component {
                 }
             );
     }
+    /**
+     * Generates a country code based on the selected realm country ID.
+     * @param {Event} event - The change event containing the selected realm country ID.
+     */
     generateCountryCode(event) {
         let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({ realmCountryCode: realmCountryCode })
     }
+    /**
+     * Calls realm country and program manager list functions on component mount
+     */
     componentDidMount() {
         this.realmList();
         let { program } = this.state;
@@ -659,6 +720,10 @@ export default class AddForecastProgram extends Component {
             document.getElementById('realmId').disabled = false;
         }
     }
+    /**
+     * Generates a health area code based on the selected health ID.
+     * @param {Event} event - The change event containing the selected health area ID.
+     */
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -669,12 +734,20 @@ export default class AddForecastProgram extends Component {
             healthAreaCode: healthAreaCode.slice(0, -1)
         })
     }
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(event) {
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programName") {
@@ -704,7 +777,10 @@ export default class AddForecastProgram extends Component {
         this.setState({ program }, () => {
         })
     }
-    
+    /**
+     * Renders the add forecast program screen.
+     * @returns {JSX.Element} - Add forecast program screen.
+     */
     render() {
         const { singleValue2 } = this.state
         const { singleValue1 } = this.state
@@ -783,7 +859,7 @@ export default class AddForecastProgram extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }
@@ -942,7 +1018,7 @@ export default class AddForecastProgram extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.programName && this.state.program.label.label_en != ''}
                                                         invalid={touched.programName && !!errors.programName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.program.label.label_en}
                                                         id="programName" />
@@ -1015,10 +1091,9 @@ export default class AddForecastProgram extends Component {
                                                             value={singleValue1}
                                                             lang={pickerLang.months}
                                                             theme="dark"
-                                                            onChange={this.handleAMonthChange1}
                                                             onDismiss={this.handleAMonthDissmis1}
                                                         >
-                                                            <MonthBox value={this.makeText(singleValue1)} onClick={this.handleClickMonthBox1} />
+                                                            <MonthBox value={makeText(singleValue1)} onClick={this.handleClickMonthBox1} />
                                                         </Picker>
                                                     </div>
                                                 </FormGroup>
@@ -1044,11 +1119,10 @@ export default class AddForecastProgram extends Component {
                                                             value={singleValue2}
                                                             lang={pickerLang.months}
                                                             theme="dark"
-                                                            onChange={this.handleAMonthChange2}
                                                             onDismiss={this.handleAMonthDissmis2}
                                                             key={JSON.stringify(singleValue2)}
                                                         >
-                                                            <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                            <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
                                                         </Picker>
                                                     </div>
                                                 </FormGroup>
@@ -1078,9 +1152,15 @@ export default class AddForecastProgram extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list forecast program screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSet/listDataSet/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the forecast program details when reset button is clicked.
+     */
     resetClicked() {
         let { program } = this.state
         program.label.label_en = '';

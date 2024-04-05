@@ -1641,7 +1641,7 @@ export default class PlanningUnitSetting extends Component {
             var programs = [];
             var program = datasetList1[i];
             var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-            var programData = JprogramsSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             let actualConsumptionList = programData.actualConsumptionList;
             for (var j = 0; j < listOfDisablePuNode.length; j++) {
                 for (var k = 0; k < actualConsumptionList.length; k++) {

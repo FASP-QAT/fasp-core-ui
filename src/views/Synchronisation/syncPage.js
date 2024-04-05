@@ -37,14 +37,16 @@ import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.commitVersion')
+// Initial values for form fields
 const initialValues = {
   notes: ''
 }
 /**
- * This const is used to define the validation schema for commit version screen
- * @param {*} values 
- * @returns 
+ * Defines the validation schema for commit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
  */
 const validationSchema = function (values, t) {
   return Yup.object().shape({

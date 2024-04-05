@@ -20,6 +20,28 @@ import DropdownService from "../../api/DropdownService";
 import { Capitalize, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t('static.program.programMaster');
+// Initial values for form fields
+let initialValues = {
+    programName: '',
+    realmId: '',
+    realmCountryId: '',
+    organisationId: '',
+    userId: '',
+    airFreightPerc: '',
+    seaFreightPerc: '',
+    roadFreightPerc: '',
+    plannedToSubmittedLeadTime: '',
+    submittedToApprovedLeadTime: '',
+    approvedToShippedLeadTime: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    shippedToArrivedByLandLeadTime: '',
+    arrivedToDeliveredLeadTime: '',
+    healthAreaId: [],
+    programNotes: '',
+    regionId: [],
+    programCode1: ''
+}
 /**
  * Defines the validation schema for program details.
  * @param {Object} values - Form values.
