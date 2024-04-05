@@ -75,6 +75,13 @@ const validationSchema = function (values) {
 class EditSupplyPlanStatus extends Component {
     constructor(props) {
         super(props);
+        var value = JSON.parse(localStorage.getItem("sesStartDate"));
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        if (value.month <= 9) {
+            date = moment(value.year + "-0" + value.month + "-01").format("YYYY-MM-DD");
+        }
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -110,7 +117,7 @@ class EditSupplyPlanStatus extends Component {
             inventoryFilteredArray: [],
             inventoryTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
+            monthCount: monthDifference,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             monthCountShipments: 0,
@@ -213,6 +220,8 @@ class EditSupplyPlanStatus extends Component {
             planningUnitDropdownList: [],
             temp_currentVersion_id: ''
         }
+        this.leftClicked = this.leftClicked.bind(this);
+        this.rightClicked = this.rightClicked.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -548,6 +557,10 @@ class EditSupplyPlanStatus extends Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
+
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -678,6 +691,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({ transView: !this.state.transView })
     }
     leftClicked = () => {
+        console.log('Left Arrow clicked');
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
         this.setState({
             monthCount: monthCount
