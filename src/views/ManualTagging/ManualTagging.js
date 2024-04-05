@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, BATCH_PREFIX, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService.js';
@@ -31,7 +31,11 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations.js';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.manualTagging');
+/**
+ * Component for manual tagging.
+ */
 export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
@@ -113,8 +117,6 @@ export default class ManualTagging extends Component {
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.link = this.link.bind(this);
         this.getProgramList = this.getProgramList.bind(this);
@@ -129,7 +131,6 @@ export default class ManualTagging extends Component {
         this.dataChange1 = this.dataChange1.bind(this);
         this.dataChangeCheckbox = this.dataChangeCheckbox.bind(this);
         this.changed = this.changed.bind(this);
-        this.onPaste = this.onPaste.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getNotLinkedShipments = this.getNotLinkedShipments.bind(this);
@@ -149,6 +150,11 @@ export default class ManualTagging extends Component {
         this.changedTab1 = this.changedTab1.bind(this)
         this.filterRealmCountryPlanningUnit = this.filterRealmCountryPlanningUnit.bind(this)
     }
+    /**
+     * Handles the change event of the version dropdown.
+     * Updates the component state based on the selected version.
+     * @param {object} event - The event object representing the version dropdown change event.
+     */
     versionChange(event) {
         this.setState({
             loading: true
@@ -175,6 +181,9 @@ export default class ManualTagging extends Component {
             }
         })
     }
+    /**
+     * Toggle Artmis history popup
+     */
     toggleArtmisHistoryModal() {
         this.setState({
             artmisHistoryModal: !this.state.artmisHistoryModal,
@@ -183,6 +192,9 @@ export default class ManualTagging extends Component {
             this.sampleFunction();
         })
     }
+    /**
+     * Calls buildJexcel function
+     */
     sampleFunction() {
         this.setState({
             test: 10
@@ -190,6 +202,9 @@ export default class ManualTagging extends Component {
             this.buildJexcel()
         })
     }
+    /**
+     * Builds the jexcel component to display order details list.
+     */
     buildJexcel() {
         try {
             this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
@@ -332,6 +347,11 @@ export default class ManualTagging extends Component {
         var elVar = jexcel(document.getElementById("tableDivShipmentDetails"), options);
         this.el = elVar;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedOrderHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
@@ -339,6 +359,11 @@ export default class ManualTagging extends Component {
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
         tr.children[8].classList.add('InfoTr');
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedShipmentHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
@@ -346,16 +371,25 @@ export default class ManualTagging extends Component {
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
         tr.children[7].classList.add('InfoTr');
     }
+    /**
+     * Toggles the details modal
+     */
     toggleDetailsModal() {
         this.setState({
             modal: !this.state.modal
         })
     }
+    /**
+     * Toggles the details modal
+     */
     toggle() {
         this.setState({
             modal: !this.state.modal,
         });
     }
+    /**
+     * Function to filter program by realm country
+     */
     filterProgramByCountry() {
         let programList = this.state.programObjectStoreList;
         let countryId = this.state.countryId;
@@ -385,6 +419,9 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Reterives planning unit list by realm country
+     */
     getPlanningUnitListByRealmCountryId() {
         PlanningUnitService.getActivePlanningUnitByRealmCountryId(this.state.countryId)
             .then(response => {
@@ -398,7 +435,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -415,7 +452,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -423,7 +460,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -431,7 +468,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -439,6 +476,12 @@ export default class ManualTagging extends Component {
                 }
             );
     }
+    /**
+     * Handles the click event when cancel button is clicked.
+     * Shows 'div2', filters data based on 'active1' or 'active2' state, or calls 'filterErpData' if neither is active.
+     * Resets state variables like 'originalQty', 'message', 'planningUnitIdUpdated', and 'table1Loader'.
+     * Hides the second component and toggles the large view.
+     */
     cancelClicked() {
         document.getElementById('div2').style.display = 'block';
         if (this.state.active1 || this.state.active2) {
@@ -453,10 +496,16 @@ export default class ManualTagging extends Component {
             planningUnitIdUpdated: '',
             table1Loader: false
         }, () => {
-            this.hideSecondComponent();
+            hideSecondComponent();
             this.toggleLarge();
         })
     }
+    /**
+     * Displays shipment data based on selected shipment or planning unit.
+     * Determines the selected shipment or planning unit based on checkbox state and DOM element values.
+     * Filters the shipment data accordingly and sorts it based on expected delivery date.
+     * Sets the state variables 'finalShipmentId', 'selectedShipment', and 'originalQty'.
+     */
     displayShipmentData() {
         let selectedShipmentId = (this.state.checkboxValue && document.getElementById("notLinkedShipmentId")!=null ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
         let selectedPlanningUnitId = (!this.state.checkboxValue && document.getElementById("planningUnitId1")!=null ? parseInt(document.getElementById("planningUnitId1").value) : 0);
@@ -480,6 +529,12 @@ export default class ManualTagging extends Component {
         }, () => {
         })
     }
+    /**
+     * Retrieves and filters shipment data for not linked shipments.
+     * Filters shipments based on program ID, planning units, and shipment status criteria.
+     * Sorts the filtered shipment list based on shipment ID.
+     * Sets the state variable 'notLinkedShipments' with the filtered and sorted shipment list.
+     */
     getNotLinkedShipments() {
         let programId1 = this.state.programId1;
         if (programId1 != "") {
@@ -514,6 +569,9 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Reterives product category list from server
+     */
     getProductCategories() {
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
@@ -528,7 +586,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -545,7 +603,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -553,7 +611,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -561,7 +619,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -569,6 +627,10 @@ export default class ManualTagging extends Component {
                 }
             );
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidationTab2 = function () {
         var valid = true;
         var json = this.state.languageEl.getJson(null, false);
@@ -598,6 +660,10 @@ export default class ManualTagging extends Component {
         }
         return valid;
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -630,6 +696,14 @@ export default class ManualTagging extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changeTab2 = function (instance, cell, x, y, value) {
         if (!this.state.changedDataForTab2) {
             this.setState({
@@ -696,6 +770,14 @@ export default class ManualTagging extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changedTab1 = function (instance, cell, x, y, value) {
         if (x == 0) {
             var finalShipmentId = this.state.finalShipmentId;
@@ -715,6 +797,14 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (this.state.instance.getJson(null, false).length > 0) {
             var rowData = this.state.instance.getRowData(y);
@@ -822,11 +912,23 @@ export default class ManualTagging extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Function to handle cell edits in jexcel.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object being edited.
+     * @param {number} x - The x-coordinate of the edited cell.
+     * @param {number} y - The y-coordinate of the edited cell.
+     * @param {any} value - The new value of the edited cell.
+     */
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(10, y, 1, true);
     }.bind(this);
-    onPaste(instance, data) {
-    }
+    /**
+     * Handles the change event of the data change checkbox.
+     * Updates the state variables based on the checkbox value.
+     * Clears the selected shipment and resets the original quantity.
+     * @param {object} event - The event object generated by the checkbox change.
+     */
     dataChangeCheckbox(event) {
         this.setState({
             selectedShipment: [],
@@ -834,6 +936,12 @@ export default class ManualTagging extends Component {
             checkboxValue: (event.target.checked ? true : false)
         })
     }
+    /**
+     * Handles the change event of data options.
+     * Updates state variables based on the selected option.
+     * Resets original quantity, selected shipment, and checkbox value accordingly.
+     * @param {object} event - The event object generated by the data options change.
+     */
     dataChange1(event) {
         if (event.target.id == 'active4') {
             this.setState({
@@ -858,6 +966,13 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Handles the change event of data options.
+     * Updates state variables based on the selected option.
+     * Resets relevant state variables accordingly.
+     * Triggers additional actions based on the selected option.
+     * @param {object} event - The event object generated by the data options change.
+     */
     dataChange(event) {
         if (event.target.id == 'active1') {
             this.setState({
@@ -918,7 +1033,6 @@ export default class ManualTagging extends Component {
             }, () => {
                 let realmId = AuthenticationService.getRealmId();
                 this.getProductCategories();
-                this.getBudgetList();
                 this.getFundingSourceList();
                 RealmCountryService.getRealmCountryForProgram(realmId)
                     .then(response => {
@@ -945,7 +1059,7 @@ export default class ManualTagging extends Component {
                             })
                         } else {
                             this.setState({ message: response.data.messageCode }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             })
                         }
                     }).catch(
@@ -955,7 +1069,7 @@ export default class ManualTagging extends Component {
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -972,7 +1086,7 @@ export default class ManualTagging extends Component {
                                             message: error.response.data.messageCode,
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent()
+                                            hideSecondComponent()
                                         });
                                         break;
                                     case 412:
@@ -980,7 +1094,7 @@ export default class ManualTagging extends Component {
                                             message: error.response.data.messageCode,
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent()
+                                            hideSecondComponent()
                                         });
                                         break;
                                     default:
@@ -988,7 +1102,7 @@ export default class ManualTagging extends Component {
                                             message: 'static.unkownError',
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent()
+                                            hideSecondComponent()
                                         });
                                         break;
                                 }
@@ -1002,6 +1116,10 @@ export default class ManualTagging extends Component {
         } catch (e) {
         }
     }
+    /**
+     * Retrieves the budget list filtered by the selected program ID.
+     * @param {object} e - The event object containing information about the selected program ID.
+     */
     getBudgetListByProgramId = (e) => {
         let programId1 = this.state.programId1.toString().split("_")[0];
         if (programId1 != "") {
@@ -1012,6 +1130,10 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Retrieves the budget list filtered by the selected funding source ID.
+     * @param {object} e - The event object containing information about the selected funding source ID.
+     */
     getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = this.state.fundingSourceId;
         const filteredBudgetList = this.state.filteredBudgetListByProgram.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
@@ -1019,6 +1141,9 @@ export default class ManualTagging extends Component {
             filteredBudgetList
         });
     }
+    /**
+     * Retrieves the list of active funding sources.
+     */
     getFundingSourceList() {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -1037,7 +1162,7 @@ export default class ManualTagging extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -1047,7 +1172,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1064,7 +1189,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -1072,7 +1197,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -1080,7 +1205,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -1088,8 +1213,10 @@ export default class ManualTagging extends Component {
                 }
             );
     }
-    getBudgetList = () => {
-    }
+    /**
+     * Handles the change event when a program is selected.
+     * @param {Event} event - The event object containing information about the selected program.
+     */
     programChange(event) {
         var programId = event.target.value;
         this.setState({
@@ -1117,6 +1244,11 @@ export default class ManualTagging extends Component {
             }
         )
     }
+    /**
+     * Fetches the list of versions for the selected program.
+     * Updates the component state with the fetched version list.
+     * Handles loading states and initializes other necessary operations.
+     */
     getVersionList() {
         this.setState({
             loading: true
@@ -1174,6 +1306,10 @@ export default class ManualTagging extends Component {
             }
         })
     }
+    /**
+     * Retrieves the planning unit array from the component state and updates the state with the formatted array.
+        * Invokes the filterData function with the updated planning unit array.
+     */
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
@@ -1186,6 +1322,12 @@ export default class ManualTagging extends Component {
             this.filterData(planningUnitArray);
         })
     }
+    /**
+     * Handles the change event when selecting a country.
+     * Updates the component state with the selected country ID, retrieves planning units based on the selected country,
+     * triggers the filterErpData function, and stores the selected country ID in local storage.
+     * @param {Event} event - The change event object.
+     */
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         localStorage.setItem("sesCountryId", event.target.value);
@@ -1199,6 +1341,13 @@ export default class ManualTagging extends Component {
             this.filterErpData();
         })
     }
+    /**
+     * Handles the change event when selecting a program in the modal.
+     * Updates the component state with the selected program ID and resets the planning units list.
+     * If a valid program ID is selected, it triggers the getOrderDetails, getPlanningUnitListBasedOnTracerCategory,
+     * and getBudgetListByProgramId functions. Otherwise, it resets relevant state variables.
+     * @param {Event} event - The change event object.
+     */
     programChangeModal(event) {
         var programId1 = event.target.value;
         this.setState({
@@ -1220,6 +1369,11 @@ export default class ManualTagging extends Component {
             }
         })
     }
+    /**
+     * Handles the change event when selecting a funding source in the modal.
+     * Updates the component state with the selected funding source ID and triggers the getBudgetListByFundingSourceId function.
+     * @param {Event} event - The change event object.
+     */
     fundingSourceModal(event) {
         this.setState({
             fundingSourceId: event.target.value
@@ -1227,11 +1381,19 @@ export default class ManualTagging extends Component {
             this.getBudgetListByFundingSourceId();
         })
     }
+    /**
+     * Handles the change event when selecting a budget.
+     * Updates the component state with the selected budget ID.
+     * @param {Event} event - The change event object.
+     */
     budgetChange(event) {
         this.setState({
             budgetId: event.target.value
         })
     }
+    /**
+     * Calculates and updates the state to control the visibility of the submit button and total quantity display based on validation and table data.
+     */
     displayButton() {
         var validation = this.checkValidation();
         var tableJson = this.state.instance.getJson(null, false);
@@ -1274,6 +1436,9 @@ export default class ManualTagging extends Component {
             })
         }
     }
+    /**
+     * Delinks the shipments and saves the data in indexed db
+     */
     delink() {
         this.setState({ loading: true })
         var validation = this.checkValidationTab2();
@@ -1463,10 +1628,13 @@ export default class ManualTagging extends Component {
                 loading: false,
                 message: i18n.t("static.supplyPlan.validationFailed")
             }, () => {
-                this.hideSecondComponent()
+                hideSecondComponent()
             })
         }
     }
+    /**
+     * Links the shipments and saves the data in indexed db
+     */
     link() {
         this.setState({ loading1: true })
         var validation = this.checkValidation();
@@ -1838,11 +2006,20 @@ export default class ManualTagging extends Component {
             }
         }
     }
+    /**
+     * Updates the component state with the provided parameter name and value.
+     * @param {string} parameterName - The name of the parameter to update in the component state.
+     * @param {*} value - The new value to set for the parameter.
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * Retrieves order details based on search criteria and updates the state with the retrieved data.
+     * @param {number} takeFromLocalProgram - Flag indicating whether to retrieve data from local program (optional).
+     */
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
         var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
@@ -1906,7 +2083,7 @@ export default class ManualTagging extends Component {
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1924,7 +2101,7 @@ export default class ManualTagging extends Component {
                                         loading: false,
                                         result: error.response.data.messageCode
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 case 412:
@@ -1932,7 +2109,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 default:
@@ -1940,9 +2117,9 @@ export default class ManualTagging extends Component {
                                         message: 'static.unkownError',
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
-                                    break;
+                                       break;
                             }
                         }
                     }
@@ -1956,19 +2133,16 @@ export default class ManualTagging extends Component {
             })
         }
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles the change event for planning unit selection.
+     * @param {Array} planningUnitIds - Array of planning unit IDs and labels.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1980,6 +2154,10 @@ export default class ManualTagging extends Component {
             this.filterErpData()
         })
     }
+    /**
+     * Handles the change event for product category selection.
+     * @param {Array} productCategoryIds - Array of product category IDs and labels.
+     */
     handleProductCategoryChange = (productCategoryIds) => {
         this.setState({
             productCategoryValues: productCategoryIds.map(ele => ele),
@@ -1996,6 +2174,9 @@ export default class ManualTagging extends Component {
             this.filterErpData();
         })
     }
+    /**
+     * Retrieves active planning units based on selected product category IDs.
+     */
     getPlanningUnitListByProductcategoryIds = () => {
         PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.map(ele => (ele.value).toString()))
             .then(response => {
@@ -2009,7 +2190,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -2026,7 +2207,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -2034,7 +2215,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -2042,7 +2223,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -2050,6 +2231,9 @@ export default class ManualTagging extends Component {
                 }
             );
     }
+    /**
+     * Filters ERP data based on selected product categories and planning units, then updates the output list accordingly.
+     */
     filterErpData() {
         var countryId = this.state.countryId;
         this.setState({
@@ -2104,7 +2288,7 @@ export default class ManualTagging extends Component {
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -2121,7 +2305,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 case 412:
@@ -2129,7 +2313,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 default:
@@ -2137,7 +2321,7 @@ export default class ManualTagging extends Component {
                                         message: 'static.unkownError',
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                             }
@@ -2152,6 +2336,10 @@ export default class ManualTagging extends Component {
             });
         }
     }
+    /**
+     * Filters data based on selected planning units and retrieves the corresponding shipments or linked shipments.
+     * @param {Array} planningUnitIds - An array of planning unit IDs.
+     */
     filterData = (planningUnitIds) => {
         var programId = this.state.programId;
         planningUnitIds = planningUnitIds;
@@ -2186,7 +2374,7 @@ export default class ManualTagging extends Component {
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent()
+                                            hideSecondComponent()
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
@@ -2203,7 +2391,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                             case 412:
@@ -2211,7 +2399,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                             default:
@@ -2219,7 +2407,7 @@ export default class ManualTagging extends Component {
                                                     message: 'static.unkownError',
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                         }
@@ -2245,7 +2433,7 @@ export default class ManualTagging extends Component {
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent()
+                                            hideSecondComponent()
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
@@ -2262,7 +2450,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                             case 412:
@@ -2270,7 +2458,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                             default:
@@ -2278,7 +2466,7 @@ export default class ManualTagging extends Component {
                                                     message: 'static.unkownError',
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                                 break;
                                         }
@@ -2358,6 +2546,10 @@ export default class ManualTagging extends Component {
             }
         })
     }
+    /**
+     * Fetches planning units based on the provided tracer category term and updates the state with the retrieved data.
+     * @param {string} term - The term to search for planning units.
+     */
     getPlanningUnitListByTracerCategory = (term) => {
         this.setState({ planningUnitName: term });
         var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
@@ -2401,7 +2593,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -2418,7 +2610,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -2426,7 +2618,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -2434,7 +2626,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -2442,6 +2634,10 @@ export default class ManualTagging extends Component {
                 }
             );
     }
+    /**
+     * Searches ERP order data based on the provided term and updates the state with the retrieved data.
+     * @param {string} term - The term to search for ERP order data.
+     */
     searchErpOrderData = (term) => {
         if (term != null && term != "") {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
@@ -2487,7 +2683,7 @@ export default class ManualTagging extends Component {
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -2504,7 +2700,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 case 412:
@@ -2512,7 +2708,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 default:
@@ -2520,7 +2716,7 @@ export default class ManualTagging extends Component {
                                         message: 'static.unkownError',
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                             }
@@ -2529,6 +2725,9 @@ export default class ManualTagging extends Component {
                 );
         }
     }
+    /**
+     * Reterives program list from server
+     */
     getProgramList() {
         let realmId = AuthenticationService.getRealmId()
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
@@ -2590,7 +2789,7 @@ export default class ManualTagging extends Component {
                         loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -2600,7 +2799,7 @@ export default class ManualTagging extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -2617,7 +2816,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -2625,7 +2824,7 @@ export default class ManualTagging extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -2633,7 +2832,7 @@ export default class ManualTagging extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -2641,6 +2840,9 @@ export default class ManualTagging extends Component {
                 }
             );
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJExcelERP(build) {
         this.setState({
             table1Loader: false
@@ -3064,7 +3266,6 @@ export default class ManualTagging extends Component {
                         copyCompatibility: true,
                         allowManualInsertRow: false,
                         parseFormulas: true,
-                        onpaste: this.onPaste,
                         license: JEXCEL_PRO_KEY,
                         contextMenu: function (obj, x, y, e) {
                             return false;
@@ -3088,6 +3289,9 @@ export default class ManualTagging extends Component {
                 }
             })
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJExcel() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId)
         RealmCountryService.getRealmCountryPlanningUnitByProgramId([programId]).then(response1 => {
@@ -3630,7 +3834,7 @@ export default class ManualTagging extends Component {
                                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent()
+                                                            hideSecondComponent()
                                                         });
                                                     } else {
                                                         switch (error.response ? error.response.status : "") {
@@ -3647,7 +3851,7 @@ export default class ManualTagging extends Component {
                                                                     message: error.response.data.messageCode,
                                                                     loading: false
                                                                 }, () => {
-                                                                    this.hideSecondComponent()
+                                                                    hideSecondComponent()
                                                                 });
                                                                 break;
                                                             case 412:
@@ -3655,7 +3859,7 @@ export default class ManualTagging extends Component {
                                                                     message: error.response.data.messageCode,
                                                                     loading: false
                                                                 }, () => {
-                                                                    this.hideSecondComponent()
+                                                                    hideSecondComponent()
                                                                 });
                                                                 break;
                                                             default:
@@ -3663,7 +3867,7 @@ export default class ManualTagging extends Component {
                                                                     message: 'static.unkownError',
                                                                     loading: false
                                                                 }, () => {
-                                                                    this.hideSecondComponent()
+                                                                    hideSecondComponent()
                                                                 });
                                                                 break;
                                                         }
@@ -3771,20 +3975,53 @@ export default class ManualTagging extends Component {
             })
         })
     }
+    /**
+     * Function to filter realm country planning unit based on planning unit
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */   
     filterRealmCountryPlanningUnit = function (o, cell, x, y, value, config) {
         var planningUnitId = this.el.getValueFromCoords(33, y);
         return this.state.realmCountryPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
     }.bind(this);
+    /**
+     * Function to filter realm country planning unit based on planning unit
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterRealmCountryPlanningUnit1 = function (o, cell, x, y, value, config) {
         var planningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment[0].planningUnit.id : 0) : 0)
         return this.state.realmCountryPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
     }.bind(this);
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedERP1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedERP = function (instance, cell, x, y, value) {
         if (this.state.active1) {
             jExcelLoadedFunctionForErp(instance, 1);
@@ -3797,6 +4034,9 @@ export default class ManualTagging extends Component {
         tr.children[10].classList.add('AsteriskTheadtrTd');
         tr.children[12].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * Open the ERP details modal on row click
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
@@ -3880,6 +4120,13 @@ export default class ManualTagging extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Retrieves shipments for a specific tab based on the provided order details.
+     * @param {number} shipmentId - The ID of the shipment.
+     * @param {number} tempShipmentId - The temporary ID of the shipment.
+     * @param {string} roNo - The Reference Order Number (RO number) associated with the shipment.
+     * @param {string} roPrimeLineNo - The RO Prime Line Number associated with the shipment.
+     */
     getShipmentsForTab2 = (shipmentId, tempShipmentId, roNo, roPrimeLineNo) => {
         var linkedShipmentsListForTab2 = this.state.linkedShipmentsListForTab2;
         var filterOnRoNoAndRoPrimeLineNo = linkedShipmentsListForTab2.filter(c => c.roNo.toString().trim() == roNo.toString().trim() && c.roPrimeLineNo.toString().trim() == roPrimeLineNo.toString().trim());
@@ -3890,10 +4137,19 @@ export default class ManualTagging extends Component {
             this.buildJExcelERP(true)
         })
     }
+    /**
+     * Calls getLocalProgramList function on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getLocalProgramList();
     }
+    /**
+     * Retrieves local program data from IndexedDB and updates component state accordingly.
+     * @param {number} parameter - Specifies the action to perform after retrieving the program data. 
+     *                             - If `parameter` is 1, it triggers the `filterErpData` function.
+     *                             - Otherwise, it triggers the `getProgramList` function.
+     */
     getLocalProgramList(parameter) {
         var db1;
         getDatabase();
@@ -3944,6 +4200,10 @@ export default class ManualTagging extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Retrieves planning unit list based on the tracer category of the program.
+     * Updates component state with the retrieved data and triggers relevant actions.
+     */
     getPlanningUnitListBasedOnTracerCategory() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
@@ -3998,7 +4258,7 @@ export default class ManualTagging extends Component {
                             color: '#BA0C2F'
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -4008,7 +4268,7 @@ export default class ManualTagging extends Component {
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -4025,7 +4285,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 case 412:
@@ -4033,7 +4293,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 default:
@@ -4041,7 +4301,7 @@ export default class ManualTagging extends Component {
                                         message: 'static.unkownError',
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                             }
@@ -4060,6 +4320,9 @@ export default class ManualTagging extends Component {
             })
         }
     }
+    /**
+     * Reterives planning unit list based on program Id
+     */
     getPlanningUnitList() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
@@ -4093,7 +4356,7 @@ export default class ManualTagging extends Component {
                             color: '#BA0C2F'
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -4103,7 +4366,7 @@ export default class ManualTagging extends Component {
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
-                                this.hideSecondComponent()
+                                hideSecondComponent()
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -4120,7 +4383,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 case 412:
@@ -4128,7 +4391,7 @@ export default class ManualTagging extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                                 default:
@@ -4136,7 +4399,7 @@ export default class ManualTagging extends Component {
                                         message: 'static.unkownError',
                                         loading: false
                                     }, () => {
-                                        this.hideSecondComponent()
+                                        hideSecondComponent()
                                     });
                                     break;
                             }
@@ -4155,6 +4418,13 @@ export default class ManualTagging extends Component {
             })
         }
     }
+    /**
+     * Formats the label value based on the selected language.
+     * If the label value is not provided or empty, returns an empty string.
+     * @param {string} cell - The label value to format.
+     * @param {object} row - The row object containing the label value.
+     * @returns {string} - The formatted label value.
+     */
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
@@ -4162,6 +4432,13 @@ export default class ManualTagging extends Component {
             return "";
         }
     }
+    /**
+     * Formats the planning unit label value based on the selected language.
+     * If the label value is not provided or empty, returns an empty string.
+     * @param {string} cell - The planning unit label value to format.
+     * @param {object} row - The row object containing the planning unit label value and additional data.
+     * @returns {string} - The formatted planning unit label value.
+     */
     formatPlanningUnitLabel(cell, row) {
         if (cell != null && cell != "") {
             if (row.skuCode != null && row.skuCode != "") {
@@ -4173,6 +4450,12 @@ export default class ManualTagging extends Component {
             return "";
         }
     }
+    /**
+     * Toggles the display of the large component.
+     * Updates the state to control various UI elements such as submit button, total quantity display, selected row planning unit,
+     * Artmis list, reason, total quantity value, result, and manual tagging status.
+     * Also, resets the active states for other components.
+     */
     toggleLarge() {
         this.setState({
             displaySubmitButton: false,
@@ -4187,6 +4470,12 @@ export default class ManualTagging extends Component {
             active5: false
         })
     }
+    /**
+     * Formats a number by adding commas as thousand separators.
+     * @param {number|string} cell - The number to format.
+     * @param {object} row - The row object containing the cell value.
+     * @returns {string} The formatted number with commas.
+    */
     addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
@@ -4198,6 +4487,12 @@ export default class ManualTagging extends Component {
         }
         return x1 + x2;
     }
+    /**
+     * Formats a number by adding commas as thousand separators and limits decimal places to four.
+     * @param {number|string} cell1 - The number to format.
+     * @param {object} row - The row object containing the cell value.
+     * @returns {string} The formatted number with commas and up to four decimal places.
+     */
     addCommasFourDecimal(cell1, row) {
         if (cell1 != null && cell1 != "") {
             cell1 += '';
@@ -4213,6 +4508,12 @@ export default class ManualTagging extends Component {
             return "";
         }
     }
+    /**
+     * Formats a date by converting it to a specified date format and capitalizing the month name.
+     * @param {string|Date} cell - The date string or Date object to format.
+     * @param {object} row - The row object containing the cell value.
+     * @returns {string} The formatted date with the month name capitalized.
+     */
     formatDate(cell, row) {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
@@ -4222,6 +4523,13 @@ export default class ManualTagging extends Component {
             return "";
         }
     }
+    /**
+     * Formats an expiry date by converting it to a specified date format and capitalizing the month name,
+     * excluding the date from the formatted string.
+     * @param {string|Date} cell - The expiry date string or Date object to format.
+     * @param {object} row - The row object containing the cell value.
+     * @returns {string} The formatted expiry date with the month name capitalized, excluding the date.
+     */
     formatExpiryDate(cell, row) {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
@@ -4231,6 +4539,11 @@ export default class ManualTagging extends Component {
             return "";
         }
     }
+    /**
+     * Updates the state to control whether to show all shipments or not, based on the value of the checkbox.
+     * If the checkbox is checked, all shipments will be shown; otherwise, only selected shipments will be shown.
+     * @param {object} e - The event object containing information about the checkbox status.
+     */
     setShowAllShipments(e) {
         this.setState({
             showAllShipments: e.target.checked
@@ -4238,6 +4551,10 @@ export default class ManualTagging extends Component {
             this.buildJExcelERP(false)
         })
     }
+    /**
+     * Renders the manual tagging screen.
+     * @returns {JSX.Element} - Manual tagging screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

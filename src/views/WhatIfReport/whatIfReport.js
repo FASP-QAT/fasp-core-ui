@@ -48,12 +48,22 @@ import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan.
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 const entityname = i18n.t('static.dashboard.whatIf')
+/**
+ * This const is used to define the intial values of validation schema for scenario options
+ * @param {*} values 
+ * @returns 
+ */
 let initialValues = {
     scenarioId: '',
     percentage: '',
     procurementAgentIdSingle:'',
     fundingSourceIdSingle:''
 }
+/**
+ * This const is used to define the validation schema for scenario options
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         scenarioId: Yup.string()
@@ -96,6 +106,9 @@ const validationSchema = function (values, t) {
             }),
     })
 }
+/**
+ * This component is used to allow user to do the scenario planning monthwise and view the supply plans for the version that is modified by the user to apply multiple pre defined Scenario
+ */
 export default class WhatIfReportComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -209,7 +222,6 @@ export default class WhatIfReportComponent extends React.Component {
             batchQtyTotalForPopup: 0
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
-        this.handleRangeChange1 = this.handleRangeChange1.bind(this);
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
         this.pickRange1 = React.createRef();
         this.getMonthArray = this.getMonthArray.bind(this);
@@ -232,7 +244,6 @@ export default class WhatIfReportComponent extends React.Component {
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
         this.addRow = this.addRow.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.toggle = this.toggle.bind(this);
         this.tabPane = this.tabPane.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.updateState = this.updateState.bind(this)
@@ -247,10 +258,8 @@ export default class WhatIfReportComponent extends React.Component {
         this.pickRange = React.createRef();
         this.pickRange2 = React.createRef();
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox2 = this._handleClickRangeBox2.bind(this)
-        this.handleRangeChange2 = this.handleRangeChange2.bind(this);
         this.handleRangeDissmis2 = this.handleRangeDissmis2.bind(this);
         this.toggleAccordionScenarioList = this.toggleAccordionScenarioList.bind(this);
         this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
@@ -259,6 +268,11 @@ export default class WhatIfReportComponent extends React.Component {
         this.setFundingSource = this.setFundingSource.bind(this)
         this.roundAMC = this.roundAMC.bind(this);
     }
+    /**
+     * This is function is used to round the AMC value
+     * @param {*} amc The value of the AMC
+     * @returns This function returns the rounded AMC
+     */
     roundAMC(amc) {
         if (amc != null) {
             if (Number(amc).toFixed(0) >= 100) {
@@ -274,6 +288,11 @@ export default class WhatIfReportComponent extends React.Component {
             return null;
         }
     }
+    /**
+     * This method is used to add commas to the number
+     * @param {*} cell This is value of the number
+     * @returns It returns the number separated by commas
+     */
     addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
@@ -285,11 +304,17 @@ export default class WhatIfReportComponent extends React.Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is called when date picker is clicked
+     * @param {*} e 
+     */
     _handleClickRangeBox1(e) {
         this.pickRange1.current.show()
     }
-    handleRangeChange1(value, text, listIndex) {
-    }
+    /**
+     * This function is used to update the date filter value
+     * @param {*} value This is the value that user has selected
+     */
     handleRangeDissmis1(value) {
         var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
         if (value.month <= 9) {
@@ -301,28 +326,44 @@ export default class WhatIfReportComponent extends React.Component {
         localStorage.setItem("sesStartDate", JSON.stringify(value));
         this.formSubmit(this.state.planningUnit, monthDifference);
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * This function is used to update the date filter value for which the specific scenario should be applied
+     * @param {*} value  This is the value that user has selected
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
+    /**
+     * This function is used to set the procurement agent Ids that is selected for a particular scenario
+     * @param {*} e This is value of the event
+     */
     setProcurementAgents(e) {
         this.setState({
             procurementAgents: e
         })
     }
+    /**
+     * This function is used to set the funding source Ids that is selected for a particular scenario
+     * @param {*} e This is value of the event
+     */
     setFundingSources(e) {
         this.setState({
             fundingSources: e
         })
     }
+    /**
+     * This function is used to set the procurement agent Id that is selected for a particular scenario for newly created shipments
+     * @param {*} e This is value of the event
+     */
     setProcurementAgent(e) {
         this.setState({
             procurementAgentIdSingle: e.target.value
         })
     }
+    /**
+     * This function is used to set the funding source Id that is selected for a particular scenario for newly created shipments
+     * @param {*} e This is value of the event
+     */
     setFundingSource(e) {
         var budgetList = this.state.budgetListForWhatIf.filter(c => c.fundingSource.fundingSourceId == e.target.value);
         this.setState({
@@ -331,56 +372,91 @@ export default class WhatIfReportComponent extends React.Component {
             budgetIdSingle: budgetList.length == 1 ? budgetList[0].budgetId : ""
         })
     }
+    /**
+     * This function is used to set the budget Id that is selected for a particular scenario for newly created shipments
+     * @param {*} e This is value of the event
+     */
     setBudget(e) {
         this.setState({
             budgetIdSingle: e.target.value
         })
     }
+    /**
+     * This function is called when date picker is clicked for a particular scenario
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
-    handleRangeChange2(value, text, listIndex) {
-    }
+    /**
+     * This function is used to update the date filter value for a particular scenario
+     * @param {*} value This is the value that user has selected
+     */
     handleRangeDissmis2(value) {
         this.setState({ rangeValue1: value })
     }
+    /**
+     * This function is called when date picker is clicked for a particular scenario
+     * @param {*} e 
+     */
     _handleClickRangeBox2(e) {
         this.pickRange2.current.show()
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div3 after 30 seconds
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div4 after 30 seconds
+     */
     hideFourthComponent() {
         document.getElementById('div4').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div4').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div5 after 30 seconds
+     */
     hideFifthComponent() {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1 || this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1) {
             window.onbeforeunload = () => true
@@ -388,6 +464,11 @@ export default class WhatIfReportComponent extends React.Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used to round the number
+     * @param {*} num This is value of the number that needs to be rounded
+     * @returns This function returns the rounded number
+     */
     roundN = num => {
         if (num != null && num != '') {
             return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
@@ -395,6 +476,11 @@ export default class WhatIfReportComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is used to add commas if the value is not null or blank
+     * @param {*} value This is value of the number that needs to formatted
+     * @returns This function returns the formatted value
+     */
     formatter = value => {
         if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
@@ -413,6 +499,11 @@ export default class WhatIfReportComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is used to add commas to a decimal number if the value is not null or blank
+     * @param {*} value This is value of the number that needs to formatted
+     * @returns This function returns the formatted value
+     */
     formatterDouble = value => {
         if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
@@ -431,6 +522,10 @@ export default class WhatIfReportComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is called when planning unit is changed and is used to call the comparision component
+     * @param {*} value This is the value of the planning unit
+     */
     updateFieldData(value) {
         var planningUnitDataList = this.state.planningUnitDataList;
         var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == value.value);
@@ -453,6 +548,9 @@ export default class WhatIfReportComponent extends React.Component {
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == value.value))[0];
         this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, rows: [], programJson: programJson, planBasedOn: programPlanningUnit.planBasedOn, minQtyPpu: programPlanningUnit.minQty, distributionLeadTime: programPlanningUnit.distributionLeadTime });
     }
+    /**
+     * This function is called when reset is clicked to reset all the scenarios that are added
+     */
     resetClicked() {
         var db1;
         getDatabase();
@@ -536,6 +634,9 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to save the supply plan after adding all the scenarios that user has added
+     */
     saveSupplyPlan() {
         var db1;
         getDatabase();
@@ -606,6 +707,10 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is called when scenario is changed and is used to show hide fields based on scenarios
+     * @param {*} event This is the value of the event
+     */
     setTextAndValue = (event) => {
         if (event.target.name === 'scenarioId') {
             this.setState({ scenarioId: event.target.value });
@@ -648,13 +753,10 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({ percentage: event.target.value });
         }
     };
-    toggle(tabPane, tab) {
-        const newArray = this.state.activeTab.slice()
-        newArray[tabPane] = tab
-        this.setState({
-            activeTab: newArray,
-        });
-    }
+    /**
+     * This function is used to de select or select particular scenario from the list of added scenrios
+     * @param {*} id Id of the scenario row that is checked or unchecked
+     */
     scenarioCheckedChanged(id) {
         var rows = this.state.rows;
         rows[id].scenarioChecked = !rows[id].scenarioChecked;
@@ -664,6 +766,9 @@ export default class WhatIfReportComponent extends React.Component {
             document.getElementById("saveScenarioDiv").style.display = 'block'
         })
     }
+    /**
+     * This function is called when a particular scenario is checked or unchecked and after that submit button is clicked to reapply the checked scenarios
+     */
     saveScenario() {
         this.setState({ loading: true });
         var db1;
@@ -1128,6 +1233,9 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is called when a partcular scenario has to be applied
+     */
     addRow() {
         this.setState({ loading: true });
         var db1;
@@ -1812,7 +1920,9 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-    
+    /**
+     * This function is used to toogle that is to show or hide scenario list
+     */
     toggleAccordionScenarioList() {
         this.setState({
             showScenarioList: !this.state.showScenarioList
@@ -1826,6 +1936,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to toggle the accordian for the total shipments
+     */
     toggleAccordionTotalShipments() {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -1855,9 +1968,17 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to add double quotes to the scenario row content
+     * @param {*} arr Content of scenario row
+     * @returns Returns the row with quotes
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * This function is used to export the supply planning data in CSV format
+     */
     exportCSV = () => {
         var csvRow = [];
         csvRow.push("\"" + (i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label).replaceAll(' ', '%20') + "\"")
@@ -1945,6 +2066,9 @@ export default class WhatIfReportComponent extends React.Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * This function is used to export the supply planning data in PDF format
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -2201,6 +2325,9 @@ export default class WhatIfReportComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.whatIf') + ".pdf")
     }
+    /**
+     * This function is used to get list of programs that user has downloaded
+     */
     componentDidMount() {
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
@@ -2288,6 +2415,10 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     };
+    /**
+     * This function is used to get list of planning units based on a particular program
+     * @param {*} value This is the value of program that is selected by the user
+     */
     getPlanningUnitList(value) {
         document.getElementById("planningUnitId").value = 0;
         document.getElementById("planningUnit").value = "";
@@ -2499,6 +2630,11 @@ export default class WhatIfReportComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to generate a month array based on the date that user has selected
+     * @param {*} currentDate This is the value of the date that user has selected
+     * @returns This function returns the month array
+     */
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
@@ -2514,6 +2650,11 @@ export default class WhatIfReportComponent extends React.Component {
         })
         return month;
     }
+    /**
+     * This function is used to build all the data that is required for supply planning
+     * @param {*} value This is the value of the planning unit
+     * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
+     */
     formSubmit(value, monthCount) {
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
@@ -3306,6 +3447,17 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
+     * @param {*} supplyPlanType This values indicates which popup needs to be displayed
+     * @param {*} month This value indicates from which month the data shpuld be displayed in the popup
+     * @param {*} quantity This value is the suggested shipment quantity
+     * @param {*} startDate This value is the start date for the suggested shipment/Shipment
+     * @param {*} endDate This value is the end date for the suggested shipment/Shipment
+     * @param {*} isEmergencyOrder This value indicates if the particular suggested shipment is emergency order or not
+     * @param {*} shipmentType This is type of the shipment that is clicked
+     * @param {*} count This is the month number for which popup needs to be displayed
+     */
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
         var cont = false;
         if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
@@ -3428,6 +3580,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when the cancel button is clicked from expired stock popup
+     */
     actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
@@ -3436,6 +3591,10 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.hideFirstComponent();
     }
+    /**
+     * This function is called when the cancel button is clicked from consumption, inventory, suggested shipments,shipments
+     * @param {*} supplyPlanType This values indicates which popup is cancelled
+     */
     actionCanceled(supplyPlanType) {
         var cont = false;
         if (this.state.consumptionChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1 || this.state.shipmentChangedFlag == 1) {
@@ -3505,6 +3664,9 @@ export default class WhatIfReportComponent extends React.Component {
                 })
         }
     }
+    /**
+     * This function is called when scroll to left is clicked on the supply plan table
+     */
     leftClicked() {
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
         this.setState({
@@ -3512,6 +3674,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCount)
     }
+    /**
+     * This function is called when scroll to right is clicked on the supply plan table
+     */
     rightClicked() {
         var monthCount = (this.state.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
         this.setState({
@@ -3519,6 +3684,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCount)
     }
+    /**
+     * This function is called when scroll to left is clicked on the consumption table
+     */
     leftClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -3526,6 +3694,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
+    /**
+     * This function is called when scroll to right is clicked on the consumption table
+     */
     rightClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -3533,6 +3704,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
+    /**
+     * This function is called when scroll to left is clicked on the inventory/adjustment table
+     */
     leftClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -3540,6 +3714,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the inventory/adjustment table
+     */
     rightClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -3547,6 +3724,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
+    /**
+     * This function is called when scroll to left is clicked on the shipment table
+     */
     leftClickedShipments() {
         var monthCountShipments = (this.state.monthCountShipments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -3554,6 +3734,9 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountShipments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the shipment table
+     */
     rightClickedShipments() {
         var monthCountShipments = (this.state.monthCountShipments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -3561,6 +3744,14 @@ export default class WhatIfReportComponent extends React.Component {
         })
         this.formSubmit(this.state.planningUnit, monthCountShipments);
     }
+    /**
+     * This function is called when a particular consumption record value is clicked
+     * @param {*} startDate This value is the start date of the month for which the consumption value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the consumption value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} actualFlag This is the value of the consumption type
+     * @param {*} month This is the value of the month for which the consumption value is clicked
+     */
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
         var cont = false;
         if (this.state.consumptionChangedFlag == 1) {
@@ -3622,6 +3813,13 @@ export default class WhatIfReportComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is called when a particular inventory/adjustment record value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} month This is the value of the month for which the inventory/adjustment value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the inventory/adjustment value is clicked
+     * @param {*} actualFlag This is the value of the inventory type
+     */
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -3688,6 +3886,14 @@ export default class WhatIfReportComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is called when suggested shipments is clicked to create that shipment and show the table
+     * @param {*} month This is month on which user has clicked
+     * @param {*} quantity This is suggested quantity
+     * @param {*} isEmergencyOrder This is flag for emergency shipment which is calculated based on lead time
+     * @param {*} startDate This is the start date for the month where user has clicked
+     * @param {*} endDate This is the end date for the month where user has clicked 
+     */
     suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate) {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
         var programJson = this.state.programJson;
@@ -3802,6 +4008,10 @@ export default class WhatIfReportComponent extends React.Component {
             }
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The supply plan data in tabular format
+     */
     tabPane() {
         const chartOptions = {
             title: {
@@ -4322,7 +4532,6 @@ export default class WhatIfReportComponent extends React.Component {
                                                             ref={this.pickRange}
                                                             value={this.state.rangeValue}
                                                             lang={pickerLang}
-                                                            onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -4344,7 +4553,6 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 value={this.state.rangeValue1}
                                                                 key={JSON.stringify(this.state.rangeValue1)}
                                                                 lang={pickerLang}
-                                                                onChange={this.handleRangeChange2}
                                                                 onDismiss={this.handleRangeDissmis2}
                                                             >
                                                                 <MonthBox value={makeText(this.state.rangeValue1.from) + ' ~ ' + makeText(this.state.rangeValue1.to)} onClick={this._handleClickRangeBox2} />
@@ -5394,6 +5602,12 @@ export default class WhatIfReportComponent extends React.Component {
             </>
         );
     }
+    /**
+     * This function is used to display the ledger of a particular batch No
+     * @param {*} batchNo This is the value of the batch number for which the ledger needs to be displayed
+     * @param {*} createdDate This is the value of the created date for which the ledger needs to be displayed
+     * @param {*} expiryDate  This is the value of the expire date for which the ledger needs to be displayed
+     */
     showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
         this.setState({ loading: true })
         var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
@@ -5410,6 +5624,11 @@ export default class WhatIfReportComponent extends React.Component {
             loading: false
         })
     }
+    /**
+     * This function is used to redirect the user to shipment details from which a particular batch was created
+     * @param {*} batchNo This is the value of the batch number for which a particular shipments needs to be displayed
+     * @param {*} expiryDate This is the value of the expire date for which a particular shipments needs to be displayed
+     */
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
         shipmentList.map((sl, count) => {
@@ -5437,6 +5656,10 @@ export default class WhatIfReportComponent extends React.Component {
             }
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The supply plan data in tabular format
+     */ 
     render() {
         const { programList } = this.state;
         const pickerLang = {
@@ -5476,7 +5699,6 @@ export default class WhatIfReportComponent extends React.Component {
                                             ref={this.pickRange1}
                                             value={this.state.startDate}
                                             lang={pickerLang}
-                                            onChange={this.handleRangeChange1}
                                             onDismiss={this.handleRangeDissmis1}
                                         >
                                             <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox1} />
@@ -5582,10 +5804,19 @@ export default class WhatIfReportComponent extends React.Component {
             </div >
         )
     }
+    /**
+     * This function is called when cancel button is clicked
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when user clicks on a particular shipment
+     * @param {*} supplyPlanType This is the type of the shipment row that user has clicked on
+     * @param {*} startDate This is the start date of the month which user has clicked on
+     * @param {*} endDate This is the end date of the month which user has clicked on 
+     */
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1) {
@@ -5679,11 +5910,20 @@ export default class WhatIfReportComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * This is function is called when cancel button is clicked from the shipment modal
+     * @param {*} type This is type of the shipment modal for example, the main shipment table, Quantity table and batch table
+     */
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             var cont = false;
@@ -5752,6 +5992,9 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when cancel button is clicked from inventory modal
+     */
     actionCanceledInventory() {
         var cont = false;
         if (this.state.inventoryBatchInfoChangedFlag == 1) {
@@ -5775,6 +6018,9 @@ export default class WhatIfReportComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is called when cancel button is clicked from consumption modal
+     */
     actionCanceledConsumption() {
         var cont = false;
         if (this.state.consumptionBatchInfoChangedFlag == 1) {

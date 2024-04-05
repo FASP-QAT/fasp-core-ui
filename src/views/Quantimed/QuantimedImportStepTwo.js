@@ -14,7 +14,12 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PRO_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = 'Quantimed Import'
+/**
+ * Component for Qunatimed Import step two for taking the planning unit details for the import
+ */
 export default class QunatimedImportStepTwo extends Component {
     constructor(props) {
         super(props);
@@ -34,15 +39,11 @@ export default class QunatimedImportStepTwo extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkDuplicateCountry = this.checkDuplicateCountry.bind(this);
         this.loaded = this.loaded.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.updatePlanningUnitNotFound = this.updatePlanningUnitNotFound.bind(this);
     }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Retrieves list of planning units
+     */
     componentDidMount() {
         this.setState({
             loading: true
@@ -68,13 +69,21 @@ export default class QunatimedImportStepTwo extends Component {
             }.bind(this);
         }.bind(this);
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunctionWithoutPagination(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[5].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
     }
+    /**
+     * Updates the planning unit not found by highlighting the corresponding cell and setting a comment.
+     */
     updatePlanningUnitNotFound = function () {
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
@@ -86,6 +95,14 @@ export default class QunatimedImportStepTwo extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     programPlanningUnitChanged = function (instance, cell, x, y, value) {
         var tableJson = this.el.getJson(null, false);
         var hasDuplicate = false;
@@ -145,6 +162,10 @@ export default class QunatimedImportStepTwo extends Component {
             this.el.setValueFromCoords(4, y, cf, true);
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -177,6 +198,10 @@ export default class QunatimedImportStepTwo extends Component {
         }
         return valid;
     }
+    /**
+     * Function to check for duplicate countries.
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
     checkDuplicateCountry = function () {
         var tableJson = this.el.getJson(null, false);
         let tempArray = tableJson;
@@ -199,6 +224,9 @@ export default class QunatimedImportStepTwo extends Component {
             return true;
         }
     }
+    /**
+     * Function to handle form submission and move to next step.
+     */
     formSubmit = function () {
         if (this.checkDuplicateCountry() && this.checkValidation()) {
             this.setState({
@@ -253,6 +281,10 @@ export default class QunatimedImportStepTwo extends Component {
             }.bind(this)
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     loadTableData() {
         this.setState({
             loading: true
@@ -267,7 +299,7 @@ export default class QunatimedImportStepTwo extends Component {
                 loading: false,
                 color: "#BA0C2F"
             })
-            this.hideFirstComponent()
+            hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -280,7 +312,7 @@ export default class QunatimedImportStepTwo extends Component {
                     loading: false,
                     color: "#BA0C2F"
                 })
-                this.hideFirstComponent()
+                hideFirstComponent()
             }.bind(this);
             procurementAgentPlanningunitRequest.onsuccess = function (e) {
                 var myResult = [];
@@ -298,7 +330,7 @@ export default class QunatimedImportStepTwo extends Component {
                         loading: false,
                         color: "#BA0C2F"
                     })
-                    this.hideFirstComponent()
+                    hideFirstComponent()
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
@@ -423,6 +455,10 @@ export default class QunatimedImportStepTwo extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Renders the quantimed import step two screen.
+     * @returns {JSX.Element} - Quantimed import step two screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

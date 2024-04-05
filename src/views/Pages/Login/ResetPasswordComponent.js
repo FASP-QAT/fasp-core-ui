@@ -8,8 +8,13 @@ import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
-import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import { API_URL } from '../../../Constants';
+/**
+ * Defines the validation schema for reset password details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         newPassword: Yup.string()
@@ -31,6 +36,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
+/**
+ * Component for reseting the password.
+ */
 class ResetPasswordComponent extends Component {
     constructor(props) {
         super(props);
@@ -42,23 +50,25 @@ class ResetPasswordComponent extends Component {
             buttonClicked: false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.showPopUp = this.showPopUp.bind(this);
     }
+    /**
+     * Show password info popup
+     */
     showPopUp() {
         alert("1) " + i18n.t("static.message.newPasswordMinLength") + "\n2) " + i18n.t("static.message.newPasswordPassString") + "\n3) " + i18n.t("static.message.newPasswordSpecialChar") + "\n4) " + i18n.t("static.message.newPasswordNumber") + "\n5) " + i18n.t("static.message.newPasswordUppercase") + "\n6) " + i18n.t("static.message.newPasswordStartAlphabet") + "\n7) " + i18n.t("static.message.newPasswordNotSameAsUsername") + "\n8) " + i18n.t("static.message.newPasswordNotSameAsOldPassword"));
     }
-    hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'block';
-        }, 30000);
-    }
+    /**
+     * Redirects to the login screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
-    
+    /**
+     * Calls confirmForgotPasswordToken to verify the token
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
                 this.setState({
@@ -89,6 +99,10 @@ class ResetPasswordComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the reset password form.
+     * @returns {JSX.Element} - Reset password form.
+     */
     render() {
         return (
             <div className="app flex-row align-items-center">
@@ -128,7 +142,7 @@ class ResetPasswordComponent extends Component {
                                                                     message: response.data.message
                                                                 });
                                                                 document.getElementById('div1').style.display = 'block';
-                                                                this.hideFirstComponent();
+                                                                hideFirstComponent();
                                                             }
                                                         })
                                                         .catch(
@@ -141,7 +155,7 @@ class ResetPasswordComponent extends Component {
                                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                     });
                                                                     document.getElementById('div1').style.display = 'block';
-                                                                    this.hideFirstComponent();
+                                                                    hideFirstComponent();
                                                                 } else {
                                                                     switch (error.response ? error.response.status : "") {
                                                                         case 404:
@@ -155,14 +169,14 @@ class ResetPasswordComponent extends Component {
                                                                             this.setState({ message: error.response.data.messageCode },
                                                                                 () => {
                                                                                     document.getElementById('div1').style.display = 'block';
-                                                                                    this.hideFirstComponent();
+                                                                                    hideFirstComponent();
                                                                                 });
                                                                             break;
                                                                         case 403:
                                                                         default:
                                                                             this.setState({ message: 'static.unkownError' });
                                                                             document.getElementById('div1').style.display = 'block';
-                                                                            this.hideFirstComponent();
+                                                                            hideFirstComponent();
                                                                             break;
                                                                     }
                                                                 }

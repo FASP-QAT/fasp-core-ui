@@ -1,6 +1,19 @@
 import moment from 'moment';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants';
+/**
+ * This function is used to calculate the modeling information of the partcular node and its related nodes 
+ * @param {*} dataset This is the json that user has downloaded
+ * @param {*} props This is the props of the page from which this function is called
+ * @param {*} page This is the name of the page from which this function is called 
+ * @param {*} nodeId This is node Id for which modeling information has to be calculated
+ * @param {*} scenarioId This is the scenario id for which modeling information has to be calculated
+ * @param {*} type This is the flag used to update data if the flag is true
+ * @param {*} treeId This is the tree Id to which this node belongs
+ * @param {*} isTemplate This is flag used to check if the calculations has be done for template or for a tree
+ * @param {*} listPage This is the flag to check if this calculation function is being called from list page
+ * @param {*} autoCalculate This is the flag used to check if auto calculate is checked or not
+ */
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate) {
     var db1;
     getDatabase();

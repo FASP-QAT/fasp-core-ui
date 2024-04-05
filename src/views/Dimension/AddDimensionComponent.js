@@ -7,9 +7,11 @@ import { API_URL } from '../../Constants.js';
 import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     label: ""
 }
+// Localized entity name
 const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -18,6 +20,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.dimension.dimensiontext'))
     })
 }
+/**
+ * Component for adding dimension detail.
+ */
 export default class AddDimensionComponent extends Component {
     constructor(props) {
         super(props);
@@ -36,11 +41,18 @@ export default class AddDimensionComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the dimension form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { dimension } = this.state
         if (event.target.name === "label") {
@@ -52,13 +64,23 @@ export default class AddDimensionComponent extends Component {
             }
         )
     };
+    /**
+     * Capitalizes the first letter of the dimension name.
+     * @param {string} str - The dimension name.
+     */
     Capitalize(str) {
         this.state.dimension.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-    
+    /**
+     * Stops the loader on component mount 
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
+    /**
+     * Renders the dimension form.
+     * @returns {JSX.Element} - dimension form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -187,9 +209,15 @@ export default class AddDimensionComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list dimension screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dimension/listDimension/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the dimension form when reset button is clicked.
+     */
     resetClicked() {
         let { dimension } = this.state
         dimension.label.label_en = '';

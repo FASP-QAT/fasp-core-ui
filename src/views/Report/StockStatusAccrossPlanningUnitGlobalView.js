@@ -37,6 +37,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { addDoubleQuoteToRowContent, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const ref = React.createRef();
 const pickerLang = {
   months: [
@@ -63,6 +64,9 @@ const legendcolor = [
   { text: i18n.t("static.report.overstock"), color: "#edb944", value: 3 },
   { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: 4 },
 ];
+/**
+ * Component for Stock Status Across Planning Unit Global View Report.
+ */
 class StockStatusAccrossPlanningUnitGlobalView extends Component {
   constructor(props) {
     super(props);
@@ -103,32 +107,27 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       programLstFiltered: [],
     };
   }
-  makeText = (m) => {
-    if (m && m.year && m.month)
-      return pickerLang.months[m.month - 1] + ". " + m.year;
-    return "?";
-  };
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show();
   };
-  handleAMonthChange2 = (value, text) => {
-  };
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleAMonthDissmis2 = (value) => {
     this.setState({ singleValue2: value }, () => {
       this.filterData();
     });
   };
-  roundN = (num) => {
-    return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(
-      1
-    );
-  };
-  round = (num) => {
-    return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
-  };
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map((ele) => '"' + ele + '"');
-  };
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
     csvRow.push(
@@ -136,7 +135,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       (
         i18n.t("static.report.month") +
         " : " +
-        this.makeText(this.state.singleValue2)
+        makeText(this.state.singleValue2)
       ).replaceAll(" ", "%20") +
       '"'
     );
@@ -195,7 +194,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     csvRow.push("");
     var re;
     var A = [
-      this.addDoubleQuoteToRowContent([
+      addDoubleQuoteToRowContent([
         i18n.t("static.report.qatPID").replaceAll(" ", "%20"),
         i18n.t("static.planningunit.planningunit").replaceAll(" ", "%20"),
         i18n.t("static.program.programMaster").replaceAll(" ", "%20"),
@@ -210,7 +209,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     for (var item = 0; item < re.length; item++) {
       re[item].programData.map((p) =>
         A.push([
-          this.addDoubleQuoteToRowContent([
+          addDoubleQuoteToRowContent([
             re[item].planningUnit.id,
             getLabelText(re[item].planningUnit.label, this.state.lang)
               .replaceAll(",", "%20")
@@ -218,10 +217,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             getLabelText(p.program.label, this.state.lang)
               .replaceAll(",", "%20")
               .replaceAll(" ", "%20"),
-            this.round(p.amc),
-            this.round(p.finalClosingBalance),
+            round(p.amc),
+            round(p.finalClosingBalance),
             p.mos != null
-              ? this.roundN(p.mos)
+              ? roundN(p.mos)
               : i18n.t("static.supplyPlanFormula.na"),
             p.minMos,
             p.maxMos,
@@ -241,38 +240,34 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     document.body.appendChild(a);
     a.click();
   }
-  formatter = (value) => {
-    var cell1 = value;
-    cell1 += "";
-    var x = cell1.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  };
+  /**
+   * Determines the cell background color based on the minimum and maximum months of stock (MOS) thresholds.
+   * @param {Object} item - An object containing MOS (months of stock), minimum MOS, and maximum MOS values.
+   * @returns {Object} - An object representing the cell's background color based on the MOS thresholds.
+   */
   cellstyleWithData = (item) => {
-    if (item.mos != null && this.roundN(item.mos) == 0) {
+    if (item.mos != null && roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color };
     } else if (
-      this.roundN(item.mos) != 0 &&
-      this.roundN(item.mos) != null &&
-      this.roundN(item.mos) < item.minMos
+      roundN(item.mos) != 0 &&
+      roundN(item.mos) != null &&
+      roundN(item.mos) < item.minMos
     ) {
       return { backgroundColor: legendcolor[1].color };
     } else if (
-      this.roundN(item.mos) >= item.minMos &&
-      this.roundN(item.mos) <= item.maxMos
+      roundN(item.mos) >= item.minMos &&
+      roundN(item.mos) <= item.maxMos
     ) {
       return { backgroundColor: legendcolor[2].color };
-    } else if (this.roundN(item.mos) > item.maxMos) {
+    } else if (roundN(item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color };
     } else if (item.mos == null) {
       return { backgroundColor: legendcolor[4].color };
     }
   };
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -321,7 +316,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           doc.text(
             i18n.t("static.report.month") +
             " : " +
-            this.makeText(this.state.singleValue2),
+            makeText(this.state.singleValue2),
             doc.internal.pageSize.width / 8,
             90,
             {
@@ -390,10 +385,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           elt.planningUnit.id,
           getLabelText(elt.planningUnit.label, this.state.lang),
           getLabelText(p.program.label, this.state.lang),
-          this.formatter(this.round(p.amc)),
-          this.formatter(this.round(p.finalClosingBalance)),
+          formatter(round(p.amc),0),
+          formatter(round(p.finalClosingBalance),0),
           p.mos != null
-            ? this.formatter(this.roundN(p.mos))
+            ? formatter(roundN(p.mos),0)
             : i18n.t("static.supplyPlanFormula.na"),
           p.minMos,
           p.maxMos,
@@ -422,6 +417,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       i18n.t("static.report.stockStatusAccrossPlanningUnitGlobalView") + ".pdf"
     );
   };
+  /**
+   * Handles the change event for tracer categories.
+   * @param {Array} tracerCategoryIds - An array containing the selected tracer category IDs.
+   */
   handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -436,6 +435,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }
     );
   };
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -450,6 +453,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }
     );
   }
+  /**
+   * Retrieves and filters tracer categories based on the provided program IDs.
+   * @param {Array} programIds - An array containing the selected program IDs.
+   */
   filterTracerCategory(programIds) {
     var programIdsValue = [];
     for (var i = 0; i < programIds.length; i++) {
@@ -555,6 +562,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       this.setState({ message: "" });
     }
   }
+  /**
+   * Handles the change event for selected countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -569,6 +580,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }
     );
   }
+  /**
+   * Filters programs based on selected countries and tracer categories.
+   */
   filterProgram = () => {
     let countryIds = this.state.countryValues.map((ele) => ele.value);
     let tracercategory =
@@ -680,6 +694,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       }
     );
   };
+  /**
+   * Filters data based on selected countries, tracer categories, programs, and other parameters.
+   */
   filterData = () => {
     let countrysId =
       this.state.countryValues.length == this.state.countrys.length
@@ -811,6 +828,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       });
     }
   };
+  /**
+   * Filters data based on stock status and updates the state with the filtered data.
+   */
   filterDataAsperstatus = () => {
     let stockStatusId = document.getElementById("stockStatusId").value;
     var filteredData = [];
@@ -821,23 +841,23 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var min = ele.minMos;
           var max = ele.maxMos;
           if (stockStatusId == 0) {
-            if (ele.mos != null && this.roundN(ele.mos) == 0) {
+            if (ele.mos != null && roundN(ele.mos) == 0) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 1) {
             if (
               ele.mos != null &&
-              this.roundN(ele.mos) != 0 &&
-              this.roundN(ele.mos) < min
+              roundN(ele.mos) != 0 &&
+              roundN(ele.mos) < min
             ) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 3) {
-            if (this.roundN(ele.mos) > max) {
+            if (roundN(ele.mos) > max) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 2) {
-            if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
+            if (roundN(ele.mos) < max && roundN(ele.mos) > min) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 4) {
@@ -872,6 +892,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       planningUnits: planningUnits,
     });
   };
+  /**
+   * Retrieves the list of countries based on the realm ID and updates the state with the list.
+   */
   getCountrys = () => {
     let realmId = AuthenticationService.getRealmId();
     DropdownService.getRealmCountryDropdownList(realmId)
@@ -936,25 +959,25 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         }
       });
   };
+  /**
+   * Calls the get countrys function on page load
+   */
   componentDidMount() {
     this.getCountrys();
   }
-  show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
-  handleRangeDissmis(value) {
-    this.setState({ rangeValue: value });
-    this.filterData();
-  }
-  _handleClickRangeBox(e) {
-    this.refs.pickRange.show();
-  }
+  /**
+   * Renders a loading indicator.
+   * @returns {JSX.Element} Loading indicator.
+   */
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">
       {i18n.t("static.common.loading")}
     </div>
   );
+  /**
+   * Renders the Stock Status Planning Unit Global View table.
+   * @returns {JSX.Element} - Stock Status Planning Unit Global View table
+   */
   render() {
     const { singleValue2 } = this.state;
     const { countrys } = this.state;
@@ -1024,11 +1047,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"
-                          onChange={this.handleAMonthChange2}
                           onDismiss={this.handleAMonthDissmis2}
                         >
                           <MonthBox
-                            value={this.makeText(singleValue2)}
+                            value={makeText(singleValue2)}
                             onClick={this.handleClickMonthBox2}
                           />
                         </Picker>
@@ -1265,7 +1287,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                                 {item.programData.filter(
                                                   (c) => c.program.code == ele1
                                                 )[0].mos != null
-                                                  ? this.roundN(
+                                                  ? roundN(
                                                     item.programData.filter(
                                                       (c) =>
                                                         c.program.code == ele1

@@ -18,7 +18,7 @@ import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html
 import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService.js';
@@ -28,7 +28,13 @@ import i18n from '../../i18n';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.common.listtree');
+/**
+ * Defines the validation schema for tree details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         datasetIdModal: Yup.string()
@@ -65,11 +71,10 @@ const validationSchema = function (values) {
             }),
     })
 }
-const initialValues = {
-    treeName: "",
-}
-
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+/**
+ * Component for list tree
+ */
 export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
@@ -124,7 +129,6 @@ export default class ListTreeComponent extends Component {
             allProcurementAgentList: [],
             planningUnitObjList: []
         }
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
@@ -148,13 +152,25 @@ export default class ListTreeComponent extends Component {
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
       }
-
+      /**
+       * Hides the message in div3 after 30 seconds.
+       */
       hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Saves tree data to IndexedDB.
+     * This function encrypts and saves the provided tree data along with associated metadata to IndexedDB.
+     * @param {string} operationId - The operation ID indicating the type of operation (e.g., save, update).
+     * @param {object} tempProgram - The temporary program object to be saved.
+     * @param {string} treeTemplateId - The ID of the tree template.
+     * @param {string} programId - The ID of the program.
+     * @param {string} treeId - The ID of the tree.
+     * @param {boolean} programCopy - Indicates whether the program is being copied.
+     */
     saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -167,7 +183,7 @@ export default class ListTreeComponent extends Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             })
-            this.hideFirstComponent()
+            hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -220,11 +236,16 @@ export default class ListTreeComponent extends Component {
                     loading: false,
                     color: "red",
                 }, () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 });
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         if (parameterName != "loading") {
             this.setState({
@@ -269,6 +290,10 @@ export default class ListTreeComponent extends Component {
             })
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildMissingPUJexcel() {
         if (localStorage.getItem('sessionType') === 'Online') {
             this.getPlanningUnitWithPricesByIds();
@@ -466,6 +491,12 @@ export default class ListTreeComponent extends Component {
         }
         );
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepageMissingPU(el, pageNo, oldPageNo) {
         if (!localStorage.getItem('sessionType') === 'Online') {
             var elInstance = el;
@@ -503,6 +534,14 @@ export default class ListTreeComponent extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 18) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
@@ -722,7 +761,12 @@ export default class ListTreeComponent extends Component {
             isChanged1: true,
         });
     }
-    loadedMissingPU = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedMissingPU = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -775,6 +819,10 @@ export default class ListTreeComponent extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -930,6 +978,9 @@ export default class ListTreeComponent extends Component {
         }
         return valid;
     }
+    /**
+     * Saves missing planning units on submission
+     */
     saveMissingPUs() {
         var validation = this.checkValidation();
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1064,6 +1115,9 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Saves planning units on submission
+     */
     updateMissingPUs() {
         var validation = this.checkValidation();
        let indexVar = 0;
@@ -1159,6 +1213,9 @@ export default class ListTreeComponent extends Component {
         }.bind(this);
     }
     }
+    /**
+     * Reterives planning unit list with procurement agent price
+     */
     getPlanningUnitWithPricesByIds() {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
@@ -1203,6 +1260,9 @@ export default class ListTreeComponent extends Component {
                 }
             );
     }
+    /**
+     * Reterives procurement agent list
+     */
     procurementAgentList() {
         const lan = 'en';
         var db1;
@@ -1219,7 +1279,7 @@ export default class ListTreeComponent extends Component {
                     message: 'unknown error occured', loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             };
             procurementAgentRequest.onsuccess = function (e) {
@@ -1257,6 +1317,9 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Function to find missing planning units while create tree from any other tree or any other program
+     */
     findMissingPUs() {
         var missingPUList = [];
         var json;
@@ -1343,6 +1406,11 @@ export default class ListTreeComponent extends Component {
             this.buildMissingPUJexcel();
         });
     }
+    /**
+     * Handle region change function.
+     * This function updates the state with the selected region values and generates a list of regions.
+     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+     */
     handleRegionChange = (regionIds) => {
         this.setState({
             regionValues: regionIds.map(ele => ele),
@@ -1361,6 +1429,10 @@ export default class ListTreeComponent extends Component {
             this.setState({ regionList });
         })
     }
+    /**
+     * Retrives region list for forecast program Id
+     * @param {String} datasetId Forecast program Id
+     */
     getRegionList(datasetId) {
         var regionList = [];
         var regionMultiList = [];
@@ -1394,6 +1466,9 @@ export default class ListTreeComponent extends Component {
                 this.findMissingPUs();
         });
     }
+    /**
+     * Retrives forecast method list from indexed db
+     */
     getForecastMethodList() {
         const lan = 'en';
         var db1;
@@ -1417,7 +1492,16 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }.bind(this)
     }
-    
+    /**
+     * Copies or deletes a tree within the program and saves the changes.
+     * This function performs operations such as copying or deleting a tree within the program's tree list.
+     * It also updates the metadata and saves the changes to the IndexedDB.
+     * @param {string} treeId - The ID of the tree to be copied or deleted.
+     * @param {string} programId - The ID of the program containing the tree.
+     * @param {string} versionId - The version ID of the program.
+     * @param {string} operationId - The operation ID indicating the type of operation (1 for deletion, 2 for copying, 3 for creating a new tree, 4 for copying from another program).
+     * @returns {void}
+     */
     copyDeleteTree(treeId, programId, versionId, operationId) {
         var program = this.state.datasetListJexcel;
         let tempProgram = JSON.parse(JSON.stringify(program))
@@ -1681,6 +1765,9 @@ export default class ListTreeComponent extends Component {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }
     }
+    /**
+     * Reterives tree template list from indexed db
+     */
     getTreeTemplateList() {
         var db1;
         getDatabase();
@@ -1707,6 +1794,9 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives tree list based on forecast program selected by user
+     */
     getTreeList() {
         var datasetId = document.getElementById("datasetId").value;
         localStorage.setItem("sesDatasetId", datasetId);
@@ -1720,6 +1810,9 @@ export default class ListTreeComponent extends Component {
             this.buildJexcel();
         });
     }
+    /**
+     * Reterives forecast program from server
+     */
     getPrograms() {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
@@ -1747,7 +1840,7 @@ export default class ListTreeComponent extends Component {
                         this.setState({
                             message: response.data.messageCode, loading: false
                         }, () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                     }
                 }).catch(
@@ -1760,6 +1853,9 @@ export default class ListTreeComponent extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         this.setState({ loading: true })
         const lan = 'en';
@@ -1890,6 +1986,10 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters and retrieves the version list for a selected program.
+     * This function fetches the version list for the selected program and updates the state accordingly.
+     */
     filterVersion() {
         this.setState({ loading: true })
         let programId = this.state.datasetId;
@@ -1974,6 +2074,12 @@ export default class ListTreeComponent extends Component {
             })
         }
     }
+    /**
+     * Retrieves and consolidates the version list including local versions from IndexedDB.
+     * This function retrieves the version list from IndexedDB and merges it with the existing version list.
+     * It also handles selection of the version to be displayed based on URL parameters or local storage.
+     * @param {string} programId - The ID of the program for which versions are being retrieved.
+     */
     consolidatedVersionList = (programId) => {
         this.setState({ loading: true })
         const lan = 'en';
@@ -2039,6 +2145,12 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves and consolidates the dataset list based on the selected program and version.
+     * This function fetches dataset data for the specified program and version from the server or local storage.
+     * @param {string} programId - The ID of the program for which dataset data is being retrieved.
+     * @param {string} versionId - The ID of the version for which dataset data is being retrieved.
+     */
     consolidatedDataSetList = (programId, versionId) => {
         this.setState({
             versionId: ((versionId == null || versionId == '' || versionId == undefined) ? (this.state.versionId) : versionId),
@@ -2068,6 +2180,11 @@ export default class ListTreeComponent extends Component {
             }
         })
     }
+    /**
+     * Sets the selected version ID and updates the dataset list accordingly.
+     * This function is triggered when a user selects a version from the dropdown menu.
+     * @param {object} event - The event object containing information about the selected version.
+     */
     setVersionId(event) {
         var versionId = event.target.value
         localStorage.setItem("sesVersionIdReport", versionId);
@@ -2078,6 +2195,11 @@ export default class ListTreeComponent extends Component {
                 this.consolidatedDataSetList(this.state.datasetId, versionId);
             })
     }
+    /**
+     * Sets the selected program ID and updates the version list accordingly.
+     * This function is triggered when a user selects a program from the dropdown menu.
+     * @param {object} event - The event object containing information about the selected program.
+     */
     setProgramId(event) {
         var datasetId = event.target.value
         localStorage.setItem("sesDatasetId", datasetId);
@@ -2089,7 +2211,7 @@ export default class ListTreeComponent extends Component {
                     message: ""
                 }, () => {
                     this.filterVersion();
-                    this.hideSecondComponent()
+                    hideSecondComponent()
                 })
         } else {
             this.setState(
@@ -2100,10 +2222,16 @@ export default class ListTreeComponent extends Component {
                 }, () => {
                     this.filterVersion();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
-                    this.hideSecondComponent()
+                    hideSecondComponent()
                 })
         }
     }
+    /**
+     * Handles the change event when selecting a tree template.
+     * This function updates the state based on the selected tree template, including tree name, active status, forecast method, region list, and notes.
+     * It also triggers additional actions such as fetching region lists based on the selected dataset ID.
+     * @param {object} event - The event object containing information about the selected tree template.
+     */
     onTemplateChange(event) {
         if (event.target.value == 0 && event.target.value != "") {
             this.setState({
@@ -2155,6 +2283,10 @@ export default class ListTreeComponent extends Component {
             });
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         if (this.state.datasetId != 0) {
             let programList = this.state.treeData;
@@ -2359,26 +2491,25 @@ export default class ListTreeComponent extends Component {
             jexcel.destroy(document.getElementById("tableDiv"), true);
         }
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Calls getPrograms,getTreeTemplateList,getForecastMethodList and procurementAgentList functions on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getPrograms();
         this.getTreeTemplateList();
         this.getForecastMethodList();
         this.procurementAgentList();
     }
+    /**
+     * Toggle modal for copy or delete tree
+     */
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2387,6 +2518,10 @@ export default class ListTreeComponent extends Component {
             treeIdAcrossProgram: 0,
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name == "treeName") {
             this.setState({
@@ -2439,9 +2574,17 @@ export default class ListTreeComponent extends Component {
             });
         }
     };
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
     }
+    /**
+     * Redirects to the build tree screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
@@ -2469,7 +2612,7 @@ export default class ListTreeComponent extends Component {
                                                 message: i18n.t('static.program.errortext'),
                                                 color: 'red'
                                             })
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         }.bind(this);
                                         openRequest.onsuccess = function (e) {
                                             db1 = e.target.result;
@@ -2494,11 +2637,21 @@ export default class ListTreeComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Toggle show guidance popup
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Handles the download action for a selected tree.
+     * This function triggers the download of dataset data for the selected program and version.
+     * It encrypts the data and saves it to IndexedDB, then redirects to the master data sync page.
+     * @param {string} treeId - The ID of the tree for which dataset data is being downloaded.
+     * @returns {void}
+     */
     downloadClicked(treeId) {
         this.setState({ loading: true })
         var programId = this.state.datasetId;
@@ -2571,6 +2724,10 @@ export default class ListTreeComponent extends Component {
                 })
             })
     }
+    /**
+     * Renders the tree list.
+     * @returns {JSX.Element} - Tree list.
+     */    
     render() {
         jexcel.setDictionary({
             Show: " ",

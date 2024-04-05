@@ -6,13 +6,19 @@ import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup,
 import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants.js';
-import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import DropdownService from '../../api/DropdownService.js';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
+/**
+ * Defines the validation schema for planning unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         unitId: Yup.string()
@@ -28,6 +34,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
+/**
+ * Component for adding planning unit details.
+ */
 export default class AddPlanningUnit extends Component {
     constructor(props) {
         super(props);
@@ -60,9 +69,13 @@ export default class AddPlanningUnit extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changePlanningUnit = this.changePlanningUnit.bind(this);
     }
+    /**
+     * Updates the planning unit based on the selected forecasting unit.
+     * If a forecasting unit is selected, the planning unit label is updated
+     * with the selected unit's text. Otherwise, the planning unit label is cleared.
+     */
     changePlanningUnit() {
         let forecastingUnitId = document.getElementById("forecastingUnitId").value;
         if (forecastingUnitId != '') {
@@ -78,11 +91,10 @@ export default class AddPlanningUnit extends Component {
             this.setState({ planningUnit }, () => { })
         }
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { planningUnit } = this.state
         if (event.target.name === "label") {
@@ -104,7 +116,9 @@ export default class AddPlanningUnit extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives unit and forecasting units list on component mount
+     */
     componentDidMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -182,7 +196,7 @@ export default class AddPlanningUnit extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -225,6 +239,10 @@ export default class AddPlanningUnit extends Component {
                 }
             );
     }
+    /**
+     * Retrieves autocomplete suggestions for forecasting units based on the given term.
+     * @param {string} term - The search term to retrieve autocomplete suggestions for.
+     */
     getAutocompleteForecastingUnit = (term) => {
         var language = this.state.lang;
         var autocompletejson = {
@@ -254,7 +272,7 @@ export default class AddPlanningUnit extends Component {
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
-                            this.hideSecondComponent()
+                            hideSecondComponent()
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -271,7 +289,7 @@ export default class AddPlanningUnit extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             case 412:
@@ -279,7 +297,7 @@ export default class AddPlanningUnit extends Component {
                                     message: error.response.data.messageCode,
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                             default:
@@ -287,7 +305,7 @@ export default class AddPlanningUnit extends Component {
                                     message: 'static.unkownError',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent()
+                                    hideSecondComponent()
                                 });
                                 break;
                         }
@@ -295,6 +313,10 @@ export default class AddPlanningUnit extends Component {
                 }
             );
     }
+    /**
+     * Renders the planning unit details form.
+     * @returns {JSX.Element} - Planning Unit details form.
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -335,7 +357,7 @@ export default class AddPlanningUnit extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -505,14 +527,24 @@ export default class AddPlanningUnit extends Component {
             </div>
         );
     }
+    /**
+     * Handles the submission of the form when the submit button is clicked.
+     * Checks if the planning unit's forecasting unit is empty and sets an error flag accordingly.
+     */
     submitClicked() {
         if(this.state.planningUnit.forecastingUnit.forecastingUnitId == ""){
             this.setState({ autocompleteError: true});
         }
     }
+    /**
+     * Redirects to the list planning unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the planning unit details when reset button is clicked.
+     */
     resetClicked() {
         let { planningUnit } = this.state
         planningUnit.label.label_en = ''

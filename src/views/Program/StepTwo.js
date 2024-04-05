@@ -14,15 +14,24 @@ import { API_URL } from '../../Constants';
 import DropdownService from '../../api/DropdownService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesTwo = {
     realmCountryId: ''
 }
+/**
+ * Defines the validation schema for step two of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
     })
 }
+/**
+ * Component for program Onboarding step two for taking the realm country details for the program
+ */
 export default class Steptwo extends Component {
     constructor(props) {
         super(props);
@@ -31,11 +40,17 @@ export default class Steptwo extends Component {
         }
         this.generateCountryCode = this.generateCountryCode.bind(this);
     }
-    
+    /**
+     * Generates a country code based on the selected realm country ID.
+     * @param {Event} event - The change event containing the selected realm country ID.
+     */ 
     generateCountryCode(event) {
         let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateCountryCode(realmCountryCode);
     }
+    /**
+     * Reterives Realm country list from server
+     */
     getRealmCountryList() {
         DropdownService.getRealmCountryDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
@@ -94,8 +109,10 @@ export default class Steptwo extends Component {
                 }
             );
     }
-    componentDidMount() {
-    }
+    /**
+     * Renders the program onboarding step two screen.
+     * @returns {JSX.Element} - Program onboarding step two screen.
+     */
     render() {
         const { realmCountryList } = this.state;
         let realmCountries = realmCountryList.length > 0
