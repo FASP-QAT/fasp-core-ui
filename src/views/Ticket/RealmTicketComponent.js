@@ -7,6 +7,11 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Add Realm"
+/**
+ * This const is used to define the validation schema for realm ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -36,6 +41,9 @@ const validationSchema = function (values) {
             .max(6, i18n.t('static.realm.realmCodeLength')),
     })
 }
+/**
+ * This component is used to display the realm form and allow user to submit the add master request in jira
+ */
 export default class RealmTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -57,6 +65,10 @@ export default class RealmTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name == "summary") {
@@ -84,14 +96,17 @@ export default class RealmTicketComponent extends Component {
             realm
         }, () => { })
     };
-    
-    componentDidMount() {
-    }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the realm details
+     */
     resetClicked() {
         let { realm } = this.state;
         realm.realmName = '';
@@ -105,6 +120,10 @@ export default class RealmTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns realm details form
+     */
     render() {
         return (
             <div className="col-md-12">

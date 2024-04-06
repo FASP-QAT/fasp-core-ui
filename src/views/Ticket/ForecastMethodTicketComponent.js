@@ -16,6 +16,11 @@ const initialValues = {
     ForecastMethod: "",
     notes: ''
 }
+/**
+ * This const is used to define the validation schema for forecast method ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -28,6 +33,9 @@ const validationSchema = function (values) {
             .required('Select forecast method type'),
     })
 }
+/**
+ * This component is used to display the tracer category form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -51,6 +59,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.getForecastMethodTypeList = this.getForecastMethodTypeList.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { forecastMethod } = this.state
         if (event.target.name == "summary") {
@@ -72,13 +84,22 @@ export default class OrganisationTypeTicketComponent extends Component {
             forecastMethod
         }, () => { })
     };
-   
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.forecastMethod.forecastMethod = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to call the get forecast method type list
+     */
     componentDidMount() {
         this.getForecastMethodTypeList();
     }
+    /**
+     * This function is used to get forecast method type list
+     */
     getForecastMethodTypeList() {
         ForecastMethodService.getForecastMethodTypeList().then(response => {
             if (response.status == 200) {
@@ -148,11 +169,17 @@ export default class OrganisationTypeTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the forecast method details
+     */
     resetClicked() {
         let { forecastMethod } = this.state;
         forecastMethod.forecastMethod = '';
@@ -164,6 +191,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns forecast method details form
+     */
     render() {
         const { forecastMethodTypeList } = this.state;
         let forecastMethodTypeList1 = forecastMethodTypeList.length > 0

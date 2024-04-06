@@ -1,3 +1,9 @@
+/**
+ * This function is used to display a particular text in the language that is requested by the user
+ * @param {*} label This is the text that needs to be displayed
+ * @param {*} lang This is the language in which the text needs to be displayed
+ * @returns This function returns the text in specified language
+ */
 export default function getLabelText(label, lang) {
     if (lang == 'en') {
         return label.label_en;

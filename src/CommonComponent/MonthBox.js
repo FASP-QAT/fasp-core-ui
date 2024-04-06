@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 
 import 'react-month-picker/css/month-picker.css';
-
+/**
+ * This component is used to display the calendar text box after date is selected
+ */
 export default class MonthBox extends Component {
     constructor(props, context) {
       super(props, context)

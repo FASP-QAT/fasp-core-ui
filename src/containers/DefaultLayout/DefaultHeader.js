@@ -15,24 +15,37 @@ const propTypes = {
   children: PropTypes.node,
 };
 const defaultProps = {};
+/**
+ * Component representing the default header of the application.
+ * This header includes navigation links, logo, language switcher, user manual link, refresh button, and user actions dropdown.
+ */
 class DefaultHeader extends Component {
   constructor(props) {
     super(props);
     this.changeLanguage = this.changeLanguage.bind(this);
     this.refreshPage = this.refreshPage.bind(this);
   }
+  /**
+   * Refreshes the page by reloading the window.
+   */
   refreshPage() {
     setTimeout(() => {
       window.location.reload(false);
     }, 0);
   }
+  /**
+   * Changes the language of the application and reloads the window.
+   * @param {string} lang - The language code to switch to.
+   */
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
-  componentDidMount() {
-  }
+  /**
+   * Renders the DefaultHeader component.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;

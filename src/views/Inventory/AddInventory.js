@@ -23,6 +23,9 @@ import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlanForDataEntry";
 const entityname = i18n.t('static.inventory.inventorydetils')
+/**
+ * This component is used to allow the users to do the data entry for the inventory or adjustment records
+ */
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -66,11 +69,13 @@ export default class AddInventory extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
         this.exportCSV = this.exportCSV.bind(this);
     }
+    /**
+     * This function is used to export the inventory or adjustment data entry template so that user can copy paste the bulk data
+     */
     exportCSV() {
         let workbook = new Workbook();
         let worksheet = (this.state.inventoryDataType.value == 1 ? workbook.addWorksheet(i18n.t('static.supplyplan.inventoryDataEntry')) : workbook.addWorksheet(i18n.t('static.supplyplan.adjustmentDataEntryTemplate')));
@@ -226,10 +231,10 @@ export default class AddInventory extends Component {
             fs.saveAs(blob, (this.state.inventoryDataType.value == 1 ? i18n.t('static.supplyplan.inventoryDataEntry') : i18n.t('static.supplyplan.adjustmentDataEntryTemplate')) + '.xlsx');
         })
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * This function is used to update the inventory or adjustment date range filter value
+     * @param {*} value This is the value that user has selected
+     */
     handleRangeDissmis(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -247,28 +252,43 @@ export default class AddInventory extends Component {
             this.formSubmit(this.state.planningUnit, value);
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div3 after 30 seconds
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1) {
             window.onbeforeunload = () => true
@@ -276,6 +296,10 @@ export default class AddInventory extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used to toggle the batch details model
+     * @param {*} method This method value is used to check if unsaved changes alert should be displayed or not
+     */
     toggleLarge(method) {
         var cont = false;
         if (method != "submit" && this.state.inventoryBatchInfoChangedFlag == 1) {
@@ -299,6 +323,9 @@ export default class AddInventory extends Component {
             });
         }
     }
+    /**
+     * This function is used to fetch list all the offline programs that the user have downloaded
+     */
     componentDidMount() {
         document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
         var db1;
@@ -371,6 +398,10 @@ export default class AddInventory extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * This function is used to fetch list all the planning units based on the programs that the user has selected
+     * @param {*} value This is value of the program that is selected either by user or is autoselected
+     */
     getPlanningUnitList(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -534,6 +565,11 @@ export default class AddInventory extends Component {
             }
         }
     }
+    /**
+     * This function is used fetch all the inventory or adjustment records based on the filters and build all the necessary data
+     * @param {*} value This is the value of planning unit
+     * @param {*} rangeValue This is the value of date range that is selected
+     */
     formSubmit(value, rangeValue) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -669,11 +705,20 @@ export default class AddInventory extends Component {
             }
         }
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * This function is used to the value of data type
+     * @param {*} value This is the value of data type that user has selected
+     */
     updateDataType(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -700,6 +745,10 @@ export default class AddInventory extends Component {
             }
         }
     }
+    /**
+     * This is used to display the content
+     * @returns The inventory or adjustments data in tabular format
+     */
     render() {
         const checkOnline = localStorage.getItem('sessionType');
         const pickerLang = {
@@ -750,7 +799,6 @@ export default class AddInventory extends Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
-                                                            onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -860,6 +908,9 @@ export default class AddInventory extends Component {
             </div >
         );
     }
+    /**
+     * This function is called when cancel button is clicked
+     */
     cancelClicked() {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -882,6 +933,9 @@ export default class AddInventory extends Component {
             })
         }
     }
+    /**
+     * This function is called when cancel button for batch modal popup is clicked
+     */
     actionCanceled() {
         var cont = false;
         if (this.state.inventoryBatchInfoChangedFlag == 1) {
@@ -904,6 +958,10 @@ export default class AddInventory extends Component {
             })
         }
     }
+    /**
+     * This function is called when inventory or adjustment date picker is clicked
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }

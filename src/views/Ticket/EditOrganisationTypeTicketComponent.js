@@ -15,6 +15,11 @@ const initialValues = {
     organizationTypeName: '',
     notes: ''
 }
+/**
+ * This const is used to define the validation schema for organisation type ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -26,6 +31,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the organisation type form and allow user to submit the update master request in jira
+ */
 export default class EditOrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -45,6 +53,10 @@ export default class EditOrganisationTypeTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { organizationType } = this.state
         if (event.target.name == "summary") {
@@ -68,7 +80,9 @@ export default class EditOrganisationTypeTicketComponent extends Component {
             organizationType
         }, () => { })
     };
-    
+    /**
+     * This function is used to get organisation type lists on page load
+     */
     componentDidMount() {
         OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
@@ -121,11 +135,17 @@ export default class EditOrganisationTypeTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the budget details
+     */
     resetClicked() {
         let { organizationType } = this.state;
         organizationType.organizationTypeName = '';
@@ -136,6 +156,10 @@ export default class EditOrganisationTypeTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns organisation type details form
+     */
     render() {
         const { organizationsType } = this.state;
         let organizationTypeList = organizationsType.length > 0

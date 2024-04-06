@@ -15,6 +15,11 @@ const initialValues = {
     realmId: '',
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for program ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -26,6 +31,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the program form and allow user to submit the update master request in jira
+ */
 export default class EditProgramTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -45,6 +53,10 @@ export default class EditProgramTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { program } = this.state
         if (event.target.name == "summary") {
@@ -66,7 +78,9 @@ export default class EditProgramTicketComponent extends Component {
             program
         }, () => { })
     };
-   
+    /**
+     * This function is used to get program list on page load
+     */
     componentDidMount() {
         ProgramService.getProgramList().then(response => {
             if (response.status == 200) {
@@ -127,11 +141,17 @@ export default class EditProgramTicketComponent extends Component {
             }
         );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the program details
+     */
     resetClicked() {
         let { program } = this.state;
         program.programName = '';
@@ -142,6 +162,10 @@ export default class EditProgramTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns program details form
+     */
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0

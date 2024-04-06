@@ -21,27 +21,14 @@ import ProcurementUnitService from "../../api/ProcurementUnitService";
 import UnitService from '../../api/UnitService';
 import i18n from "../../i18n";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
-let initialValues = {
-    procurementUnitName: '',
-    planningUnitId: '',
-    multiplier: '',
-    unitId: '',
-    supplierId: '',
-    heightUnitId: '',
-    heightQty: "",
-    lengthUnitId: '',
-    lengthQty: 0,
-    widthUnitId: '',
-    widthQty: 0,
-    weightUnitId: '',
-    weightQty: 0,
-    labeling: '',
-    unitsPerContainer: 0,
-    unitsPerCase: 0,
-    unitsPerPalletEuro1: 0,
-    unitsPerPalletEuro2: 0
-}
+/**
+ * Defines the validation schema for procurement unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementUnitName: Yup.string()
@@ -86,6 +73,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.procurementUnit.validValueText')),
     })
 }
+/**
+ * Component for editing procurement unit details.
+ */
 export default class EditProcurementUnit extends Component {
     constructor(props) {
         super(props);
@@ -147,19 +137,11 @@ export default class EditProcurementUnit extends Component {
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        let { procurementUnit } = this.state
-        procurementUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Fetches procurement unit details on component mount.
+     */
     componentDidMount() {
         ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
             this.setState({
@@ -182,7 +164,7 @@ export default class EditProcurementUnit extends Component {
                             message: response.data.messageCode, loading: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -264,6 +246,10 @@ export default class EditProcurementUnit extends Component {
             }
         );
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { procurementUnit } = this.state;
         if (event.target.name == "procurementUnitName") {
@@ -328,7 +314,10 @@ export default class EditProcurementUnit extends Component {
             () => {
             });
     }
-   
+    /**
+     * Renders the procurement unit details form.
+     * @returns {JSX.Element} - Procurement unit details form.
+     */
     render() {
         const { unitList } = this.state;
         let units = unitList.length > 0
@@ -381,7 +370,7 @@ export default class EditProcurementUnit extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }
@@ -461,7 +450,7 @@ export default class EditProcurementUnit extends Component {
                                                         valid={!errors.procurementUnitName}
                                                         bsSize="sm"
                                                         invalid={touched.procurementUnitName && !!errors.procurementUnitName || !!errors.procurementUnitName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.procurementUnit.label.label_en}
                                                         id="procurementUnitName" />
@@ -740,9 +729,15 @@ export default class EditProcurementUnit extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementUnit/listProcurementUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the procurement unit details when reset button is clicked.
+     */
     resetClicked() {
         ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
             this.setState({

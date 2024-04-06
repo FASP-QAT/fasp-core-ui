@@ -1,4 +1,3 @@
-import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -29,11 +28,15 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { PercentageFormatter, addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, dateFormatterLanguage, formatter, makeText, round } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
+/**
+ * Component for Forecast Matrix Over Time Report.
+ */
 class ForcastMatrixOverTime extends Component {
   constructor(props) {
     super(props);
@@ -63,58 +66,20 @@ class ForcastMatrixOverTime extends Component {
     };
     this.fetchData = this.fetchData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
-  formatter = value => {
-    if (value != null) {
-      var cell1 = value
-      cell1 += '';
-      var x = cell1.split('.');
-      var x1 = x[0];
-      var x2 = x.length > 1 ? '.' + x[1] : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    } else {
-      return '';
-    }
-  }
-  dateFormatter = value => {
-    return moment(value).format('MMM YY')
-  }
-  dateFormatterCSV = value => {
-    return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
-  }
-  makeText = m => {
-    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-    return '?'
-  }
-  round = num => {
-    if (num != '' && num != null) {
-      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
-    } else {
-      return NaN
-    }
-  }
-  PercentageFormatter = num => {
-    if (num != '' && num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2) + '%';
-    } else {
-      return ''
-    }
-  }
+  /**
+   * Toggles the value of the 'show' state variable.
+   */
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map(ele => '"' + ele + '"')
-  }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
-    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.report.timeWindow') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -128,10 +93,10 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push(('"' + i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
+    var A = [addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ', '%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ', '%20'), ((i18n.t('static.report.error')).replaceAll(' ', '%20')).replaceAll(' ', '%20')])]
     re = this.state.matricsList
     for (var item = 0; item < re.length; item++) {
-      A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? this.PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
+      A.push(addDoubleQuoteToRowContent([dateFormatterCSV(re[item].month).replaceAll(' ', '%20'), re[item].forecastedConsumption == null ? '' : re[item].forecastedConsumption, re[item].actualConsumption == null ? '' : re[item].actualConsumption, re[item].message == null ? PercentageFormatter(re[item].forecastError) : (i18n.t(re[item].message)).replaceAll(' ', '%20')]))
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -144,6 +109,9 @@ class ForcastMatrixOverTime extends Component {
     document.body.appendChild(a)
     a.click()
   }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -174,7 +142,7 @@ class ForcastMatrixOverTime extends Component {
         if (i == 1) {
           doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.report.timeWindow') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -204,7 +172,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
-    const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), elt.message == null ? this.PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
+    const data = this.state.matricsList.map(elt => [dateFormatter(elt.month), formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0), elt.message == null ? PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: height,
@@ -217,6 +185,9 @@ class ForcastMatrixOverTime extends Component {
     addFooters(doc)
     doc.save(i18n.t('static.report.forecasterrorovertime') + ".pdf")
   }
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -281,6 +252,9 @@ class ForcastMatrixOverTime extends Component {
       this.setState({ loading: false })
     }
   }
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state
     var proList = programs;
@@ -339,6 +313,12 @@ class ForcastMatrixOverTime extends Component {
       }.bind(this);
     }.bind(this);
   }
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -424,6 +404,13 @@ class ForcastMatrixOverTime extends Component {
       })
     }
   }
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state
     var verList = versions;
@@ -483,6 +470,9 @@ class ForcastMatrixOverTime extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Retrieves the list of planning units for a selected program and version.
+   */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -594,9 +584,16 @@ class ForcastMatrixOverTime extends Component {
       }
     });
   }
+  /**
+   * Calls the get programs function on page load
+   */
   componentDidMount() {
     this.getPrograms();
   }
+  /**
+   * Sets the selected program ID selected by the user.
+   * @param {object} event - The event object containing information about the program selection.
+   */
   setProgramId(event) {
     this.setState({
       programId: event.target.value,
@@ -606,6 +603,10 @@ class ForcastMatrixOverTime extends Component {
       this.filterVersion();
     })
   }
+  /**
+   * Sets the version ID and updates the tracer category list.
+   * @param {Object} event - The event object containing the version ID value.
+   */
   setVersionId(event) {
     this.setState({
       versionId: event.target.value
@@ -621,6 +622,9 @@ class ForcastMatrixOverTime extends Component {
   rowtextFormatClassName(row) {
     return (row.forecastError > 50) ? 'textcolor-red' : '';
   }
+  /**
+   * Fetches data based on selected filters.
+   */
   fetchData() {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -802,56 +806,32 @@ class ForcastMatrixOverTime extends Component {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [], planningUnitLabel: '' });
     }
   }
-  show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
       this.fetchData();
     })
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
-  handleClickMonthBox2 = (e) => {
-    this.refs.pickAMonth2.show()
-  }
-  handleAMonthChange2 = (value, text) => {
-  }
-  handleAMonthDissmis2 = (value) => {
-    this.setState({ singleValue2: value }, () => {
-      this.fetchData();
-    })
-  }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-  dateFormatterLanguage = value => {
-    if (moment(value).format('MM') === '01') {
-      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '02') {
-      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '03') {
-      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '04') {
-      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '05') {
-      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '06') {
-      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '07') {
-      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '08') {
-      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '09') {
-      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '10') {
-      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '11') {
-      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-    } else {
-      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-    }
-  }
+  /**
+   * Renders the Forecast metrics over time report table.
+   * @returns {JSX.Element} - Forecast metrics over time report table.
+   */
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -972,7 +952,7 @@ class ForcastMatrixOverTime extends Component {
       },
     }
     const bar = {
-      labels: this.state.matricsList.map((item, index) => (this.dateFormatterLanguage(item.month))),
+      labels: this.state.matricsList.map((item, index) => (dateFormatterLanguage(item.month))),
       datasets: [
         {
           type: "line",
@@ -984,7 +964,7 @@ class ForcastMatrixOverTime extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#####%",
-          data: this.state.matricsList.map((item, index) => (this.round(item.forecastError)))
+          data: this.state.matricsList.map((item, index) => (round(item.forecastError)))
         }
       ],
     }
@@ -1031,10 +1011,9 @@ class ForcastMatrixOverTime extends Component {
                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 value={rangeValue}
                                 lang={pickerLang}
-                                onChange={this.handleRangeChange}
                                 onDismiss={this.handleRangeDissmis}
                               >
-                                <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                               </Picker>
                             </div>
                           </FormGroup>
@@ -1157,15 +1136,15 @@ class ForcastMatrixOverTime extends Component {
                                     &&
                                     this.state.matricsList.map((item, idx) =>
                                       <tr id="addr0" key={idx} className={this.rowtextFormatClassName(item)} >
-                                        <td>{this.dateFormatter(this.state.matricsList[idx].month)}</td>
+                                        <td>{dateFormatter(this.state.matricsList[idx].month)}</td>
                                         <td className="textcolor-purple">
-                                          {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
+                                          {formatter(this.state.matricsList[idx].forecastedConsumption,0)}
                                         </td>
                                         <td>
-                                          {this.formatter(this.state.matricsList[idx].actualConsumption)}
+                                          {formatter(this.state.matricsList[idx].actualConsumption,0)}
                                         </td>
                                         <td>
-                                          {this.state.matricsList[idx].message == null ? this.PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}
+                                          {this.state.matricsList[idx].message == null ? PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}
                                         </td>
                                       </tr>)
                                   }

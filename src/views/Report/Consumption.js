@@ -30,11 +30,15 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText, round } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
+/**
+ * Component for Consumption Report.
+ */
 class Consumption extends Component {
   constructor(props) {
     super(props);
@@ -71,13 +75,15 @@ class Consumption extends Component {
     this.getPrograms = this.getPrograms.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.storeProduct = this.storeProduct.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
+  /**
+   * Retrieves and stores product data based on the selected planning unit.
+   */
   storeProduct() {
     let productId = document.getElementById("planningUnitId").value;
     if (productId != 0) {
@@ -210,33 +216,16 @@ class Consumption extends Component {
       }
     }
   }
-  makeText = m => {
-    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-    return '?'
-  }
+  /**
+   * Toggles the value of the 'show' state variable.
+   */
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  formatter = value => {
-    if (value != null) {
-      var cell1 = value
-      cell1 += '';
-      var x = cell1.split('.');
-      var x1 = x[0];
-      var x2 = x.length > 1 ? '.' + x[1] : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    } else {
-      return ''
-    }
-  }
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map(ele => '"' + ele + '"')
-  }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
-    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -278,9 +267,9 @@ class Consumption extends Component {
       }
     }
     var A = [];
-    A[0] = this.addDoubleQuoteToRowContent(head);
-    A[1] = this.addDoubleQuoteToRowContent(row1);
-    A[2] = this.addDoubleQuoteToRowContent(row2);
+    A[0] = addDoubleQuoteToRowContent(head);
+    A[1] = addDoubleQuoteToRowContent(row1);
+    A[2] = addDoubleQuoteToRowContent(row2);
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
@@ -288,10 +277,13 @@ class Consumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.consumption_') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -322,7 +314,7 @@ class Consumption extends Component {
         if (i == 1) {
           doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -353,7 +345,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = localStorage.getItem("sessionType") === 'Online' ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = localStorage.getItem("sessionType") === 'Online' ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0)]);
     let head = [];
     let head1 = [];
     let row1 = [];
@@ -366,8 +358,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
-        row2.push(this.formatter(consumptionArray[i].actualConsumption));
+        row1.push(formatter(consumptionArray[i].forecastedConsumption,0));
+        row2.push(formatter(consumptionArray[i].actualConsumption,0));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -376,8 +368,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(this.formatter(consumptionArray[i].forecastedConsumption));
-        row2.push(this.formatter(consumptionArray[i].actualConsumption));
+        row1.push(formatter(consumptionArray[i].forecastedConsumption,0));
+        row2.push(formatter(consumptionArray[i].actualConsumption,0));
       }
     }
     head1[0] = head;
@@ -395,13 +387,9 @@ class Consumption extends Component {
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.consumption').concat('.pdf'));
   }
-  round = num => {
-    if (num === '' || num == null) {
-      return null
-    } else {
-      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
-    }
-  }
+  /**
+   * Fetches and filters data based on selected program, version, planning unit, and date range.
+   */
   filterData() {
     let programId = document.getElementById("programId").value;
     let viewById = document.getElementById("viewById").value;
@@ -489,11 +477,11 @@ class Consumption extends Component {
               let forecastValue = 0;
               let transDate = '';
               if (objActual.length > 0) {
-                actualValue = this.round(objActual[0].consumptionQty);
+                actualValue = round(objActual[0].consumptionQty);
                 transDate = objActual[0].consumptionDate;
               }
               if (objForecast.length > 0) {
-                forecastValue = this.round(objForecast[0].consumptionQty);
+                forecastValue = round(objForecast[0].consumptionQty);
                 transDate = objForecast[0].consumptionDate;
               }
               if (viewById == 2) {
@@ -506,8 +494,8 @@ class Consumption extends Component {
               } else {
                 let json = {
                   "transDate": transDate,
-                  "actualConsumption": this.round(actualValue),
-                  "forecastedConsumption": this.round(forecastValue)
+                  "actualConsumption": round(actualValue),
+                  "forecastedConsumption": round(forecastValue)
                 }
                 finalOfflineConsumption.push(json);
               }
@@ -592,6 +580,9 @@ class Consumption extends Component {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [], offlineConsumptionList: [], planningUnitLabel: '' });
     }
   }
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms() {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -656,6 +647,9 @@ class Consumption extends Component {
       this.setState({ loading: false })
     }
   }
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state
     var proList = programs;
@@ -712,6 +706,9 @@ class Consumption extends Component {
       }.bind(this);
     }.bind(this);
   }
+  /**
+   * Retrieves the list of planning units for a selected program and version.
+   */
   getPlanningUnit() {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -823,6 +820,12 @@ class Consumption extends Component {
       }
     });
   }
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -915,6 +918,13 @@ class Consumption extends Component {
       })
     }
   }
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state
     var verList = versions;
@@ -977,9 +987,16 @@ class Consumption extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Calls the get programs function on page load
+   */
   componentDidMount() {
     this.getPrograms();
   }
+  /**
+   * Sets the selected program ID selected by the user.
+   * @param {object} event - The event object containing information about the program selection.
+   */
   setProgramId(event) {
     this.setState({
       programId: event.target.value,
@@ -989,6 +1006,10 @@ class Consumption extends Component {
       this.filterVersion();
     })
   }
+  /**
+   * Sets the version ID and updates the tracer category list.
+   * @param {Object} event - The event object containing the version ID value.
+   */
   setVersionId(event) {
     if (this.state.versionId != '' || this.state.versionId != undefined) {
       this.setState({
@@ -1005,46 +1026,32 @@ class Consumption extends Component {
       })
     }
   }
-  show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
       this.filterData();
     })
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-  dateFormatterLanguage = value => {
-    if (moment(value).format('MM') === '01') {
-      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '02') {
-      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '03') {
-      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '04') {
-      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '05') {
-      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '06') {
-      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '07') {
-      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '08') {
-      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '09') {
-      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '10') {
-      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '11') {
-      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-    } else {
-      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-    }
-  }
+  /**
+   * Renders the Consumption report table.
+   * @returns {JSX.Element} - Consumption report table.
+   */
   render() {
     const { planningUnits } = this.state;
     const { offlinePlanningUnitList } = this.state;
@@ -1134,7 +1141,7 @@ class Consumption extends Component {
     let bar = "";
     if (localStorage.getItem("sessionType") === 'Online') {
       bar = {
-        labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        labels: this.state.consumptions.map((item, index) => (dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1168,7 +1175,7 @@ class Consumption extends Component {
     }
     if (!localStorage.getItem("sessionType") === 'Online') {
       bar = {
-        labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1249,7 +1256,6 @@ class Consumption extends Component {
                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                             value={rangeValue}
                             lang={pickerLang}
-                            onChange={this.handleRangeChange}
                             onDismiss={this.handleRangeDissmis}
                           >
                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -1425,7 +1431,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
+                                      {formatter(this.state.consumptions[idx].forecastedConsumption,0)}
                                     </td>
                                   )
                                 }
@@ -1437,7 +1443,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.consumptions[idx].actualConsumption)}
+                                      {formatter(this.state.consumptions[idx].actualConsumption,0)}
                                     </td>
                                   )
                                 }
@@ -1468,7 +1474,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.offlineConsumptionList.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
+                                      {formatter(this.state.offlineConsumptionList[idx].forecastedConsumption,0)}
                                     </td>
                                   )
                                 }
@@ -1480,7 +1486,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.offlineConsumptionList.map((item, idx) =>
                                     <td id="addr0" key={idx}>
-                                      {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
+                                      {formatter(this.state.offlineConsumptionList[idx].actualConsumption,0)}
                                     </td>
                                   )
                                 }
