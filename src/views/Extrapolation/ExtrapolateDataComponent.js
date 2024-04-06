@@ -1481,16 +1481,18 @@ export default class ExtrapolateDataComponent extends React.Component {
             let programId = this.state.forecastProgramId.split("_")[0];
             let versionId = this.state.versionId;
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
                 datasetJson = this.state.datasetJson;
                 this.setState({
-                    isDisabled: false
+                    isDisabled: false,
+                    loading: false
                 })
             } else {
                 this.setState({ loading: true })
                 this.setState({
                     isDisabled: true
                 })
-                await DatasetService.getDatasetData(programId, versionId)
+                await DatasetService.getDatasetDataWithoutTree(programId, versionId)
                 .then(response => {
                     if (response.status == 200) {
                         datasetJson = response.data
@@ -3002,7 +3004,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     setFieldTouched,
                                     setFieldError
                                 }) => (
-                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off" style={{display: !this.state.loading ? "block" : "none"}}>
                                         <FormGroup className="">
                                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <>
                                             <div className="col-md-12 pl-lg-0">
