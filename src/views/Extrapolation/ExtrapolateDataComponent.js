@@ -2813,7 +2813,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     when={this.state.dataChanged}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
-                <h5 className={"green"} id="div2">{this.state.message}</h5>
+                <h5 className={"green"} id="div1">{this.state.message}</h5>
                 <Card>
                     <div className="card-header-actions">
                         <div className="Card-header-reporticon">
