@@ -927,6 +927,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 this.getPlanningUnitList(event);
             })
         } else {
+            localStorage.setItem("sesVersionId", event.target.value);
             this.setState({
                 versionId: event.target.value
             }, () => {
@@ -1055,11 +1056,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }, () => {
                         this.setVersionId();
                     })
-                } else if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
-                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesForecastVersionIdReport"));
+                } else if (localStorage.getItem("sesVersionId") != '' && localStorage.getItem("sesVersionId") != undefined) {
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionId"));
                     this.setState({
                         versions: versionList,
-                        versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesForecastVersionIdReport") : versionList[0].versionId),
+                        versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionId") : versionList[0].versionId),
                     }, () => {
                         this.setVersionId();
                     })
