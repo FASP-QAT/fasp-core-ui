@@ -3858,8 +3858,12 @@ class EditSupplyPlanStatus extends Component {
             entries: " ",
         });
         const { statuses } = this.state;
+        let {editable} = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
+                if(editable && item.id == 4){//don't show option 'No Review Needed' when editable == true
+                    return '';
+                }
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}

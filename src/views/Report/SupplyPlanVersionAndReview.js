@@ -129,7 +129,7 @@ class SupplyPlanVersionAndReview extends Component {
             data[2] = getLabelText(matricsList[j].versionType.label, this.state.lang)
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
-            data[5] = matricsList[j].versionStatus.id == 1 ? "" : getLabelText(matricsList[j].versionStatus.label, this.state.lang);
+            data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang);
             data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
             data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null) : null
             data[8] = matricsList[j].notes
