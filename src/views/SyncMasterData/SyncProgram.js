@@ -14,6 +14,9 @@ import DatasetService from '../../api/DatasetService';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+/**
+ * This component is used to show users if there is some latest version avaiable for users to load and is also used to load the updated version for readonly programs
+ */
 export default class SyncProgram extends Component {
     constructor(props) {
         super(props);
@@ -34,11 +37,17 @@ export default class SyncProgram extends Component {
         }
         this.syncPrograms = this.syncPrograms.bind(this)
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to get list of supply plan and forecast programs that are loaded by user
+     */
     componentDidMount() {
         var db1;
         getDatabase();
@@ -117,6 +126,10 @@ export default class SyncProgram extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to show popup for latest version and to update the readonly versions for forecast program
+     * @param {*} programList This is the list of forecast programs that user has loaded
+     */
     syncDataset(programList) {
         var programIdsToLoad = this.state.datasetIdsToLoad;
         var pIds = [];
@@ -231,6 +244,10 @@ export default class SyncProgram extends Component {
         }).catch(error => {
         })
     }
+    /**
+     * This function is used to show popup for latest version and to update the readonly versions for supply planning program
+     * @param {*} programList This is the list of supply planning programs that user has loaded
+     */
     syncPrograms(programList) {
         var programIdsToLoad = this.state.programIdsToLoad;
         var pIds = [];
@@ -345,6 +362,11 @@ export default class SyncProgram extends Component {
         }).catch(error => {
         })
     }
+    /**
+     * This function is used to load the latest versions for forecast programs for which user have selecetd ok
+     * @param {*} programIds This is list of programs Ids for which latest version has to be loaded
+     * @param {*} readonlyProgramToBeDeleted This is the list of readonly programs that should be deleted
+     */
     loadLatestVersionDataset(programIds, readonlyProgramToBeDeleted) {
         if (programIds.length > 0) {
             var checkboxesChecked = [];
@@ -509,6 +531,11 @@ export default class SyncProgram extends Component {
             }.bind(this)
         }
     }
+    /**
+     * This function is used to load the latest versions for supply plan programs for which user have selecetd ok
+     * @param {*} programIds This is list of programs Ids for which latest version has to be loaded
+     * @param {*} readonlyProgramToBeDeleted This is the list of readonly programs that should be deleted
+     */
     loadLatestVersion(programIds, readonlyProgramToBeDeleted) {
         if (programIds.length > 0) {
             var checkboxesChecked = [];
@@ -756,6 +783,10 @@ export default class SyncProgram extends Component {
             }.bind(this)
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This returns a progress bar to show progress of the sync
+     */
     render() {
         return (
             <div className="animated fadeIn" >

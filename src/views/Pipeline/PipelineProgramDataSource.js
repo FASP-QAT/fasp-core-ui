@@ -10,6 +10,9 @@ import PipelineService from '../../api/PipelineService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import data source details
+ */
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -26,12 +29,27 @@ export default class PipelineProgramDataSource extends Component {
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
+    /**
+     * Function to filter data source based on data source type
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapDataSourceEl.getJson(null, false)[r])[c - 1];
@@ -45,6 +63,9 @@ export default class PipelineProgramDataSource extends Component {
         }
         return mylist;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.dataSourceList;
         var json = this.el.getJson(null, false);
@@ -61,6 +82,14 @@ export default class PipelineProgramDataSource extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -86,6 +115,10 @@ export default class PipelineProgramDataSource extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var reg = /^[0-9\b]+$/;
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
@@ -119,6 +152,9 @@ export default class PipelineProgramDataSource extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveDataSource() {
         var list = this.state.dataSourceList;
         var json = this.el.getJson(null, false);
@@ -139,6 +175,9 @@ export default class PipelineProgramDataSource extends Component {
         }
         return dataSourceArray;
     }
+    /**
+     * Reterives data source type, data source, pipeline data source list and builds jexcel table on component mount
+     */
     componentDidMount() {
         var dataSourceTypeList = [];
         DataSourceTypeService.getDataSourceTypeListActive(AuthenticationService.getRealmId())
@@ -369,9 +408,18 @@ export default class PipelineProgramDataSource extends Component {
                 }
             );
     }
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunction = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Renders the pipeline program import data source details screen.
+     * @returns {JSX.Element} - Pipeline program import data source details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

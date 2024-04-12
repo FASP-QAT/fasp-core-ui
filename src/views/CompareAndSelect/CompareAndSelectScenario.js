@@ -36,12 +36,17 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+// Localized entity name
 const entityname = i18n.t('static.dashboard.compareAndSelect')
+/**
+ * Component for comparing and selecting the scenario for different forecasts.
+ */
 class CompareAndSelectScenario extends Component {
     constructor(props) {
         super(props);
@@ -89,8 +94,6 @@ class CompareAndSelectScenario extends Component {
             changed: false
         };
         this.getDatasets = this.getDatasets.bind(this);
-        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.setViewById = this.setViewById.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
         this.setRegionId = this.setRegionId.bind(this);
@@ -101,26 +104,32 @@ class CompareAndSelectScenario extends Component {
         this.loaded = this.loaded.bind(this)
         this.onchangepage = this.onchangepage.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.loadedTable1 = this.loadedTable1.bind(this)
         this.changeTable1 = this.changeTable1.bind(this)
     }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = (value, text) => {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
             this.setMonth1List()
         })
     }
+    /**
+     * Sets the state to show or hide the forecast period based on the checked status of the target element.
+     * @param {Event} e - The change event.
+     * @returns {void}
+     */
     setShowForecastPeriod(e) {
         this.setState({
             showForecastPeriod: e.target.checked
@@ -128,6 +137,11 @@ class CompareAndSelectScenario extends Component {
             this.setMonth1List()
         })
     }
+    /**
+     * Sets the month list based on the selected range value or forecast period.
+     * If the forecast period is shown, it uses the forecast start and stop dates. 
+     * If not, it calculates the month list based on the selected range value.
+     */
     setMonth1List() {
         this.setState({
             loading: true
@@ -156,6 +170,10 @@ class CompareAndSelectScenario extends Component {
             this.buildJexcel();
         })
     }
+    /**
+     * Retrieves and processes data to be displayed based on the selected planning unit and region.
+     * Updates component state with the retrieved data for rendering.
+     */
     showData() {
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
             this.setState({ loading: true })
@@ -266,6 +284,9 @@ class CompareAndSelectScenario extends Component {
             })
         }
     }
+    /**
+     * Builds the jexcel table based on the tree scenario list.
+     */
     buildJexcel() {
         this.setState({
             loading: true
@@ -484,7 +505,7 @@ class CompareAndSelectScenario extends Component {
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
                 data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? this.formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2)) : ""
+                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2),0) : ""
                 data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined ? countArray[j] + 1 : ""
                 data[7] = finalData[j].compareToConsumptionForecast
                 data[8] = finalData[j].id
@@ -592,6 +613,11 @@ class CompareAndSelectScenario extends Component {
             })
         })
     }
+    /**
+     * Sets the equivalency unit ID in the component state based on the selected value.
+     * Triggers a data refresh if the view mode is set to 3 (specific condition) and a valid equivalency unit ID is selected.
+     * @param {object} e - The event object containing the selected value.
+     */
     setEquivalencyUnit(e) {
         var equivalencyUnitId = e.target.value;
         this.setState({
@@ -602,6 +628,11 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
+    /**
+     * Sets the planning unit ID in the component state based on the selected value.
+     * @param {object} e - The event object containing the selected value.
+     * @returns {void}
+     */
     setPlanningUnitId(e) {
         localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
         this.setState({
@@ -639,6 +670,11 @@ class CompareAndSelectScenario extends Component {
             })
         }
     }
+    /**
+     * Sets the forecasting unit ID in the component state based on the selected value.
+     * @param {object} e - The event object containing the selected value.
+     * @returns {void}
+     */
     setForecastingUnit(e) {
         var forecastingUnitId = e.target.value;
         var viewById = this.state.viewById;
@@ -650,14 +686,13 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Toggles the 'show' state in the component, changing its value to the opposite of the current state.
+     */
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -665,7 +700,7 @@ class CompareAndSelectScenario extends Component {
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1])).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (getLabelText(this.state.datasetJson.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push(('"' + (i18n.t('static.compareAndSelect.yAxisIn') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : this.state.viewById == 2 ? i18n.t('static.dashboard.forecastingunit') : i18n.t('static.equivalancyUnit.equivalancyUnit')) + '"')).replaceAll(' ', '%20'))
@@ -676,7 +711,7 @@ class CompareAndSelectScenario extends Component {
         }
         csvRow.push('"' + (i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + (this.state.showForecastPeriod == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))).replaceAll(' ', '%20') + '"')
         if (!this.state.showForecastPeriod) {
-            csvRow.push('"' + (i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to)).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)).replaceAll(' ', '%20') + '"')
         }
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -692,9 +727,9 @@ class CompareAndSelectScenario extends Component {
         columns.push(i18n.t('compareToConsumptionForecast'));
         let headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var A = [addDoubleQuoteToRowContent(headers)];
         this.state.finalData.map(ele =>
-            A.push(this.addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+            A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
             ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
             !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
@@ -704,7 +739,7 @@ class CompareAndSelectScenario extends Component {
         headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
         var C = []
-        C.push([this.addDoubleQuoteToRowContent(headers)]);
+        C.push([addDoubleQuoteToRowContent(headers)]);
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
@@ -723,7 +758,7 @@ class CompareAndSelectScenario extends Component {
                     }
                 }
             })
-            C.push(this.addDoubleQuoteToRowContent(B));
+            C.push(addDoubleQuoteToRowContent(B));
         })
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -741,18 +776,9 @@ class CompareAndSelectScenario extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -812,7 +838,7 @@ class CompareAndSelectScenario extends Component {
         doc.setFont('helvetica', 'normal')
         doc.setTextColor("#002f6c");
         var y = 100;
-        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
+        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -886,7 +912,7 @@ class CompareAndSelectScenario extends Component {
         }
         if (!this.state.showForecastPeriod) {
             y = y + 5;
-            doc.text(i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to), doc.internal.pageSize.width / 20, y, {
+            doc.text(i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to), doc.internal.pageSize.width / 20, y, {
                 align: 'left'
             })
         }
@@ -916,10 +942,10 @@ class CompareAndSelectScenario extends Component {
             dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
             ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-            this.formatter(ele.totalForecast),
-            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? this.formatter(ele.forecastError) : "" : ele.forecastError,
+            formatter(ele.totalForecast,0),
+            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError,0) : "" : ele.forecastError,
             ele.noOfMonths.toString(),
-            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? this.formatter(ele.compareToConsumptionForecast) : ele.compareToConsumptionForecast])
+            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast,0) : ele.compareToConsumptionForecast])
         )
         let data2 = dataArr3;
         let content1 = {
@@ -954,9 +980,9 @@ class CompareAndSelectScenario extends Component {
                 if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
-                            dataArr.push(this.formatter(ele[idx]) + " %");
+                            dataArr.push(formatter(ele[idx],0) + " %");
                         } else {
-                            dataArr.push(this.formatter(ele[idx]));
+                            dataArr.push(formatter(ele[idx],0));
                         }
                     } else if (item.type == 'calendar') {
                         dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
@@ -1000,6 +1026,9 @@ class CompareAndSelectScenario extends Component {
         addFooters(doc)
         doc.save(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.compareAndSelect') + "-" + document.getElementById("planningUnitId").selectedOptions[0].text + "-" + document.getElementById("regionId").selectedOptions[0].text + '.pdf');
     }
+    /**
+     * Retrieves datasets from IndexedDB and updates the component state accordingly.
+     */
     getDatasets() {
         this.setState({
             loading: true
@@ -1079,10 +1108,18 @@ class CompareAndSelectScenario extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Calls getDatasets function on component mount
+     */
     componentDidMount() {
         this.getDatasets();
     }
-    loadedTable1 = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedTable1 = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var elInstance = instance.worksheets[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1136,6 +1173,14 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changeTable1 = function (instance, cell, x, y, value) {
         this.setState({
             loading: true
@@ -1160,7 +1205,12 @@ class CompareAndSelectScenario extends Component {
             })
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
@@ -1196,6 +1246,12 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -1229,6 +1285,10 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
+    /**
+     * Sets the dataset ID and updates the component state with associated data.
+     * @param {object} event - The event object containing the dataset ID value.
+     */
     setDatasetId(event) {
         var datasetId = event.target.value;
         this.setState({ loading: true })
@@ -1365,6 +1425,10 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
+    /**
+     * Sets the region ID and updates the component state with associated data.
+     * @param {object} event - The event object containing the region ID value.
+     */
     setRegionId(event) {
         localStorage.setItem("sesDatasetRegionId", event.target.value);
         var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
@@ -1379,6 +1443,10 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
+    /**
+     * Updates the selected tree scenario ID and triggers the rebuilding of Jexcel.
+     * @param {number} id - The ID of the selected tree scenario.
+     */
     scenarioOrderChanged(id) {
         this.setState({
             loading: true
@@ -1390,14 +1458,14 @@ class CompareAndSelectScenario extends Component {
             this.buildJexcel();
         })
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
-    _handleClickRangeBox(e) {
-        this.refs.pickRange.show()
-    }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Sets the view mode ID and updates the display of related elements.
+     * @param {Object} e - The event object containing the selected value.
+     */
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({
@@ -1421,6 +1489,9 @@ class CompareAndSelectScenario extends Component {
             this.buildJexcel()
         })
     }
+    /**
+     * Submits the selected scenario and updates the dataset accordingly.
+     */
     submitScenario() {
         this.setState({ loading: true })
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
@@ -1490,19 +1561,26 @@ class CompareAndSelectScenario extends Component {
                             return a < b ? -1 : a > b ? 1 : 0;
                         }.bind(this))
                     }, () => {
-                        this.hideFirstComponent()
+                        hideFirstComponent()
                         this.showData();
                     })
                 }.bind(this)
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Updates the forecast notes in the component state.
+     * @param {Object} e - The event object representing the input field change event.
+     */
     setForecastNotes(e) {
         this.setState({
             forecastNotes: e.target.value,
             changed: true
         })
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.setState({
             changed: false
@@ -1511,11 +1589,18 @@ class CompareAndSelectScenario extends Component {
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
         })
     }
+    /**
+     * Toggles the visibility of guidance in the component state.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Renders the compare and select screen.
+     * @returns {JSX.Element} - Compare and select screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1998,7 +2083,6 @@ class CompareAndSelectScenario extends Component {
                                                                 value={this.state.singleValue2}
                                                                 key={JSON.stringify(this.state.singleValue2)}
                                                                 lang={pickerLang}
-                                                                onChange={this.handleAMonthChange2}
                                                                 onDismiss={this.handleAMonthDissmis2}
                                                             >
                                                                 <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />

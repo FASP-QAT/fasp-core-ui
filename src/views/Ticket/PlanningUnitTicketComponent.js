@@ -21,6 +21,11 @@ const initialValues = {
     multiplier: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for planning unit ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -39,6 +44,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
+/**
+ * This component is used to display the planning unit form and allow user to submit the add master request in jira
+ */
 export default class PlanningUnitTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -65,6 +73,10 @@ export default class PlanningUnitTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeForecastingUnit = this.changeForecastingUnit.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { planningUnit } = this.state
         if (event.target.name == "summary") {
@@ -95,6 +107,10 @@ export default class PlanningUnitTicketComponent extends Component {
             planningUnit
         }, () => { })
     };
+    /**
+     * This function is called when forecasting unit is changed
+     * @param {*} event This is the on change event
+     */
     changeForecastingUnit(event) {
         if (event === null) {
             let { planningUnit } = this.state;
@@ -117,6 +133,9 @@ export default class PlanningUnitTicketComponent extends Component {
             });
         }
     }
+    /**
+     * This function is used to get unit list on page load
+     */
     componentDidMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -196,11 +215,17 @@ export default class PlanningUnitTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the planning unit details
+     */
     resetClicked() {
         let { planningUnit } = this.state;
         planningUnit.planningUnitDesc = '';
@@ -215,6 +240,10 @@ export default class PlanningUnitTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns planning unit details form
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0

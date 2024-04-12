@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import i18n from '../../i18n';
-class SupplyPlanFormulas extends Component {
+/**
+ * Component for Showing Formulas on Problem List.
+ */
+class ProblemListFormulas extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -23,18 +26,18 @@ class SupplyPlanFormulas extends Component {
         };
         this.toggle = this.toggle.bind(this);
     }
-    toggle(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({
-                activeTab: tab
-            });
-        }
-    }
+    /**
+     * This function is used to toggle the show formula modal
+     */
     toggle() {
         this.setState({
             modal: !this.state.modal,
         });
     }
+    /**
+     * Renders the Formula popup for problem list.
+     * @returns {JSX.Element} - Problem list formula popup.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -102,4 +105,4 @@ class SupplyPlanFormulas extends Component {
         );
     }
 }
-export default SupplyPlanFormulas;
+export default ProblemListFormulas;

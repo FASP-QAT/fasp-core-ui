@@ -7,13 +7,20 @@ import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.currency.currencyMaster');
+// Initial values for form fields
 let initialValues = {
     currencyCode: '',
     label: '',
     conversionRate: '',
     isSync: true
 }
+/**
+ * Defines the validation schema for currency details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
@@ -27,6 +34,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
+/**
+ * Component for editing currency details.
+ */
 export default class UpdateCurrencyComponent extends Component {
     constructor(props) {
         super(props);
@@ -52,11 +62,18 @@ export default class UpdateCurrencyComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the currency form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { currency } = this.state
         if (event.target.name === "currencyCode") {
@@ -76,8 +93,11 @@ export default class UpdateCurrencyComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Fetches currency details on component mount.
+     */
     componentDidMount() {
+        //Fetch currency details by currencyId
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -132,15 +152,26 @@ export default class UpdateCurrencyComponent extends Component {
             }
         );
     }
+    /**
+     * Capitalizes the first letter of the currency name.
+     * @param {string} str - The currency name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { currency } = this.state
             currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
+    /**
+     * Redirects to the list currency screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/currency/listCurrency/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Renders the currency details form.
+     * @returns {JSX.Element} - currency details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -334,7 +365,11 @@ export default class UpdateCurrencyComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the currency details form when reset button is clicked. Also fetches the currency details.
+     */
     resetClicked() {
+        //Fetch currency details by currencyId
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
             this.setState({
                 currency: response.data

@@ -6,7 +6,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
@@ -14,7 +14,12 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.procurementagent.procurementagent')
+/**
+ * Component for list of procurement agent type details.
+ */
 class ListProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -28,26 +33,23 @@ class ListProcurementAgentComponent extends Component {
         }
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgentType = this.addNewProcurementAgentType.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Redirects to the add procurement agent type screen.
+     */
     addNewProcurementAgentType() {
         this.props.history.push("/procurementAgentType/addProcurementAgentType");
     }
+    /**
+     * Function to filter procurement agent types based on realm Id
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -65,6 +67,9 @@ class ListProcurementAgentComponent extends Component {
             });
         }
     }
+    /**
+     * Builds the jexcel component to display procurement agent type list.
+     */
     buildJExcel() {
         let procurementAgentTypeList = this.state.selProcurementAgentType;
         let procurementAgentTypeArray = [];
@@ -125,7 +130,7 @@ class ListProcurementAgentComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -152,6 +157,9 @@ class ListProcurementAgentComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Redirects to the edit procurement agent type screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -164,11 +172,11 @@ class ListProcurementAgentComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Reterives realm and procurement agent type list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -186,7 +194,7 @@ class ListProcurementAgentComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -244,7 +252,7 @@ class ListProcurementAgentComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -288,6 +296,10 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the procurement agent type list.
+     * @returns {JSX.Element} - Procurement agent type list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

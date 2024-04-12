@@ -17,6 +17,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.uploadUserManual')
+/**
+ * This component is used to upload the latest user manual
+ */
 export default class uploadUserManual extends Component {
     constructor(props) {
         super(props);
@@ -30,6 +33,9 @@ export default class uploadUserManual extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -39,6 +45,9 @@ export default class uploadUserManual extends Component {
         bsCustomFileInput.init()
         this.setState({ loading: false })
     }
+    /**
+     * This component is used to check the extension of the file and save it on server
+     */
     formSubmit() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -120,6 +129,10 @@ export default class uploadUserManual extends Component {
             }
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This component returns the upload user manual form
+     */
     render() {
         return (
             <>
@@ -160,10 +173,16 @@ export default class uploadUserManual extends Component {
             </>
         )
     }
+    /**
+     * This function is called when cancel button is clicked to go back to application dashboard
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when reset button is clicked to reset the form data
+     */
     resetClicked() {
     }
 }

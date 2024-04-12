@@ -23,6 +23,9 @@ import {
 import i18n from '../i18n';
 import AuthenticationService from '../views/Common/AuthenticationService';
 import createMinMaxProblems from "./createMinMaxProblems";
+/**
+ * This component is used to build the problem list based on the data
+ */
 export default class QatProblemActionNew extends Component {
     constructor(props) {
         super(props);
@@ -38,6 +41,12 @@ export default class QatProblemActionNew extends Component {
             <></>
         );
     }
+    /**
+     * This function has all the logic for building different types of QPL problems
+     * @param {*} programId This is program Id for which QPL has to be build
+     * @param {*} key Key is the state parameter that should be updated once problem list is build
+     * @param {*} buildFullQPL This is a boolean parameter which indicates if full problem list should be rebuild or not
+     */
     qatProblemActions(programId, key, buildFullQPL) {
         var problemActionList = [];
         var db1;

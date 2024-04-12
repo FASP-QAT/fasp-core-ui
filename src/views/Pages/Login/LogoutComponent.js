@@ -4,6 +4,9 @@ import React, { Component } from 'react';
 import { SECRET_KEY } from '../../../Constants.js';
 import LogoutService from "../../../api/LogoutService";
 import AuthenticationService from '../../Common/AuthenticationService.js';
+/**
+ * Component for Logout.
+ */
 class LogoutComponent extends Component {
     constructor(props) {
         super(props);
@@ -11,6 +14,9 @@ class LogoutComponent extends Component {
             message: ''
         }
     }
+    /**
+     * Calls the logout api on component mount
+     */
     componentDidMount() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sessionType"];
@@ -45,6 +51,10 @@ class LogoutComponent extends Component {
             }
         }
     }
+    /**
+     * Renders the component.
+     * @returns {JSX.Element} - The rendered component.
+     */
     render() {
         return (
             <div className="animated fadeIn">

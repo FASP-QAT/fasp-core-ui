@@ -10,11 +10,18 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.organisationType.organisationType');
+// Initial values for form fields
 let initialValues = {
     realmId: '',
     organisationTypeName: ''
 }
+/**
+ * Defines the validation schema for organization type details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -24,6 +31,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisationType.organisationTypetext')),
     })
 }
+/**
+ * Component for adding organization type details.
+ */
 export default class AddOrganisationTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -46,6 +56,10 @@ export default class AddOrganisationTypeComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
     }
+    /**
+     * Handles data change in the organization type form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { organisationType } = this.state
         if (event.target.name === "organisationTypeName") {
@@ -59,7 +73,11 @@ export default class AddOrganisationTypeComponent extends Component {
         ) => {
         })
     }
+    /**
+     * Fetches Realm list & RealmId on component mount.
+     */
     componentDidMount() {
+        //Fetch realm list
         UserService.getRealmList()
             .then(response => {
                 var listArray = response.data;
@@ -111,6 +129,7 @@ export default class AddOrganisationTypeComponent extends Component {
                     }
                 }
             );
+        //Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         if (realmId != -1) {
             let { organisationType } = this.state
@@ -123,9 +142,17 @@ export default class AddOrganisationTypeComponent extends Component {
                 })
         }
     }
+    /**
+     * Capitalizes the first letter of the organization type name.
+     * @param {string} str - The organization type name.
+     */
     Capitalize(str) {
         this.state.organisationType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Renders the organization type details form.
+     * @returns {JSX.Element} - organization type details form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -280,9 +307,15 @@ export default class AddOrganisationTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list organisation type when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/organisationType/listOrganisationType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the organisation type details form when reset button is clicked.
+     */
     resetClicked() {
         let { organisationType } = this.state
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {

@@ -14,6 +14,11 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
+/**
+ * This const is used to define the validation schema for realm country ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -27,6 +32,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.country.currencytext')),
     })
 }
+/**
+ * This component is used to display the realm country form and allow user to submit the add master request in jira
+ */
 export default class RealmCountryTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -54,6 +62,10 @@ export default class RealmCountryTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeCountry = this.changeCountry.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realmCountry } = this.state
         if (event.target.name == "summary") {
@@ -84,6 +96,10 @@ export default class RealmCountryTicketComponent extends Component {
             realmCountry
         }, () => { })
     };
+    /**
+     * This function is called when realm country is changed
+     * @param {*} event This is the on change event
+     */
     changeCountry(event) {
         if (event === null) {
             let { realmCountry } = this.state;
@@ -106,7 +122,9 @@ export default class RealmCountryTicketComponent extends Component {
             });
         }
     }
-    
+    /**
+     * This function is used to get realm, country and currency lists on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -300,11 +318,17 @@ export default class RealmCountryTicketComponent extends Component {
             }
         );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the realm country details
+     */
     resetClicked() {
         let { realmCountry } = this.state;
         realmCountry.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -319,6 +343,10 @@ export default class RealmCountryTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns realm country details form
+     */
     render() {
         const { realms } = this.state;
         const { currencies } = this.state;
