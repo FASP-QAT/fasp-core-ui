@@ -4140,6 +4140,103 @@ class EditSupplyPlanStatus extends Component {
     loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
+    updateFieldData = (value) => {
+        let { program } = this.state;
+        this.setState({ regionId: value });
+        var regionId = value;
+        var regionIdArray = [];
+        for (var i = 0; i < regionId.length; i++) {
+            regionIdArray[i] = regionId[i].value;
+        }
+        program.regionArray = regionIdArray;
+        this.setState({
+            program: program,
+        });
+    }
+
+    addMannualProblem() {
+        this.getProblemCriticality();
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+            loading: false
+        }, () => {
+        });
+    }
+    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
+        var json = {
+            "realmProblem": {
+                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
+                "problemType": {
+                    "id": "2"
+                }
+            },
+            "program": {
+                "id": this.props.match.params.programId
+            },
+            "versionId": this.props.match.params.versionId,
+            "problemStatus": {
+                "id": "1"
+            },
+            "dt": moment(new Date()).format("YYYY-MM-DD"),
+            "region": {
+                "id": regionId
+            },
+            "planningUnit": {
+                "id": modelPlanningUnitId
+            },
+            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
+            "notes": ""
+        }
+        ProgramService.createManualProblem(json)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        message: response.data.message,
+                        problemReportChanged: 0,
+                        remainingDataChanged: 0,
+                    })
+                    this.componentDidMount();
+                    this.toggle(0, '2');
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 404:
+                                this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                break;
+                            case 500:
+                            case 401:
+                            case 403:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        })
+    }
     /**
      * This function is called when program is changed
      * @param {*} value
@@ -4256,8 +4353,12 @@ class EditSupplyPlanStatus extends Component {
             entries: " ",
         });
         const { statuses } = this.state;
+        let { editable } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
+                if (editable && item.id == 4) {//don't show option 'No Review Needed' when editable == true
+                    return '';
+                }
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
