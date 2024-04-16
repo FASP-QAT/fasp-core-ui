@@ -14,15 +14,20 @@ import { API_URL } from '../../Constants';
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-const initialValuesFour = {
-    regionId: []
-}
+/**
+ * Defines the validation schema for program region details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
     })
 }
+/**
+ * Component for pipeline program import region details
+ */
 export default class PipelineProgramDataStepFive extends Component {
     constructor(props) {
         super(props);
@@ -31,7 +36,9 @@ export default class PipelineProgramDataStepFive extends Component {
             regionId: ''
         }
     }
-    
+    /**
+     * Reterives country, health area and organisation list on component mount
+     */
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         var realmCountryIdd = document.getElementById("realmCountryId").value;
@@ -195,6 +202,10 @@ export default class PipelineProgramDataStepFive extends Component {
                 );
         }
     }
+    /**
+     * Renders the pipeline program import region details screen.
+     * @returns {JSX.Element} - Pipeline program import region details screen.
+     */
     render() {
         return (
             <>

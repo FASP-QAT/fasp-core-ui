@@ -16,6 +16,11 @@ let initialValues = {
     planningUnitCategoryName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for product category ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -29,6 +34,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the product category form and allow user to submit the update master request in jira
+ */
 export default class EditProductCategoryTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +60,10 @@ export default class EditProductCategoryTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProductCategory = this.getProductCategory.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { planningUnitCategory } = this.state
         if (event.target.name == "summary") {
@@ -81,7 +93,9 @@ export default class EditProductCategoryTicketComponent extends Component {
             planningUnitCategory
         }, () => { })
     };
-    
+    /**
+     * This function is used to get list of realm and product categories on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -203,11 +217,17 @@ export default class EditProductCategoryTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the product category details
+     */
     resetClicked() {
         let { planningUnitCategory } = this.state;
         planningUnitCategory.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -220,6 +240,10 @@ export default class EditProductCategoryTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns product category details form
+     */
     render() {
         const { planningUnitCategories } = this.state;
         const { realms } = this.state;

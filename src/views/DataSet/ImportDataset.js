@@ -25,11 +25,16 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 const initialValues = {
     programId: ''
 }
-
+// Localized entity name
 const entityname = i18n.t('static.dashboard.importprogram')
+/**
+ * Component for importing the forecast program from zip.
+ */
 export default class ImportDataset extends Component {
     constructor(props) {
         super(props);
@@ -41,16 +46,13 @@ export default class ImportDataset extends Component {
         this.formSubmit = this.formSubmit.bind(this)
         this.importFile = this.importFile.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Retrieves programs from the indexedDB.
+     */
     getPrograms() {
         var db1;
         getDatabase();
@@ -96,6 +98,10 @@ export default class ImportDataset extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Checks for newer versions of programs.
+     * @param {Array} programs - An array of programs to check for newer versions.
+     */
     checkNewerVersions(programs) {
         if (localStorage.getItem("sessionType") === 'Online') {
             ProgramService.checkNewerVersions(programs)
@@ -105,6 +111,9 @@ export default class ImportDataset extends Component {
                 })
         }
     }
+    /**
+     * Calls the get programs function on component mount
+     */
     componentDidMount() {
         this.getPrograms();
         bsCustomFileInput.init()
@@ -114,6 +123,9 @@ export default class ImportDataset extends Component {
         document.getElementById("fileImportButton").style.display = "block";
         this.setState({ loading: false })
     }
+    /**
+     * Reads the data from the file and stores in indexed db
+     */
     formSubmit() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -468,6 +480,12 @@ export default class ImportDataset extends Component {
             }
         }
     }
+    /**
+     * Imports forecast program data from a zip file.
+     * This function allows users to upload a zip file containing program data. It reads the contents
+     * of the zip file asynchronously, decrypts the program data, and displays the program information
+     * for further processing.
+     */
     importFile() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -499,7 +517,7 @@ export default class ImportDataset extends Component {
                                 catch (err) {
                                     this.setState({ message: i18n.t('static.program.zipfilereaderror'), loading: false },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
@@ -540,10 +558,17 @@ export default class ImportDataset extends Component {
             }
         }
     }
-    
+    /**
+     * Updates program Ids
+     * @param {*} value Program Id selected by the user
+     */
     updateFieldData(value) {
         this.setState({ programId: value });
     }
+    /**
+     * Renders the import forecast program screen.
+     * @returns {JSX.Element} - Import forecast Program screen.
+     */
     render() {
         return (
             <>
@@ -611,10 +636,16 @@ export default class ImportDataset extends Component {
             </>
         )
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the import details when reset button is clicked.
+     */
     resetClicked() {
         this.state.programId = '';
         this.setState({ programId: '', message: '' });

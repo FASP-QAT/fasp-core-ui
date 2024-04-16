@@ -13,6 +13,11 @@ import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboad.regioncountry"))
 let summaryText_2 = "Add Realm Country Region"
+/**
+ * This const is used to define the validation schema for realm country region ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -32,6 +37,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.region.glntext')),
     })
 }
+/**
+ * This component is used to display the realm country region form and allow user to submit the add master request in jira
+ */
 export default class RealmCountryRegionTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -60,6 +68,10 @@ export default class RealmCountryRegionTicketComponent extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.changeRealmCountry = this.changeRealmCountry.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realmCountryRegion } = this.state
         if (event.target.name == "summary") {
@@ -91,6 +103,10 @@ export default class RealmCountryRegionTicketComponent extends Component {
             realmCountryRegion
         }, () => { })
     };
+    /**
+     * This function is called realm country is changed
+     * @param {*} event This is the on change event
+     */
     changeRealmCountry(event) {
         if (event === null) {
             let { realmCountryRegion } = this.state;
@@ -113,6 +129,10 @@ export default class RealmCountryRegionTicketComponent extends Component {
             });
         }
     }
+    /**
+     * This function is used to get realm country list
+     * @param {*} realmId This the realm Id for which the list should appear
+     */
     getDependentLists(realmId) {
         if (realmId != "") {
             ProgramService.getRealmCountryList(realmId)
@@ -179,7 +199,9 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 );
         }
     }
-   
+    /**
+     * This function is used to get the realm list on page load
+     */
     componentDidMount() {
         HealthAreaService.getRealmList()
             .then(response => {
@@ -251,11 +273,17 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the realm country region details
+     */
     resetClicked() {
         let { realmCountryRegion } = this.state;
         realmCountryRegion.realmCountryId = '';
@@ -271,6 +299,10 @@ export default class RealmCountryRegionTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns realm country region details form
+     */
     render() {
         const { realmList } = this.state;
         const { realmCountries } = this.state;

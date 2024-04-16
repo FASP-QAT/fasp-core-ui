@@ -4,14 +4,19 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import IntegrationService from '../../api/IntegrationService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.integration.integration');
+/**
+ * Component for list of integration details.
+ */
 export default class IntegrationListComponent extends Component {
     constructor(props) {
         super(props);
@@ -23,9 +28,11 @@ export default class IntegrationListComponent extends Component {
             lang: localStorage.getItem('lang')
         }
         this.addNewIntegration = this.addNewIntegration.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Builds the jexcel component to display integration list.
+     */
     buildJexcel() {
         let integrationList = this.state.selSource;
         let integrationArray = [];
@@ -62,7 +69,7 @@ export default class IntegrationListComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -88,21 +95,17 @@ export default class IntegrationListComponent extends Component {
             IntegrationListEl: IntegrationListEl, loading: false
         })
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Reterives integration list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         IntegrationService.getIntegrationListAll().then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -118,7 +121,7 @@ export default class IntegrationListComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -162,9 +165,9 @@ export default class IntegrationListComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Redirects to the edit integration screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
@@ -179,6 +182,9 @@ export default class IntegrationListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add integration screen.
+     */
     addNewIntegration() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/integration/addIntegration`)
@@ -186,6 +192,10 @@ export default class IntegrationListComponent extends Component {
             alert("You must be Online.")
         }
     }
+    /**
+     * Renders the integration list.
+     * @returns {JSX.Element} - Integration list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

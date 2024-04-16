@@ -26,13 +26,21 @@ import RealmService from "../../api/RealmService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { Capitalize, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Initial values for form fields
 let initialValues = {
   realmId: [],
   label: "",
   dataSourceTypeId: "",
   dataSourceTypeList: [],
 };
+// Localized entity name
 const entityname = i18n.t("static.datasource.datasource");
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string().required(i18n.t("static.common.realmtext")),
@@ -44,6 +52,9 @@ const validationSchema = function (values) {
     ),
   });
 };
+/**
+ * Component for adding data source details.
+ */
 export default class AddDataSource extends Component {
   constructor(props) {
     super(props);
@@ -73,16 +84,19 @@ export default class AddDataSource extends Component {
       programs: [],
       programId: "",
       loading: true,
+      lang: localStorage.getItem('lang')
     };
-    this.Capitalize = this.Capitalize.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
     this.getDataSourceTypeByRealmId =
       this.getDataSourceTypeByRealmId.bind(this);
     this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
+  /**
+   * Handles data change in the form.
+   * @param {Event} event - The change event.
+   */
   dataChange(event) {
     if (event.target.name === "label") {
       this.state.label.label_en = event.target.value;
@@ -100,7 +114,9 @@ export default class AddDataSource extends Component {
       dataSource,
     });
   }
-  
+  /**
+   * Reterives realm list on component mount
+   */
   componentDidMount() {
     RealmService.getRealmListAll()
       .then((response) => {
@@ -175,25 +191,19 @@ export default class AddDataSource extends Component {
       );
     }
   }
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById("div2").style.display = "none";
-    }, 30000);
-  }
+  /**
+   * Retrieves the data source types associated with a specific realm ID.
+   * @param {Event} e - The event triggering the function call.
+   * @returns {void}
+   */
   getDataSourceTypeByRealmId(e) {
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          var listArray = response.data.filter(c=>c.active==true);
+          var listArray = response.data.filter(c => c.active == true);
           listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(
-              a.label,
-              this.state.lang
-            ).toUpperCase();
-            var itemLabelB = getLabelText(
-              b.label,
-              this.state.lang
-            ).toUpperCase();
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -249,6 +259,10 @@ export default class AddDataSource extends Component {
       });
     }
   }
+  /**
+   * Retrieves the programs associated with a specific realm ID.
+   * @param {Event} e - The event triggering the function call.
+   */
   getProgramByRealmId(e) {
     let realmId = AuthenticationService.getRealmId();
     if (realmId != 0) {
@@ -327,9 +341,10 @@ export default class AddDataSource extends Component {
       });
     }
   }
-  Capitalize(str) {
-    this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  /**
+   * Renders the data source details form.
+   * @returns {JSX.Element} - Data source details form.
+   */
   render() {
     const { realms } = this.state;
     const { programs } = this.state;
@@ -347,7 +362,7 @@ export default class AddDataSource extends Component {
       realms.map((item, i) => {
         return (
           <option key={i} value={item.realmId}>
-            {item.label.label_en}
+            {getLabelText(item.label, this.state.lang)}
           </option>
         );
       }, this);
@@ -357,7 +372,7 @@ export default class AddDataSource extends Component {
       dataSourceTypeList.map((item, i) => {
         return (
           <option key={i} value={item.dataSourceTypeId}>
-            {item.label.label_en}
+            {getLabelText(item.label, this.state.lang)}
           </option>
         );
       }, this);
@@ -395,7 +410,7 @@ export default class AddDataSource extends Component {
                             loading: false,
                           },
                           () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                           }
                         );
                       }
@@ -579,7 +594,7 @@ export default class AddDataSource extends Component {
                           onChange={(e) => {
                             handleChange(e);
                             this.dataChange(e);
-                            this.Capitalize(e.target.value);
+                            Capitalize(e.target.value);
                           }}
                           onBlur={handleBlur}
                           value={this.state.label.label_en}
@@ -655,6 +670,9 @@ export default class AddDataSource extends Component {
       </div>
     );
   }
+  /**
+   * Redirects to the list data source screen when cancel button is clicked.
+   */
   cancelClicked() {
     this.props.history.push(
       `/dataSource/listDataSource/` +
@@ -662,6 +680,9 @@ export default class AddDataSource extends Component {
       i18n.t("static.message.cancelled", { entityname })
     );
   }
+  /**
+   * Resets the data source details when reset button is clicked.
+   */
   resetClicked() {
     this.state.label.label_en = "";
     this.state.dataSourceType.id = "";

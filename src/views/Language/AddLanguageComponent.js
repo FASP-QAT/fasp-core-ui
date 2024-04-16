@@ -7,12 +7,19 @@ import { API_URL, SPECIAL_CHARECTER_WITHOUT_NUM } from '../../Constants.js';
 import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     label: "",
     languageCode: "",
     countryCode: ""
 }
+// Localized entity name
 const entityname = i18n.t('static.language.language');
+/**
+ * Defines the validation schema for language details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -26,6 +33,9 @@ const validationSchema = function (values) {
             .max(2, i18n.t('static.language.countrycode2chartext'))
     })
 }
+/**
+ * Component for adding language details.
+ */
 class AddLanguageComponent extends Component {
     constructor(props) {
         super(props);
@@ -48,6 +58,10 @@ class AddLanguageComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Handles data change in the language form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { language } = this.state;
         if (event.target.name == "label") {
@@ -64,19 +78,32 @@ class AddLanguageComponent extends Component {
         },
             () => { });
     };
+    /**
+     * Capitalizes the first letter of the language name.
+     * @param {string} str - The language name.
+     */
     Capitalize(str) {
         let { language } = this.state
         language.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-   
+    /**
+     * Stops the loader on component mount 
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Renders the language details form.
+     * @returns {JSX.Element} - language details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -233,9 +260,15 @@ class AddLanguageComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list language when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the language details form when reset button is clicked.
+     */
     resetClicked() {
         let { language } = this.state;
         language.label.label_en = '';

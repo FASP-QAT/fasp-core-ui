@@ -7,7 +7,14 @@ import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.procurementagenttype');
+/**
+ * Defines the validation schema for procurement agent type details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentTypeCode: Yup.string()
@@ -18,6 +25,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgenTtype.procurementagenttypenametext')),
     })
 }
+/**
+ * Component for editing procurement agent type details.
+ */
 class EditProcurementAgentTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -47,23 +57,12 @@ class EditProcurementAgentTypeComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { procurementAgent } = this.state;
-            procurementAgent.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        } else {
-            return "";
-        }
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { procurementAgentType } = this.state;
         if (event.target.name == "procurementAgentTypeCode") {
@@ -80,7 +79,9 @@ class EditProcurementAgentTypeComponent extends Component {
         },
             () => { });
     };
-    
+    /**
+     * Fetches procurement agent type details on component mount.
+     */
     componentDidMount() {
         ProcurementAgentService.getProcurementAgentTypeById(this.props.match.params.procurementAgentTypeId).then(response => {
             if (response.status == 200) {
@@ -92,7 +93,7 @@ class EditProcurementAgentTypeComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -135,6 +136,10 @@ class EditProcurementAgentTypeComponent extends Component {
             }
         );
     }
+    /**
+     * Renders the procurement agent type details form.
+     * @returns {JSX.Element} - Procurement agent type details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -164,7 +169,7 @@ class EditProcurementAgentTypeComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -241,7 +246,7 @@ class EditProcurementAgentTypeComponent extends Component {
                                                         id="procurementAgentTypeName"
                                                         valid={!errors.procurementAgentTypeName}
                                                         invalid={(touched.procurementAgentTypeName && !!errors.procurementAgentTypeName) || !!errors.procurementAgentTypeName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         maxLength={255}
                                                         required
@@ -324,9 +329,15 @@ class EditProcurementAgentTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement agent type screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgentType/listProcurementAgentType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the procurement agent type details when reset button is clicked.
+     */
     resetClicked() {
         ProcurementAgentService.getProcurementAgentTypeById(this.props.match.params.procurementAgentTypeId).then(response => {
             this.setState({

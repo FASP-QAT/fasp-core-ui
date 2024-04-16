@@ -16,7 +16,9 @@ import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.budget');
+// Initial values for form fields
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
@@ -24,6 +26,12 @@ let initialValues = {
     fundingSourceId: '',
     programId: []
 }
+/**
+ * Defines the validation schema for budget details.
+ * @param {*} values - Form values.
+ * @param {*} t 
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
@@ -40,6 +48,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.fundingtext')),
     })
 }
+/**
+ * Component for editing budget details.
+ */
 class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
@@ -107,6 +118,10 @@ class EditBudgetComponent extends Component {
         this.pickRange = React.createRef();
         this.programChange = this.programChange.bind(this);
     }
+    /**
+     * Handles change in selected programs.
+     * @param {Array} programId - Selected program IDs.
+     */
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -134,22 +149,44 @@ class EditBudgetComponent extends Component {
         },
             () => { });
     }
+    /**
+     * Show budget date range picker
+     * @param {Event} e -  The click event.
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
+    /**
+     * Handle date range change
+     * @param {*} value 
+     * @param {*} text 
+     * @param {*} listIndex 
+     */
     handleRangeChange(value, text, listIndex) {
     }
+    /**
+     * Update budget range after date range picker is closed
+     * @param {*} value 
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Fetches RealmId, Program list, Budget details and Funding source list on component mount.
+     */
     componentDidMount() {
         this.setState({ loading: true })
+        // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
+        //Fetch Program list
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
@@ -216,6 +253,7 @@ class EditBudgetComponent extends Component {
                     }
                 }
             );
+        //Fetch Budget details by budgetId to show on form
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.status == 200) {
@@ -289,6 +327,7 @@ class EditBudgetComponent extends Component {
                     }
                 }
             );
+        //Fetch all funding source list
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
@@ -341,10 +380,18 @@ class EditBudgetComponent extends Component {
                 }
             );
     }
+    /**
+     * Capitalizes the first letter of the budget name.
+     * @param {string} str - The budget name.
+     */
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Handles data change in the budget form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { budget } = this.state;
         if (event.target.name === "budgetName") {
@@ -370,6 +417,10 @@ class EditBudgetComponent extends Component {
             () => {
             });
     };
+    /**
+     * Renders the budget details form.
+     * @returns {JSX.Element} - Budget details form.
+     */
     render() {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -699,9 +750,15 @@ class EditBudgetComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list budget screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the budget details form when reset button is clicked.
+     */
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
