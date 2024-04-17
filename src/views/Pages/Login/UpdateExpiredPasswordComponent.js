@@ -6,11 +6,16 @@ import CryptoJS from 'crypto-js';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import { API_URL, SECRET_KEY } from '../../../Constants.js';
 import UserService from '../../../api/UserService';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import i18n from '../../../i18n';
+/**
+ * Defines the validation schema for update expired password.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()
@@ -40,6 +45,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
+/**
+ * Component for updating expired password.
+ */
 class UpdateExpiredPasswordComponent extends Component {
     constructor(props) {
         super(props);
@@ -48,19 +56,17 @@ class UpdateExpiredPasswordComponent extends Component {
             emailId: this.props.location.state.emailId
         }
         this.logoutClicked = this.logoutClicked.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
-    componentDidMount() {
-    }
-    hideFirstComponent() {
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Redirects to login page on logout clicked
+     */
     logoutClicked() {
         this.props.history.push(`/login/` + i18n.t('static.logoutSuccess'))
     }
-    
+    /**
+     * Renders the update expired password form.
+     * @returns {JSX.Element} - Update Expired password form.
+     */
     render() {
         return (
             <div className="app flex-row align-items-center">
@@ -113,7 +119,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 }, () => {
                                                                     document.getElementById('div1').style.display = 'block';
-                                                                    this.hideFirstComponent();
+                                                                    hideFirstComponent();
                                                                 });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
@@ -126,14 +132,14 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                         this.setState({ message: error.response.data.messageCode },
                                                                             () => {
                                                                                 document.getElementById('div1').style.display = 'block';
-                                                                                this.hideFirstComponent();
+                                                                                hideFirstComponent();
                                                                             });
                                                                         break;
                                                                     default:
                                                                         this.setState({ message: 'static.unkownError' },
                                                                             () => {
                                                                                 document.getElementById('div1').style.display = 'block';
-                                                                                this.hideFirstComponent();
+                                                                                hideFirstComponent();
                                                                             });
                                                                         break;
                                                                 }
@@ -144,7 +150,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                 this.setState({ message: 'static.common.onlinepasswordtext' },
                                                     () => {
                                                         document.getElementById('div1').style.display = 'block';
-                                                        this.hideFirstComponent();
+                                                        hideFirstComponent();
                                                     });
                                             }
                                         }}

@@ -7,11 +7,18 @@ import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import FundingSourceService from "../../api/FundingSourceService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 let initialValues = {
     fundingSource: "",
     fundingSourceCode: "",
 }
+// Localized entity name
 const entityname = i18n.t('static.fundingsource.fundingsource');
+/**
+ * Defines the validation schema for funding source details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
@@ -22,7 +29,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
-
+/**
+ * Component for editing funding source details.
+ */
 class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -54,7 +63,11 @@ class EditFundingSourceComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Fetches Funding source details on component mount.
+     */
     componentDidMount() {
+        //Fetches Funding source details by fundingSourceId
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -109,11 +122,18 @@ class EditFundingSourceComponent extends Component {
             }
         );
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the funding source form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { fundingSource } = this.state;
         if (event.target.name == "fundingSource") {
@@ -133,13 +153,20 @@ class EditFundingSourceComponent extends Component {
         },
             () => { });
     };
-    
+    /**
+     * Capitalizes the first letter of the funding source name.
+     * @param {string} str - The funding source name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { fundingSource } = this.state
             fundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
+    /**
+     * Renders the funding source details form.
+     * @returns {JSX.Element} - Funding source form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -364,10 +391,17 @@ class EditFundingSourceComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list funding source when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/fundingSource/listFundingSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the funding source details form when reset button is clicked.
+     */
     resetClicked() {
+        //Fetch funding source details by fundingSourceId
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             this.setState({
                 fundingSource: response.data

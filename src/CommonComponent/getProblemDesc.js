@@ -1,4 +1,10 @@
 import getLabelText from '../CommonComponent/getLabelText';
+/**
+ * This function is used to construct the problem desc based on different dynamic parameters
+ * @param {*} row This is the instance of the problem
+ * @param {*} lang This is the language in which the description must be displayed
+ * @returns This function returns problem desc in specified language
+ */
 export default function getProblemDesc(row, lang) {
     if (row.realmProblem.problem.problemId == 1) {
         var desc_en = row.realmProblem.problem.label.label_en;

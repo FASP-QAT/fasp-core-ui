@@ -21,24 +21,11 @@ import step5 from '../../assets/img/5-step.png';
 import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-const initialValuesSix = {
-    programName: '',
-    userId: '',
-    airFreightPerc: '',
-    seaFreightPerc: '',
-    roadFreightPerc: '',
-    draftToSubmittedLeadTime: '',
-    plannedToDraftLeadTime: '',
-    submittedToApprovedLeadTime: '',
-    approvedToShippedLeadTime: '',
-    monthsInFutureForAmc: '',
-    monthsInPastForAmc: '',
-    programNotes: '',
-    arrivedToDeliveredLeadTime: '',
-    shippedToArrivedBySeaLeadTime: '',
-    shippedToArrivedByAirLeadTime: '',
-    shippedToArrivedByRoadLeadTime: ''
-}
+/**
+ * Defines the validation schema for program details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
@@ -106,6 +93,9 @@ const validationSchemaSix = function (values) {
                 }),
     })
 }
+/**
+ * Component for pipeline program import details
+ */
 export default class PipelineProgramDataStepSix extends Component {
     constructor(props) {
         super(props);
@@ -118,16 +108,28 @@ export default class PipelineProgramDataStepSix extends Component {
         this.stopLoading = this.stopLoading.bind(this);
         this.setErrorMessage = this.setErrorMessage.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
+    /**
+     * Sets error message
+     * @param {*} message Message that needs to be set 
+     */
     setErrorMessage(message) {
         this.setState({ message: message });
     }
-    
+    /**
+     * Reterives program manager list on component mount
+     */
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getProgramManagerList(realmId)
@@ -183,6 +185,10 @@ export default class PipelineProgramDataStepSix extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import details screen.
+     * @returns {JSX.Element} - Pipeline program import details screen.
+     */
     render() {
         const { programManagerList } = this.state;
         let programManagers = programManagerList.length > 0

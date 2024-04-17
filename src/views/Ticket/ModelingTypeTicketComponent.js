@@ -8,6 +8,11 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.modelingType.modelingType"))
 let summaryText_2 = "Add Modeling Type"
+/**
+ * This const is used to define the validation schema for modeling type ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -18,6 +23,9 @@ const validationSchema = function (values) {
             .required('Enter modeling type'),
     })
 }
+/**
+ * This component is used to display the modeling type form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -37,6 +45,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { modelingType } = this.state
         if (event.target.name == "summary") {
@@ -52,18 +64,30 @@ export default class OrganisationTypeTicketComponent extends Component {
             modelingType
         }, () => { })
     };
-    
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.modelingType.modelingTypeName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This is used to make the loader off on page load
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the modeling type details
+     */
     resetClicked() {
         let { modelingType } = this.state;
         modelingType.modelingTypeName = '';
@@ -73,6 +97,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns modeling type details form
+     */
     render() {
         return (
             <div className="col-md-12">

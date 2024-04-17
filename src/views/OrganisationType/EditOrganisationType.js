@@ -9,11 +9,18 @@ import OrganisationTypeService from "../../api/OrganisationTypeService";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 let initialValues = {
     realmId: '',
     organisationTypeName: '',
 }
+// Localized entity name
 const entityname = i18n.t('static.organisationType.organisationType');
+/**
+ * Defines the validation schema for organization type details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -23,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisationType.organisationTypetext')),
     })
 }
+/**
+ * Component for editing organization type details.
+ */
 export default class EditOrganisationTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -55,11 +65,18 @@ export default class EditOrganisationTypeComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the organization type form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { organisationType } = this.state
         if (event.target.name === "organisationName") {
@@ -75,8 +92,11 @@ export default class EditOrganisationTypeComponent extends Component {
         ) => {
         })
     }
-    
+    /**
+     * Fetches organization type details & realm list on component mount.
+     */
     componentDidMount() {
+        //Fetch organization type details by id
         OrganisationTypeService.getOrganisationTypeById(this.props.match.params.organisationTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -95,6 +115,7 @@ export default class EditOrganisationTypeComponent extends Component {
                 organisationTypeName: this.state.organisationType.label.label_en,
                 realmId: this.state.organisationType.realm.id
             }
+            //Fetch realm list
             UserService.getRealmList()
                 .then(response => {
                     var listArray = response.data;
@@ -185,9 +206,17 @@ export default class EditOrganisationTypeComponent extends Component {
             }
         );
     }
+    /**
+     * Capitalizes the first letter of the organization type name.
+     * @param {string} str - The organization type name.
+     */
     Capitalize(str) {
         this.state.organisationType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Renders the organization type details form.
+     * @returns {JSX.Element} - organization type details form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -380,14 +409,22 @@ export default class EditOrganisationTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list organization type when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/organisationType/listOrganisationType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the organization type details form when reset button is clicked.
+     */
     resetClicked() {
+        //Fetch organization type details by id
         OrganisationTypeService.getOrganisationTypeById(this.props.match.params.organisationTypeId).then(response => {
             this.setState({
                 organisationType: response.data
             })
+            //Fetch Realm list
             UserService.getRealmList()
                 .then(response => {
                     this.setState({

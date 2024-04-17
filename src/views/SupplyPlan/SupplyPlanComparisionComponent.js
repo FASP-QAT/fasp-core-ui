@@ -24,6 +24,9 @@ import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "./InventoryInSupplyPlan";
 import ShipmentsInSupplyPlanComponent from "./ShipmentsInSupplyPlan";
 const entityname = i18n.t('static.dashboard.supplyPlan')
+/**
+ * This component is used to allow user to do the supply planning monthwise and view the supply plans for the download version
+ */
 export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -116,6 +119,11 @@ export default class SupplyPlanComponent extends React.Component {
         this.updateState = this.updateState.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
     }
+    /**
+     * This is function is used to round the AMC value
+     * @param {*} amc The value of the AMC
+     * @returns This function returns the rounded AMC
+     */
     roundAMC(amc) {
         if (amc != null) {
             if (Number(amc).toFixed(0) >= 100) {
@@ -131,6 +139,11 @@ export default class SupplyPlanComponent extends React.Component {
             return null;
         }
     }
+    /**
+     * This method is used to add commas to the number
+     * @param {*} cell This is value of the number
+     * @returns It returns the number separated by commas
+     */
     addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
@@ -142,16 +155,25 @@ export default class SupplyPlanComponent extends React.Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is called when scroll to left is clicked on the supply plan table
+     */
     leftClicked() {
         var monthCount = (this.props.items.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
         this.props.updateState("monthCount", monthCount);
         this.formSubmit(monthCount)
     }
+    /**
+     * This function is called when scroll to right is clicked on the supply plan table
+     */
     rightClicked() {
         var monthCount = (this.props.items.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
         this.props.updateState("monthCount", monthCount);
         this.formSubmit(monthCount)
     }
+    /**
+     * This function is used to toggle the accordian for the total shipments
+     */
     toggleAccordionTotalShipments() {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -181,6 +203,11 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to round the number
+     * @param {*} num This is value of the number that needs to be rounded
+     * @returns This function returns the rounded number
+     */
     roundN = num => {
         if (num != null && num != '') {
             return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
@@ -188,6 +215,11 @@ export default class SupplyPlanComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is used to add commas to a decimal number if the value is not null or blank
+     * @param {*} value This is value of the number that needs to formatted
+     * @returns This function returns the formatted value
+     */
     formatterDouble = value => {
         if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
@@ -206,6 +238,9 @@ export default class SupplyPlanComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is used to export the supply planning data in CSV format
+     */
     exportCSV = () => {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20') + '"')
@@ -273,6 +308,11 @@ export default class SupplyPlanComponent extends React.Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * This function is used to add commas if the value is not null or blank
+     * @param {*} value This is value of the number that needs to formatted
+     * @returns This function returns the formatted value
+     */
     formatter = value => {
         if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
@@ -291,6 +331,9 @@ export default class SupplyPlanComponent extends React.Component {
             return ''
         }
     }
+    /**
+     * This function is used to export the supply planning data in PDF format
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -522,6 +565,9 @@ export default class SupplyPlanComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
     }
+    /**
+     * This function is used to get list of programs that user has downloaded
+     */
     componentDidMount() {
         var fields = document.getElementsByClassName("totalShipments1");
         for (var i = 0; i < fields.length; i++) {
@@ -582,6 +628,10 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     };
+    /**
+     * This function is used to get list of planning units based on a particular program
+     * @param {*} value This is the value of program that is selected by the user
+     */
     getPlanningUnitList(event) {
         this.setState({ loading: true })
         var programId = document.getElementById("programId").value;
@@ -710,6 +760,11 @@ export default class SupplyPlanComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to generate a month array based on the date that user has selected
+     * @param {*} currentDate This is the value of the date that user has selected
+     * @returns This function returns the month array
+     */
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
@@ -726,6 +781,11 @@ export default class SupplyPlanComponent extends React.Component {
         })
         return month;
     }
+    /**
+     * This function is used to build all the data that is required for supply planning
+     * @param {*} value This is the value of the planning unit
+     * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
+     */
     formSubmit(monthCount) {
         this.setState({
             planningUnitChange: true,
@@ -1397,6 +1457,17 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
+     * @param {*} supplyPlanType This values indicates which popup needs to be displayed
+     * @param {*} month This value indicates from which month the data shpuld be displayed in the popup
+     * @param {*} quantity This value is the suggested shipment quantity
+     * @param {*} startDate This value is the start date for the suggested shipment/Shipment
+     * @param {*} endDate This value is the end date for the suggested shipment/Shipment
+     * @param {*} isEmergencyOrder This value indicates if the particular suggested shipment is emergency order or not
+     * @param {*} shipmentType This is type of the shipment that is clicked
+     * @param {*} count This is the month number for which popup needs to be displayed
+     */
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
         var supplyPlanType = supplyPlanType;
         this.setState({
@@ -1489,6 +1560,9 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when the cancel button is clicked from expired stock popup
+     */
     actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
@@ -1498,6 +1572,10 @@ export default class SupplyPlanComponent extends React.Component {
         this.props.updateState("color", "#BA0C2F");
         this.props.hideFirstComponent();
     }
+    /**
+     * This function is called when the cancel button is clicked from consumption, inventory, suggested shipments,shipments
+     * @param {*} supplyPlanType This values indicates which popup is cancelled
+     */
     actionCanceled(supplyPlanType) {
         var inputs = document.getElementsByClassName("submitBtn");
         for (var i = 0; i < inputs.length; i++) {
@@ -1543,6 +1621,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.props.hideFirstComponent();
         this.toggleLarge(supplyPlanType);
     }
+    /**
+     * This function is called when scroll to left is clicked on the consumption table
+     */
     leftClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -1550,6 +1631,9 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountConsumption)
     }
+    /**
+     * This function is called when scroll to right is clicked on the consumption table
+     */
     rightClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -1557,6 +1641,9 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountConsumption);
     }
+    /**
+     * This function is called when scroll to left is clicked on the inventory/adjustment table
+     */
     leftClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -1564,6 +1651,9 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountAdjustments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the inventory/adjustment table
+     */
     rightClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -1571,6 +1661,9 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountAdjustments);
     }
+    /**
+     * This function is called when scroll to left is clicked on the shipment table
+     */
     leftClickedShipments() {
         var monthCountShipments = (this.state.monthCountShipments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -1578,6 +1671,9 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountShipments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the shipment table
+     */
     rightClickedShipments() {
         var monthCountShipments = (this.state.monthCountShipments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -1585,6 +1681,14 @@ export default class SupplyPlanComponent extends React.Component {
         })
         this.formSubmit(monthCountShipments);
     }
+    /**
+     * This function is called when a particular consumption record value is clicked
+     * @param {*} startDate This value is the start date of the month for which the consumption value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the consumption value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} actualFlag This is the value of the consumption type
+     * @param {*} month This is the value of the month for which the consumption value is clicked
+     */
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
         this.setState({ loading: true, consumptionStartDateClicked: startDate });
         var elInstance = this.state.consumptionBatchInfoTableEl;
@@ -1633,6 +1737,13 @@ export default class SupplyPlanComponent extends React.Component {
             }
         })
     }
+    /**
+     * This function is called when a particular inventory/adjustment record value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} month This is the value of the month for which the inventory/adjustment value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the inventory/adjustment value is clicked
+     * @param {*} actualFlag This is the value of the inventory type
+     */
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -1687,6 +1798,10 @@ export default class SupplyPlanComponent extends React.Component {
             }
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The supply plan data in tabular format
+     */
     render() {
         const chartOptions1 = {
             title: {
@@ -2893,6 +3008,12 @@ export default class SupplyPlanComponent extends React.Component {
             </div>
         )
     }
+    /**
+     * This function is used to display the ledger of a particular batch No
+     * @param {*} batchNo This is the value of the batch number for which the ledger needs to be displayed
+     * @param {*} createdDate This is the value of the created date for which the ledger needs to be displayed
+     * @param {*} expiryDate  This is the value of the expire date for which the ledger needs to be displayed
+     */
     showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
         this.setState({ loading: true })
         var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
@@ -2909,6 +3030,11 @@ export default class SupplyPlanComponent extends React.Component {
             loading: false
         })
     }
+    /**
+     * This function is used to redirect the user to shipment details from which a particular batch was created
+     * @param {*} batchNo This is the value of the batch number for which a particular shipments needs to be displayed
+     * @param {*} expiryDate This is the value of the expire date for which a particular shipments needs to be displayed
+     */
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
         shipmentList.map((sl, count) => {
@@ -2936,6 +3062,12 @@ export default class SupplyPlanComponent extends React.Component {
             }
         })
     }
+    /**
+     * This function is called when user clicks on a particular shipment
+     * @param {*} supplyPlanType This is the type of the shipment row that user has clicked on
+     * @param {*} startDate This is the start date of the month which user has clicked on
+     * @param {*} endDate This is the end date of the month which user has clicked on 
+     */
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {
         var programJson = this.state.programJson;
         var shipmentListUnFiltered = programJson.shipmentList;
@@ -2978,11 +3110,20 @@ export default class SupplyPlanComponent extends React.Component {
             }
         })
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * This is function is called when cancel button is clicked from the shipment modal
+     * @param {*} type This is type of the shipment modal for example, the main shipment table, Quantity table and batch table
+     */
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
@@ -3015,6 +3156,9 @@ export default class SupplyPlanComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is called when cancel button is clicked from inventory modal
+     */
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
@@ -3026,6 +3170,9 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryBatchError: ""
         })
     }
+    /**
+     * This function is called when cancel button is clicked from consumption modal
+     */
     actionCanceledConsumption() {
         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);

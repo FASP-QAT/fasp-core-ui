@@ -15,6 +15,10 @@ import QuantimedImportStepOne from './QuantimedImportStepOne';
 import QuantimedImportStepThree from './QuantimedImportStepThree';
 import QuantimedImportStepTwo from './QuantimedImportStepTwo';
 import QunatimedImportStepFive from './QunatimedImportStepFive';
+/**
+ * Component for quantimed import onboarding.
+ * Allows users to go through a multi-step form for quantimed import.
+ */
 export default class QuantimedImportOnboarding extends Component {
     constructor(props) {
         super(props);
@@ -58,10 +62,16 @@ export default class QuantimedImportOnboarding extends Component {
         this.triggerStepFive = this.triggerStepFive.bind(this);
         this.redirectToDashboard = this.redirectToDashboard.bind(this);
     }
+    /**
+     * Redirects to the dashboard based on the user's role.
+     */
     redirectToDashboard() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.quantimed.quantimedImportSuccess'))
     }
+    /**
+     * Sets up the initial display state for the steps.
+     */
     componentDidMount() {
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -76,6 +86,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
     finishedStepOne() {
         this.setState({ progressPer: 25 });
         document.getElementById('stepOne').style.display = 'none';
@@ -91,6 +104,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles the completion of step two and updates the display to show step three.
+     */
     finishedStepTwo() {
         this.setState({ progressPer: 50 });
         document.getElementById('stepOne').style.display = 'none';
@@ -106,6 +122,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles the completion of step three and updates the display to show step four.
+     */
     finishedStepThree() {
         this.setState({ progressPer: 75 });
         document.getElementById('stepOne').style.display = 'none';
@@ -121,6 +140,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles the completion of step four and updates the display to show step five.
+     */
     finishedStepFour() {
         this.setState({ progressPer: 100 });
         document.getElementById('stepOne').style.display = 'none';
@@ -136,6 +158,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 1
         })
     }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     previousToStepOne() {
         this.setState({ progressPer: 0 });
         document.getElementById('stepOne').style.display = 'block';
@@ -151,6 +176,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     previousToStepTwo() {
         this.setState({ progressPer: 25 });
         document.getElementById('stepOne').style.display = 'none';
@@ -166,6 +194,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles moving back to step three from any subsequent step and updates the display accordingly.
+     */
     previousToStepThree() {
         this.setState({ progressPer: 50 });
         document.getElementById('stepOne').style.display = 'none';
@@ -181,6 +212,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles moving back to step four from any subsequent step and updates the display accordingly.
+     */
     previousToStepFour() {
         this.setState({ progressPer: 75 });
         document.getElementById('stepOne').style.display = 'none';
@@ -196,19 +230,39 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
+    /**
+     * Handles changes in data.
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
     }
+    /**
+     * Triggers an alert in a child component.
+     */
     triggerChildAlert() {
         this.refs.child.loadTableData();
     }
+    /**
+     * Triggers step three in the form.
+     */
     triggerStepThree() {
         this.refs.child_3.loadRegionList();
     }
+    /**
+     * Triggers step four in the form.
+     */
     triggerStepFour() {
     }
+    /**
+     * Triggers step five in the form.
+     */
     triggerStepFive() {
         this.refs.child_5.showFinalData();
     }
+    /**
+     * Renders the quantimed import screen.
+     * @returns {JSX.Element} - Quantimed import screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">

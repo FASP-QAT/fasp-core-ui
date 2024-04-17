@@ -28,12 +28,14 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+/**
+ * Component for showing the dashboard.
+ */
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
-    this.hideFirstComponent = this.hideFirstComponent.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.state = {
       id: this.props.match.params.id,
       dropdownOpen: false,
@@ -65,6 +67,11 @@ class ApplicationDashboard extends Component {
     this.deleteProgram = this.deleteProgram.bind(this);
     this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
   }
+  /**
+   * Deletes a supply plan program.
+   * @param {string} programId - The ID of the program to be deleted.
+   * @param {string} versionId - The version ID of the program to be deleted.
+   */
   deleteSupplyPlanProgram(programId, versionId) {
     confirmAlert({
       title: i18n.t('static.program.confirm'),
@@ -103,7 +110,7 @@ class ApplicationDashboard extends Component {
                       message: i18n.t("static.dashboard.programDeletedSuccessfully"),
                       color: 'green'
                     }, () => {
-                      this.hideSecondComponent()
+                      hideSecondComponent()
                     })
                     this.getPrograms();
                   }.bind(this)
@@ -118,13 +125,18 @@ class ApplicationDashboard extends Component {
               message: i18n.t('static.actionCancelled'), loading: false, color: "red"
             })
             this.setState({ loading: false, color: "red" }, () => {
-              this.hideSecondComponent()
+              hideSecondComponent()
             })
           }
         }
       ]
     })
   }
+  /**
+   * Deletes a program.
+   * @param {string} programId - The ID of the program to be deleted.
+   * @param {string} versionId - The version ID of the program to be deleted.
+   */
   deleteProgram(programId, versionId) {
     confirmAlert({
       title: i18n.t('static.program.confirm'),
@@ -159,7 +171,7 @@ class ApplicationDashboard extends Component {
                     message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
                     color: 'green'
                   }, () => {
-                    this.hideSecondComponent()
+                    hideSecondComponent()
                   })
                   this.getDataSetList();
                 }.bind(this)
@@ -173,16 +185,27 @@ class ApplicationDashboard extends Component {
               message: i18n.t('static.actionCancelled'), loading: false, color: "red"
             })
             this.setState({ loading: false, color: "red" }, () => {
-              this.hideSecondComponent()
+              hideSecondComponent()
             })
           }
         }
       ]
     })
   }
+  /**
+   * Redirects the user to a specified URL.
+   * @param {string} url - The URL to redirect to.
+   */
   redirectToCrud = (url) => {
     this.props.history.push(url);
   }
+  /**
+   * Redirects the user to a specified URL and stores data in local storage based on the provided parameters.
+   * @param {string} url - The URL to redirect to.
+   * @param {string} programId - The program ID.
+   * @param {string} versionId - The version ID.
+   * @param {number} typeId - The type ID.
+   */
   redirectToCrudWithValue = (url, programId, versionId, typeId) => {
     if (typeId == 1) {
       let obj = { label: this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0].programCode, value: programId }
@@ -192,25 +215,24 @@ class ApplicationDashboard extends Component {
     }
     this.props.history.push(url);
   }
-  hideFirstComponent() {
-    this.timeout = setTimeout(function () {
-      document.getElementById('div1').style.display = 'none';
-    }, 30000);
-  }
-  hideSecondComponent() {
-    document.getElementById('div2').style.display = 'block';
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 30000);
-  }
+  /**
+   * Clears the timeout when the component is unmounted.
+   */
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
+  /**
+   * Toggles the state of the dropdownOpen variable in the component's state.
+   */
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
     });
   }
+  /**
+   * Checks for newer versions of programs and updates local storage with the latest program information.
+   * @param {Array} programs - List of programs to check for newer versions.
+   */
   checkNewerVersions(programs) {
     if (localStorage.getItem('sessionType') === 'Online') {
       ProgramService.checkNewerVersions(programs)
@@ -220,6 +242,10 @@ class ApplicationDashboard extends Component {
         })
     }
   }
+  /**
+   * Checks for newer versions of datasets and updates local storage with the latest dataset information.
+   * @param {Array} datasets - List of datasets to check for newer versions.
+   */
   checkNewerVersionsDataset(programs) {
     if (localStorage.getItem('sessionType') === 'Online') {
       ProgramService.checkNewerVersions(programs)
@@ -229,6 +255,9 @@ class ApplicationDashboard extends Component {
         })
     }
   }
+  /**
+   * Retrieves supply plan programs from indexedDB and updates the state with the fetched program list.
+   */
   getPrograms() {
     var db1;
     getDatabase();
@@ -277,6 +306,9 @@ class ApplicationDashboard extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Retrieves forecast programs from indexedDB and updates the state with the fetched program list.
+   */
   getDataSetList() {
     var db1;
     getDatabase();
@@ -330,6 +362,9 @@ class ApplicationDashboard extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Reterives dashboard data from server on component mount
+   */
   componentDidMount() {
     if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
@@ -390,30 +425,54 @@ class ApplicationDashboard extends Component {
         })
       })
     }
-    this.hideFirstComponent();
+    hideFirstComponent();
   }
+  /**
+   * Callback function invoked when an animation is about to start exiting.
+   * Used in components that utilize animations or transitions to perform specific actions just before the exit animation begins.
+   */
   onExiting() {
     this.animating = true;
   }
+  /**
+   * Callback function invoked when an animation has completed exiting.
+   * Used in components that utilize animations or transitions to perform specific actions after the exit animation has finished.
+   */
   onExited() {
     this.animating = false;
   }
+  /**
+   * Move to the next item in the carousel.
+   */
   next() {
     if (this.animating) return;
     const nextIndex = this.state.activeIndex === this.state.users.length - 1 ? 0 :
       this.state.activeIndex + 1;
     this.setState({ activeIndex: nextIndex });
   }
+  /**
+   * Move to the previous item in the carousel.
+   */
   previous() {
     if (this.animating) return;
     const nextIndex = this.state.activeIndex === 0 ? this.state.users.length - 1 :
       this.state.activeIndex - 1;
     this.setState({ activeIndex: nextIndex });
   }
+  /**
+   * Navigate to a specific index in the carousel.
+   * @param {number} newIndex The index of the item to navigate to.
+   * @returns 
+   */
   goToIndex(newIndex) {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
   }
+  /**
+   * Update a specific key-value pair in the state's programList array.
+   * @param {string} key The key of the item in the programList array to update.
+   * @param {any} value The new value to set for the specified key.
+   */
   updateState(key, value) {
     var programList = this.state.programList;
     var index = programList.findIndex(c => c.id == key);
@@ -422,6 +481,10 @@ class ApplicationDashboard extends Component {
       'programList': programList
     })
   }
+  /**
+   * Retrieves the problem list after calculation for a specific program ID.
+   * @param {number} id The ID of the program for which to retrieve the problem list. 
+   */
   getProblemListAfterCalculation(id) {
     this.updateState(id, true);
     if (id != 0) {
@@ -430,7 +493,14 @@ class ApplicationDashboard extends Component {
       this.updateState(id, false);
     }
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+  /**
+   * Renders the application dashboard.
+   * @returns {JSX.Element} - Application Dashboard.
+   */
   render() {
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;

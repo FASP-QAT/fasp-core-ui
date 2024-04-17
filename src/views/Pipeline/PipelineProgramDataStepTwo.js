@@ -15,15 +15,20 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValuesTwo = {
-    realmCountryId: ''
-}
+/**
+ * Defines the validation schema for program realm country details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
     })
 }
+/**
+ * Component for pipeline program import realm country details
+ */
 export default class PipelineProgramDataStepTwo extends Component {
     constructor(props) {
         super(props);
@@ -31,7 +36,9 @@ export default class PipelineProgramDataStepTwo extends Component {
             realmCountryList: []
         }
     }
-    
+    /**
+     * Reterives realm country list on component mount
+     */
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getRealmCountryList(realmId)
@@ -86,6 +93,10 @@ export default class PipelineProgramDataStepTwo extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import realm country details screen.
+     * @returns {JSX.Element} - Pipeline program import realm country details screen.
+     */
     render() {
         const { realmCountryList } = this.state;
         let realmCountries = realmCountryList.length > 0

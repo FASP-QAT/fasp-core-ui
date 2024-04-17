@@ -18,6 +18,9 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import { generateRandomAplhaNumericCode, paddingZero, decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
+/**
+ * This component is used to sync the master data into QAT
+ */
 export default class SyncMasterData extends Component {
     constructor(props) {
         super(props);
@@ -36,16 +39,25 @@ export default class SyncMasterData extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.fetchData = this.fetchData.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to get user details by user Id on page load
+     */
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         document.getElementById("retryButtonDiv").style.display = "none";
@@ -58,6 +70,10 @@ export default class SyncMasterData extends Component {
         })
         this.hideFirstComponent();
     }
+    /**
+     * This is used to display the content
+     * @returns This returns a progress bar to show progress of the sync
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -95,6 +111,12 @@ export default class SyncMasterData extends Component {
             </div>
         )
     }
+    /**
+     * This function is used to check pending commit requests for forecast programs and update the readonly flag
+     * @param {*} datasetList This is the list of all the forecast programs that user has loaded with their details
+     * @param {*} datasetDetailsList This is the list of all the forecast programs with that user has loaded with very less details like readonly flag, id etc
+     * @param {*} readonlyProgramIds This is the list of program Ids that are readonly because commit was in progress
+     */
     syncDatasetData(datasetList, datasetDetailsList, readonlyProgramIds) {
         var db1;
         var storeOS;
@@ -134,6 +156,15 @@ export default class SyncMasterData extends Component {
                 })
         }.bind(this)
     }
+    /**
+     * This function is used to check pending commit requests for supply planning programs and update the readonly flag. This function is also used to sync erp 
+     * @param {*} date This is the last sync date
+     * @param {*} programList This is the list of all the supply planning programs that user has loaded with their details
+     * @param {*} programQPLDetailsList This is the list of all the supply plan programs with that user has loaded with very less details like readonly flag, id etc
+     * @param {*} readonlyProgramIds This is the list of program Ids that are readonly because commit was in progress 
+     * @param {*} programPlanningUnitList This is the list of program planning unit mapping for all the loaded programs to update the catalog price for planned shipments
+     * @param {*} procurementAgentPlanningUnitList This is the list of procurement agent planning unit mapping for all the loaded programs to update the catalog price for planned shipments 
+     */
     syncProgramData(date, programList, programQPLDetailsList, readonlyProgramIds, programPlanningUnitList, procurementAgentPlanningUnitList) {
         var valid = true;
         var jsonForNewShipmentSync = [];
@@ -692,8 +723,13 @@ export default class SyncMasterData extends Component {
                     })
                 }
             })
-        return valid;
+        // return valid;
     }
+    /**
+     * This function is used to update the count of progress bar
+     * @param {*} hasPrograms This is true if the progress bar count should be updated for program. False if the progress bar count should be updated for masters
+     * @param {*} programId This is the program Id for which the progress bar count should be updated
+     */
     fetchData(hasPrograms, programId) {
         var realmId = AuthenticationService.getRealmId();
         if (hasPrograms != 0) {
@@ -746,6 +782,9 @@ export default class SyncMasterData extends Component {
             }.bind(this)
         }
     }
+    /**
+     * This function is used to sync all the masters on page load
+     */
     syncMasters() {
         this.setState({ loading: false })
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -1565,6 +1604,9 @@ export default class SyncMasterData extends Component {
                 })
         }
     }
+    /**
+     * This function is called when sync fails and user wants to retry the sync
+     */
     retryClicked() {
         this.setState({
             totalMasters: TOTAL_NO_OF_MASTERS_IN_SYNC,
