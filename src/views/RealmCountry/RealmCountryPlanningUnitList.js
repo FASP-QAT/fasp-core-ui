@@ -130,34 +130,35 @@ export default class RealmCountryPlanningUnitList extends Component {
     data[3] = "";
     data[4] = "";
     data[5] = "";
-    data[6] = true;
-    data[7] = "";
-    data[8] = 0;
-    data[9] = 1;
-    data[10] = "";
+    data[6] = "";
+    data[7] = true;
+    data[8] = "";
+    data[9] = 0;
+    data[10] = 1;
+    data[11] = "";
     this.el.insertRow(data, 0, 1);
   };
   oneditionend = function (instance, cell, x, y, value) {
     var elInstance = instance;
     var rowData = elInstance.getRowData(y);
     if (
-      x == 5 &&
-      !isNaN(rowData[5]) &&
-      rowData[5].toString().indexOf(".") != -1
+      x == 6 &&
+      !isNaN(rowData[6]) &&
+      rowData[6].toString().indexOf(".") != -1
     ) {
-      elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+      elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
     }
-    this.el.setValueFromCoords(9, y, 1, true);
+    this.el.setValueFromCoords(10, y, 1, true);
   };
   onPaste(instance, data) {
     var z = -1;
     for (var i = 0; i < data.length; i++) {
       if (z != data[i].y) {
-        var index = instance.getValue(`I${parseInt(data[i].y) + 1}`, true);
+        var index = instance.getValue(`J${parseInt(data[i].y) + 1}`, true);
         if (index === "" || index == null || index == undefined) {
-          instance.setValueFromCoords(6, data[i].y, true, true);
-          instance.setValueFromCoords(8, data[i].y, 0, true);
-          instance.setValueFromCoords(9, data[i].y, 1, true);
+          instance.setValueFromCoords(7, data[i].y, true, true);
+          instance.setValueFromCoords(9, data[i].y, 0, true);
+          instance.setValueFromCoords(10, data[i].y, 1, true);
           z = data[i].y;
         }
       }
@@ -189,15 +190,15 @@ export default class RealmCountryPlanningUnitList extends Component {
       var isMultiplierChanged = 0;
       for (var i = 0; i < tableJson.length; i++) {
         var value = this.el
-          .getValue(`F${parseInt(i) + 1}`, true)
+          .getValue(`G${parseInt(i) + 1}`, true)
           .toString()
           .replaceAll(",", "");
-        var map1 = new Map(Object.entries(tableJson[i]));
-        var oldValue = map1.get("10");
-        if (value != oldValue && map1.get("8") > 0) {
+        var map1 = new Map(Object.entries(tableJson[i]));        
+        var oldValue = map1.get("11");
+        if (value != oldValue && map1.get("9") > 0) {
           isMultiplierChanged = 1;
         }
-        if (parseInt(map1.get("9")) === 1) {
+        if (parseInt(map1.get("10")) === 1) {
           let json = {
             planningUnit: {
               id: parseInt(map1.get("1")),
@@ -209,15 +210,16 @@ export default class RealmCountryPlanningUnitList extends Component {
             unit: {
               unitId: parseInt(map1.get("4")),
             },
-            multiplier: this.el
-              .getValue(`F${parseInt(i) + 1}`, true)
+            conversionMethod: parseInt(map1.get("5")),
+            conversionNumber: this.el
+              .getValue(`G${parseInt(i) + 1}`, true)
               .toString()
               .replaceAll(",", ""),
-            active: map1.get("6"),
+            active: map1.get("7"),
             realmCountry: {
               id: parseInt(map1.get("0")),
             },
-            realmCountryPlanningUnitId: parseInt(map1.get("8")),
+            realmCountryPlanningUnitId: parseInt(map1.get("9")),
           };
           changedpapuList.push(json);
         }
@@ -385,7 +387,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     var valid = true;
     var json = this.el.getJson(null, false);
     for (var y = 0; y < json.length; y++) {
-      var value = this.el.getValueFromCoords(9, y);
+      var value = this.el.getValueFromCoords(10, y);
       if (parseInt(value) == 1) {
         valid = checkValidation(this.el);
         if(!valid){
@@ -398,7 +400,7 @@ export default class RealmCountryPlanningUnitList extends Component {
               })
       }
         var value = this.el
-          .getValue(`F${parseInt(y) + 1}`, true)
+          .getValue(`G${parseInt(y) + 1}`, true)
           .toString()
           .replaceAll(",", "");
 
@@ -411,8 +413,8 @@ export default class RealmCountryPlanningUnitList extends Component {
     changed(instance, cell, x, y, value)
     
     //Active
-    if (x != 9) {
-      this.el.setValueFromCoords(9, y, 1, true);
+    if (x != 10) {
+      this.el.setValueFromCoords(10, y, 1, true);
     }
   }.bind(this);
   addNewEntity() {
@@ -430,6 +432,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     let planningUnitArr = [];
     let unitArr = [];
     let realmCountryArr = [];
+    let convMethodArr = [];
     if (realmCountrys.length > 0) {
       for (var i = 0; i < realmCountrys.length; i++) {
         var paJson = {
@@ -460,6 +463,17 @@ export default class RealmCountryPlanningUnitList extends Component {
         unitArr[i] = paJson;
       }
     }
+    //Create json for Conversion method dropdown    
+    convMethodArr[0] = {
+      name: i18n.t("static.alternateReportingUnit.multiply"),
+      id: parseInt(1)//Multiply
+    };
+
+    convMethodArr[1] = {
+      name: i18n.t("static.alternateReportingUnit.divide"),
+      id: parseInt(2)//Divide
+    };
+
     var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
@@ -472,12 +486,13 @@ export default class RealmCountryPlanningUnitList extends Component {
         data[2] = papuList[j].label.label_en;
         data[3] = papuList[j].skuCode;
         data[4] = parseInt(papuList[j].unit.unitId);
-        data[5] = papuList[j].multiplier;
-        data[6] = papuList[j].active;
-        data[7] = papuList[j].realmCountry.id;
-        data[8] = papuList[j].realmCountryPlanningUnitId;
-        data[9] = 0;
-        data[10] = papuList[j].multiplier;
+        data[5] = papuList[j].conversionMethod;
+        data[6] = papuList[j].conversionNumber;
+        data[7] = papuList[j].active;
+        data[8] = papuList[j].realmCountry.id;
+        data[9] = papuList[j].realmCountryPlanningUnitId;
+        data[10] = 0;
+        data[11] = papuList[j].conversionNumber;
         papuDataArr[count] = data;
         count++;
       }
@@ -490,11 +505,12 @@ export default class RealmCountryPlanningUnitList extends Component {
       data[3] = "";
       data[4] = "";
       data[5] = "";
-      data[6] = true;
-      data[7] = "";
-      data[8] = 0;
-      data[9] = 1;
-      data[10] = "";
+      data[6] = "";
+      data[7] = true;
+      data[8] = "";
+      data[9] = 0;
+      data[10] = 1;
+      data[11] = "";
       papuDataArr[0] = data;
     }
     this.el = jexcel(document.getElementById("tableDiv"), "");
@@ -531,6 +547,12 @@ export default class RealmCountryPlanningUnitList extends Component {
           title: i18n.t("static.unit.unit"),
           type: "autocomplete",
           source: unitArr,
+          required: true
+        },
+        {
+          title: i18n.t("static.unit.conversionMethod"),
+          type: "autocomplete",
+          source: convMethodArr,
           required: true
         },
         {
@@ -574,17 +596,17 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (realmCountryPlanningUnitId == 0) {
           var cell = elInstance.getCell(`B${parseInt(y) + 1}`);
           var cellA = elInstance.getCell(`A${parseInt(y) + 1}`);
-          var cellF = elInstance.getCell(`F${parseInt(y) + 1}`);
+          var cellG = elInstance.getCell(`G${parseInt(y) + 1}`);
           cell.classList.remove("readonly");
           cellA.classList.remove("readonly");
-          cellF.classList.remove("readonly");
+          cellG.classList.remove("readonly");
         } else {
           var cell = elInstance.getCell(`B${parseInt(y) + 1}`);
           var cellA = elInstance.getCell(`A${parseInt(y) + 1}`);
-          var cellF = elInstance.getCell(`F${parseInt(y) + 1}`);
+          var cellG = elInstance.getCell(`G${parseInt(y) + 1}`);
           cell.classList.add("readonly");
           cellA.classList.add("readonly");
-          cellF.classList.add("readonly");
+          cellG.classList.add("readonly");
         }
       },
       onsearch: function (el) {
@@ -659,11 +681,12 @@ export default class RealmCountryPlanningUnitList extends Component {
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
-                data[6] = true;
-                data[7] = "";
-                data[8] = 0;
-                data[9] = 1;
-                data[10] = "";
+                data[6] = "";
+                data[7] = true;
+                data[8] = "";
+                data[9] = 0;
+                data[10] = 1;
+                data[11] = "";
                 obj.insertRow(data, parseInt(y), 1);
               }.bind(this),
             });
@@ -679,17 +702,18 @@ export default class RealmCountryPlanningUnitList extends Component {
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
-                data[6] = true;
-                data[7] = "";
-                data[8] = 0;
-                data[9] = 1;
-                data[10] = "";
+                data[6] = "";
+                data[7] = true;
+                data[8] = "";
+                data[9] = 0;
+                data[10] = 1;
+                data[11] = "";
                 obj.insertRow(data, parseInt(y));
               }.bind(this),
             });
           }
           if (obj.options.allowDeleteRow == true) {
-            if (obj.getRowData(y)[8] == 0) {
+            if (obj.getRowData(y)[9] == 0) {
               items.push({
                 title: i18n.t("static.common.deleterow"),
                 onclick: function () {
@@ -1017,15 +1041,16 @@ export default class RealmCountryPlanningUnitList extends Component {
     tr.children[3].classList.add("AsteriskTheadtrTd");
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
-    tr.children[6].classList.add("InfoTrAsteriskTheadtrTdImageARU");
-    tr.children[6].title = i18n.t("static.tooltip.conversionfactorARU");
+    tr.children[6].classList.add("AsteriskTheadtrTd");
+    tr.children[7].classList.add("InfoTrAsteriskTheadtrTdImageARU");
+    tr.children[7].title = i18n.t("static.tooltip.conversionfactorARU");
   };
   blur = function (instance) {
   };
   focus = function (instance) {
   };
   onedit = function (instance, cell, x, y, value) {
-    this.el.setValueFromCoords(9, y, 1, true);
+    this.el.setValueFromCoords(10, y, 1, true);
   }.bind(this);
   componentDidMount() {
     this.getPrograms();
