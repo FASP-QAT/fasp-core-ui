@@ -1749,7 +1749,8 @@ export default class TreeExtrapolationComponent extends React.Component {
      */
     loadedExtrapolation = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        // var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.querySelector("#tableDiv thead");      
         var tr = asterisk.firstChild.nextSibling;
         tr.children[3].classList.add('InfoTr');
         tr.children[3].title = i18n.t('static.tooltip.ReportingRate');
