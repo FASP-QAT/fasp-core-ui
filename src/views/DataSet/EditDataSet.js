@@ -195,7 +195,7 @@ export default class EditProgram extends Component {
             var healthAreaCode = splitCode[1];
             var organisationCode = splitCode[2];
             if (splitCode.length > 4) {
-                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]), programCode.length);
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3])+2, programCode.length);
             }
             if (uniqueCode == undefined) {
                 uniqueCode = ""

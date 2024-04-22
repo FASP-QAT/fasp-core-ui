@@ -243,7 +243,7 @@ export default class EditProgram extends Component {
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
             if (splitCode.length > 4) {
-                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]), programCode.length);
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3])+2, programCode.length);
             }
             var realmCountryCode = splitCode[0];
             var healthAreaCode = splitCode[1];
