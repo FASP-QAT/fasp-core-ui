@@ -14,15 +14,24 @@ import { API_URL } from '../../Constants';
 import DropdownService from '../../api/DropdownService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesFour = {
     organisationId: ''
 }
+/**
+ * Defines the validation schema for step four of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
     })
 }
+/**
+ * Component for program Onboarding step six for taking the organisation details for program
+ */
 export default class StepFour extends Component {
     constructor(props) {
         super(props);
@@ -31,11 +40,17 @@ export default class StepFour extends Component {
         }
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
-    
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(event) {
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateOrganisationCode(organisationCode);
     }
+    /**
+     * Reterives organisation list from server
+     */
     getOrganisationList() {
         DropdownService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
@@ -94,8 +109,10 @@ export default class StepFour extends Component {
                 }
             );
     }
-    componentDidMount() {
-    }
+    /**
+     * Renders the program onboarding step four screen.
+     * @returns {JSX.Element} - Program onboarding step four screen.
+     */
     render() {
         const { organisationList } = this.state;
         let realmOrganisation = organisationList.length > 0

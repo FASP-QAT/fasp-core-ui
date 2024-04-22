@@ -51,6 +51,9 @@ import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketCompone
 import EditUsagePeriodTicketComponent from './EditUsagePeriodTicketComponent';
 import EditBranchTemplateTicketComponent from './EditBranchTemplateTicketComponent';
 import EditTreeTemplateTicketComponent from './EditTreeTemplateTicketComponent';
+/**
+ * This component is used to show multiple options for creating the tickets in JIRA
+ */
 export default class InitialTicketPageComponent extends Component {
   constructor(props) {
     super(props);
@@ -142,8 +145,9 @@ export default class InitialTicketPageComponent extends Component {
     this.backFromEditMasterForms = this.backFromEditMasterForms.bind(this);
     this.toggleChangeRequest = this.toggleChangeRequest.bind(this);
   }
-  componentDidMount() {
-  }
+  /**
+   * This function is used to toggle the ticketing module
+   */
   togglehelp() {
     if (localStorage.getItem("sessionType") === 'Online') {
       this.setState({
@@ -220,6 +224,10 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to toggle the ticket created message module
+   * @param {*} msg This is message that should be showed
+   */
   toggleSmall(msg) {
     confirmAlert({
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
@@ -230,18 +238,27 @@ export default class InitialTicketPageComponent extends Component {
       ]
     });
   }
+  /**
+   * This function is used to toggle the bug report details
+   */
   togglebugreport() {
     this.setState({
       initialPage: 0,
       showBugReport: 1
     });
   }
+  /**
+   * This function is used to toggle the change report details
+   */
   toggleChangeRequest() {
     this.setState({
       initialPage: 0,
       showChangeRequest: 1
     });
   }
+  /**
+   * This function is used to toggle the change master details
+   */
   togglechangemaster() {
     this.setState({
       changemaster: !this.state.changemaster,
@@ -250,24 +267,36 @@ export default class InitialTicketPageComponent extends Component {
       showBugReport: 0
     });
   }
+  /**
+   * This function is used to toggle the add master details
+   */
   toggleMasterList() {
     this.setState({
       showAddEditMaster: 0,
       showOnlyMaster: 1
     });
   }
+  /**
+   * This function is used to toggle the edit master details
+   */
   toggleEditMaster() {
     this.setState({
       showAddEditMaster: 0,
       showEditMaster: 1
     });
   }
+  /**
+   * This function is used to toggle the user master details
+   */
   toggleUserMaster() {
     this.setState({
       initialPage: 0,
       showUserData: 1
     });
   }
+  /**
+   * This function is used to toggle the main model details on back button clicked
+   */
   toggleMain() {
     this.setState({
       initialPage: 1,
@@ -276,24 +305,37 @@ export default class InitialTicketPageComponent extends Component {
       showChangeRequest: 0
     });
   }
+  /**
+   * This function is used to toggle add/edit master model details on back button clicked
+   */
   toggleMain1() {
     this.setState({
       initialPage: 1,
       showAddEditMaster: 0
     });
   }
+  /**
+   * This function is used to toggle add master model details on back button clicked
+   */
   toggleMain2() {
     this.setState({
       showAddEditMaster: 1,
       showOnlyMaster: 0
     });
   }
+  /**
+   * This function is used to toggle edit master model details on back button clicked
+   */
   toggleMain3() {
     this.setState({
       showAddEditMaster: 1,
       showEditMaster: 0
     });
   }
+  /**
+   * This function is used to display a particular master screen when user clicks on the option
+   * @param {*} formNo This is the form no for the master that is clicked
+   */
   showOnlyAddMasterForms(formNo) {
     if (formNo == 1) {
       this.setState({
@@ -489,6 +531,10 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to toggle add master model details on back button clicked
+   * @param {*} masterFormNo This is the form no for the master that is clicked
+   */
   backFromAddMasterForms(masterFormNo) {
     if (masterFormNo == 1) {
       this.setState({
@@ -612,6 +658,10 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to display a particular master screen when user clicks on the option
+   * @param {*} formNo This is the form no for the master that is clicked
+   */
   showOnlyEditMasterForms(formNo) {
     if (formNo == 1) {
       this.setState({
@@ -783,6 +833,10 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to toggle edit master model details on back button clicked
+   * @param {*} masterFormNo This is the form no for the master that is clicked
+   */
   backFromEditMasterForms(masterFormNo) {
     if (masterFormNo == 1) {
       this.setState({
@@ -891,6 +945,10 @@ export default class InitialTicketPageComponent extends Component {
       });
     }
   }
+  /**
+   * This is used to display the content
+   * @returns This returns the popup for creating tickets
+   */
   render() {
     const checkOnline = localStorage.getItem('sessionType');
     return (

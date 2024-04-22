@@ -8,9 +8,15 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import { API_URL } from '../../../Constants';
 import UserService from '../../../api/UserService.js';
+// Initial values for form fields
 const initialValues = {
     emailId: ""
 }
+/**
+ * Defines the validation schema for forgot password.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         emailId: Yup.string()
@@ -18,7 +24,13 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validemail')),
     })
 }
+/**
+ * Component for forgot password.
+ */
 class ForgotPasswordComponent extends Component {
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
     constructor(props) {
         super(props);
@@ -28,13 +40,22 @@ class ForgotPasswordComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideMessage = this.hideMessage.bind(this);
     }
+    /**
+     * Redirects to the login screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/login/` + i18n.t('static.actionCancelled'))
     }
-    
+    /**
+     * Hides message after 30 seconds.
+     */
     hideMessage() {
         setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 30000);
     }
+    /**
+     * Renders the Forgot password form.
+     * @returns {JSX.Element} - Forgot Password form.
+     */
     render() {
         return (
             <div className="app flex-row align-items-center">

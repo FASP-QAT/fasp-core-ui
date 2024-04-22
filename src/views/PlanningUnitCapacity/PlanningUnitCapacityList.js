@@ -12,7 +12,11 @@ import DropdownService from '../../api/DropdownService';
 import PlanningUnitCapacityService from '../../api/PlanningUnitCapacityService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboad.planningunitcapacity');
+/**
+ * Component for listing planning unit volume/capacity details.
+ */
 export default class PlanningUnitCapacityList extends Component {
     constructor(props) {
         super(props);
@@ -27,6 +31,9 @@ export default class PlanningUnitCapacityList extends Component {
         this.filterData = this.filterData.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Builds the jexcel component to display planning unit volume list.
+     */
     buildJexcel() {
         let planningUnitCapacityList = this.state.selSource;
         let planningUnitCapacityArray = [];
@@ -123,6 +130,9 @@ export default class PlanningUnitCapacityList extends Component {
             planningUnitCapacityEl: planningUnitCapacityEl, loading: false
         })
     }
+    /**
+     * Filters the planning unit volume list according to the planningUnitId & builds the jexcel.
+     */
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
         if (planningUnitId != 0) {
@@ -138,7 +148,11 @@ export default class PlanningUnitCapacityList extends Component {
                 () => { this.buildJexcel() })
         }
     }
+    /**
+     * Fetches planning unit list for dropdown and planning unit capacity list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
+        //Fetch planning unit list for dropdown
         DropdownService.getPlanningUnitDropDownList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -188,6 +202,7 @@ export default class PlanningUnitCapacityList extends Component {
                 }
             }
         );
+        //Fetch planning unit capacity list
         PlanningUnitCapacityService.getPlanningUnitCapacityList().then(response => {
             this.setState({
                 planningUnitCapacityList: response.data,
@@ -234,9 +249,21 @@ export default class PlanningUnitCapacityList extends Component {
             }
         );
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the Planning Unit Volume/Capacity list.
+     * @returns {JSX.Element} - the Planning Unit Volume list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

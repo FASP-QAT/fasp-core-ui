@@ -1,4 +1,7 @@
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../Constants.js';
+/**
+ * This function is used to check if there are any upgrade needed to indexed db
+ */
 export function getDatabase() {
     var db1;
     var storeOS;
@@ -180,17 +183,4 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('datasetDataServer', { keyPath: 'id'});
         }
     };
-}
-export function getEnLabel() {
-    var json = {
-        "static.procurementagent.realmtext": "Please select realm",
-        "static.healtharea.realmtext": "Please select realm",
-        "static.datasource.datasourceedit": "Update Data Source",
-        "static.program.programwithsameversion": "Program with same version already exists in the local machine you want to overwirte that program with the new data?",
-        "static.dashboard.subfundingsource": "Sub Funding Source",
-        "static.region.regionedit": "Update Region",
-        "static.common.select": "Please Select",
-        "static.procurementagent.procurementagentlist": "Procurement Agent List"
-    }
-    return json;
 }

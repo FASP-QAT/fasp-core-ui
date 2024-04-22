@@ -19,6 +19,11 @@ const initialValues = {
     dataSourceName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for datasource ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -35,6 +40,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.datasource.datasourcetext')),
     })
 }
+/**
+ * This component is used to display the data source form and allow user to submit the master request in jira
+ */
 export default class DataSourceTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -63,6 +71,10 @@ export default class DataSourceTicketComponent extends Component {
         this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { dataSource } = this.state
         if (event.target.name == "summary") {
@@ -96,7 +108,9 @@ export default class DataSourceTicketComponent extends Component {
             dataSource
         }, () => { })
     };
-    
+    /**
+     * This function is used to get list of realms, datasource type and programs
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -163,6 +177,10 @@ export default class DataSourceTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get data source type list when user changes realm
+     * @param {*} realmId This is the realm Id based on which data source type list should appear
+     */
     getDataSourceTypeByRealmId(realmId) {
         if (realmId != "") {
             DataSourceTypeService.getDataSourceTypeByRealmId(realmId)
@@ -217,6 +235,10 @@ export default class DataSourceTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to get program list when user changes realm
+     * @param {*} realmId This is the realm Id based on which program list should appear
+     */
     getProgramByRealmId(realmId) {
         if (realmId != "") {
             ProgramService.getProgramList(realmId)
@@ -271,11 +293,17 @@ export default class DataSourceTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the data source details
+     */
     resetClicked() {
         let { dataSource } = this.state;
         dataSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -291,6 +319,10 @@ export default class DataSourceTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns data source details form
+     */
     render() {
         const { realms } = this.state;
         const { programs } = this.state;

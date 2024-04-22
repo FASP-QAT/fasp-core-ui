@@ -7,14 +7,19 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.role.role');
+/**
+ * Component for list of role details.
+ */
 class ListRoleComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,12 +30,12 @@ class ListRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editRole = this.editRole.bind(this);
         this.addNewRole = this.addNewRole.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJexcel() {
         let roleList = this.state.selSource;
         let roleArray = [];
@@ -67,7 +72,7 @@ class ListRoleComponent extends Component {
                 }
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -93,29 +98,21 @@ class ListRoleComponent extends Component {
             roleEl: roleEl, loading: false
         })
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Redirects to the add role screen.
+     */
     addNewRole() {
         this.props.history.push("/role/addRole");
     }
-    editRole(role) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
-            this.props.history.push({
-                pathname: `/role/editRole/${role.roleId}`,
-            });
-        }
-    }
+    /**
+     * Redirects to the edit role screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -130,8 +127,11 @@ class ListRoleComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Fetches the role list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
@@ -145,7 +145,7 @@ class ListRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent()
                         })
                 }
             })
@@ -189,9 +189,10 @@ class ListRoleComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Renders the role list.
+     * @returns {JSX.Element} - Role list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

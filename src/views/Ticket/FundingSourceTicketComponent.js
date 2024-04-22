@@ -17,6 +17,11 @@ const initialValues = {
     fundingSourceCode: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for funding source ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -32,6 +37,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
+/**
+ * This component is used to display the funding source form and allow user to submit the add master request in jira
+ */
 export default class FundingSourceTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -56,6 +64,10 @@ export default class FundingSourceTicketComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { fundingSource } = this.state
         if (event.target.name == "summary") {
@@ -83,7 +95,9 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource
         }, () => { })
     };
-    
+    /**
+     * This function is used to get realm list on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -148,11 +162,17 @@ export default class FundingSourceTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the funding source details
+     */
     resetClicked() {
         let { fundingSource } = this.state;
         fundingSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -165,6 +185,10 @@ export default class FundingSourceTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -172,6 +196,9 @@ export default class FundingSourceTicketComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is used to get the display name based on funding source
+     */
     getDisplayName() {
         let realmId = this.state.realmId;
         let fundingSourceValue = this.state.fundingSource.fundingSourceName;
@@ -276,6 +303,10 @@ export default class FundingSourceTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This returns funding source details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0

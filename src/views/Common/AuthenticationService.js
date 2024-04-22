@@ -7,6 +7,11 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SE
 import i18n from '../../i18n';
 let myDt;
 class AuthenticationService {
+    /**
+     * Checks if a user with the specified email ID is logged in and returns their decrypted password.
+     * @param {string} emailId - The email ID of the user to check for login status.
+     * @returns {string} The decrypted password of the logged-in user, or an empty string if the user is not logged in.
+     */
     isUserLoggedIn(emailId) {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
@@ -22,6 +27,10 @@ class AuthenticationService {
         }
         return decryptedPassword;
     }
+    /**
+     * Checks if the synchronization expiration date for the current user is within 30 days.
+     * @returns {boolean} True if the synchronization expiration date is more than 30 days from the current date, otherwise false.
+     */
     syncExpiresOn() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -33,6 +42,10 @@ class AuthenticationService {
         }
         return true;
     }
+    /**
+     * Retrieves the username of the currently logged-in user from local storage.
+     * @returns {string} The username of the currently logged-in user, or an empty string if the user is not logged in.
+     */
     getLoggedInUsername() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -41,6 +54,10 @@ class AuthenticationService {
         }
         return "";
     }
+    /**
+     * Retrieves the role(s) of the currently logged-in user from local storage.
+     * @returns {Array|string} An array containing the role(s) of the currently logged-in user, or an empty string if the user is not logged in.
+     */
     getLoggedInUserRole() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -52,6 +69,15 @@ class AuthenticationService {
             return decryptedUser.roleList;
         }
     }
+    /**
+     * Determines the type of dashboard to be displayed based on the roles assigned to the currently logged-in user.
+     * @returns {number} An integer representing the type of dashboard to be displayed:
+     * 1 - Application-level dashboard for administrators.
+     * 2 - Realm-level dashboard for realm administrators.
+     * 3 - Program-level dashboard for program administrators.
+     * 4 - Default dashboard for regular users.
+     * If the user is not logged in, returns undefined.
+     */
     displayDashboardBasedOnRole() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -72,10 +98,20 @@ class AuthenticationService {
             return 4;
         }
     }
+    /**
+     * Retrieves the user ID of the currently logged-in user from local storage.
+     * @returns {string} The user ID of the currently logged-in user, decrypted from local storage.
+     * If the user is not logged in or if the user ID is not found, returns an empty string.
+     */
     getLoggedInUserId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         return decryptedCurUser;
     }
+    /**
+     * Retrieves the realm ID of the currently logged-in user from local storage.
+     * @returns {string} The realm ID of the currently logged-in user, decrypted from local storage.
+     *                   If the user is not logged in or if the realm ID is not found, returns an empty string.
+     */
     getRealmId() {
         try{
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -85,11 +121,21 @@ class AuthenticationService {
             return "";
         }
     }
+    /**
+     * Retrieves the realm object of the currently logged-in user from local storage.
+     * @returns {Object} The realm object of the currently logged-in user, decrypted from local storage.
+     *                   If the user is not logged in or if the realm object is not found, returns null.
+     */
     getLoggedInUserRealm() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         return decryptedUser.realm;
     }
+    /**
+     * Checks the type of session based on the current URL and the stored session type in local storage.
+     * @param {string} url - The current URL.
+     * @returns {boolean} True if the session type matches the current URL conditions, otherwise false.
+     */
     checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
         let typeOfSession = localStorage.getItem('typeOfSession');
@@ -106,6 +152,11 @@ class AuthenticationService {
             return false;
         }
     }
+    /**
+     * Checks if a different user is logged in by comparing the stored username with the new username.
+     * @param {string} newUsername - The new username to compare with the stored username.
+     * @returns {boolean} True if a different user is logged in, otherwise false.
+     */
     checkIfDifferentUserIsLoggedIn(newUsername) {
         let usernameStored = localStorage.getItem('username');
         if (usernameStored !== null && usernameStored !== "") {
@@ -128,6 +179,10 @@ class AuthenticationService {
             return true;
         }
     }
+    /**
+     * Checks if the user token has expired.
+     * @returns {boolean} True if the token has expired, otherwise false.
+     */
     checkIfTokenExpired() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
@@ -140,6 +195,10 @@ class AuthenticationService {
             return false;
         }
     }
+    /**
+     * Updates the user's language preference in local storage.
+     * @param {string} languageCode - The language code to set for the user.
+     */
     updateUserLanguage(languageCode) {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
@@ -147,6 +206,10 @@ class AuthenticationService {
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
+    /**
+     * Sets up Axios interceptors to automatically add the Authorization header with the user's token for authenticated requests.
+     * It also handles token refreshing if the token is expired.
+     */
     setupAxiosInterceptors() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
@@ -169,6 +232,10 @@ class AuthenticationService {
             axios.defaults.headers.common['Authorization'] = basicAuthHeader;
         }
     }
+    /**
+     * Retrieves the business functions associated with the currently logged-in user.
+     * @returns {string[]} An array of business functions assigned to the user.
+     */
     getLoggedInUserRoleBusinessFunction() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -178,6 +245,10 @@ class AuthenticationService {
         }
         return "";
     }
+    /**
+     * Retrieves the business functions associated with the currently logged-in user.
+     * @returns {string[]} An array of business functions assigned to the user.
+     */
     getLoggedInUserRoleBusinessFunctionArray() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -197,6 +268,12 @@ class AuthenticationService {
             return [];
         }
     }
+    /**
+     * Checks if the current user is authenticated to access a specific route.
+     * @param {string} route - The route to be checked for authentication.
+     * @param {string} url - The URL of the route.
+     * @returns {boolean|string} Returns true if the user is authenticated, or a redirect URL if session is changed.
+     */
     authenticatedRoute(route, url) {
         if (url == "") {
             localStorage.setItem("isOfflinePage", 0);
@@ -544,11 +621,6 @@ class AuthenticationService {
                     case "/organisationType/listOrganisationType":
                     case "/organisationType/listOrganisationType/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_ORGANIZATION_TYPE")) {
-                            return true;
-                        }
-                        break;
-                    case "/program/addProgram":
-                        if (bfunction.includes("ROLE_BF_CREATE_A_PROGRAM")) {
                             return true;
                         }
                         break;
@@ -1168,8 +1240,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/forecastReport/compareScenario":
-                        return true;
                     default:
                         return false;
                 }
@@ -1182,6 +1252,12 @@ class AuthenticationService {
             return "/login/static.message.sessionChange";
         }
     }
+    /**
+     * Converts a hexadecimal color code to RGBA format.
+     * @param {string} hex - The hexadecimal color code (e.g., "#RRGGBB" or "#RGB").
+     * @returns {string} Returns the RGBA color code.
+     * @throws {Error} Throws an error if the input is not a valid hexadecimal color code.
+     */
     hexToRgbA(hex) {
         var c;
         if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
@@ -1194,6 +1270,10 @@ class AuthenticationService {
         }
         throw new Error('Bad Hex');
     }
+    /**
+     * Validates the current request to ensure user authentication and session validity.
+     * @returns {string} Returns a redirect URL or an empty string based on validation results.
+     */
     validateRequest() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1214,6 +1294,9 @@ class AuthenticationService {
             }
         }
     }
+    /**
+     * Clears user-related details from local storage.
+     */
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
@@ -1223,6 +1306,10 @@ class AuthenticationService {
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
+    /**
+     * Retrieves the default language for the user from local storage.
+     * @returns {string} The default language code.
+     */
     getDefaultUserLanguage() {
         let lang = localStorage.getItem('lastLoggedInUsersLanguage');
         if (lang != null && lang != "") {
@@ -1231,9 +1318,16 @@ class AuthenticationService {
             return "en";
         }
     }
+    /**
+     * Sets the language change flag to false in local storage.
+     */
     setLanguageChangeFlag() {
         localStorage.setItem('lastLoggedInUsersLanguageChanged', false);
     }
+    /**
+     * Sets the record count and initializes various session storage items for the given count.
+     * @param {number} count - The record count to set.
+     */
     setRecordCount(count) {
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1285,6 +1379,11 @@ class AuthenticationService {
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
         localStorage.setItem('sesAutoCalculate',true)
     }
+    /**
+     * Retrieves the icon or static label based on the specified value and the user's default language.
+     * @param {string} val - The value specifying whether to retrieve the icon or the label.
+     * @returns {string} - The icon class or static label based on the specified value and user's default language.
+     */
     getIconAndStaticLabel(val) {
         let lang = this.getDefaultUserLanguage();
         if (val == "icon") {

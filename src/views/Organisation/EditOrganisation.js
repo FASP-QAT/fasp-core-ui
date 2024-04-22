@@ -13,6 +13,7 @@ import OrganisationTypeService from "../../api/OrganisationTypeService.js";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 let initialValues = {
     realmId: '',
     organisationName: '',
@@ -20,7 +21,13 @@ let initialValues = {
     realmCountryId: [],
     organisationTypeId: '',
 }
+// Localized entity name
 const entityname = i18n.t('static.organisation.organisation');
+/**
+ * Defines the validation schema for Organization details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -38,7 +45,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisationType.organisationTypeValue'))
     })
 }
-
+/**
+ * Component for editing organization details.
+ */
 export default class EditOrganisationComponent extends Component {
     constructor(props) {
         super(props);
@@ -88,11 +97,18 @@ export default class EditOrganisationComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the organization details form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { organisation } = this.state
         if (event.target.name === "organisationName") {
@@ -112,8 +128,11 @@ export default class EditOrganisationComponent extends Component {
         ) => {
         })
     }
-    
+    /**
+     * Fetches organization details, Realm list, Realm country list & Organization Type list on component mount.
+     */
     componentDidMount() {
+        //Fetch organization details by id
         OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -133,6 +152,7 @@ export default class EditOrganisationComponent extends Component {
                 organisationCode: this.state.organisation.organisationCode,
                 realmId: this.state.organisation.realm.id
             }
+            //Fetch realm list
             UserService.getRealmList()
                 .then(response => {
                     var listArray = response.data;
@@ -183,6 +203,7 @@ export default class EditOrganisationComponent extends Component {
                         }
                     }
                 );
+            //Fetch realm country dropdown list
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)
                 .then(response => {
                     if (response.status == 200) {
@@ -245,6 +266,7 @@ export default class EditOrganisationComponent extends Component {
                         }
                     }
                 );
+            //Fetch Organization type list by realmId
             OrganisationTypeService.getOrganisationTypeByRealmId(this.state.organisation.realm.id)
                 .then(response => {
                     if (response.status == 200) {
@@ -343,6 +365,10 @@ export default class EditOrganisationComponent extends Component {
             }
         );
     }
+    /**
+     * Handles change event on realm country dropdown & filters the dropdown list
+     * @param {Event} value - The change event.
+     */
     updateFieldData(value) {
         var selectedArray = [];
         for (var p = 0; p < value.length; p++) {
@@ -365,9 +391,17 @@ export default class EditOrganisationComponent extends Component {
         organisation.realmCountryArray = realmCountryIdArray;
         this.setState({ organisation: organisation });
     }
+    /**
+     * Capitalizes the first letter of the organization name.
+     * @param {string} str - The organization name.
+     */
     Capitalize(str) {
         this.state.organisation.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Renders the organization details form.
+     * @returns {JSX.Element} - organization details form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -623,14 +657,22 @@ export default class EditOrganisationComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list organization when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the organization details form when reset button is clicked.
+     */
     resetClicked() {
+        //Fetch organization details by Id
         OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
             this.setState({
                 organisation: response.data
             })
+            //Fetch realm list
             UserService.getRealmList()
                 .then(response => {
                     this.setState({
@@ -675,6 +717,7 @@ export default class EditOrganisationComponent extends Component {
                         }
                     }
                 );
+            //Fetch realm country list
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)
                 .then(response => {
                     if (response.status == 200) {
