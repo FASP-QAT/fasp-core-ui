@@ -2277,7 +2277,6 @@ export default class BuildTree extends Component {
     validation1 = function () {
 
         var nodeTypeId = document.getElementById("nodeTypeId").value;
-        console.log("nodeTypeId", nodeTypeId)
         var nodeTitle = document.getElementById("nodeTitle").value;
         var nodeValue = document.getElementById("nodeValue").value;
         var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
@@ -8036,11 +8035,15 @@ export default class BuildTree extends Component {
                 this.qatCalculatedPUPerVisit(0);
             });
         }
+        if (event.target.name != "treeId" && event.target.name != "datasetId" && event.target.name != "scenarioId" && event.target.name != "monthPicker") {
+           this.setState({
+                isChanged:true
+            })
+        }
         if (event.target.name != "treeId") {
             this.setState({
                 currentItemConfig,
-                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
-                isChanged: true
+                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 if (flag) {
                     if (event.target.name === "planningUnitId") {
@@ -9029,7 +9032,7 @@ export default class BuildTree extends Component {
                             labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                 this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                     this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode != null && this.state.currentScenario.fuNode.forecastingUnit != null && this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
-                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode!=undefined && this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
                                             : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
                                 : "",
@@ -9191,7 +9194,7 @@ export default class BuildTree extends Component {
                             usageFrequencyCon: "",
                             usageFrequencyDis: "",
                             oneTimeUsage: "",
-                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
+                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]!=undefined ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
                         }}
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
