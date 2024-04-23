@@ -17,6 +17,11 @@ const initialValues = {
     forecastingUnitName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for forecasting unit ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -28,6 +33,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the forecasting unit form and allow user to submit the update master request in jira
+ */
 export default class EditForecastingUnitTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +57,10 @@ export default class EditForecastingUnitTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeForecastingUnit = this.changeForecastingUnit.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name == "summary") {
@@ -72,6 +84,10 @@ export default class EditForecastingUnitTicketComponent extends Component {
             forecastingUnit
         }, () => { })
     };
+    /**
+     * This function is called on change of forecasting unit
+     * @param {*} event This is the on change event
+     */
     changeForecastingUnit(event) {
         if (event === null) {
             let { forecastingUnit } = this.state;
@@ -94,7 +110,9 @@ export default class EditForecastingUnitTicketComponent extends Component {
             });
         }
     }
-   
+    /**
+     * This function is used to get the forecasting unit list on page load
+     */   
     componentDidMount() {
         if (this.props.items.userRealmId > 0) {
             ForecastingUnitService.getForcastingUnitByRealmId(this.props.items.userRealmId).then(response => {
@@ -230,11 +248,17 @@ export default class EditForecastingUnitTicketComponent extends Component {
             );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the forecasting unit details
+     */
     resetClicked() {
         let { forecastingUnit } = this.state;
         forecastingUnit.forecastingUnitName = '';
@@ -245,6 +269,10 @@ export default class EditForecastingUnitTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns forecasting unit details form
+     */
     render() {
         return (
             <div className="col-md-12">

@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import { Button, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
-
+/**
+ * Component to display 404 error
+ */
 class Page500 extends Component {
+  /**
+   * Renders the 500 error page.
+   * @returns {JSX.Element} - 500 error page.
+   */
   render() {
     return (
       <div className="app flex-row align-items-center">

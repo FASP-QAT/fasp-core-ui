@@ -29,9 +29,16 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Initial values for form fields
 let initialValues = {
     productCategory: ''
 }
+/**
+ * Defines the validation schema for product category details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         productCategory: Yup.string()
@@ -39,7 +46,10 @@ const validationSchema = function (values, t) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
-
+/**
+ * ProductCategoryTree component displays a tree structure for managing product categories.
+ * It allows users to add, disable, enable, and save product categories.
+ */
 export default class ProductCategoryTree extends Component {
     constructor(props) {
         super(props);
@@ -66,15 +76,11 @@ export default class ProductCategoryTree extends Component {
         this.enableNode = this.enableNode.bind(this);
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.handleSearchOnChange = this.handleSearchOnChange.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -104,7 +110,7 @@ export default class ProductCategoryTree extends Component {
                         message: response.data.messageCode,
                         loading: false
                     })
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 }
             }).catch(
                 error => {
@@ -146,15 +152,26 @@ export default class ProductCategoryTree extends Component {
                 }
             );
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
         this.getProductCategoryListByRealmId();
     };
+    /**
+     * Handles changes in the node name.
+     * @param {Event} event - The change event.
+     */
     nodeNameChange(event) {
         this.setState({ nodename: event.target.value });
     }
+    /**
+     * Reterives product category list
+     */
     getProductCategoryListByRealmId() {
         let realmId = document.getElementById("realmId").value;
         if (realmId == 0) {
@@ -163,7 +180,7 @@ export default class ProductCategoryTree extends Component {
                 color: '#BA0C2F',
                 productCategoryList: []
             });
-            this.hideSecondComponent();
+            hideSecondComponent();
             document.getElementById("treeDiv").style.display = "none";
         } else {
             this.setState({
@@ -195,7 +212,7 @@ export default class ProductCategoryTree extends Component {
                         this.setState({
                             message: response.data.messageCode, loading: false
                         })
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     }
                 }).catch(
                     error => {
@@ -238,6 +255,9 @@ export default class ProductCategoryTree extends Component {
                 );
         }
     }
+    /**
+     * Adds a new node to the tree.
+     */
     addNewNode() {
         let children = this.state.treeData[0].children;
         let duplicate = 0;
@@ -283,12 +303,16 @@ export default class ProductCategoryTree extends Component {
                 message: i18n.t('static.productCategoryTree.duplicateProductCategoryTree'),
                 color: '#BA0C2F'
             })
-            this.hideSecondComponent();
+            hideSecondComponent();
         }
         this.setState({
             duplicate: duplicate
         })
     }
+    /**
+     * Disables a node in the tree.
+     * @param {object} rowInfo - Information about the node.
+     */
     disableNode(rowInfo) {
         const changeNode = {
             id: rowInfo.node.id,
@@ -383,6 +407,10 @@ export default class ProductCategoryTree extends Component {
         }
         )
     }
+    /**
+     * Enables a node in the tree.
+     * @param {object} rowInfo - Information about the node.
+     */
     enableNode(rowInfo) {
         if (rowInfo.parentNode.payload.active == true) {
             const changeNode = {
@@ -408,9 +436,12 @@ export default class ProductCategoryTree extends Component {
             this.setState({ treeData: enabledNode, message: '' });
         } else {
             this.setState({ message: i18n.t('static.productCategory.parentIsDisabled') });
-            this.hideSecondComponent();
+            hideSecondComponent();
         }
     }
+    /**
+     * Retrieves the sorted flat tree data.
+     */
     getSortedFaltTreeData() {
         this.setState({ loading: true })
         let unsortedFlatTreeData = getFlatDataFromTree({
@@ -446,13 +477,13 @@ export default class ProductCategoryTree extends Component {
                         color: 'green',
                         loading: false
                     })
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 } else {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false
                     })
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 }
             })
             .catch(
@@ -495,16 +526,26 @@ export default class ProductCategoryTree extends Component {
                 }
             );
     }
+    /**
+     * Resets the tree when reset button is clicked.
+     */
     reSetTree() {
         this.setState({ nodename: '' });
         this.getProductCategoryListByRealmId();
     }
-    
+    /**
+     * Handles changes in the search input.
+     * @param {object} e - The change event.
+     */
     handleSearchOnChange = e => {
         this.setState({
             searchQuery: e.target.value,
         });
     };
+    /**
+     * Renders the product category tree.
+     * @returns {JSX.Element} - Product Category tree.
+     */
     render() {
         const { searchString, searchFocusIndex, searchFoundCount } = this.state;
         const customSearchMethod = ({ node, searchQuery }) =>

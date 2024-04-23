@@ -6,14 +6,14 @@ import { API_URL } from '../../Constants.js';
 import IntegrationService from '../../api/IntegrationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+// Localized entity name
 const entityname = i18n.t('static.integration.integration');
-let initialValues = {
-    realmId: '',
-    integrationName: '',
-    integrationViewId: '',
-    folderLocation: '',
-    fileName: ''
-}
+/**
+ * Defines the validation schema for integration details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         integrationName: Yup.string()
@@ -27,6 +27,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.integration.validFileName'))
     })
 }
+/**
+ * Component for edit integrations
+ */
 export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -59,18 +62,18 @@ export default class UpdateDataSourceComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addParameter = this.addParameter.bind(this);
         this.clearParameter = this.clearParameter.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Sets the 'isHide' state to false, enabling the display of a parameter.
+     */
     addParameter() {
         this.setState({ isHide: false })
     }
+    /**
+     * Clears the fileName, isHide, and bodyParameter states, and resets the integration state.
+     */
     clearParameter() {
         let { integration } = this.state
         integration.fileName = ''
@@ -82,6 +85,10 @@ export default class UpdateDataSourceComponent extends Component {
             }
         )
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { integration } = this.state
         if (event.target.name === "integrationName") {
@@ -115,7 +122,9 @@ export default class UpdateDataSourceComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives integration list and integration details on component mount
+     */
     componentDidMount() {
         IntegrationService.getIntegrationById(this.props.match.params.integrationId).then(response => {
             if (response.status == 200) {
@@ -128,7 +137,7 @@ export default class UpdateDataSourceComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -223,9 +232,16 @@ export default class UpdateDataSourceComponent extends Component {
                 }
             );
     }
+    /**
+     * Redirects to list integration on cancel button clicked
+     */
     cancelClicked() {
         this.props.history.push(`/integration/listIntegration/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Renders the Edit Integration form.
+     * @returns {JSX.Element} - Edit Integration form.
+     */
     render() {
         const { integrationViewList } = this.state;
         let viewList = integrationViewList.length > 0
@@ -265,7 +281,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -458,6 +474,9 @@ export default class UpdateDataSourceComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the integration details when reset button is clicked.
+     */
     resetClicked() {
         IntegrationService.getIntegrationById(this.props.match.params.integrationId).then(response => {
             this.setState({

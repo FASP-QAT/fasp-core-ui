@@ -18,6 +18,11 @@ let initialValues = {
     healthAreaId: "",
     submittedToApprovedLeadTime: ""
 }
+/**
+ * This const is used to define the validation schema for tracer category
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -29,6 +34,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
     })
 }
+/**
+ * This component is used to display the tracer category fields in a form and allow user to add the details
+ */
 class AddTracerCategoryComponent extends Component {
     constructor(props) {
         super(props);
@@ -65,6 +73,10 @@ class AddTracerCategoryComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -72,6 +84,10 @@ class AddTracerCategoryComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { tracerCategory } = this.state;
         if (event.target.name == "realmId") {
@@ -88,7 +104,9 @@ class AddTracerCategoryComponent extends Component {
         },
             () => { });
     };
-   
+    /**
+     * This function is used to get realm and health area list
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -217,11 +235,18 @@ class AddTracerCategoryComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This is used to display the content
+     * @returns This returns tracer category details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -403,9 +428,15 @@ class AddTracerCategoryComponent extends Component {
             </div>
         );
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to list tracer category screen
+     */
     cancelClicked() {
         this.props.history.push(`/tracerCategory/listTracerCategory/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when reset button is clicked to reset the tracer category details
+     */
     resetClicked() {
         let { tracerCategory } = this.state;
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {

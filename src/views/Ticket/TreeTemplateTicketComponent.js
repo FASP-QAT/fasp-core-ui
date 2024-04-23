@@ -9,6 +9,11 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.common.TreeTemplate"))
 let summaryText_2 = "Add Tree Template"
+/**
+ * This const is used to define the validation schema for tree template ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -23,6 +28,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.report.updateDetails')),
     })
 }
+/**
+ * This component is used to display the tree template form and allow user to submit the update master request in jira
+ */
 export default class TreeTemplateTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -46,6 +54,10 @@ export default class TreeTemplateTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { treeTemplate } = this.state
         if (event.target.name == "summary") {
@@ -71,7 +83,9 @@ export default class TreeTemplateTicketComponent extends Component {
             treeTemplate
         }, () => { })
     };
-    
+    /**
+     * This function is used to get the realm list on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -136,11 +150,17 @@ export default class TreeTemplateTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the tree template details
+     */
     resetClicked() {
         let { treeTemplate } = this.state;
         treeTemplate.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -154,6 +174,10 @@ export default class TreeTemplateTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -161,7 +185,10 @@ export default class TreeTemplateTicketComponent extends Component {
             return "";
         }
     }
-
+    /**
+     * This is used to display the content
+     * @returns This returns tree template details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0

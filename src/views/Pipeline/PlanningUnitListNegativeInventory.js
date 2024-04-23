@@ -7,11 +7,17 @@ import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunction
 import { API_URL, JEXCEL_PRO_KEY } from '../../Constants';
 import PipelineService from '../../api/PipelineService.js';
 import i18n from '../../i18n';
+/**
+ * Component to display negative inventory
+ */
 export default class PlanningUnitListNegativeInventory extends Component {
     constructor(props) {
         super(props);
         this.cancelClicked = this.cancelClicked.bind(this);
     }
+    /**
+     * Reterives planning unit list with final inventory on component mount
+     */
     componentDidMount() {
         PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
             .then(response => {
@@ -102,9 +108,18 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 }
             );
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the pipeline program import negative inventory details screen.
+     * @returns {JSX.Element} - Pipeline program import negative inventory details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -126,6 +141,9 @@ export default class PlanningUnitListNegativeInventory extends Component {
             </>
         );
     }
+    /**
+     * Redirects to pipeline program import list on cancel button clicked
+     */
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList`);
     }

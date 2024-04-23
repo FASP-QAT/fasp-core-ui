@@ -16,7 +16,12 @@ import IntegrationService from '../../api/IntegrationService.js';
 import ProgramService from "../../api/ProgramService.js";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.integration.programIntegration')
+/**
+ * Component for mapping program and intergations
+ */
 class ProgramIntegration extends Component {
     constructor(props) {
         super(props);
@@ -40,19 +45,24 @@ class ProgramIntegration extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to filter version status based on version type
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterVersionStatus = function (instance, cell, c, r, source) {
         var rowData = (this.state.dataEL.getJson(null, false)[r]);
         return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
     }.bind(this);
+    /**
+     * Reterives program integartion by programId on component mount
+     */
     componentDidMount() {
         IntegrationService.getProgramIntegrationByProgramId(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
@@ -238,8 +248,6 @@ class ProgramIntegration extends Component {
                                                         allowManualInsertColumn: false,
                                                         allowDeleteRow: true,
                                                         onchange: this.changed,
-                                                        onblur: this.blur,
-                                                        onfocus: this.focus,
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         onpaste: this.onPaste,
@@ -343,7 +351,7 @@ class ProgramIntegration extends Component {
                                                         message: response.data.messageCode
                                                     },
                                                         () => {
-                                                            this.hideSecondComponent();
+                                                            hideSecondComponent();
                                                         })
                                                 }
                                             })
@@ -391,7 +399,7 @@ class ProgramIntegration extends Component {
                                                 message: response.data.messageCode
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     })
@@ -439,7 +447,7 @@ class ProgramIntegration extends Component {
                                         message: response.data.messageCode
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                             })
@@ -487,7 +495,7 @@ class ProgramIntegration extends Component {
                                 message: response.data.messageCode
                             },
                                 () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 })
                         }
                     })
@@ -535,7 +543,7 @@ class ProgramIntegration extends Component {
                     message: response.data.messageCode
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -579,6 +587,9 @@ class ProgramIntegration extends Component {
                 }
             );
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var data = [];
         data[0] = this.state.program.label.label_en;
@@ -592,6 +603,11 @@ class ProgramIntegration extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -606,6 +622,9 @@ class ProgramIntegration extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -642,7 +661,7 @@ class ProgramIntegration extends Component {
                             message: response.data.messageCode
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -688,7 +707,12 @@ class ProgramIntegration extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -696,10 +720,14 @@ class ProgramIntegration extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-    blur = function (instance) {
-    }
-    focus = function (instance) {
-    }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if(x==1 || x==2 || x==3 || x==4){
             var col = ("B").concat(parseInt(y) + 1);
@@ -752,6 +780,14 @@ class ProgramIntegration extends Component {
             this.el.setValueFromCoords(6, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Function to handle cell edits in jexcel.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object being edited.
+     * @param {number} x - The x-coordinate of the edited cell.
+     * @param {number} y - The y-coordinate of the edited cell.
+     * @param {any} value - The new value of the edited cell.
+     */
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(6, y, 1, true);
         var elInstance = instance;
@@ -760,6 +796,10 @@ class ProgramIntegration extends Component {
             elInstance.setValueFromCoords(3, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -769,7 +809,7 @@ class ProgramIntegration extends Component {
                 this.setState({
                     message:'static.programIntegration.duplicateIntegration',
                 },()=>{
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
                 valid = false;
             }else{
@@ -813,6 +853,10 @@ class ProgramIntegration extends Component {
     }
         return valid;
     }
+    /**
+     * Renders the mapping of program integration.
+     * @returns {JSX.Element} - Mapping of program integration.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -853,6 +897,9 @@ class ProgramIntegration extends Component {
             </div>
         )
     }
+    /**
+     * Redirects to list program screen on cancel clicked
+     */
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

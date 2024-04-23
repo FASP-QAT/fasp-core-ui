@@ -16,16 +16,11 @@ import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
-const initialValues = {
-    summary: "",
-    programName: "",
-    fundingSourceName: "",
-    budgetName: "",
-    budgetCode: "",
-    currency: "",
-    budgetAmount: "",
-    notes: ""
-}
+/**
+ * This const is used to define the validation schema for budget ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -52,6 +47,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.stopdatetext')).nullable().default(undefined),
     })
 }
+/**
+ * This component is used to display the budget form and allow user to submit the master request in jira
+ */
 export default class BudgetTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -86,6 +84,10 @@ export default class BudgetTicketComponent extends Component {
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
         this.programChange = this.programChange.bind(this);
     }
+    /**
+     * This function is called when program in the form is changed
+     * @param {*} programId This is the list of program Ids selected by the user
+     */
     programChange(programId) {
         let { budget } = this.state;
         var selectedArray = [];
@@ -110,6 +112,10 @@ export default class BudgetTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { budget } = this.state
         if (event.target.name == "summary") {
@@ -149,7 +155,9 @@ export default class BudgetTicketComponent extends Component {
             budget
         }, () => { })
     };
-    
+    /**
+     * This function is used to get program, funding source and currency lists
+     */
     componentDidMount() {
         ProgramService.getProgramList()
             .then(response => {
@@ -319,11 +327,17 @@ export default class BudgetTicketComponent extends Component {
             }
         );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the budget details
+     */
     resetClicked() {
         let { budget } = this.state;
         budget.programName = '';
@@ -343,20 +357,38 @@ export default class BudgetTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to add the months for start date min
+     * @param {*} date This is the date on on which months should be added
+     * @param {*} months This is the no of months that should be added
+     * @returns This function returns date after added months
+     */
     addMonths(date, months) {
         date.setMonth(date.getMonth() + months);
         return date;
     }
+    /**
+     * This function is called when start date is changed
+     * @param {*} date This is the value start date selected by user
+     */
     dataChangeDate(date) {
         let { budget } = this.state
         budget.startDate = date;
         this.setState({ budget: budget });
     }
+    /**
+     * This function is called when end date is changed
+     * @param {*} date This is the value end date selected by user
+     */
     dataChangeEndDate(date) {
         let { budget } = this.state;
         budget.stopDate = date;
         this.setState({ budget: budget });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns budget details form
+     */
     render() {
         const { fundingSources } = this.state;
         const { currencies } = this.state;

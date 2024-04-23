@@ -19,17 +19,23 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValues = {
-    programId: ''
-}
+import { hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+/**
+ * Defines the validation schema for quantimed import step one.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
             .required(i18n.t('static.program.validselectprogramtext')),
     })
 }
-
+// Localized entity name
 const entityname = i18n.t('static.quantimed.quantimedImport')
+/**
+ * Component for Qunatimed Import step one for taking the program details for the import
+ */
 class QuantimedImportStepOne extends Component {
     constructor(props) {
         super(props);
@@ -42,15 +48,11 @@ class QuantimedImportStepOne extends Component {
             programs: []
         }
         this.dataChange = this.dataChange.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
     }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
-    
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programId") {
@@ -65,6 +67,9 @@ class QuantimedImportStepOne extends Component {
             program
         }, () => { });
     }
+    /**
+     * Retrieves list of program on component mount
+     */
     componentDidMount() {
         bsCustomFileInput.init();
         AuthenticationService.setupAxiosInterceptors();
@@ -80,7 +85,7 @@ class QuantimedImportStepOne extends Component {
                 loading: false,
                 color: "#BA0C2F"
             })
-            this.hideFirstComponent()
+            hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -94,7 +99,7 @@ class QuantimedImportStepOne extends Component {
                     loading: false,
                     color: "#BA0C2F"
                 })
-                this.hideFirstComponent()
+                hideFirstComponent()
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -122,6 +127,10 @@ class QuantimedImportStepOne extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Renders the quantimed import step one screen.
+     * @returns {JSX.Element} - Quantimed import step one screen.
+     */
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
@@ -169,7 +178,7 @@ class QuantimedImportStepOne extends Component {
                                             message: i18n.t('static.unkownError'), color: "#BA0C2F", loading: false
                                         },
                                             () => {
-                                                this.hideFirstComponent()
+                                                hideFirstComponent()
                                             })
                                     }
                                 })

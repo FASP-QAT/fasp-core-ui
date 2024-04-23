@@ -5,6 +5,9 @@ const propTypes = {
   children: PropTypes.node,
 };
 const defaultProps = {};
+/**
+ * This is the footer component that needs to be displayed on every page
+ */
 class DefaultFooter extends Component {
   render() {
     const { children, ...attributes } = this.props;

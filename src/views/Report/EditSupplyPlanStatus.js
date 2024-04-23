@@ -37,6 +37,11 @@ import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert';
 import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.report.problem');
+/**
+ * This const is used to define the validation schema for adding a new problem
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
@@ -53,6 +58,11 @@ const validationSchemaForAddingProblem = function (values) {
             .required(i18n.t('static.editStatus.validCriticality'))
     })
 }
+/**
+ * This const is used to define the validation schema for the main screen
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
@@ -70,6 +80,9 @@ const validationSchema = function (values) {
             }),
     })
 }
+/**
+ * This component is used to allow the supply plan reviewer user to check supply plans monthwise and view the supply plans for the version that are committed by the user
+ */
 class EditSupplyPlanStatus extends Component {
     constructor(props) {
         super(props);
@@ -93,6 +106,7 @@ class EditSupplyPlanStatus extends Component {
             shippedShipmentsTotalData: [],
             orderedShipmentsTotalData: [],
             plannedShipmentsTotalData: [],
+            onholdShipmentsTotalData: [],
             consumptionDataForAllMonths: [],
             amcTotalData: [],
             consumptionFilteredArray: [],
@@ -210,7 +224,6 @@ class EditSupplyPlanStatus extends Component {
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
-        this.updateState = this.updateState.bind(this);
         this.toggle = this.toggle.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.getNote = this.getNote.bind(this);
@@ -222,11 +235,14 @@ class EditSupplyPlanStatus extends Component {
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
         this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
         this.loaded1 = this.loaded1.bind(this);
-        this.addMannualProblem = this.addMannualProblem.bind(this);
-        this.modelOpenClose = this.modelOpenClose.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
     }
+    /**
+     * This is function is used to round the AMC value
+     * @param {*} amc The value of the AMC
+     * @returns This function returns the rounded AMC
+     */
     roundAMC(amc) {
         if (amc != null) {
             if (Number(amc).toFixed(0) >= 100) {
@@ -242,6 +258,11 @@ class EditSupplyPlanStatus extends Component {
             return null;
         }
     }
+    /**
+     * This method is used to add commas to the number
+     * @param {*} cell This is value of the number
+     * @returns It returns the number separated by commas
+     */
     addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
@@ -253,6 +274,9 @@ class EditSupplyPlanStatus extends Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is used to get the problem criticality list
+     */
     getProblemCriticality() {
         var db1;
         getDatabase();
@@ -282,11 +306,19 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * This function is used to add a row for a manual problem in QPL
+     */
     addRow = function () {
         var data = [];
         data[0] = "";
@@ -331,6 +363,10 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
     };
+    /**
+     *  This function is used to check the validation of QPL before user clicks submit
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -417,6 +453,14 @@ class EditSupplyPlanStatus extends Component {
         }
         return valid;
     }
+    /**
+     *  This function is called when something in the QPL table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     rowChanged = function (instance, cell, x, y, value) {
         this.setState({
             problemReportChanged: 1
@@ -520,22 +564,45 @@ class EditSupplyPlanStatus extends Component {
             }
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
     }
+    /**
+     * This function is used to hide the messages that are there in div3 after 30 seconds
+     */
     hideThirdComponent() {
     }
+    /**
+     * This function is used to hide the messages that are there in div4 after 30 seconds
+     */
     hideFourthComponent() {
     }
+    /**
+     * This function is used to hide the messages that are there in div5 after 30 seconds
+     */
     hideFifthComponent() {
     }
+    /**
+     * This function is used to hide the messages that are there in div5 after 30 seconds
+     */
     hideMessageComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to generate a month array based on the date that user has selected
+     * @param {*} currentDate This is the value of the date that user has selected
+     * @returns This function returns the month array
+     */
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
@@ -549,6 +616,17 @@ class EditSupplyPlanStatus extends Component {
         })
         return month;
     }
+    /**
+     * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
+     * @param {*} supplyPlanType This values indicates which popup needs to be displayed
+     * @param {*} month This value indicates from which month the data shpuld be displayed in the popup
+     * @param {*} quantity This value is the suggested shipment quantity
+     * @param {*} startDate This value is the start date for the suggested shipment/Shipment
+     * @param {*} endDate This value is the end date for the suggested shipment/Shipment
+     * @param {*} isEmergencyOrder This value indicates if the particular suggested shipment is emergency order or not
+     * @param {*} shipmentType This is type of the shipment that is clicked
+     * @param {*} count This is the month number for which popup needs to be displayed
+     */
     toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder, shipmentType, count) {
         var supplyPlanType = supplyPlanType;
         this.setState({
@@ -653,11 +731,18 @@ class EditSupplyPlanStatus extends Component {
             }
         }
     }
+    /**
+     * This function is used to toggle the trans view
+     * @param {*} problemTransList This is list of problem transaction
+     */
     toggleTransView(problemTransList) {
         this.setState({ transView: !this.state.transView, problemTransList: problemTransList }, () => {
             this.test();
         })
     }
+    /**
+     * This function is used to build the QPL trans
+     */
     test() {
         this.setState({
             test: 1
@@ -665,9 +750,15 @@ class EditSupplyPlanStatus extends Component {
             this.buildProblemTransJexcel();
         })
     }
+    /**
+     * This function is used to toogle the trans modal
+     */
     toggleTransModal() {
         this.setState({ transView: !this.state.transView })
     }
+    /**
+     * This function is called when scroll to left is clicked on the supply plan table
+     */
     leftClicked = () => {
         var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
         this.setState({
@@ -675,6 +766,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCount)
     }
+    /**
+     * This function is called when scroll to right is clicked on the supply plan table
+     */
     rightClicked = () => {
         var monthCount = (this.state.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
         this.setState({
@@ -682,6 +776,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCount)
     }
+    /**
+     * This function is called when scroll to left is clicked on the consumption table
+     */
     leftClickedConsumption = () => {
         var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -689,6 +786,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountConsumption)
     }
+    /**
+     * This function is called when scroll to right is clicked on the consumption table
+     */
     rightClickedConsumption = () => {
         var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -696,6 +796,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountConsumption);
     }
+    /**
+     * This function is called when scroll to left is clicked on the inventory/adjustment table
+     */
     leftClickedAdjustments = () => {
         var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -703,6 +806,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountAdjustments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the inventory/adjustment table
+     */
     rightClickedAdjustments = () => {
         var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -710,6 +816,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountAdjustments);
     }
+    /**
+     * This function is called when scroll to left is clicked on the shipment table
+     */
     leftClickedShipments = () => {
         var monthCountShipments = (this.state.monthCountShipments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
@@ -717,6 +826,9 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountShipments)
     }
+    /**
+     * This function is called when scroll to right is clicked on the shipment table
+     */
     rightClickedShipments = () => {
         var monthCountShipments = (this.state.monthCountShipments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
@@ -724,6 +836,14 @@ class EditSupplyPlanStatus extends Component {
         })
         this.formSubmit(monthCountShipments);
     }
+    /**
+     * This function is called when a particular consumption record value is clicked
+     * @param {*} startDate This value is the start date of the month for which the consumption value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the consumption value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} actualFlag This is the value of the consumption type
+     * @param {*} month This is the value of the month for which the consumption value is clicked
+     */
     consumptionDetailsClicked = (startDate, endDate, region, actualFlag, month) => {
         this.setState({ loading: true, consumptionStartDateClicked: startDate });
         var elInstance = this.state.consumptionBatchInfoTableEl;
@@ -833,6 +953,13 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is called when a particular inventory/adjustment record value is clicked
+     * @param {*} region This is the value of the region for which the data needs to displayed
+     * @param {*} month This is the value of the month for which the inventory/adjustment value is clicked
+     * @param {*} endDate  This value is the end date of the month for which the inventory/adjustment value is clicked
+     * @param {*} actualFlag This is the value of the inventory type
+     */    
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -948,8 +1075,20 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is called when suggested shipments is clicked to create that shipment and show the table
+     * @param {*} month This is month on which user has clicked
+     * @param {*} quantity This is suggested quantity
+     * @param {*} isEmergencyOrder This is flag for emergency shipment which is calculated based on lead time
+     */
     suggestedShipmentsDetailsClicked = (month, quantity, isEmergencyOrder) => {
     }
+    /**
+     * This function is called when user clicks on a particular shipment
+     * @param {*} supplyPlanType This is the type of the shipment row that user has clicked on
+     * @param {*} startDate This is the start date of the month which user has clicked on
+     * @param {*} endDate This is the end date of the month which user has clicked on 
+     */
     shipmentsDetailsClicked = (supplyPlanType, startDate, endDate) => {
         this.setState({ loading: true, shipmentStartDateClicked: startDate })
         var programId = document.getElementById("programId").value;
@@ -1084,7 +1223,9 @@ class EditSupplyPlanStatus extends Component {
                                             } else if (supplyPlanType == 'orderedShipments') {
                                                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'plannedShipments') {
-                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'onholdShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'deliveredErpShipments') {
                                                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'shippedErpShipments') {
@@ -1131,6 +1272,9 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to toggle the accordian for the total shipments
+     */
     toggleAccordionTotalShipments = () => {
         this.setState({
             showTotalShipment: !this.state.showTotalShipment
@@ -1160,32 +1304,9 @@ class EditSupplyPlanStatus extends Component {
             }
         }
     }
-    toggleAccordionManualShipments = () => {
-        this.setState({
-            showManualShipment: !this.state.showManualShipment
-        })
-        var fields = document.getElementsByClassName("manualShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showManualShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-    toggleAccordionErpShipments = () => {
-        this.setState({
-            showErpShipment: !this.state.showErpShipment
-        })
-        var fields = document.getElementsByClassName("erpShipments");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showErpShipment == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
+    /**
+     * This function is called when the cancel button is clicked from expired stock popup
+     */
     actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
@@ -1194,6 +1315,10 @@ class EditSupplyPlanStatus extends Component {
         })
         this.hideFirstComponent()
     }
+    /**
+     * This function is called when the cancel button is clicked from consumption, inventory, suggested shipments,shipments
+     * @param {*} supplyPlanType This values indicates which popup is cancelled
+     */
     actionCanceled(supplyPlanType) {
         var inputs = document.getElementsByClassName("submitBtn");
         for (var i = 0; i < inputs.length; i++) {
@@ -1251,6 +1376,10 @@ class EditSupplyPlanStatus extends Component {
             })
         this.toggleLarge(supplyPlanType);
     }
+    /**
+     * This is function is called when cancel button is clicked from the shipment modal
+     * @param {*} type This is type of the shipment modal for example, the main shipment table, Quantity table and batch table
+     */
     actionCanceledShipments(type) {
         if (type == "qtyCalculator") {
             document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
@@ -1283,6 +1412,9 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    /**
+     * This function is called when cancel button is clicked from inventory modal
+     */
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
@@ -1294,6 +1426,9 @@ class EditSupplyPlanStatus extends Component {
             inventoryBatchError: ""
         })
     }
+    /**
+     * This function is called when cancel button is clicked from consumption modal
+     */
     actionCanceledConsumption() {
         document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("consumptionBatchInfoTable"), true);
@@ -1305,6 +1440,11 @@ class EditSupplyPlanStatus extends Component {
             consumptionBatchError: ""
         })
     }
+    /**
+     * This function is used to build all the data that is required for supply planning
+     * @param {*} value This is the value of the planning unit
+     * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
+     */
     formSubmit = (monthCount, isShipment, startDate, stopDate) => {
         if (document.getElementById("planningUnitId").value != 0) {
             this.setState({
@@ -1335,6 +1475,7 @@ class EditSupplyPlanStatus extends Component {
         var shippedShipmentsTotalData = [];
         var orderedShipmentsTotalData = [];
         var plannedShipmentsTotalData = [];
+        var onholdShipmentsTotalData = [];
         var totalExpiredStockArr = [];
         var amcTotalData = [];
         var minStockMoS = [];
@@ -1461,26 +1602,32 @@ class EditSupplyPlanStatus extends Component {
                                 var sd2 = [];
                                 var sd3 = [];
                                 var sd4 = [];
+                                var sd5 = [];
                                 var isEmergencyOrder1 = 0;
                                 var isEmergencyOrder2 = 0;
                                 var isEmergencyOrder3 = 0;
                                 var isEmergencyOrder4 = 0;
+                                var isEmergencyOrder5 = 0;
                                 var isLocalProcurementAgent1 = 0;
                                 var isLocalProcurementAgent2 = 0;
                                 var isLocalProcurementAgent3 = 0;
                                 var isLocalProcurementAgent4 = 0;
+                                var isLocalProcurementAgent5 = 0;
                                 var paColor1 = "";
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+                                var paColor5 = "";
                                 var paColor1Array = [];
                                 var paColor2Array = [];
                                 var paColor3Array = [];
                                 var paColor4Array = [];
+                                var paColor5Array = [];
                                 var isErp1 = 0;
                                 var isErp2 = 0;
                                 var isErp3 = 0;
                                 var isErp4 = 0;
+                                var isErp5 = 0;
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1588,7 +1735,7 @@ class EditSupplyPlanStatus extends Component {
                                             if (paColor3Array.indexOf(paColor3) === -1) {
                                                 paColor3Array.push(paColor3);
                                             }
-                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -1623,6 +1770,41 @@ class EditSupplyPlanStatus extends Component {
                                             if (paColor4Array.indexOf(paColor4) === -1) {
                                                 paColor4Array.push(paColor4);
                                             }
+                                        }else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor5);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor5 = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor5 = "#efefef"
+                                                }
+                                            }
+                                            sd5.push(shipmentDetail);
+                                            if (paColor5Array.indexOf(paColor5) === -1) {
+                                                paColor5Array.push(paColor5);
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder5 = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent5 = true;
+                                            }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp5 = true;
+                                            }
                                         }
                                     }
                                 }
@@ -1653,14 +1835,23 @@ class EditSupplyPlanStatus extends Component {
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
                                     if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
+                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
+                                }
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor5;
+                                    if (paColor5Array.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    onholdShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData), month: m[n], shipmentDetail: sd5, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder5, isLocalProcurementAgent: isLocalProcurementAgent5, isErp: isErp5 });
+                                } else {
+                                    onholdShipmentsTotalData.push("")
                                 }
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
@@ -1872,6 +2063,8 @@ class EditSupplyPlanStatus extends Component {
                                     stock: jsonList[0].closingBalance,
                                     planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
                                     ,
+                                    onhold: Number(onholdShipmentsTotalData[n] != "" ? onholdShipmentsTotalData[n].qty : 0)
+                                    ,
                                     delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0)
                                     ,
                                     shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0)
@@ -1895,6 +2088,7 @@ class EditSupplyPlanStatus extends Component {
                                 shippedShipmentsTotalData.push("");
                                 orderedShipmentsTotalData.push("");
                                 plannedShipmentsTotalData.push("");
+                                onholdShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
@@ -1916,6 +2110,7 @@ class EditSupplyPlanStatus extends Component {
                                     consumption: null,
                                     stock: lastClosingBalance,
                                     planned: 0,
+                                    onhold: 0,
                                     delivered: 0,
                                     shipped: 0,
                                     ordered: 0,
@@ -1939,6 +2134,7 @@ class EditSupplyPlanStatus extends Component {
                             shippedShipmentsTotalData: shippedShipmentsTotalData,
                             orderedShipmentsTotalData: orderedShipmentsTotalData,
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
+                            onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
@@ -1966,6 +2162,10 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is called when version status or version notes is changed
+     * @param {*} event This is value of the event
+     */
     dataChange(event) {
         let { program } = this.state
         if (event.target.name === "versionStatusId") {
@@ -1981,6 +2181,9 @@ class EditSupplyPlanStatus extends Component {
             }
         )
     };
+    /**
+     * This function is used to get list of planning units for a particular program
+     */
     getPlanningUnit = () => {
         let programId = this.props.match.params.programId;
         ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -2037,6 +2240,9 @@ class EditSupplyPlanStatus extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get list of data sources
+     */
     getDatasource = () => {
         this.setState({
             display: 'none'
@@ -2076,6 +2282,9 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * This function is used to get planning unit, program data, problem criticaliy list
+     */
     componentDidMount() {
         this.setState({
             loading:true
@@ -2338,6 +2547,11 @@ class EditSupplyPlanStatus extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * This function is used to add commas if the value is not null or blank
+     * @param {*} value This is value of the number that needs to formatted
+     * @returns This function returns the formatted value
+     */
     formatter = value => {
         if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
@@ -2356,6 +2570,11 @@ class EditSupplyPlanStatus extends Component {
             return ''
         }
     }
+    /**
+     * This function is when the tab is changed from supply plan to QPL
+     * @param {*} tabPane
+     * @param {*} tab This is the value of the tab
+     */
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -2363,6 +2582,10 @@ class EditSupplyPlanStatus extends Component {
             activeTab: newArray,
         });
     }
+    /**
+     * This function contains data that needs to be displayed for both the tabs
+     * @returns This function returns the view for both the tabs
+     */
     tabPane() {
         const chartOptions = {
             title: {
@@ -2628,7 +2851,19 @@ class EditSupplyPlanStatus extends Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
                 },
                 {
-                    label: i18n.t('static.supplyPlan.planned'),
+                    label: i18n.t('static.report.hold'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#6C6463',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.onhold)),
+                },
+                {
+                    label: i18n.t('static.report.planned'),
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#A7C6ED',
@@ -3005,7 +3240,43 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
                                                         <tr className="totalShipments">
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.report.hold')}</td>
+                                                            {
+                                                                this.state.onholdShipmentsTotalData.map((item1, count) => {
+                                                                    if (item1.toString() != "") {
+                                                                        var classNameForShipments = "";
+                                                                        if (item1.isLocalProcurementAgent) {
+                                                                            if (item1.textColor == "#fff") {
+                                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                                            } else {
+                                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                                            }
+                                                                        }
+                                                                        if (item1.isErp) {
+                                                                            if (item1.textColor == "#fff") {
+                                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                                            } else {
+                                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                                            }
+                                                                        }
+                                                                        if (item1.isEmergencyOrder) {
+                                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                                        }
+                                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
+                                                                        if (item1.textColor == "#fff") {
+                                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'onholdShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                        } else {
+                                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'onholdShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                        }
+                                                                    } else {
+                                                                        return (<td align="right" >{item1}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+                                                        <tr className="totalShipments">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.report.planned')}</td>
                                                             {
                                                                 this.state.plannedShipmentsTotalData.map((item1, count) => {
                                                                     if (item1.toString() != "") {
@@ -3224,6 +3495,10 @@ class EditSupplyPlanStatus extends Component {
             </>
         );
     }
+    /**
+     * This function is called when problem status is changed
+     * @param {*} event This is value of the event 
+     */
     handleProblemStatusChange = (event) => {
         var cont = false;
         if (this.state.problemReportChanged == 1) {
@@ -3249,6 +3524,10 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    /**
+     * This function is called when problem reviewed flaged is changed
+     * @param {*} event This is value of the event 
+     */
     handleProblemReviewedChange = (event) => {
         var cont = false;
         if (this.state.problemReportChanged == 1) {
@@ -3274,6 +3553,12 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the notes from trans
+     * @param {*} row This is the QPL row for which notes should be build
+     * @param {*} lang This the language in which note should be displayed
+     * @returns This function returns the notes
+     */
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
         if (transList.length == 0) {
@@ -3283,6 +3568,9 @@ class EditSupplyPlanStatus extends Component {
             return transList[listLength - 1].notes;
         }
     }
+    /**
+     * This function is used to fetch the QPL data
+     */
     fetchData() {
         var cont = false;
         if (this.state.problemReportChanged == 1) {
@@ -3340,12 +3628,18 @@ class EditSupplyPlanStatus extends Component {
             }
         }
     }
+    /**
+     * This function is used to filter the problem status based on user managed flag
+     */
     filterProblemStatus = function (instance, cell, c, r, source) {
         var mylist = [];
         mylist = this.state.problemStatusListForEdit;
         mylist = mylist.filter(c => c.userManaged == true);
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to build the problem trans table
+     */
     buildProblemTransJexcel() {
         var currentTrans = this.state.problemTransList.length > 0 ? this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
@@ -3411,9 +3705,17 @@ class EditSupplyPlanStatus extends Component {
             problemTransEl: problemTransEl
         })
     }
-    loaded1 = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the QPL trans table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded1 = function (instance, cell) {
         jExcelLoadedFunction(instance, 1);
     }
+    /**
+     * This function is used to build the QPL table
+     */
     buildJExcel() {
         let problemList = this.state.problemList;
         problemList = problemList;
@@ -3752,106 +4054,18 @@ class EditSupplyPlanStatus extends Component {
             loading:false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+        /**
+     * This function is used to format the QPL table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
-    updateFieldData = (value) => {
-        let { program } = this.state;
-        this.setState({ regionId: value });
-        var regionId = value;
-        var regionIdArray = [];
-        for (var i = 0; i < regionId.length; i++) {
-            regionIdArray[i] = regionId[i].value;
-        }
-        program.regionArray = regionIdArray;
-        this.setState({
-            program: program,
-        });
-    }
-
-    addMannualProblem() {
-        this.getProblemCriticality();
-        this.setState({
-            isModalOpen: !this.state.isModalOpen,
-            loading:false
-        }, () => {
-        });
-    }
-    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
-        var json = {
-            "realmProblem": {
-                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
-                "problemType": {
-                    "id": "2"
-                }
-            },
-            "program": {
-                "id": this.props.match.params.programId
-            },
-            "versionId": this.props.match.params.versionId,
-            "problemStatus": {
-                "id": "1"
-            },
-            "dt": moment(new Date()).format("YYYY-MM-DD"),
-            "region": {
-                "id": regionId
-            },
-            "planningUnit": {
-                "id": modelPlanningUnitId
-            },
-            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
-            "notes": ""
-        }
-        ProgramService.createManualProblem(json)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        message: response.data.message,
-                        problemReportChanged: 0,
-                        remainingDataChanged: 0,
-                    })
-                    this.componentDidMount();
-                    this.toggle(0, '2');
-                } else {
-                    this.setState({
-                        message: response.data.message,
-                    })
-                }
-            })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 404:
-                                this.props.history.push(`/login/${error.response.data.messageCode}`)
-                                break;
-                            case 500:
-                            case 401:
-                            case 403:
-                            case 406:
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-    modelOpenClose() {
-        this.setState({
-            isModalOpen: !this.state.isModalOpen
-        })
-    }
+    /**
+     * This is used to display the content
+     * @returns The supply plan data in tabular format
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -4551,174 +4765,6 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </ModalBody>
                         </Modal>
-                        <Modal isOpen={this.state.isModalOpen}
-                            className={'modal-lg ' + this.props.className}>
-                            <ModalHeader>
-                                <strong>{i18n.t('static.dashboard.add.problem')}</strong>
-                                <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                            </ModalHeader>
-                            <ModalBody className='pb-lg-0'>
-                                <Col sm={12} style={{ flexBasis: 'auto' }}>
-                                    <Formik
-                                        initialValues={{
-                                            problemDescription: '',
-                                            modelPlanningUnitId: '',
-                                            modelCriticalityId: '',
-                                            suggession: ''
-                                        }}
-                                        validationSchema={validationSchemaForAddingProblem}
-                                        onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            var criticalityId = (document.getElementById("modelCriticalityId").value)
-                                            var regionId = (document.getElementById("modelRegionId").value);
-                                            var modelPlanningUnitId = (document.getElementById("modelPlanningUnitId").value);
-                                            var problemDescription = (document.getElementById("problemDescription").value);
-                                            var suggession = (document.getElementById("suggession").value);
-                                            if (this.state.problemReportChanged) {
-                                                this.setState({
-                                                    isModalOpen: !this.state.isModalOpen,
-                                                })
-                                                confirmAlert({
-                                                    message: 'There is some review changes in table, if you wish to add Manual problem than you will lose all review changes. Are you sure you want to add this manual problem ?',
-                                                    buttons: [
-                                                        {
-                                                            label: i18n.t('static.program.yes'),
-                                                            onClick: () => {
-                                                                this.setState({ loading: true, isSubmitClicked: true }, () => {
-                                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
-                                                                })
-                                                            }
-                                                        },
-                                                        {
-                                                            label: i18n.t('static.program.no'),
-                                                            onClick: () => {
-                                                                this.setState({
-                                                                    isSubmitClicked: true
-                                                                })
-                                                            }
-                                                        }
-                                                    ]
-                                                });
-                                            } else {
-                                                this.setState({ loading: true, isSubmitClicked: true, isModalOpen: !this.state.isModalOpen }, () => {
-                                                    this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
-                                                })
-                                            }
-                                        }}
-                                        render={
-                                            ({
-                                                values,
-                                                errors,
-                                                touched,
-                                                handleChange,
-                                                handleBlur,
-                                                handleSubmit,
-                                                isSubmitting,
-                                                isValid,
-                                                setTouched,
-                                                handleReset,
-                                                setFieldValue,
-                                                setFieldTouched
-                                            }) => (
-                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='addProblemForm' autocomplete="off">
-                                                    <div className="col-md-12">
-                                                        <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
-                                                            <div className='row'>
-                                                                <FormGroup className="col-md-6">
-                                                                    <Label for="programCode">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="modelPlanningUnitId"
-                                                                        id="modelPlanningUnitId"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.modelPlanningUnitId}
-                                                                        invalid={touched.modelPlanningUnitId && !!errors.modelPlanningUnitId}
-                                                                        onChange={(e) => { handleChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {planningUnitList}
-                                                                    </Input>
-                                                                    <FormFeedback className="red">{errors.modelPlanningUnitId}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="col-md-6">
-                                                                    <Label>{i18n.t('static.report.Criticality')}<span className="red Reqasterisk">*</span></Label>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        name="modelCriticalityId"
-                                                                        id="modelCriticalityId"
-                                                                        valid={!errors.modelCriticalityId}
-                                                                        invalid={touched.modelCriticalityId && !!errors.modelCriticalityId}
-                                                                        onChange={(e) => { handleChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {criticalities}
-                                                                    </Input>
-                                                                    <FormFeedback className="red">{errors.modelCriticalityId}</FormFeedback>
-                                                                </FormGroup>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row">
-                                                            <FormGroup className="col-md-6">
-                                                                <Label>{i18n.t('static.region.region')}</Label>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    name="modelRegionId"
-                                                                    id="modelRegionId"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {regions}
-                                                                </Input>
-                                                                <FormFeedback className="red">{errors.modelRegionId}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label>{i18n.t('static.report.problemDescription')}<span className="red Reqasterisk">*</span></Label>
-                                                                <Input type="text"
-                                                                    bsSize="sm"
-                                                                    name="problemDescription"
-                                                                    id="problemDescription"
-                                                                    valid={!errors.problemDescription}
-                                                                    invalid={touched.problemDescription && !!errors.problemDescription}
-                                                                    onChange={(e) => { handleChange(e) }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                >
-                                                                </Input>
-                                                                <FormFeedback className="red">{errors.problemDescription}</FormFeedback>
-                                                            </FormGroup>
-                                                        </div>
-                                                        <div className='row'>
-                                                            <FormGroup className="col-md-6">
-                                                                <Label>{i18n.t('static.report.suggession')}<span className="red Reqasterisk">*</span></Label>
-                                                                <Input type="textarea"
-                                                                    bsSize="sm"
-                                                                    name="suggession"
-                                                                    id="suggession"
-                                                                    valid={!errors.suggession}
-                                                                    invalid={touched.suggession && !!errors.suggession}
-                                                                    onChange={(e) => { handleChange(e) }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                >
-                                                                </Input>
-                                                                <FormFeedback className="red">{errors.suggession}</FormFeedback>
-                                                            </FormGroup>
-                                                        </div>
-                                                        <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
-                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClickedModal}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                            &nbsp;
-                                                        </FormGroup>
-                                                    </div>
-                                                </Form>
-                                            )} />
-                                </Col>
-                                <br />
-                            </ModalBody>
-                        </Modal>
                         <Formik
                             enableReinitialize={true}
                             initialValues={{
@@ -5006,6 +5052,12 @@ class EditSupplyPlanStatus extends Component {
             </div >
         );
     }
+    /**
+     * This function is used to display the ledger of a particular batch No
+     * @param {*} batchNo This is the value of the batch number for which the ledger needs to be displayed
+     * @param {*} createdDate This is the value of the created date for which the ledger needs to be displayed
+     * @param {*} expiryDate  This is the value of the expire date for which the ledger needs to be displayed
+     */
     showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
         this.setState({ loading: true })
         var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
@@ -5022,6 +5074,11 @@ class EditSupplyPlanStatus extends Component {
             loading: false
         })
     }
+    /**
+     * This function is used to redirect the user to shipment details from which a particular batch was created
+     * @param {*} batchNo This is the value of the batch number for which a particular shipments needs to be displayed
+     * @param {*} expiryDate This is the value of the expire date for which a particular shipments needs to be displayed
+     */
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
         shipmentList.map((sl, count) => {
@@ -5049,6 +5106,9 @@ class EditSupplyPlanStatus extends Component {
             }
         })
     }
+    /**
+     * This function is called when cancel button is clicked
+     */
     cancelClicked = () => {
         var cont = false;
         if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
@@ -5064,6 +5124,9 @@ class EditSupplyPlanStatus extends Component {
             this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }
+    /**
+     * This function is called when reset button is clicked
+     */
     resetClicked = () => {
         var cont = false;
         if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
@@ -5083,13 +5146,6 @@ class EditSupplyPlanStatus extends Component {
                 this.componentDidMount();
             })
         }
-    }
-    resetClickedModal = () => {
-    }
-    updateState(parameterName, value) {
-        this.setState({
-            [parameterName]: value
-        })
     }
 }
 export default EditSupplyPlanStatus

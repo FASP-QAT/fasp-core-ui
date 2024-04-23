@@ -7,7 +7,14 @@ import { API_URL } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.realm.realm');
+/**
+ * Defines the validation schema for realm details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
@@ -84,6 +91,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
+/**
+ * Component for editing realm details.
+ */
 export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -113,17 +123,14 @@ export default class UpdateDataSourceComponent extends Component {
             lang: localStorage.getItem('lang'),
             message: ''
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name === "label") {
@@ -177,7 +184,9 @@ export default class UpdateDataSourceComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Fetches realm details on component mount.
+     */
     componentDidMount(str) {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
@@ -190,7 +199,7 @@ export default class UpdateDataSourceComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -234,13 +243,16 @@ export default class UpdateDataSourceComponent extends Component {
                 }
             );
     }
-    Capitalize(str) {
-        let { realm } = this.state
-        realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Redirects to the list realm screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Renders the realm details form.
+     * @returns {JSX.Element} - Realm details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -281,7 +293,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -347,7 +359,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.realm.label.label_en}
                                                         required />
@@ -625,6 +637,9 @@ export default class UpdateDataSourceComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the realm details when reset button is clicked.
+     */
     resetClicked() {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             this.setState({

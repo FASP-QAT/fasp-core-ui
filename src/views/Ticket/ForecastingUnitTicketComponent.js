@@ -22,6 +22,11 @@ const initialValues = {
     unit: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for forecasting unit ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -43,6 +48,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
     })
 }
+/**
+ * This component is used to display the forecasting unit form and allow user to submit the add master request in jira
+ */
 export default class ForecastingUnitTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -74,6 +82,10 @@ export default class ForecastingUnitTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name == "summary") {
@@ -116,7 +128,9 @@ export default class ForecastingUnitTicketComponent extends Component {
             forecastingUnit
         }, () => { })
     };
-   
+    /**
+     * This function is used to get the unit,realm,tracer category, product category list on page load
+     */
     componentDidMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -282,6 +296,10 @@ export default class ForecastingUnitTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get product category list based on realm Id
+     * @param {*} realmId This is realm Id for which product category list should appear
+     */
     getProductCategoryByRealmId(realmId) {
         if (realmId != "") {
             ProductService.getProductCategoryList(realmId)
@@ -330,11 +348,17 @@ export default class ForecastingUnitTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the forecasting unit details
+     */
     resetClicked() {
         let { forecastingUnit } = this.state;
         forecastingUnit.realm = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -353,6 +377,10 @@ export default class ForecastingUnitTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns forecasting unit details form
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0

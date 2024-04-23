@@ -11,8 +11,8 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { checkValidation, changed, jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { contrast, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
@@ -25,6 +25,9 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Import from QAT supply plan step one for the import
+ */
 export default class StepOneImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -62,7 +65,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -72,18 +74,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProgramPlanningUnit = this.getProgramPlanningUnit.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div12').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -91,6 +93,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Reterives the tracer category list
+     */
     getTracerCategoryList() {
         DropdownService.getTracerCategoryDropdownList()
             .then(response => {
@@ -142,6 +147,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         changed(instance, cell, x, y, value)
         this.props.removeMessageText && this.props.removeMessageText();
@@ -223,12 +236,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Calls getPrograms function on component mount
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Reterives the forecast programs from indexed db
+     */
     getDatasetList() {
         var db1;
         getDatabase();
@@ -297,6 +313,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives supply plan programs from server
+     */
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
@@ -351,8 +370,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({
             rangeValue: value
@@ -360,13 +382,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.filterData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Reterives planning unit list based on program and version Id
+     */
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -484,6 +510,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             document.getElementById("stepOneBtn").disabled = true;
         }
     }
+    /**
+     * Reterives forecast planning unit list based on forecast program
+     */
     getProgramPlanningUnit() {
         let versionId = this.state.forecastProgramVersionId;
         let forecastProgramId = document.getElementById("forecastProgramId").value;
@@ -531,6 +560,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -693,7 +726,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -707,6 +740,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
+    /**
+     * Filters planning unit list based on tracer category
+     */
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[5];
@@ -726,6 +762,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * Sets the program id in the component state on change and builds data accordingly.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -738,6 +777,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.filterData();
         })
     }
+    /**
+     * Filters versions based on program
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -804,6 +846,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => { })
         }
     }
+    /**
+     * Filters the dataset list based on the selected program ID and updates the state accordingly.
+     */
     filterForcastUnit = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -825,6 +870,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => { })
         }
     }
+    /**
+     * Sets the version id in the component state on change and builds data accordingly.
+     */
     setVersionId(event) {
         this.setState({
             versionId: event.target.value
@@ -832,6 +880,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.filterData();
         })
     }
+    /**
+     * Handles the selection of a forecast program ID and updates the state accordingly.
+     * @param {Object} event The event object containing information about the selected forecast program ID.
+     */
     setForecastProgramId(event) {
         var forecastProgramId = event.target.value;
         if (forecastProgramId != "" && forecastProgramId != 0) {
@@ -866,6 +918,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -927,6 +983,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Saves the data in the form of json
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -952,6 +1011,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
         } else {
         }
     }
+    /**
+     * Renders the import from QAT supply plan step one screen.
+     * @returns {JSX.Element} - Import from QAT supply plan step one screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1058,10 +1121,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     value={rangeValue}
                                     lang={pickerLang}
                                     key={JSON.stringify(rangeValue)}
-                                    onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
                                 >
-                                    <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
                             </div>
                         </FormGroup>

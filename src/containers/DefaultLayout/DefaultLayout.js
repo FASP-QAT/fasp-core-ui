@@ -19,6 +19,9 @@ import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png'
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import ErrorBoundary from '../../views/Pages/PageError/ErrorBoundary';
+/**
+ * Imports for all the components
+ */
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const AddInventory = React.lazy(() => import('../../views/Inventory/AddInventory'));
@@ -74,7 +77,6 @@ const AddBudgetComponent = React.lazy(() => import('../../views/Budget/AddBudget
 const ListBudgetComponent = React.lazy(() => import('../../views/Budget/ListBudgetComponent'));
 const EditBudgetComponent = React.lazy(() => import('../../views/Budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('../../views/ProgramProduct/AddProgramProduct'));
-const AddProgram = React.lazy(() => import('../../views/Program/AddProgram'));
 const Programs = React.lazy(() => import('../../views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('../../views/Program/EditProgram'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
@@ -188,6 +190,9 @@ const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSet
 const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
+/**
+ * Array of all the routes
+ */
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
@@ -238,7 +243,6 @@ const routes = [
   { path: '/realm/listRealm', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
   { path: '/realm/updateRealm/:realmId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.realmheader', component: EditRealm },
   { path: '/realm/listRealm/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.realmheader', component: RealmList },
-  { path: '/program/addProgram', name: 'static.breadcrum.add', entityname: 'static.programHead.program', component: AddProgram },
   { path: '/program/listProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/listProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.programHead.program', component: Programs },
   { path: '/program/editProgram/:programId', name: 'static.programHead.program', entityname: 'static.programHead.program', component: EditProgram },
@@ -431,6 +435,9 @@ const routes = [
   { path: '/forecastReport/forecastSummary', exact: true, name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
   { path: '/forecastReport/forecastSummary/:programId/:versionId', name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
 ];
+/**
+ * This is the default component of the application that consists of default header, footer etc
+ */
 class DefaultLayout extends Component {
   constructor(props) {
     super(props);
@@ -458,19 +465,41 @@ class DefaultLayout extends Component {
     this.toggle = this.toggle.bind(this);
     this.refreshPage = this.refreshPage.bind(this);
   }
+  /**
+   * Refreshes the page by reloading the window.
+   */
   refreshPage() {
   }
+  /**
+   * The checkEvent method is responsible for handling events and triggering the _onAction method based on the event type.
+   * It ensures that the _onAction method is only called when the event type is not "mousemove".
+   * @param {Event} e The event object containing information about the event.
+   */
   checkEvent = (e) => {
     if (e.type != "mousemove") {
       this._onAction(e);
     }
   }
+  /**
+   * Updates the component state to indicate that the timeout has not occurred.
+   * @param {Event} e The event object.
+   */
   _onAction(e) {
     this.setState({ isTimedOut: false })
   }
+  /**
+   * Updates the component state to indicate that the timeout has not occurred.
+   * @param {Event} e The event object.
+   */
   _onActive(e) {
     this.setState({ isTimedOut: false })
   }
+  /**
+   * Handles the idle state of the component.
+   * If the user is already timed out, redirects to the logout page with a session expired message.
+   * Otherwise, sets the showModal state to true, resets the idle timer, and marks the user as timed out.
+   * @param {Event} e The event object.
+   */
   _onIdle(e) {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
@@ -482,6 +511,12 @@ class DefaultLayout extends Component {
       this.setState({ isTimedOut: true })
     }
   }
+  /**
+   * Updates the header title and performs necessary actions based on the provided name and URL.
+   * If the name is different from the current state, it updates the URL and performs additional checks.
+   * @param {String} name The new header title.
+   * @param {String} url The URL associated with the title.
+   */
   displayHeaderTitle = (name, url) => {
     if (this.state.name !== name) {
       if (AuthenticationService.checkTypeOfSession(url)) {
@@ -500,15 +535,27 @@ class DefaultLayout extends Component {
       });
     }
   }
+  /**
+   * Sets the user's online status to false, redirects to the offline dashboard, and reloads the page.
+   * @param {Event} e The event triggering the method.
+   */
   goOffline(e) {
     localStorage.setItem("loginOnline", false);
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.login.successOffline'))
     window.location.reload();
   }
+  /**
+   * Logs the user out by redirecting to the login page with a session expired message.
+   * @param {Event} e The event triggering the method.
+   */
   logout(e){
     this.props.history.push('/login/static.message.sessionExpired')
   }
+  /**
+   * Prompts the user to confirm switching to online mode. If confirmed, redirects to the login page to log in again.
+   * @param {Event} e The event triggering the method.
+   */
   goOnline(e) {
     confirmAlert({
       message: i18n.t("static.login.confirmSessionChange"),
@@ -529,6 +576,9 @@ class DefaultLayout extends Component {
       ]
     })
   }
+  /**
+   * Sets the default module on component mount
+   */
   componentDidMount() {
     window.addEventListener('blur', this.handleBlur);
     window.addEventListener('click', this.handleFocus);
@@ -570,10 +620,17 @@ class DefaultLayout extends Component {
         })
     }
   }
+  /**
+   * Removes event listeners for blur and click events on the window object to handle component unmounting.
+   */
   componentWillUnmount() {
     window.removeEventListener('blur', this.handleBlur);
     window.removeEventListener('click', this.handleFocus);
   }
+  /**
+   * Handles blur events on the window object to determine if the session has expired due to user inactivity.
+   * Redirects to the logout page if the session has expired.
+   */
   handleBlur = () => {
     var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
@@ -585,6 +642,10 @@ class DefaultLayout extends Component {
       this.props.history.push('/logout/static.message.sessionExpired')
     }
   };
+  /**
+   * Handles focus events on the window object to update the last focus time.
+   * Checks if the session has expired due to user inactivity and redirects to the logout page if necessary.
+   */
   handleFocus = () => {
     var lastFocus = localStorage.getItem("lastFocus") ? localStorage.getItem("lastFocus") : new Date();
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
@@ -597,15 +658,30 @@ class DefaultLayout extends Component {
     }
     localStorage.setItem("lastFocus", new Date())
   };
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
+  /**
+   * Redirects the user to the change password page.
+   * @param {Event} e The event object
+   */
   changePassword(e) {
     e.preventDefault();
     this.props.history.push(`/changePassword`);
   }
+  /**
+   * Redirects the user to the master data synchronization page.
+   * @param {Event} e The event object
+   */
   goToMasterDataSync(e) {
     e.preventDefault();
     this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
   }
+  /**
+   * Displays a confirmation dialog to sign out the user.
+   * @param {Event} e The event object
+   */
   signOut(e) {
     e.preventDefault();
     confirmAlert({
@@ -623,14 +699,26 @@ class DefaultLayout extends Component {
       ]
     });
   }
+  /**
+   * Redirects the user to the program loading page.
+   * @param {Event} e The event object
+   */
   goToLoadProgram(e) {
     e.preventDefault();
     this.props.history.push(`/program/downloadProgram/`)
   }
+  /**
+   * Redirects the user to the forecast program loading page.
+   * @param {Event} e The event object
+   */
   goToLoadProgramFC(e) {
     e.preventDefault();
     this.props.history.push(`/dataset/loadDeleteDataSet`)
   }
+  /**
+   * Redirects the user to the program commit page, showing a confirmation dialog if offline.
+   * @param {Event} e The event object
+   */
   goToCommitProgram(e) {
     e.preventDefault();
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -646,6 +734,10 @@ class DefaultLayout extends Component {
       });
     }
   }
+  /**
+   * Redirects the user to the forecast program commit page, showing a confirmation dialog if offline.
+   * @param {Event} e The event object
+   */
   goToCommitProgramFC(e) {
     e.preventDefault();
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -661,15 +753,26 @@ class DefaultLayout extends Component {
       });
     }
   }
+  /**
+   * Redirects the user to the shipment linking alerts page.
+   * @param {Event} e The event object
+   */
   showShipmentLinkingAlerts(e) {
     e.preventDefault();
     this.props.history.push(`/shipmentLinkingNotification`)
   }
+  /**
+   * Redirects the user to the dashboard based on their role.
+   * @param {Event} e The event object
+   */
   showDashboard(e) {
     e.preventDefault();
     var id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}`)
   }
+  /**
+   * Retrieves and updates the notification count.
+   */
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
@@ -687,6 +790,9 @@ class DefaultLayout extends Component {
         );
     }
   }
+  /**
+   * Retrieves and updates the program data.
+   */
   getProgramData() {
     var db1;
     getDatabase();
@@ -736,6 +842,9 @@ class DefaultLayout extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Retrieves and updates the forecast program data.
+   */
   getDatasetData() {
     var db1;
     getDatabase();
@@ -785,6 +894,11 @@ class DefaultLayout extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Toggles between different tabs and updates the active tab state.
+   * @param {String} tabPane The tab pane to toggle.
+   * @param {String} tab The tab to set as active.
+   */
   toggle(tabPane, tab) {
     if (localStorage.getItem("sessionType") === 'Online') {
       UserService.updateUserModule(tab).then(response => {
@@ -802,6 +916,10 @@ class DefaultLayout extends Component {
       activeTab: decryptedUser1.defaultModuleId,
     });
   }
+  /**
+   * Renders the DefaultLayout component.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   render() {
     let events = ["keydown", "mousedown"];
     const checkOnline = localStorage.getItem('sessionType');

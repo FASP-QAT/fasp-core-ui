@@ -26,12 +26,17 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { consumptionExtrapolationNotesClicked, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+// Localized entity name
 const entityname = i18n.t('static.versionSettings.versionSettings');
+/**
+ * Component for version setting details.
+ */
 class VersionSettingsComponent extends Component {
     constructor(props) {
         super(props);
@@ -90,8 +95,6 @@ class VersionSettingsComponent extends Component {
             consumptionExtrapolationList: [],
             consumptionExtrapolationNotes: ''
         }
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getOnLineDatasetsVersion = this.getOnLineDatasetsVersion.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
@@ -101,11 +104,15 @@ class VersionSettingsComponent extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.updateState = this.updateState.bind(this);
         this.onchangepage = this.onchangepage.bind(this)
     }
+    /**
+     * Updates the state with the provided parameter name and value, then invokes the buildActualJxl method.
+     * @param {String} parameterName The name of the parameter to update in the state.
+     * @param {any} value The new value to set for the parameter.
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
@@ -118,24 +125,35 @@ class VersionSettingsComponent extends Component {
             }
         })
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.getOnLineDatasetsVersion()
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Redirects to application dashboard on cancel button clicked
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -284,6 +302,14 @@ class VersionSettingsComponent extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
@@ -445,6 +471,9 @@ class VersionSettingsComponent extends Component {
             });
         }
     }.bind(this);
+    /**
+     * Handles form submission and save version setting details in indexed db
+     */
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -494,7 +523,7 @@ class VersionSettingsComponent extends Component {
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
-                        this.hideFirstComponent()
+                        hideFirstComponent()
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
@@ -523,7 +552,7 @@ class VersionSettingsComponent extends Component {
                                 color: "green",
                                 isChanged: false
                             }, () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             });
                         }.bind(this);
                         transaction.onerror = function (event) {
@@ -531,7 +560,7 @@ class VersionSettingsComponent extends Component {
                                 loading: false,
                                 color: "red",
                             }, () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             });
                         }.bind(this);
                     }.bind(this);
@@ -539,6 +568,13 @@ class VersionSettingsComponent extends Component {
             }
         }
     }
+    /**
+     * Retrieves dataset information by dataset IDs.
+     * Filters the dataset list to include only datasets with matching program IDs.
+     * Updates the component state with the filtered dataset list and dataset IDs.
+     * Invokes the method to fetch online datasets' versions.
+     * @param {array} datasetIds - An array containing the dataset IDs to filter by.
+     */
     getDatasetById(datasetIds) {
         var versionSettingsListOffLine = [];
         var versionSettingsList = [];
@@ -555,6 +591,9 @@ class VersionSettingsComponent extends Component {
             this.getOnLineDatasetsVersion()
         });
     }
+    /**
+     * Reterives version type list
+     */
     getVersionTypeList() {
         var db1;
         getDatabase();
@@ -582,6 +621,9 @@ class VersionSettingsComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives forecast program list from indexed db
+     */
     getDatasetList() {
         var db1;
         getDatabase();
@@ -635,30 +677,41 @@ class VersionSettingsComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         elInstance.setValueFromCoords(12, y, 1, true);
     }
+    /**
+     * Function to filter stop date based on start date
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterStopDate = function (o, cell, x, y, value, config) {
         var previousColumnValue = o.getValueFromCoords(x - 2, y);
         config.options.validRange = [previousColumnValue, null];
         return config;
     }
+    /**
+     * Reterives online versions
+     */
     getOnLineDatasetsVersion() {
         var programIds = this.state.programValues.map(x => x.value).join(",");
         var programIdsarr = Array.from(new Set(programIds.split(',')));
@@ -734,6 +787,12 @@ class VersionSettingsComponent extends Component {
             }
         );
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -784,6 +843,10 @@ class VersionSettingsComponent extends Component {
             }
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJExcel() {
         let versionSettingsListUnSorted = this.state.versionSettingsList;
         let versionSettingsList = versionSettingsListUnSorted.sort(
@@ -971,7 +1034,6 @@ class VersionSettingsComponent extends Component {
             allowManualInsertRow: false,
             parseFormulas: true,
             allowDeleteRow: false,
-            onselection: this.selected,
             onchange: this.changed,
             onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
@@ -1038,6 +1100,10 @@ class VersionSettingsComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Toggle data check popup
+     * @param {*} programData Forecast program details
+     */
     openModalPopup(programData) {
         this.setState({
             showValidation: !this.state.showValidation,
@@ -1051,14 +1117,12 @@ class VersionSettingsComponent extends Component {
             }
         })
     }
-    selected = function (instance, cell, x, y, value, e) {
-        if (e.buttons == 1) {
-            if ((x == 0 && value != 0) || (y == 0)) {
-            } else {
-            }
-        }
-    }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1125,6 +1189,9 @@ class VersionSettingsComponent extends Component {
             }
         }
     }
+    /**
+     * Reterives forecast program dropdown
+     */
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
@@ -1152,7 +1219,7 @@ class VersionSettingsComponent extends Component {
                     this.setState({
                         message: response.data.messageCode, loading: false
                     }, () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
                 }
             }).catch(
@@ -1162,10 +1229,16 @@ class VersionSettingsComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
@@ -1173,6 +1246,10 @@ class VersionSettingsComponent extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram(programIds) {
         this.setState({
             programValues: programIds.map(ele => ele),
@@ -1184,6 +1261,12 @@ class VersionSettingsComponent extends Component {
             this.getDatasetById(programIds);
         })
     }
+    /**
+     * Toggles the checked state of a tree scenario based on the provided tree and scenario IDs.
+     * Updates the state with the modified tree scenario list.
+     * @param {string} treeId - The ID of the tree.
+     * @param {string} scenarioId - The ID of the scenario.
+     */
     plusMinusClicked(treeId, scenarioId) {
         var index = this.state.treeScenarioList.findIndex(c => c.treeId == treeId && c.scenarioId == scenarioId);
         var treeScenarioList = this.state.treeScenarioList;
@@ -1192,6 +1275,11 @@ class VersionSettingsComponent extends Component {
             treeScenarioList: treeScenarioList
         })
     }
+    /**
+     * Updates the state to include or exclude only selected forecasts based on the checkbox's checked status.
+     * Invokes the `dataCheck` function after updating the state.
+     * @param {Object} e - The event object representing the checkbox's change event.
+     */
     setIncludeOnlySelectedForecasts(e) {
         this.setState({
             includeOnlySelectedForecasts: e.target.checked
@@ -1199,11 +1287,18 @@ class VersionSettingsComponent extends Component {
             dataCheck(this, this.state.programData, "versionSettings")
         })
     }
+    /**
+     * Toggles the visibility of guidance information by updating the state.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Renders the version setting screen.
+     * @returns {JSX.Element} - Version setting screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1423,7 +1518,6 @@ class VersionSettingsComponent extends Component {
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
-                                            onChange={this.handleRangeChange}
                                             onDismiss={this.handleRangeDissmis}
                                         >
                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

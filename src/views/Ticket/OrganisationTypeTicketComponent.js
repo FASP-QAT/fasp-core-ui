@@ -16,6 +16,11 @@ const initialValues = {
     organisationTypeName: '',
     notes: ''
 }
+/**
+ * This const is used to define the validation schema for organisation type ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -28,6 +33,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisationType.organisationTypetext')),
     })
 }
+/**
+ * This component is used to display the organisation type form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +57,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { organisationType } = this.state
         if (event.target.name == "summary") {
@@ -70,10 +82,16 @@ export default class OrganisationTypeTicketComponent extends Component {
             organisationType
         }, () => { })
     };
-    
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.organisationType.organisationTypeName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to get realm list on page load
+     */
     componentDidMount() {
         UserService.getRealmList()
             .then(response => {
@@ -138,11 +156,17 @@ export default class OrganisationTypeTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the budget details
+     */
     resetClicked() {
         let { organisationType } = this.state;
         organisationType.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -154,6 +178,10 @@ export default class OrganisationTypeTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns organisation type details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0

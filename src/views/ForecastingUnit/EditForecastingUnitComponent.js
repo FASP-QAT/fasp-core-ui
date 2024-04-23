@@ -9,8 +9,14 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import UnitService from '../../api/UnitService.js';
 import AuthenticationService from '../Common/AuthenticationService';
-
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
+/**
+ * Defines the validation schema for forecasting unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -22,6 +28,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.unit.unittext'))
     })
 }
+/**
+ * Component for editing forecasting unit details.
+ */
 export default class EditForecastingUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -87,13 +96,11 @@ export default class EditForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name === "label") {
@@ -123,7 +130,9 @@ export default class EditForecastingUnitComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives unit list and forecasting unit details on component mount
+     */
     componentDidMount() {
         UnitService.getUnitListAll().then(response => {
             var listArray = response.data;
@@ -186,7 +195,7 @@ export default class EditForecastingUnitComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -229,6 +238,10 @@ export default class EditForecastingUnitComponent extends Component {
             }
         );
     }
+    /**
+     * Renders the forecasting unit details form.
+     * @returns {JSX.Element} - Forecasting unit details form.
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -267,7 +280,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -474,9 +487,15 @@ export default class EditForecastingUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list forecasting unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the forecasting unit details when reset button is clicked.
+     */
     resetClicked() {
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             this.setState({

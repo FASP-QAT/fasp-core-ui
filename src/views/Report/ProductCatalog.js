@@ -16,7 +16,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -28,7 +27,12 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 const ref = React.createRef();
+/**
+ * Component for Product Catalog Report.
+ */
 class ProductCatalog extends Component {
     constructor(props) {
         super(props);
@@ -60,9 +64,10 @@ class ProductCatalog extends Component {
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
@@ -76,9 +81,9 @@ class ProductCatalog extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
-        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var A = [addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
-            ele => A.push(this.addDoubleQuoteToRowContent([
+            ele => A.push(addDoubleQuoteToRowContent([
                 getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.tracerCategory.label, this.state.lang) != null ? getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20') : '',
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
@@ -105,6 +110,10 @@ class ProductCatalog extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -187,6 +196,11 @@ class ProductCatalog extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.productcatalog') + '.pdf')
     }
+    /**
+   * Retrieves tracer categories based on the selected program.
+   * Fetches from local IndexedDB if version is local, or from server API.
+   * Updates component state with fetched data and handles errors.
+   */
     getTracerCategoryList() {
         var programId = document.getElementById('programId').value;
         if (programId > 0) {
@@ -310,6 +324,9 @@ class ProductCatalog extends Component {
             })
         }
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -391,6 +408,9 @@ class ProductCatalog extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -449,6 +469,9 @@ class ProductCatalog extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Retrieves the list of product categories based on the program ID and updates the state with the list.
+     */
     getProductCategories() {
         let programId = document.getElementById("programId").value
         if (programId > 0) {
@@ -549,6 +572,9 @@ class ProductCatalog extends Component {
             })
         }
     }
+    /**
+     * Builds the jexcel table based on the output list.
+     */
     buildJexcel() {
         let outPutList = this.state.outPutList;
         let outPutArray = [];
@@ -632,7 +658,7 @@ class ProductCatalog extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -656,9 +682,9 @@ class ProductCatalog extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         let programId = document.getElementById("programId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
@@ -865,10 +891,20 @@ class ProductCatalog extends Component {
                 });
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Renders the Product Catalog table.
+     * @returns {JSX.Element} - Product Catalog table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

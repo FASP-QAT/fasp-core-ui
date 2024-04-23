@@ -26,6 +26,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * This component is used to display the product validation for a tree
+ */
 class ProductValidation extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +55,10 @@ class ProductValidation extends Component {
         this.getTreeList = this.getTreeList.bind(this);
         this.getDatasetData = this.getDatasetData.bind(this);
     }
+    /**
+     * This function is used to set the version Id selected by the user
+     * @param {*} e This is the event value
+     */
     setVersionId(e) {
         this.setState({ loading: true })
         var versionId = e.target.value;
@@ -76,6 +83,9 @@ class ProductValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the dataset data
+     */
     getDatasetData() {
         this.setState({
             loading: true
@@ -158,6 +168,9 @@ class ProductValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the tree list
+     */
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
@@ -182,6 +195,10 @@ class ProductValidation extends Component {
             this.setTreeId(event);
         })
     }
+    /**
+     * This function is used to set the tree Id selected by the user
+     * @param {*} e This is the event value
+     */
     setTreeId(e) {
         var treeId = e.target.value;
         localStorage.setItem("sesTreeId", treeId);
@@ -201,6 +218,9 @@ class ProductValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the list of scenarios for a tree
+     */
     getScenarioList() {
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
@@ -234,6 +254,10 @@ class ProductValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to set the scenario Id selected by the user
+     * @param {*} e This is the event value
+     */
     setScenarioId(e) {
         var scenarioId = e.target.value;
         localStorage.setItem("sesScenarioId", scenarioId);
@@ -243,6 +267,10 @@ class ProductValidation extends Component {
             this.getData()
         })
     }
+    /**
+     * This function is used to set the dataset(program) Id selected by the user
+     * @param {*} e This is the event value
+     */
     setDatasetId(e) {
         var datasetId = e.target.value;
         localStorage.setItem("sesLiveDatasetId", datasetId);
@@ -275,7 +303,12 @@ class ProductValidation extends Component {
             })
         }
     }
-    addCommasWith8Decimals(cell1, row) {
+    /**
+     * This function is used to add commas to a number and display it till 8 decimals
+     * @param {*} cell1 This is value of the number that needs to be formatted
+     * @returns This function returns the comma separted value with 8 decimals
+     */
+    addCommasWith8Decimals(cell1) {
         if (cell1 != null && cell1 != "") {
             cell1 += '';
             var x = cell1.replaceAll(",", "").split('.');
@@ -290,6 +323,9 @@ class ProductValidation extends Component {
             return "";
         }
     }
+    /**
+     * This function is used to get the data for the product validation
+     */
     getData() {
         if (this.state.scenarioId > 0) {
             this.setState({
@@ -585,7 +621,12 @@ class ProductValidation extends Component {
             })
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.worksheets[0].getJson(null, false);
         var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -598,6 +639,9 @@ class ProductValidation extends Component {
             }
         }
     }
+    /**
+     * This function is used to get the version list based on dataset(program) Id
+     */
     getVersionList() {
         this.setState({
             loading: true
@@ -652,6 +696,9 @@ class ProductValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the list of dataset(programs)
+     */
     componentDidMount() {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
@@ -686,6 +733,9 @@ class ProductValidation extends Component {
             }
         );
     }
+    /**
+     * This function is used to get the list of datasets that are downloaded by user
+     */
     getOfflineDatasetList() {
         this.setState({
             loading: true
@@ -807,9 +857,19 @@ class ProductValidation extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to add the double quotes to the row
+     * @param {*} arr This is the arr of the row elements
+     * @returns This function returns the row with double quotes
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * This function is used to format a number
+     * @param {*} value This is the value that needs to be formatted
+     * @returns This function returns the formatted value
+     */
     formatter = value => {
         var cell1 = value
         cell1 += '';
@@ -822,6 +882,9 @@ class ProductValidation extends Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is used to export the data in PDF format
+     */
     exportPDF() {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -938,6 +1001,9 @@ class ProductValidation extends Component {
         addFooters(doc)
         doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.productValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
     }
+    /**
+     * This function is used to export the data in CSV format
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -977,6 +1043,10 @@ class ProductValidation extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * This function is used to set the currency Id selected by the user
+     * @param {*} e This is the event value
+     */
     setCurrencyId(e) {
         var currencyId = e.target.value;
         this.setState({
@@ -987,6 +1057,10 @@ class ProductValidation extends Component {
             }
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The product validation data in tabular format along with the different filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -9,6 +9,9 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for mapping program and planning unit.
+ */
 export default class MapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -27,6 +30,9 @@ export default class MapPlanningUnits extends Component {
         this.addRow = this.addRow.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var data = [];
         data[0] = "-1";
@@ -49,6 +55,10 @@ export default class MapPlanningUnits extends Component {
         );
         var json = this.el.getJson(null, false)
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var reg = /^[0-9\b]+$/;
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
@@ -274,6 +284,14 @@ export default class MapPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText();
         var rowData = this.el.getRowData(y);
@@ -562,6 +580,15 @@ export default class MapPlanningUnits extends Component {
             }
         }
     }
+    /**
+     * Function to filter planning unit based on product category
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (o, cell, c, r, source, config) {
         var mylist = [];
         var value = o.getValueFromCoords(c - 1, r);
@@ -587,6 +614,9 @@ export default class MapPlanningUnits extends Component {
         config.source = mylist;
         return config;
     }
+    /**
+     * Reterives product category list
+     */
     getRealmId() {
         var list = [];
         var productCategoryList = [];
@@ -1014,6 +1044,14 @@ export default class MapPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -1033,6 +1071,11 @@ export default class MapPlanningUnits extends Component {
             elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1056,6 +1099,10 @@ export default class MapPlanningUnits extends Component {
         cell1.classList.remove('readonly');
         jExcelLoadedFunctionWithoutPagination(instance);
     }
+    /**
+     * Builds planning unit data
+     * @returns Planning Unit List JSON for saving the data on server
+     */
     myFunction() {
         var json = this.el.getJson(null, false);
         var planningUnitArray = []
@@ -1085,8 +1132,10 @@ export default class MapPlanningUnits extends Component {
         }
         return planningUnitArray;
     }
-    componentDidMount() {
-    }
+    /**
+     * Renders the mapping of program planning unit list.
+     * @returns {JSX.Element} - Mapping of program planning unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

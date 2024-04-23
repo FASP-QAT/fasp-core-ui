@@ -41,11 +41,15 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for forecast output report
+ */
 class ForecastOutput extends Component {
     constructor(props) {
         super(props);
@@ -90,7 +94,6 @@ class ForecastOutput extends Component {
         this.getPrograms = this.getPrograms.bind(this);
         this.filterData = this.filterData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setViewById = this.setViewById.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
@@ -105,6 +108,10 @@ class ForecastOutput extends Component {
         this.addGraphConsumptionData = this.addGraphConsumptionData.bind(this);
         this.addGraphId = this.addGraphId.bind(this);
     }
+    /**
+     * Calculates the total consumption quantity for each consumption date.
+     * Updates the state with the calculated total consumption quantities.
+     */
     calculateEquivalencyUnitTotal() {
         let consumptionData = this.state.consumptionData;
         let consumptionList = consumptionData.filter(c => c.display == true).map(v => v.consumptionList);
@@ -151,6 +158,13 @@ class ForecastOutput extends Component {
             })
         }
     }
+    /**
+     * Handles the change in checked state of a planning unit.
+     * Updates the display property of the corresponding consumption data entry.
+     * Recalculates total consumption quantities and updates the state.
+     * @param {number} id - The ID of the planning unit.
+     * @param {number} regionId - The ID of the region associated with the planning unit.
+     */
     planningUnitCheckedChanged(id, regionId) {
         var consumptionData = this.state.consumptionData;
         var index = this.state.consumptionData.findIndex(c => c.objUnit.id == id && c.region.regionId == regionId);
@@ -163,6 +177,10 @@ class ForecastOutput extends Component {
             this.calculateEquivalencyUnitTotal();
         })
     }
+    /**
+     * Fetches the equivalency unit data based on the selected program ID and version ID.
+     * Updates the state with the fetched data and triggers data filtering.
+     */
     getEquivalencyUnitData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -320,6 +338,11 @@ class ForecastOutput extends Component {
             }
         })
     }
+    /**
+     * Handles the change event when the user selects a new value for the y-axis equivalency unit.
+     * Updates the state with the new y-axis equivalency unit value and triggers data retrieval and filtering.
+     * @param {Object} e - The event object containing the selected value for the y-axis equivalency unit.
+     */
     yAxisChange(e) {
         var yaxisEquUnit = e.target.value;
         this.setState({
@@ -343,6 +366,11 @@ class ForecastOutput extends Component {
             }
         })
     }
+    /**
+     * Handles the change event when the user selects a new value for the x-axis equivalency unit.
+     * Updates the state with the new x-axis equivalency unit value and triggers data filtering.
+     * @param {Object} e - The event object containing the selected value for the x-axis equivalency unit.
+     */
     xAxisChange(e) {
         var xaxisEquUnit = e.target.value;
         this.setState({
@@ -351,6 +379,12 @@ class ForecastOutput extends Component {
             this.filterData();
         })
     }
+    /**
+     * Sets the selected forecasting unit values and labels based on the user's selection.
+     * Sorts the forecasting unit values in ascending order by their numeric values.
+     * Updates the state with the selected forecasting unit values and labels, then triggers data filtering.
+     * @param {Array} event - An array containing the selected forecasting unit values and labels.
+     */
     setForecastingUnit = (event) => {
         var forecastingUnitIds = event
         forecastingUnitIds = forecastingUnitIds.sort(function (a, b) {
@@ -363,11 +397,14 @@ class ForecastOutput extends Component {
             this.filterData()
         })
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Toggles the 'show' state between true and false.
+     * This function is used to toggle the visibility of a component or element.
+     */
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -375,7 +412,7 @@ class ForecastOutput extends Component {
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ': ' + this.state.forecastPeriod).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('"' + (i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('"' + (i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
@@ -393,13 +430,13 @@ class ForecastOutput extends Component {
                 headers.push(moment(item).format("YYYY"))
             ))
         }
-        var A = [this.addDoubleQuoteToRowContent(headers)]
+        var A = [addDoubleQuoteToRowContent(headers)]
         this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) : ''
             ));
             propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1).toFixed(2))
-            return (A.push(this.addDoubleQuoteToRowContent([
+            return (A.push(addDoubleQuoteToRowContent([
                 ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 ((ele.scenario.label != null ? ele.scenario.label : "").replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
             ].concat(propertyName))))
@@ -410,7 +447,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty : ''
             ));
             propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1).toFixed(2))
-            A.push(this.addDoubleQuoteToRowContent([
+            A.push(addDoubleQuoteToRowContent([
                 ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 '',
             ].concat(propertyName)));
@@ -421,7 +458,7 @@ class ForecastOutput extends Component {
             ));
             propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1).toFixed(2))
             return (
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                     ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 ].concat(propertyName)))
@@ -433,7 +470,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
             ));
             propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1).toFixed(2))
-            A.push(this.addDoubleQuoteToRowContent([
+            A.push(addDoubleQuoteToRowContent([
                 ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 '',
             ].concat(propertyName)));
@@ -449,9 +486,9 @@ class ForecastOutput extends Component {
         document.body.appendChild(a)
         a.click();
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -493,7 +530,7 @@ class ForecastOutput extends Component {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
                     doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.common.forecastPeriod') + ":</b> " + this.state.forecastPeriod + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 100)
-                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 110)
+                    doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 110)
                     doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ":</b> " + document.getElementById("yaxisEquUnit").selectedOptions[0].text + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 120)
                     doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.common.display') + ":</b> " + document.getElementById("viewById").selectedOptions[0].text + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 130)
                     doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.xAxisAggregateByYear') + ":</b> " + document.getElementById("xaxis").selectedOptions[0].text + "</font></span>", (doc.internal.pageSize.width / 8) - 50, 140)
@@ -603,6 +640,10 @@ class ForecastOutput extends Component {
         addFooters(doc)
         doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".pdf")
     }
+    /**
+     * Adds a unique graph ID to each item in the consumption data.
+     * The graph ID is used for identifying items in the graph.
+     */
     addGraphId() {
         let consumptionData1 = this.state.consumptionData;
         if (consumptionData1.length > 0) {
@@ -622,6 +663,10 @@ class ForecastOutput extends Component {
             });
         }
     }
+    /**
+     * Constructs graph consumption data from the filtered consumption data.
+     * Filters out items with display set to false and scenarios with ID equal to 0.
+     */
     addGraphConsumptionData() {
         let consumptionData1 = this.state.consumptionData;
         consumptionData1 = consumptionData1.filter(c => c.display == true).filter(c => c.scenario.id != 0);
@@ -651,6 +696,9 @@ class ForecastOutput extends Component {
             })
         }
     }
+    /**
+     * Builds the data based on the selected filters
+     */
     filterData() {
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
         let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value))
@@ -1209,6 +1257,9 @@ class ForecastOutput extends Component {
             this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         }
     }
+    /**
+     * Reterives forecast programs from server
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -1265,6 +1316,9 @@ class ForecastOutput extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates server and local programs from indexed db
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -1357,10 +1411,17 @@ class ForecastOutput extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Calls getPrograms function on component mount
+     */
     componentDidMount() {
         this.getPrograms();
         document.getElementById("forecastingUnitDiv").style.display = "none";
     }
+    /**
+     * Sets the program ID in the component's state, resets related state variables, and triggers data filtering and version ID retrieval. 
+     * @param {Event} event - The event object containing the selected program ID.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -1382,6 +1443,9 @@ class ForecastOutput extends Component {
             this.getVersionIds();
         })
     }
+    /**
+     * Reterives the planning unit and forecasting unit list
+     */
     getPlanningUnitForecastingUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -1689,6 +1753,9 @@ class ForecastOutput extends Component {
             });
         }
     }
+    /**
+     * Sets the forecast period based on the selected program ID and version ID, updating the component's state accordingly.
+     */
     setForecastPeriod() {
         let programId = this.state.programId;
         let versionId = this.state.versionId;
@@ -1761,6 +1828,11 @@ class ForecastOutput extends Component {
             }, () => { })
         }
     }
+    /**
+     * Sets the version ID based on the selected event, updating the component's state accordingly.
+     * If the event is null, empty, or undefined, the function extracts the version ID from the current state.
+     * @param {Event | null | string} event - The event triggered by selecting a version ID or null if not triggered by an event.
+     */
     setVersionId(event) {
         var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
         versionId = parseInt(versionId);
@@ -1801,6 +1873,9 @@ class ForecastOutput extends Component {
             })
         }
     }
+    /**
+     * Reterives version list based on selected program
+     */
     getVersionIds() {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -1876,6 +1951,11 @@ class ForecastOutput extends Component {
             }, () => { })
         }
     }
+    /**
+     * Retrieves and consolidates the list of versions for the specified program ID, including local versions stored in indexedDB.
+     * Updates the component's state with the retrieved version list, sets the version ID based on various conditions, and triggers data filtering and related updates.
+     * @param {string} programId - The ID of the program for which to retrieve the version list.
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -1936,10 +2016,11 @@ class ForecastOutput extends Component {
             }.bind(this);
         }.bind(this)
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         let startDate = value.from.year + '-' + value.from.month + '-01';
         let stopDate = value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate();
@@ -1954,10 +2035,22 @@ class ForecastOutput extends Component {
             this.filterData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Sets the view mode based on the selected option. Updates the component's state accordingly and triggers related data retrieval and filtering operations.
+     * @param {object} e - The event object representing the change in the selected view mode.
+     */
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({
@@ -1984,6 +2077,10 @@ class ForecastOutput extends Component {
             }
         })
     }
+    /**
+     * Handles the change in selected planning units. Updates the component's state with the selected planning unit IDs and labels, and triggers data filtering accordingly.
+     * @param {object} event - The event object representing the change in selected planning units.
+     */
     handlePlanningUnitChange = (event) => {
         var planningUnitIds = event
         planningUnitIds = planningUnitIds.sort(function (a, b) {
@@ -1996,11 +2093,20 @@ class ForecastOutput extends Component {
             this.filterData()
         })
     }
+    /**
+     * Toggles the visibility of the popover.
+     */
     toggleEu() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
         });
     }
+    /**
+     * Filters the options based on the provided filter string.
+     * @param {Array} options - The array of options to filter.
+     * @param {string} filter - The filter string used to match option labels.
+     * @returns {Promise<Array>} - A promise that resolves to the filtered options.
+     */
     filterOptions = async (options, filter) => {
         if (filter) {
             return options.filter((i) =>
@@ -2010,11 +2116,18 @@ class ForecastOutput extends Component {
             return options;
         }
     };
+    /**
+     * Toggles the visibility of guidance.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Renders the Forecast output report table.
+     * @returns {JSX.Element} - Forecast output report table.
+     */
     render() {
         const backgroundColor = [
             "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
@@ -2334,7 +2447,6 @@ class ForecastOutput extends Component {
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         key={JSON.stringify(rangeValue)}
-                                                        onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
                                                         <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

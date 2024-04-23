@@ -9,10 +9,18 @@ import IntegrationService from '../../api/IntegrationService.js';
 import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 const initialValues = {
     label: ""
 }
+// Localized entity name
 const entityname = i18n.t('static.integration.integration');
+/**
+ * Defines the validation schema for integration details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -28,6 +36,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.integration.validFileName'))
     })
 }
+/**
+ * Component for add integrations
+ */
 export default class AddDimensionComponent extends Component {
     constructor(props) {
         super(props);
@@ -51,13 +62,18 @@ export default class AddDimensionComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addParameter = this.addParameter.bind(this);
         this.clearParameter = this.clearParameter.bind(this);
     }
+    /**
+     * Sets the 'isHide' state to false, enabling the display of a parameter.
+     */
     addParameter() {
         this.setState({ isHide: false })
     }
+    /**
+     * Clears the fileName, isHide, and bodyParameter states, and resets the integration state.
+     */
     clearParameter() {
         this.state.fileName = ''
         this.state.isHide = true
@@ -69,11 +85,10 @@ export default class AddDimensionComponent extends Component {
             }
         )
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name === "integrationName") {
             this.state.integrationName = event.target.value
@@ -107,7 +122,9 @@ export default class AddDimensionComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives realm, integration view list on component mount
+     */
     componentDidMount() {
         this.setState({ loading: false })
         RealmService.getRealmListAll()
@@ -213,6 +230,10 @@ export default class AddDimensionComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the Add Integration form.
+     * @returns {JSX.Element} - Add Integration form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -262,7 +283,7 @@ export default class AddDimensionComponent extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }
@@ -467,9 +488,15 @@ export default class AddDimensionComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list integration screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/integration/listIntegration/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the integration details when reset button is clicked.
+     */
     resetClicked() {
         this.state.integrationName = ''
         this.state.integrationView.integrationViewId = ''

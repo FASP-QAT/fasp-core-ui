@@ -12,7 +12,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -25,12 +25,16 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { addDoubleQuoteToRowContent, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Cost of Inventory Report.
+ */
 export default class CostOfInventory extends Component {
     constructor(props) {
         super(props);
@@ -62,10 +66,9 @@ export default class CostOfInventory extends Component {
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -130,6 +133,9 @@ export default class CostOfInventory extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -190,6 +196,12 @@ export default class CostOfInventory extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         let costOfInventoryInput = this.state.CostOfInventoryInput;
@@ -270,6 +282,13 @@ export default class CostOfInventory extends Component {
             })
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -335,38 +354,24 @@ export default class CostOfInventory extends Component {
             }.bind(this);
         }.bind(this)
     }
-    roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV = (columns) => {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
         csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -378,6 +383,10 @@ export default class CostOfInventory extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -417,7 +426,7 @@ export default class CostOfInventory extends Component {
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.month') + ' : ' + makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
                 }
@@ -430,7 +439,7 @@ export default class CostOfInventory extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.stock), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), this.formatter(ele.catalogPrice), this.formatter(ele.cost)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(ele.stock,0), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')),formatter(ele.catalogPrice,0), formatter(ele.cost,0)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,
@@ -443,11 +452,19 @@ export default class CostOfInventory extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.costOfInventory') + ".pdf")
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = (value, text) => {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
         var dt = new Date(`${value.year}`, `${value.month}`, 1)
@@ -456,6 +473,11 @@ export default class CostOfInventory extends Component {
             this.formSubmit();
         })
     }
+    /**
+     * Handles the change in data input fields.
+     * Updates the corresponding values in the CostOfInventoryInput state and submits the form.
+     * @param {Object} event - The event object triggered by the change.
+     */
     dataChange(event) {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
         if (event.target.name == "programId") {
@@ -469,9 +491,16 @@ export default class CostOfInventory extends Component {
         }
         this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms()
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -485,6 +514,10 @@ export default class CostOfInventory extends Component {
             this.formSubmit();
         })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         this.setState({
             versionId: event.target.value
@@ -495,6 +528,9 @@ export default class CostOfInventory extends Component {
             this.formSubmit()
         })
     }
+    /**
+     * Builds the jexcel table based on the cost of inventory list.
+     */
     buildJExcel() {
         let costOfInventory = this.state.costOfInventory;
         let costOfInventoryArray = [];
@@ -540,7 +576,7 @@ export default class CostOfInventory extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -566,9 +602,9 @@ export default class CostOfInventory extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     formSubmit() {
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
@@ -644,7 +680,7 @@ export default class CostOfInventory extends Component {
                                         planningUnit: planningUnit.planningUnit,
                                         stock: document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
                                         catalogPrice: planningUnit.catalogPrice,
-                                        cost: this.roundN(document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance * planningUnit.catalogPrice : list[0].closingBalanceWps * planningUnit.catalogPrice),
+                                        cost: roundN2(document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance * planningUnit.catalogPrice : list[0].closingBalanceWps * planningUnit.catalogPrice),
                                         calculated: list[0].regionCount > list[0].regionCountForStock ? 1 : 0
                                     }
                                     data.push(json)
@@ -741,6 +777,10 @@ export default class CostOfInventory extends Component {
             });
         }
     }
+    /**
+     * Renders the Cost of Inventory report table.
+     * @returns {JSX.Element} - Cost of Inventory report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -849,10 +889,9 @@ export default class CostOfInventory extends Component {
                                                     value={singleValue2}
                                                     lang={pickerLang.months}
                                                     theme="dark"
-                                                    onChange={this.handleAMonthChange2}
                                                     onDismiss={this.handleAMonthDissmis2}
                                                 >
-                                                    <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                    <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
                                                 </Picker>
                                             </div>
                                         </FormGroup>

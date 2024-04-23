@@ -12,7 +12,12 @@ import { API_URL, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } fr
 import PipelineService from '../../api/PipelineService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
+/**
+ * Component for list of pipeline programs.
+ */
 export default class PipelineProgramList extends Component {
     constructor(props) {
         super(props);
@@ -26,17 +31,20 @@ export default class PipelineProgramList extends Component {
         this.importNewProgram = this.importNewProgram.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.formatDate = this.formatDate.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Formats a date cell in a specific format.
+     * @param {string} cell - The date value to be formatted.
+     * @param {Object} row - The row object containing the cell value.
+     * @returns {string} The formatted date string or an empty string if the cell value is null or empty.
+     */
     formatDate(cell, row) {
         if (cell != null && cell != "") {
             var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -45,6 +53,9 @@ export default class PipelineProgramList extends Component {
             return "";
         }
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJExcel() {
         let pipelineProgramList = this.state.pipelineProgramList;;
         let pipelineProgramArray = [];
@@ -112,6 +123,9 @@ export default class PipelineProgramList extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Redirects to the edit pipeline program setup screen on row click.
+     */
     selected = function (instance, x1, y1, x2, y2, value) {
         if (y1 == y2) {
             this.props.history.push({
@@ -119,11 +133,19 @@ export default class PipelineProgramList extends Component {
             });
         }
     }.bind(this);
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Reterives pipeline program list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         PipelineService.getPipelineProgramList().then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -174,11 +196,19 @@ export default class PipelineProgramList extends Component {
             }
         );
     }
+    /**
+     * Redirects to the pipeline program setup page with the specified program ID.
+     * @param {Object} program - The pipeline program object containing the PIPELINE_ID.
+     */
     getPipelineProgramInfo(program) {
         this.props.history.push({
             pathname: `/pipeline/pieplineProgramSetup/${program.PIPELINE_ID}`,
         });
     }
+    /**
+     * Redirects to the pipeline program import page if the session type is 'Online'.
+     * Displays an alert message if the session type is not 'Online'.
+     */
     importNewProgram() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/pipeline/pipelineProgramImport`)
@@ -186,9 +216,19 @@ export default class PipelineProgramList extends Component {
             alert("You must be Online.")
         }
     }
+    /**
+     * Formats the label using the getLabelText function and the language stored in the component's state.
+     * @param {any} cell - The cell value to be formatted.
+     * @param {object} row - The row object containing the cell value.
+     * @returns {string} The formatted label.
+     */
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+    /**
+     * Renders the pipeline program list screen.
+     * @returns {JSX.Element} - Pipeline program list screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

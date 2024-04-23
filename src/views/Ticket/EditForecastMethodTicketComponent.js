@@ -14,6 +14,11 @@ const initialValues = {
     forecastMethodName: "",
     notes: ""
 }
+/**
+ * This const is used to define the validation schema for forecast method ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the tracer category form and allow user to submit the update master request in jira
+ */
 export default class EditTracerCategoryTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -44,6 +52,10 @@ export default class EditTracerCategoryTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { forecastMethod } = this.state
         if (event.target.name == "summary") {
@@ -67,7 +79,9 @@ export default class EditTracerCategoryTicketComponent extends Component {
             forecastMethod
         }, () => { })
     };
-    
+    /**
+     * This function is used to get the forecast method list on page load
+     */
     componentDidMount() {
         ForecastMethodService.getForecastMethodList()
             .then(response => {
@@ -120,11 +134,17 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the forecast method details
+     */
     resetClicked() {
         let { forecastMethod } = this.state;
         forecastMethod.forecastMethodName = '';
@@ -135,6 +155,10 @@ export default class EditTracerCategoryTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns forecast method details form
+     */
     render() {
         const { forecastMethods } = this.state;
         let forecastMethodList = forecastMethods.length > 0

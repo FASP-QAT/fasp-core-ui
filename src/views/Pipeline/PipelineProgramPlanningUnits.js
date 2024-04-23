@@ -9,6 +9,9 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import planning unit details
+ */
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -27,12 +30,27 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.stopLoading = this.stopLoading.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
+    /**
+     * Function to filter planning unit based on product category
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
@@ -57,6 +75,9 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         return mylist;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.planningUnitList;
         var json = this.el.getJson(null, false);
@@ -100,6 +121,14 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -292,6 +321,10 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var reg = /^[0-9\b]+$/;
         var valid = true;
@@ -480,6 +513,9 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     savePlanningUnits() {
         var list = this.state.planningUnitList;
         var json = this.el.getJson(null, false);
@@ -512,6 +548,9 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         return planningUnitArray;
     }
+    /**
+     * Reterives product category list on component mount
+     */
     componentDidMount() {
         var productCategoryList = [];
         ProductCategoryServcie.getProductCategoryListByRealmId(1)
@@ -822,6 +861,14 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -843,9 +890,18 @@ export default class PipelineProgramPlanningUnits extends Component {
             elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Renders the pipeline program import planning unit details screen.
+     * @returns {JSX.Element} - Pipeline program import planning unit details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
