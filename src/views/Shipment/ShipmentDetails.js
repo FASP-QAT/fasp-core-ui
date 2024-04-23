@@ -343,6 +343,12 @@ export default class ShipmentDetails extends React.Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
+            worksheet.getCell('K' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
             worksheet.getCell('O' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -405,16 +411,19 @@ export default class ShipmentDetails extends React.Component {
         worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('V').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
