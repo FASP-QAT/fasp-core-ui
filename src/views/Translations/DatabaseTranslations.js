@@ -18,6 +18,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.label.databaseTranslations');
+/**
+ * This component is used to show and update dynamic labels
+ */
 export default class DatabaseTranslations extends React.Component {
     constructor(props) {
         super(props);
@@ -33,11 +36,17 @@ export default class DatabaseTranslations extends React.Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to get database(dynamic) labels and display in jexcel tabular format
+     */
     componentDidMount() {
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
@@ -137,12 +146,20 @@ export default class DatabaseTranslations extends React.Component {
             }
         );
     };
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when submit button of the database translation is clicked and is used to save database translations if all the data is successfully validated.
+     */
     saveData = function () {
         var labelList = this.state.labelList;
         var tableJson = this.el.getRowData(this.state.rowId);
@@ -215,6 +232,10 @@ export default class DatabaseTranslations extends React.Component {
             alert(`${i18n.t('static.label.validData')}`);
         }
     };
+    /**
+     * This is used to display the content
+     * @returns The database translation data in tabular format
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -253,10 +274,21 @@ export default class DatabaseTranslations extends React.Component {
             </div>
         )
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to application dashboard screen
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when something in the database translation table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     changed = function (instance, cell, x, y, value) {
         changed(instance, cell, x, y, value)
         if (x == 4) {
@@ -281,6 +313,14 @@ export default class DatabaseTranslations extends React.Component {
             labelList: labelList
         })
     }.bind(this)
+    /**
+     * This function is used when the editing for a particular cell starts to format the cell or to update the value or to set some value in state
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     editStart = function (instance, cell, x, y, value) {
         this.setState({
             rowId: y

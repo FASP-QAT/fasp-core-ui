@@ -1,6 +1,12 @@
 import moment from "moment";
 import getLabelText from '../CommonComponent/getLabelText';
 import i18n from '../i18n';
+/**
+ * This function is used to construct the problem suggestion based on different dynamic parameters
+ * @param {*} row This is the instance of the problem
+ * @param {*} lang This is the language in which the suggestion must be displayed
+ * @returns This function returns problem desc in specified language
+ */
 export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 1) {
         var monthString = '';

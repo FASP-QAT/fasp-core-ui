@@ -1,6 +1,11 @@
 import moment from 'moment';
 import i18n from '../../src/i18n';
 import { MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY } from '../Constants';
+/**
+ * This function is used to format the jexcel table
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -47,6 +52,11 @@ export function jExcelLoadedFunction(instance, number) {
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
+/**
+ * This function is used to format the jexcel table for erp linking screens
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionForErp(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -93,6 +103,11 @@ export function jExcelLoadedFunctionForErp(instance, number) {
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
+/**
+ * This function is used to format the jexcel table when search option is not there
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionWithoutSearch(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -118,14 +133,27 @@ export function jExcelLoadedFunctionWithoutSearch(instance, number) {
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 }
+/**
+ * This function is called when pagination dropdown to show show number of records in one page is changed for jspreadsheet
+ * @param {*} number This is the value that is selected by the user from the dropdown
+ */
 export function paginationChange(number) {
     var recordCount = document.getElementsByClassName('jss_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)
 }
+/**
+ * This function is called when pagination dropdown to show show number of records in one page is changed for jexcel
+ * @param {*} number This is the value that is selected by the user from the dropdown
+ */
 export function paginationChange1(number) {
     var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)
 }
+/**
+ * This function is used to format the jexcel table for pipeline screens
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionPipeline(instance, number) {
     var obj = {};
     obj.options = {};
@@ -167,6 +195,11 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 }
+/**
+ * This function is used to format the jexcel table without pagination option
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -195,10 +228,20 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
 }
+/**
+ * This function is used to format the jexcel table where only the index column should not be visible
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
 }
+/**
+ * This function is used to format the jexcel table for qunatimed screens
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionQuantimed(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -243,6 +286,19 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 }
+/**
+ * This function is used for adding the validation to the cell
+ * @param {*} type This is the type of the cell
+ * @param {*} colName This is the name of the column
+ * @param {*} rowNo This is the row number
+ * @param {*} value This is the value of the cell
+ * @param {*} elInstance This is the instance of the jexcel
+ * @param {*} reg This is regular expression that needs to be validated
+ * @param {*} greaterThan0 This is boolean parameter to only validate numbers greater than 0 if true
+ * @param {*} equalTo0 This is boolean parameter to also validate if number is equal to 0 if true
+ * @param {*} colNo This is the column number
+ * @returns This function returns true if validation is correct else returns false
+ */
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0, colNo) {
     if (type == "text") {
         var col = (colName).concat(parseInt(rowNo) + 1);
@@ -407,71 +463,49 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
         }
     }
 }
+/**
+ * This function is used to change the cell color and comments when the text is valid
+ * @param {*} colName This is the name of the column
+ * @param {*} rowNo This is the row number
+ * @param {*} elInstance This is the instance of jexcel
+ */
 export function positiveValidation(colName, rowNo, elInstance) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setComments(col, "");
 }
+/**
+ * This function is used to change the cell color and comments when the text is in valid
+ * @param {*} colName This is the name of the column
+ * @param {*} rowNo This is the row number
+ * @param {*} rowNo This is the message that should be displayed if validation fails
+ * @param {*} elInstance This is the instance of jexcel
+ */
 export function inValid(colName, rowNo, message, elInstance) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setStyle(col, "background-color", "yellow");
     elInstance.setComments(col, message);
 }
+/**
+ * This function is used to change the cell color to specified colour and comments when the text is in valid
+ * @param {*} colName This is the name of the column
+ * @param {*} rowNo This is the row number
+ * @param {*} rowNo This is the message that should be displayed if validation fails
+ * @param {*} elInstance This is the instance of jexcel
+ * @param {*} color This is the name of the cell background colour
+ */
 export function inValidWithColor(colName, rowNo, message, elInstance, color) {
     var col = (colName).concat(parseInt(rowNo) + 1);
     elInstance.setStyle(col, "background-color", "transparent");
     elInstance.setStyle(col, "background-color", color);
     elInstance.setComments(col, message);
 }
-export function jExcelLoadedFunctionOld(instance, number) {
-    if (number == undefined) {
-        number = 0;
-    }
-    var obj = {};
-    obj.options = {};
-    var elInstance = instance.jexcel;
-    elInstance.hideIndex(0);
-    var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
-    pagignation.classList.add('row');
-    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
-    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    try {
-        searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    } catch (error) { }
-    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
-    var clearBtn = document.createElement('button');
-    clearBtn.type = "button";
-    clearBtn.classList.add('btn-default');
-    clearBtn.classList.add('btn');
-    clearBtn.classList.add('jexcel_clear_btn');
-    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
-    clearBtn.setAttribute("id", "clearBtnID");
-    clearBtn.onclick = function () {
-        document.getElementsByClassName("jexcel_search")[number].value = "";
-        elInstance.search('')
-    };
-    clearBtn.appendChild(clarText);
-    searchContainer.appendChild(clearBtn);
-    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
-    jexcel_pagination.lastChild.classList.add('order-3');
-    jexcel_pagination.firstChild.classList.add('order-2');
-    jexcel_pagination.firstChild.classList.add('mr-auto');
-    jexcel_pagination.firstChild.classList.add('pl-0');
-    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
-    pageSelect.options[3].innerHTML = "All";
-    pageSelect.addEventListener("change", () => paginationChange1(number));
-    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
-    var filter = jexcel_filterFirstdiv.firstChild;
-    filter.classList.add('order-1');
-    filter.classList.add('pr-1');
-    filter.classList.add('ml-2');
-    jexcel_pagination.appendChild(filter);
-}
-export function jExcelLoadedFunctionOnlyHideRowOld(instance) {
-    var elInstance = instance.jexcel;
-    elInstance.hideIndex(0);
-}
+/**
+ * This function is used to format the jexcel table for compare and select screen
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
 export function jExcelLoadedFunctionOldForCompareAndSelect(instance, number) {
     if (number == undefined) {
         number = 0;
@@ -516,7 +550,11 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance, number) {
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
-
+/**
+ * This is the common check validation function for checking jexcel validation on submit
+ * @param {*} worksheets This is the instance of the jexcel
+ * @returns Returns true if the cells are valid otherwise returns false
+ */
 export function checkValidation(worksheets) {
     var valid = true;
     var json = worksheets.getJson(null, false);
@@ -590,7 +628,14 @@ export function checkValidation(worksheets) {
     }
     return valid;
 }
-
+/**
+ * This is the common on change function when something in the jexcel table is changed to add the validations or fill some auto values for the cells
+ * @param {*} worksheets This is the DOM Element where sheet is created
+ * @param {*} cell This is the object of the DOM element
+ * @param {*} x This is the value of the column number that is being updated
+ * @param {*} y This is the value of the row number that is being updated
+ * @param {*} value This is the updated value
+ */    
 export function changed(worksheets, cell, x, y, value) {
     var columns = worksheets.getConfig().columns
     var isChangedColumnIndex = columns.findIndex(c => c.isChangedFlag == true);
@@ -653,3 +698,11 @@ export function changed(worksheets, cell, x, y, value) {
         worksheets.setComments(col, "");
     }
 };
+/**
+ * This function is used to format the table like add asterisk or info to the table headers
+ * @param {*} instance This is the DOM Element where sheet is created
+ * @param {*} cell This is the object of the DOM element
+ */
+export function loadedForNonEditableTables(instance, cell) {
+    jExcelLoadedFunction(instance);
+}

@@ -26,6 +26,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.user.user')
+/**
+ * This component is used to show list of users
+ */
 class ListUserComponent extends Component {
     constructor(props) {
         super(props);
@@ -74,7 +77,6 @@ class ListUserComponent extends Component {
                 message1: ''
             },
         }
-        this.editUser = this.editUser.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewUser = this.addNewUser.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -84,23 +86,38 @@ class ListUserComponent extends Component {
         this.buildJExcel2 = this.buildJExcel2.bind(this);
         this.getUserDetails = this.getUserDetails.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when user clicks on add new user button and is redirected to add user screen
+     */
     addNewUser() {
         this.props.history.push("/user/addUser");
     }
+    /**
+     * This function is used to filter user list based on realm Id
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -120,13 +137,9 @@ class ListUserComponent extends Component {
             });
         }
     }
-    editUser(user) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
-            this.props.history.push({
-                pathname: `/user/editUser/${user.userId}`,
-            });
-        }
-    }
+    /**
+     * This function is called when user click on the row to edit the user and is redirected to edit user screen
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -141,12 +154,25 @@ class ListUserComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
-    loaded2 = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded2 = function (instance, cell) {
         jExcelLoadedFunction(instance, 1);
     }
+    /**
+     * This function is used to get list of realms and user list
+     */
     componentDidMount() {
         this.hideFirstComponent();
         RealmService.getRealmListAll()
@@ -333,6 +359,11 @@ class ListUserComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to toggle the tab for user list and user access control
+     * @param {*} tabPane
+     * @param {*} tab This is the value of the tab
+     */
     toggleModal(tabPane, tab) {
         const newArray = this.state.activeTab1.slice()
         newArray[tabPane] = tab
@@ -345,6 +376,10 @@ class ListUserComponent extends Component {
             }
         });
     }
+    /**
+     * This function has data for both the tabs
+     * @returns Returns data for both the tabs
+     */
     tabPane1() {
         return (
             <>
@@ -363,6 +398,9 @@ class ListUserComponent extends Component {
             </>
         );
     }
+    /**
+     * This function is used to get list of user from api
+     */
     getUserDetails() {
         UserService.getUserList()
             .then(response => {
@@ -422,6 +460,9 @@ class ListUserComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to display the user details list in jexcel tabular format
+     */
     buildJExcel1() {
         let userList = this.state.selUserList;
         let userArray = [];
@@ -539,6 +580,9 @@ class ListUserComponent extends Component {
             loading: false
         })
     }
+    /**
+     * This function is used to display the user access control details in tabular format
+     */
     buildJExcel2() {
         let userList = this.state.selUserList;
         let userArray = [];
@@ -623,6 +667,10 @@ class ListUserComponent extends Component {
             loading: false
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The user and access control data in tabular format with filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

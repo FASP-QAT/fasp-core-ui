@@ -9,11 +9,19 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 let initialValues = {
     realmId: [],
     label: ''
 }
+// Localized entity name
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -23,6 +31,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
+/**
+ * Component for adding data source type details.
+ */
 export default class AddDataSourceTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -43,11 +54,13 @@ export default class AddDataSourceTypeComponent extends Component {
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { dataSourceType } = this.state
         if (event.target.name === "label") {
@@ -63,7 +76,9 @@ export default class AddDataSourceTypeComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -130,15 +145,10 @@ export default class AddDataSourceTypeComponent extends Component {
             });
         }
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        let { dataSourceType } = this.state
-        dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Renders the data source type details form.
+     * @returns {JSX.Element} - Data source type details form.
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -173,7 +183,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -259,7 +269,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label && this.state.dataSourceType.label.label_en != ''}
                                                         invalid={touched.label && !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.dataSourceType.label.label_en}
                                                         required />
@@ -295,9 +305,15 @@ export default class AddDataSourceTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list data source type screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the data source type details when reset button is clicked.
+     */
     resetClicked() {
         let { dataSourceType } = this.state
         dataSourceType.label.label_en = ''

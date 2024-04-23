@@ -27,6 +27,10 @@ const defaultProps = {
   tasks: false,
   mssgs: false,
 };
+/**
+ * Component representing the default header dropdown in the application.
+ * This dropdown includes user profile information, language selection, and user actions.
+ */
 class DefaultHeaderDropdown extends Component {
   constructor(props) {
     super(props);
@@ -43,6 +47,9 @@ class DefaultHeaderDropdown extends Component {
       message: ""
     };
   }
+  /**
+   * Retrieves the list of languages from the IndexedDB.
+   */
   getLanguageList() {
     var db1;
     getDatabase();
@@ -74,6 +81,10 @@ class DefaultHeaderDropdown extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Changes the language of the application and performs related actions.
+   * @param {string} lang - The language code to switch to.
+   */
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     localStorage.removeItem('lastLoggedInUsersLanguage');
@@ -116,14 +127,24 @@ class DefaultHeaderDropdown extends Component {
       window.location.reload();
     }
   }
+  /**
+   * Toggles the dropdown open/closed state.
+   */
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
     });
   }
+  /**
+   * Redirects the user to the logout action.
+   */
   redirect() {
     this.props.logout();
   }
+  /**
+   * Renders the user profile dropdown.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   dropAccnt() {
     const checkOnline = localStorage.getItem('sessionType');
     return (
@@ -167,6 +188,10 @@ class DefaultHeaderDropdown extends Component {
       </Dropdown>
     );
   }
+  /**
+   * Renders the tasks dropdown.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   dropTasks() {
     const itemsCount = 15;
     return (
@@ -174,12 +199,20 @@ class DefaultHeaderDropdown extends Component {
       </Dropdown>
     );
   }
+  /**
+   * Renders the messages dropdown.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   dropMssgs() {
     const itemsCount = 7;
     return (
       <InitialTicketPageComponent />
     );
   }
+  /**
+   * Renders the DefaultHeaderDropdown component.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   render() {
     const { notif, accnt, tasks, mssgs } = this.props;
     return (

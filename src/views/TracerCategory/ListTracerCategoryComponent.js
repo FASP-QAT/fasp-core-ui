@@ -15,6 +15,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.tracercategory.tracercategory');
+/**
+ * This component is used to display the tracer category in tabular format
+ */
 class ListTracerCategoryComponent extends Component {
     constructor(props) {
         super(props);
@@ -26,13 +29,15 @@ class ListTracerCategoryComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true
         }
-        this.editTracerCategory = this.editTracerCategory.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewTracerCategory = this.addNewTracerCategory.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * This function is used to build the jexcel table for tracer category
+     */
     buildJexcel() {
         let tracerCategoryList = this.state.selTracerCategory;
         let tracerCategory = [];
@@ -119,22 +124,37 @@ class ListTracerCategoryComponent extends Component {
             tracerCategoryEl: tracerCategoryEl, loading: false
         })
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when user clicks on add new tracer category button and is redirected to add tracer category screen
+     */
     addNewTracerCategory() {
         this.props.history.push("/tracerCategory/addTracerCategory");
     }
+    /**
+     * This function is used to filter the unit list based on realm Id
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -150,13 +170,9 @@ class ListTracerCategoryComponent extends Component {
                 () => { this.buildJexcel() });
         }
     }
-    editTracerCategory(tracerCategory) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TRACER_CATEGORY')) {
-            this.props.history.push({
-                pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
-            });
-        }
-    }
+    /**
+     * This function is called when user click on the row to edit the tracer category and is redirected to edit tracer category screen
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -169,6 +185,9 @@ class ListTracerCategoryComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * This function is used to get the realm and tracer category list
+     */
     componentDidMount() {
         this.hideFirstComponent();
         RealmService.getRealmListAll()
@@ -279,9 +298,18 @@ class ListTracerCategoryComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * This is used to display the content
+     * @returns The tracer category data in tabular format with filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

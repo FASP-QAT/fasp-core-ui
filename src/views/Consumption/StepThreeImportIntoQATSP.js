@@ -28,10 +28,14 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Import into QAT supply plan step three for the import
+ */
 export default class StepThreeImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -56,7 +60,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             monthArrayList: [],
             realm: {}
         }
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
@@ -64,23 +67,43 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.updateState = this.updateState.bind(this);
         this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
     }
+    /**
+     * Toggles the visibility of the guidance.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Updates the component state with the provided parameter name and value.
+     * @param {string} parameterName - The name of the parameter to update in the component state.
+     * @param {*} value - The new value to set for the parameter.
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * Redirects to the dashboard page.
+     */
     redirectToDashbaord() {
         this.props.redirectToDashboard();
     }
+    /**
+     * Calculates the difference in months between two dates.
+     * @param {*} dateFrom The start date.
+     * @param {*} dateTo The end date.
+     * @returns The difference in months.
+     */
     monthDiff(dateFrom, dateTo) {
         return dateTo.getMonth() - dateFrom.getMonth() +
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
+    /**
+     * Changes the background color of cells based on certain conditions.
+     */
     changeColor() {
         var elInstance = this.state.languageEl;
         var json = elInstance.getJson();
@@ -116,6 +139,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         }
     }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         const headers = [];
@@ -129,8 +155,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.QATForecastImport.convertedForecastConsumption'));
         headers.push(i18n.t('static.QATForecastImport.currentForecastConsumption'));
         headers.push(i18n.t('static.quantimed.importData'));
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.v1).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.v2).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.v3, ele.v4.replaceAll(' ', '%20'), ele.v5, ele.v6, ele.v7, ele.v8, ele.v9, ele.v10 == true ? 'Yes' : 'No'])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.buildCSVTable.map(ele => A.push(addDoubleQuoteToRowContent([((ele.v1).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.v2).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.v3, ele.v4.replaceAll(' ', '%20'), ele.v5, ele.v6, ele.v7, ele.v8, ele.v9, ele.v10 == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -142,9 +168,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Saves consumption data in indexed db
+     */
     formSubmit() {
         var minDate = moment(this.props.items.startDate).format("YYYY-MM-DD");
         var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
@@ -354,16 +380,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             ]
         });
     }
-    loaded = function (instance, cell, x, y, value) {
-    }
-    componentDidMount() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Retrieves forecast data and supply plan information from an indexed database and API.
+     * Processes the data and prepares it for display in the user interface.
+     * Updates the component's state with the processed data and loading flags.
+     * Handles various error scenarios, such as network errors and authentication failures.
+     */
     filterData() {
         var realmId = AuthenticationService.getRealmId();
         var db1;
@@ -539,6 +561,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -705,6 +731,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             this.changeColor();
         })
     }
+    /**
+     * Renders the import into QAT supply plan step three screen.
+     * @returns {JSX.Element} - Import into QAT supply plan step three screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

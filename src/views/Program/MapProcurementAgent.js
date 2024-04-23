@@ -10,11 +10,22 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+// Localized entity name
 const entityname = i18n.t('static.report.procurementAgentName');
+/**
+ * Defines the validation schema for map procurement agent.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
     })
 }
+/**
+ * This component allows users to map procurement agents in a program.
+ * It displays a form where users can select procurement agents for the program and update the selection.
+ */
 export default class AddDimensionComponent extends Component {
     constructor(props) {
         super(props);
@@ -33,14 +44,10 @@ export default class AddDimensionComponent extends Component {
         }
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    
+    /**
+     * Reterives the mapping of program and procurement agent
+     */
     componentDidMount() {
         this.setState({ loading: false })
         ProcurementAgentService.getProcurementAgentForProgram(this.state.program.id)
@@ -130,6 +137,10 @@ export default class AddDimensionComponent extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {Array} event - An array containing the selected procurement agent IDs.
+     */
     procurementAgentChange(selectedProcurementAgentList) {
         var selectedArray = [];
         for (var p = 0; p < selectedProcurementAgentList.length; p++) {
@@ -145,6 +156,10 @@ export default class AddDimensionComponent extends Component {
             var selectedProcurementAgentList = selectedProcurementAgentList;
         }
     }
+    /**
+     * Renders the map program procurement agent screen.
+     * @returns {JSX.Element} - Map program procurement agent screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -176,7 +191,7 @@ export default class AddDimensionComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -296,9 +311,15 @@ export default class AddDimensionComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list program screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the mapping details when reset button is clicked.
+     */
     resetClicked() {
         this.state.selectedProcurementAgentList = this.state.program.procurementAgents
         let { selectedProcurementAgentList } = this.state

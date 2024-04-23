@@ -16,6 +16,9 @@ import maxQty from '../../assets/img/maxQty.png';
 import suggestedShipmentplan1 from '../../assets/img/suggestedShipmentplan1.png';
 import suggestedShipmentplan2 from '../../assets/img/suggestedShipmentplan2.png';
 import i18n from '../../i18n';
+/**
+ * This component is used to display formulas for multiple screens
+ */
 class SupplyPlanFormulas extends Component {
   constructor(props) {
     super(props);
@@ -47,70 +50,91 @@ class SupplyPlanFormulas extends Component {
     this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
     this.toggleShippmentCost = this.toggleShippmentCost.bind(this);
     this.toggleStockStatusMatrix = this.toggleStockStatusMatrix.bind(this);
-    this.toggleShowTermLogic = this.toggleShowTermLogic.bind(this);
   }
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
+  /**
+   * This function is used to toggle the show formula modal for supply planning screens
+   */
   toggle() {
     this.setState({
       modal: !this.state.modal,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for cost of inventory report screen
+   */
   togglecostOfInventory() {
     this.setState({
       costofinventory: !this.state.costofinventory,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for forecast matrix over time report screen
+   */
   toggleForecastMatrix() {
     this.setState({
       forecastmatrix: !this.state.forecastmatrix,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for forecast matrix report screen
+   */
   toggleForecastMatrix1() {
     this.setState({
       forecastmatrix1: !this.state.forecastmatrix1,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for stock status over time report screen
+   */
   toggleStockStatusOverTime() {
     this.setState({
       stockstatusovertime: !this.state.stockstatusovertime,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for inventory turns report screen
+   */
   toggleInventoryTurns() {
     this.setState({
       inventoryturns: !this.state.inventoryturns,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for stock status report screen
+   */
   toggleStockStatus() {
     this.setState({
       stockstatus: !this.state.stockstatus,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for stock status across planning unit report screen
+   */
   toggleStockStatusAcrossPlaningUnit() {
     this.setState({
       stockstatusacrossplaningunit: !this.state.stockstatusacrossplaningunit,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for shipment report screen
+   */
   toggleShippmentCost() {
     this.setState({
       shipmentcost: !this.state.shipmentcost,
     });
   }
+  /**
+   * This function is used to toggle the show formula modal for stock status matrix report screen
+   */
   toggleStockStatusMatrix() {
     this.setState({
       stockstatusmatrix: !this.state.stockstatusmatrix,
     });
   }
-  toggleShowTermLogic() {
-    this.setState({
-      showtermslogic: !this.state.showtermslogic,
-    });
-  }
+  /**
+   * This is used to display the content
+   * @returns It returns the modal popup for different screens to show formulas
+   */
   render() {
     return (
       <div className="animated fadeIn">
@@ -1088,51 +1112,6 @@ class SupplyPlanFormulas extends Component {
                   <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
-            </ListGroup>
-          </ModalBody>
-        </Modal>
-        <Modal isOpen={this.state.showtermslogic} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleShowTermLogic} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
-          <ModalBody >
-            <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
-              <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-                  <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
-                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
-                    <br></br>
-                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
-                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
-                </ListGroupItemText>
-              </ListGroupItem>
-              <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-                  <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
-                    <br></br>
-                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
-                </ListGroupItemText>
-              </ListGroupItem>
-              <div className="mt-2" >
-                <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
-              </div>
             </ListGroup>
           </ModalBody>
         </Modal>

@@ -14,13 +14,20 @@ import { API_URL } from '../../Constants';
 import HealthAreaService from "../../api/HealthAreaService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-
+/**
+ * Defines the validation schema for step one of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
     })
 }
+/**
+ * Component for program Onboarding step six for taking the realm details for program
+ */
 export default class StepOne extends Component {
     constructor(props) {
         super(props);
@@ -29,7 +36,9 @@ export default class StepOne extends Component {
             realmId: '',
         }
     }
-    
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
         HealthAreaService.getRealmList()
             .then(response => {
@@ -88,6 +97,10 @@ export default class StepOne extends Component {
                 }
             );
     }
+    /**
+     * Renders the program onboarding step one screen.
+     * @returns {JSX.Element} - Program onboarding step one screen.
+     */
     render() {
         const { realmList } = this.state;
         let realms = realmList.length > 0

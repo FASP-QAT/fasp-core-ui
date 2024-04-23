@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
@@ -13,7 +13,12 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
+/**
+ * Component for list of data source type details.
+ */
 export default class DataSourceTypeListComponent extends Component {
     constructor(props) {
         super(props);
@@ -27,23 +32,17 @@ export default class DataSourceTypeListComponent extends Component {
         }
         this.addNewDataSourceType = this.addNewDataSourceType.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Filters data source based on realm Id
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -61,6 +60,9 @@ export default class DataSourceTypeListComponent extends Component {
             });
         }
     }
+    /**
+     * Builds the jexcel component to display data source type list.
+     */
     buildJexcel() {
         let dataSourceTypeList = this.state.selSource;
         let dataSourceTypeArray = [];
@@ -115,7 +117,7 @@ export default class DataSourceTypeListComponent extends Component {
                     ]
                 },
             ],
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -142,6 +144,9 @@ export default class DataSourceTypeListComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Redirects to the edit data source type screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -154,11 +159,11 @@ export default class DataSourceTypeListComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Reterives realm and data source type list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -176,7 +181,7 @@ export default class DataSourceTypeListComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -233,7 +238,7 @@ export default class DataSourceTypeListComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -277,6 +282,9 @@ export default class DataSourceTypeListComponent extends Component {
                 }
             );
     }
+    /**
+     * Redirects to the add data source type screen.
+     */
     addNewDataSourceType() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/dataSourceType/addDataSourceType`)
@@ -284,6 +292,10 @@ export default class DataSourceTypeListComponent extends Component {
             alert(i18n.t('static.common.online'))
         }
     }
+    /**
+     * Renders the data source type list.
+     * @returns {JSX.Element} - Data source type list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -11,15 +11,20 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-const initialValuesFour = {
-    organisationId: ''
-}
+/**
+ * Defines the validation schema for program organisation details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
     })
 }
+/**
+ * Component for pipeline program import organisation details
+ */
 export default class PipelineProgramDataStepFour extends Component {
     constructor(props) {
         super(props);
@@ -27,7 +32,9 @@ export default class PipelineProgramDataStepFour extends Component {
             organisationList: []
         }
     }
-    
+    /**
+     * Reterives organisation list
+     */
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getOrganisationList(realmId)
@@ -82,6 +89,10 @@ export default class PipelineProgramDataStepFour extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import organisation details screen.
+     * @returns {JSX.Element} - Pipeline program import organisation details screen.
+     */
     render() {
         const { organisationList } = this.state;
         let realmOrganisation = organisationList.length > 0

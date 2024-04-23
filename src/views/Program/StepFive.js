@@ -15,15 +15,24 @@ import { API_URL } from '../../Constants';
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesFour = {
     regionId: []
 }
+/**
+ * Defines the validation schema for step five of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
     })
 }
+/**
+ * Component for program Onboarding step five for taking the region details for program
+ */
 export default class StepFive extends Component {
     constructor(props) {
         super(props);
@@ -32,9 +41,9 @@ export default class StepFive extends Component {
             regionId: ''
         }
     }
-    
-    componentDidMount() {
-    }
+    /**
+     * Reterives region list from server
+     */
     getRegionList() {
         ProgramService.getRegionList(document.getElementById('realmCountryId').value)
             .then(response => {
@@ -99,6 +108,10 @@ export default class StepFive extends Component {
                 }
             );
     }
+    /**
+     * Renders the program onboarding step five screen.
+     * @returns {JSX.Element} - Program onboarding step five screen.
+     */
     render() {
         return (
             <>

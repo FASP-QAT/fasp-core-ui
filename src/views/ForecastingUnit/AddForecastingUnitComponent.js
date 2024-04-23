@@ -12,6 +12,8 @@ import UnitService from "../../api/UnitService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 let initialValues = {
     realmId: [],
     productCategoryId: [],
@@ -19,7 +21,13 @@ let initialValues = {
     unitId: [],
     label: ''
 }
+// Localized entity name
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
+/**
+ * Defines the validation schema for forecasting unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -37,6 +45,9 @@ const validationSchema = function (values) {
             .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
+/**
+ * Component for adding forecasting unit details.
+ */
 export default class AddForecastingUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -69,13 +80,11 @@ export default class AddForecastingUnitComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name === "label") {
@@ -103,7 +112,9 @@ export default class AddForecastingUnitComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives unit, realm and tracer category list on component mount
+     */
     componentDidMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -273,6 +284,9 @@ export default class AddForecastingUnitComponent extends Component {
                 })
         }
     }
+    /**
+     * Reterives product category list based on realm Id from server
+     */
     getProductCategoryByRealmId() {
         let realmId = this.state.forecastingUnit.realm.id;
         if (realmId != "") {
@@ -333,6 +347,10 @@ export default class AddForecastingUnitComponent extends Component {
             })
         }
     }
+    /**
+     * Renders the forecasting unit details form.
+     * @returns {JSX.Element} - Forecasting unit details form.
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -395,7 +413,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                     loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -585,9 +603,15 @@ export default class AddForecastingUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list forecasting unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the forecasting unit details when reset button is clicked.
+     */
     resetClicked() {
         let { forecastingUnit } = this.state
         forecastingUnit.label.label_en = ''

@@ -15,7 +15,11 @@ import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.budget');
+/**
+ * Component for list of budget details.
+ */
 class ListBudgetComponent extends Component {
   constructor(props) {
     super(props);
@@ -41,6 +45,10 @@ class ListBudgetComponent extends Component {
     this.fundingSourceChanged = this.fundingSourceChanged.bind(this);
     this.statusChanged = this.statusChanged.bind(this);
   }
+  /**
+   * Handles change in selected program & filters data accordingly.
+   * @param {Event} event - The change event.
+   */
   programChanged(event) {
     localStorage.setItem("sesBudPro", event.target.value);
     this.setState({
@@ -49,6 +57,10 @@ class ListBudgetComponent extends Component {
       this.filterData();
     })
   }
+  /**
+   * Handles change in selected funding source & filters data accordingly.
+   * @param {Event} event - The change event.
+   */
   fundingSourceChanged(event) {
     localStorage.setItem("sesBudFs", event.target.value);
     this.setState({
@@ -57,6 +69,10 @@ class ListBudgetComponent extends Component {
       this.filterData();
     })
   }
+  /**
+   * Handles change in selected status & filters data accordingly.
+   * @param {Event} event - The change event.
+   */
   statusChanged(event) {
     localStorage.setItem("sesBudStatus", event.target.value);
     this.setState({
@@ -65,19 +81,31 @@ class ListBudgetComponent extends Component {
       this.filterData();
     })
   }
+  /**
+   * Hides the message in div1 after 30 seconds.
+   */
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
   }
+  /**
+   * Clears the timeout when the component is unmounted.
+   */
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
+  /**
+   * Hides the message in div2 after 30 seconds.
+   */
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
+  /**
+   * Filters the budget list according to the Program, Funding source & Status filters
+   */
   filterData() {
     let fundingSourceId = this.state.fundingSourceId;
     let programId = parseInt(this.state.programId);
@@ -140,6 +168,12 @@ class ListBudgetComponent extends Component {
       });
     }
   }
+  /**
+   * Formats the date
+   * @param {*} cell - value of the cell
+   * @param {*} row 
+   * @returns {string} - Formatted date.
+   */
   formatDate(cell, row) {
     if (cell != null && cell != "") {
       var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -148,11 +182,18 @@ class ListBudgetComponent extends Component {
       return "";
     }
   }
+  /**
+   * Redirects to the add budget screen
+   * @param {*} budget 
+   */
   addBudget(budget) {
     this.props.history.push({
       pathname: "/budget/addBudget"
     });
   }
+  /**
+   * Builds the jexcel component to display budget list.
+   */
   buildJExcel() {
     let budgetList = this.state.selBudget;
     let budgetArray = [];
@@ -289,6 +330,15 @@ class ListBudgetComponent extends Component {
       languageEl: languageEl, loading: false
     })
   }
+  /**
+   * Redirects to the edit budget screen on row click with budgetId for editing.
+   * @param {*} instance - This is the DOM Element where sheet is created
+   * @param {*} cell - This is the object of the DOM element
+   * @param {*} x - Row Number
+   * @param {*} y - Column Number
+   * @param {*} value - Cell Value
+   * @param {Event} e - The selected event.
+   */
   selected = function (instance, cell, x, y, value, e) {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || (y == 0)) {
@@ -303,6 +353,14 @@ class ListBudgetComponent extends Component {
       }
     }
   }.bind(this);
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
+   * @param {*} instance - This is the DOM Element where sheet is created
+   * @param {*} cell - This is the object of the DOM element
+   * @param {*} x - Row Number
+   * @param {*} y - Column Number
+   * @param {*} value - Cell Value
+   */
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
@@ -326,9 +384,14 @@ class ListBudgetComponent extends Component {
       }
     }
   }
+  /**
+   * Fetches the RealmId, Program list, Budget list and Funding source list from the server and builds the jexcel component on component mount.
+   */
   componentDidMount() {
     this.hideFirstComponent();
+    // Fetch realmId
     let realmId = AuthenticationService.getRealmId();
+    //Fetch Program list
     DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
       .then(response => {
         if (response.status == 200) {
@@ -390,6 +453,7 @@ class ListBudgetComponent extends Component {
           }
         }
       );
+    //Fetch budget list
     BudgetServcie.getBudgetList()
       .then(response => {
         if (response.status == 200) {
@@ -446,6 +510,7 @@ class ListBudgetComponent extends Component {
           }
         }
       );
+    //Fetch all funding source list
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
@@ -501,6 +566,10 @@ class ListBudgetComponent extends Component {
         }
       );
   }
+  /**
+   * Renders the budget list with filters.
+   * @returns {JSX.Element} - Budget list.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",

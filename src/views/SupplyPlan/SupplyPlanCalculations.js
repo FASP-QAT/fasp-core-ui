@@ -5,6 +5,19 @@ import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonCompone
 import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from '../../Constants.js';
 import i18n from '../../i18n';
 import { convertSuggestedShipmentsIntoPlannedShipments } from '../SupplyPlan/SupplyPlanCalculationsForWhatIf.js';
+/**
+ * This function is used do all the supply plan calculations
+ * @param {*} programId This is the program Id for which supply plan has to be build
+ * @param {*} planningUnitId This is the planning unit Id for which supply plan has to be build
+ * @param {*} objectStoreName This is the name of object store for which supply plan has to be build i.e if supply plan needs to build for scenario planning or supply planning
+ * @param {*} page This is the name of the page from which this function is called
+ * @param {*} props This is the props of the page from which this function is called
+ * @param {*} planningUnitList List of planning units for which supply plan has to be build
+ * @param {*} minimumDate This is the minimum date from where the supply plan has to be build
+ * @param {*} problemListChild This is the ref for QPL so that QPL can be rebuild after supply plan is build
+ * @param {*} rebuild This is used to check if supply plan has to be rebuild or not
+ * @param {*} rebuildQPL This is used to check if QPL has to be rebuild or not
+ */
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
     if (page == 'masterDataSync' && !rebuild) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {

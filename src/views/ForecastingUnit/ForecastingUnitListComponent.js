@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import DropdownService from '../../api/DropdownService';
@@ -15,7 +15,12 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
+/**
+ * Component for list of forecasting unit details.
+ */
 export default class ForecastingUnitListComponent extends Component {
     constructor(props) {
         super(props);
@@ -34,10 +39,11 @@ export default class ForecastingUnitListComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Builds the jexcel component to display forecasting unit list.
+     */
     buildJexcel() {
         let forecastingUnitList = this.state.selSource;
         let forecastingUnitListArray = [];
@@ -113,7 +119,7 @@ export default class ForecastingUnitListComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -139,19 +145,15 @@ export default class ForecastingUnitListComponent extends Component {
             forecastingUnitListEl: forecastingUnitListEl, loading: false
         })
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Filters data based on realm Id
+     */
     filterDataForRealm() {
         this.setState({ loading: true })
         let realmId = document.getElementById("realmId").value;
@@ -172,7 +174,7 @@ export default class ForecastingUnitListComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -215,6 +217,9 @@ export default class ForecastingUnitListComponent extends Component {
             }
         );
     }
+    /**
+     * Filters data based on product category and tracer category
+     */
     filterData() {
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
@@ -266,6 +271,9 @@ export default class ForecastingUnitListComponent extends Component {
                 })
         }
     }
+    /**
+     * Reterives product categories list from server
+     */
     getProductCategories() {
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
@@ -313,8 +321,11 @@ export default class ForecastingUnitListComponent extends Component {
                 }
             );
     }
+    /**
+     * Reterives Product category, real, tracer category and forecasting unit list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
             let realmId = AuthenticationService.getRealmId();
             ProductService.getProductCategoryList(realmId)
@@ -386,7 +397,7 @@ export default class ForecastingUnitListComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -445,7 +456,7 @@ export default class ForecastingUnitListComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -502,7 +513,7 @@ export default class ForecastingUnitListComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -545,9 +556,9 @@ export default class ForecastingUnitListComponent extends Component {
             }
         );
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Redirects to the edit forecasting unit screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -562,6 +573,9 @@ export default class ForecastingUnitListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add forecasting unit screen.
+     */
     addNewForecastingUnit() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/forecastingUnit/addForecastingUnit`)
@@ -569,6 +583,10 @@ export default class ForecastingUnitListComponent extends Component {
             alert(i18n.t('static.common.online'))
         }
     }
+    /**
+     * Renders the forecasting unit list.
+     * @returns {JSX.Element} - Forecasting unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -19,7 +19,12 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.forecastMethod.forecastMethod')
+/**
+ * Component for forecast method.
+ */
 class forecastMethod extends Component {
     constructor(props) {
         super(props);
@@ -37,22 +42,21 @@ class forecastMethod extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getForecastMethodData = this.getForecastMethodData.bind(this);
         this.getForecastMethodTypeList = this.getForecastMethodTypeList.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
@@ -60,6 +64,9 @@ class forecastMethod extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+   * Builds the jexcel component to display forecast method list.
+   */
     buildJexcel() {
         const { realms } = this.state;
         let realmList = [];
@@ -231,6 +238,9 @@ class forecastMethod extends Component {
             loading: false
         })
     }
+    /**
+     * Reterives forecast method type list from server
+     */
     getForecastMethodTypeList() {
         ForecastMethodService.getForecastMethodTypeList().then(response => {
             if (response.status == 200) {
@@ -263,7 +273,7 @@ class forecastMethod extends Component {
                     message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -311,6 +321,9 @@ class forecastMethod extends Component {
                 }
             );
     }
+    /**
+     * Reterives Realm and Forecast method list from server
+     */
     getForecastMethodData() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -369,7 +382,7 @@ class forecastMethod extends Component {
                     }
                 }
             );
-        this.hideSecondComponent();
+        hideSecondComponent();
         ForecastMethodService.getForecastMethodList().then(response => {
             if (response.status == 200) {
                 var listArray = response.data;
@@ -391,7 +404,7 @@ class forecastMethod extends Component {
                     message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -439,12 +452,26 @@ class forecastMethod extends Component {
                 }
             );
     }
+    /**
+     * Calls getForecastMethodTypeList function on component mount
+     */
     componentDidMount() {
         this.getForecastMethodTypeList();
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(7, y, 1, true);
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var data = [];
         data[0] = 0;
@@ -460,6 +487,9 @@ class forecastMethod extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -487,7 +517,7 @@ class forecastMethod extends Component {
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                                 this.getForecastMethodData();
                             })
                     } else {
@@ -496,7 +526,7 @@ class forecastMethod extends Component {
                             color: "#BA0C2F", loading: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -523,7 +553,7 @@ class forecastMethod extends Component {
                                         color: "#BA0C2F", loading: false
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                     break;
                                 case 412:
@@ -532,7 +562,7 @@ class forecastMethod extends Component {
                                         color: "#BA0C2F", loading: false
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                     break;
                                 default:
@@ -548,13 +578,26 @@ class forecastMethod extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
 
         changed(instance, cell, x, y, value)
@@ -567,6 +610,10 @@ class forecastMethod extends Component {
             isChanged: true,
         });
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -580,13 +627,17 @@ class forecastMethod extends Component {
                             color: 'red'
                         },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }
         }
         return valid;
     }
+    /**
+     * Renders the forecast method list.
+     * @returns {JSX.Element} - Forecast method list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

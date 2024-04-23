@@ -14,15 +14,24 @@ import { API_URL } from '../../Constants';
 import HealthAreaService from "../../api/HealthAreaService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     realmId: 1
 }
+/**
+ * Defines the validation schema for program realm Id details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
     })
 }
+/**
+ * Component for pipeline program import realm details
+ */
 export default class PipelineProgramDataStepOne extends Component {
     constructor(props) {
         super(props);
@@ -30,7 +39,9 @@ export default class PipelineProgramDataStepOne extends Component {
             realmList: [],
         }
     }
-    
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
         HealthAreaService.getRealmList()
             .then(response => {
@@ -84,6 +95,10 @@ export default class PipelineProgramDataStepOne extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import realm details screen.
+     * @returns {JSX.Element} - Pipeline program import realm details screen.
+     */
     render() {
         const { realmList } = this.state;
         let realms = realmList.length > 0

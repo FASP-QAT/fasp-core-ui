@@ -7,13 +7,23 @@ import { API_URL } from '../../Constants';
 import RegionService from "../../api/RegionService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.region.region');
+/**
+ * Defines the validation schema for region details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()
             .required(i18n.t('static.region.validregion'))
     })
 }
+/**
+ * Component for editing region details.
+ */
 class EditRegionComponent extends Component {
     constructor(props) {
         super(props);
@@ -42,9 +52,12 @@ class EditRegionComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { region } = this.state;
         if (event.target.name == "region") {
@@ -58,13 +71,9 @@ class EditRegionComponent extends Component {
         },
             () => { });
     };
-    
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { region } = this.state;
-            region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
+    /**
+     * Fetches region details on component mount.
+     */
     componentDidMount() {
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
@@ -110,6 +119,10 @@ class EditRegionComponent extends Component {
             }
         );
     }
+    /**
+     * Renders the region details form.
+     * @returns {JSX.Element} - Region details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -209,7 +222,7 @@ class EditRegionComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.region}
                                                         invalid={touched.region && !!errors.region}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={getLabelText(this.state.region.label, this.state.lang)}
                                                         required />
@@ -267,9 +280,15 @@ class EditRegionComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list region screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the region details when reset button is clicked.
+     */
     resetClicked() {
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({

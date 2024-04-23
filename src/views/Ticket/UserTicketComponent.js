@@ -14,6 +14,11 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
+/**
+ * This const is used to define the validation schema for user ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -44,6 +49,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.org&CountryText')),
     })
 }
+/**
+ * This component is used to display the user form and allow user to submit the add master request in jira
+ */
 export default class UserTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -73,6 +81,10 @@ export default class UserTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.roleChange = this.roleChange.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { user } = this.state
         if (event.target.name == "summary") {
@@ -106,6 +118,10 @@ export default class UserTicketComponent extends Component {
             user
         }, () => { })
     };
+    /**
+     * This function is called when role is changed
+     * @param {*} roleId This is the on change event
+     */
     roleChange(roleId) {
         let { user } = this.state;
         let count = 0;
@@ -135,7 +151,9 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
-   
+    /**
+     * This function is used to get the language list on page load
+     */
     componentDidMount() {
         LanguageService.getLanguageListActive()
             .then(response => {
@@ -330,11 +348,17 @@ export default class UserTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the usage period details
+     */
     resetClicked() {
         let { user } = this.state;
         user.realm = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -352,6 +376,10 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns user details form
+     */
     render() {
         const { realms } = this.state;
         const { languages } = this.state;

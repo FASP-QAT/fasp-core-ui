@@ -15,6 +15,11 @@ import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
+/**
+ * This const is used to define the validation schema for technical area ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -33,6 +38,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.displayName')),
     })
 }
+/**
+ * This component is used to display the technial area form and allow user to submit the add master request in jira
+ */
 export default class TechnicalAreaTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -63,6 +71,10 @@ export default class TechnicalAreaTicketComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { technicalArea } = this.state
         if (event.target.name == "summary") {
@@ -87,7 +99,9 @@ export default class TechnicalAreaTicketComponent extends Component {
             technicalArea
         }, () => { })
     };
-    
+    /**
+     * This function is used to get country and realm list on page load
+     */
     componentDidMount() {
         CountryService.getCountryListAll()
             .then(response => {
@@ -201,6 +215,10 @@ export default class TechnicalAreaTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is called realm country is changed
+     * @param {*} value This is value of realm country that is selected by the user
+     */
     updateFieldData(value) {
         let { technicalArea } = this.state;
         this.setState({ countryId: value });
@@ -212,6 +230,10 @@ export default class TechnicalAreaTicketComponent extends Component {
         technicalArea.countryName = realmCountryIdArray;
         this.setState({ technicalArea: technicalArea });
     }
+    /**
+     * This function is used to get the realm country list based on realm
+     * @param {*} realmId This is the realm Id for which realm country list will appear
+     */
     getRealmCountryList(realmId) {
         if (realmId !== "") {
             RealmCountryService.getRealmCountryForProgram(realmId)
@@ -278,11 +300,17 @@ export default class TechnicalAreaTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the technical area details
+     */
     resetClicked() {
         let { technicalArea } = this.state;
         technicalArea.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -297,9 +325,17 @@ export default class TechnicalAreaTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.technicalArea.technicalAreaName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to get the display name for technical area
+     * @param {*} event This is the on change event
+     */
     getDisplayName(event) {
         let realmId = this.state.realmId;
         let healthAreaValue = this.state.technicalArea.technicalAreaName;
@@ -404,6 +440,10 @@ export default class TechnicalAreaTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This returns technical area details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0

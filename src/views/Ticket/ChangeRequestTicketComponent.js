@@ -10,6 +10,11 @@ const initialValues = {
     description: ""
 }
 const entityname = i18n.t('static.program.realmcountry');
+/**
+ * This const is used to define the validation schema for change request ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -21,6 +26,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.selectfile'))
     })
 }
+/**
+ * This component is used to display the change request form and allow user to submit the change request in jira
+ */
 export default class ChangeRequestTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -38,6 +46,10 @@ export default class ChangeRequestTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { changeRequest } = this.state
         if (event.target.name == "summary") {
@@ -54,14 +66,17 @@ export default class ChangeRequestTicketComponent extends Component {
             changeRequest
         }, () => { })
     };
-    
-    componentDidMount() {
-    }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the change request details
+     */
     resetClicked() {
         let { changeRequest } = this.state;
         changeRequest.summary = '';
@@ -73,6 +88,10 @@ export default class ChangeRequestTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns change request details form
+     */
     render() {
         return (
             <div className="col-md-12">
