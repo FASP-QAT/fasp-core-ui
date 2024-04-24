@@ -3242,5 +3242,6 @@
     "static.importFromQATSupplyPlan.supplyPlanProgram": "Programa del Plan de Abastecimiento",
     "static.importIntoSP.dataExists": "Los datos ya existen en el programa del plan de suministro.",
     "static.importIntoSP.dataExistsGray": "Los datos existen en el programa del plan de suministro y ya pasaron {{month}} meses, por lo que no se puede importar.",
-    "static.forecastMonthlyErrorReport.showConsumption": "¿Mostrar el consumo ajustado por desabastecimiento?"
+    "static.forecastMonthlyErrorReport.showConsumption": "¿Mostrar el consumo ajustado por desabastecimiento?",
+    "static.common.allItemsSelected": "Todos los artículos están seleccionados"
 }

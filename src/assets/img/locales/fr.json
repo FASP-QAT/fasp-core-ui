@@ -3238,9 +3238,10 @@
     "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
     "static.common.node": "Nœud",
     "static.pipeline.pipelineConvertorLinux": "Linux.",
-    "static.supplyPlan.importIntoSP": "Importer dans le plan d'approvisionnement",
+    "static.supplyPlan.importIntoSP": "Importer dans le plan d`approvisionnement",
     "static.importIntoSP.forecastBlank": "La prévision est vide",
-    "static.importIntoSP.dataExists": "Les données existent déjà dans le programme du plan d'approvisionnement",
-    "static.importIntoSP.dataExistsGray": "Les données existent dans le programme du plan d'approvisionnement et sont passées {{month}} mois, il ne peut donc pas être importé.",
-    "static.forecastMonthlyErrorReport.showConsumption": "Afficher la consommation ajustée aux ruptures de stock ?"
+    "static.importIntoSP.dataExists": "Les données existent déjà dans le programme du plan d`approvisionnement",
+    "static.importIntoSP.dataExistsGray": "Les données existent dans le programme du plan d`approvisionnement et sont passées {{month}} mois, il ne peut donc pas être importé.",
+    "static.forecastMonthlyErrorReport.showConsumption": "Afficher la consommation ajustée aux ruptures de stock ?",
+    "static.common.allItemsSelected": "Tous les éléments sont sélectionnés"
 }

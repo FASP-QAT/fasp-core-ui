@@ -3242,5 +3242,6 @@
     "static.importIntoSP.forecastBlank": "Forecast is blank",
     "static.importIntoSP.dataExists": "Data already exists in Supply Plan Program",
     "static.importIntoSP.dataExistsGray": "Data exists in Supply Plan Program and is past {{month}} months, so it cannot be imported.",
-    "static.forecastMonthlyErrorReport.showConsumption": "Show consumption adjusted for stock out?"
+    "static.forecastMonthlyErrorReport.showConsumption": "Show consumption adjusted for stock out?",
+    "static.common.allItemsSelected": "All items are selected"
 }
