@@ -358,6 +358,7 @@ export default class ExportProgram extends Component {
                                                 multi
                                                 options={this.state.programList}
                                                 value={this.state.programId}
+                                                placeholder={i18n.t('static.common.select')}
                                             />
                                             <span className="red">{this.state.selectProgramMessage}</span>
                                         </FormGroup>

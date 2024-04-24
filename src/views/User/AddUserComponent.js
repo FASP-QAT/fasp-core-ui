@@ -1742,6 +1742,7 @@ class AddUserComponent extends Component {
                           min={1}
                           options={this.state.roleList}
                           value={this.state.roleId}
+                          placeholder={i18n.t('static.common.select')}
                         />
                         <FormFeedback className="red">
                           {errors.roleId}

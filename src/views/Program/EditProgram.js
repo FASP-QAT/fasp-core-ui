@@ -895,6 +895,7 @@ export default class EditProgram extends Component {
                                                         multi
                                                         options={this.state.regionList}
                                                         value={this.state.program.regionArray}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback>{errors.regionId}</FormFeedback>
                                                 </FormGroup>
@@ -919,6 +920,7 @@ export default class EditProgram extends Component {
                                                         disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_SP") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>

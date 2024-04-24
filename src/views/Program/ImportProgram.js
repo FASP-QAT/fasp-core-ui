@@ -630,6 +630,7 @@ export default class ImportProgram extends Component {
                                                 multi
                                                 options={this.state.programList}
                                                 value={this.state.programId}
+                                                placeholder={i18n.t('static.common.select')}
                                             />
                                             <FormFeedback>{errors.programId}</FormFeedback>
                                         </FormGroup>

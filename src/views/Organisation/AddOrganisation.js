@@ -669,6 +669,8 @@ export default class AddOrganisationComponent extends Component {
                                                         multi
                                                         options={this.state.realmCountryList}
                                                         value={this.state.realmCountryId}
+                                                        placeholder={i18n.t('static.common.select')}
+
                                                     />
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </FormGroup>

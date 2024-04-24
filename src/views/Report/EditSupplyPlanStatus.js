@@ -3319,6 +3319,9 @@ class EditSupplyPlanStatus extends Component {
                                         value={this.state.problemStatusValues}
                                         onChange={(e) => { this.handleProblemStatusChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
+                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                        
                                     />
                                 </div>
                             </FormGroup>
@@ -3363,6 +3366,8 @@ class EditSupplyPlanStatus extends Component {
                                         value={this.state.problemReviewedValues}
                                         onChange={(e) => { this.handleProblemReviewedChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
+                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                     />
                                 </div>
                             </FormGroup>

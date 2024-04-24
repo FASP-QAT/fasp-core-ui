@@ -968,6 +968,7 @@ export default class AddForecastProgram extends Component {
                                                         multi
                                                         options={this.state.healthAreaList}
                                                         value={this.state.program.healthAreaArray}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
@@ -1008,6 +1009,7 @@ export default class AddForecastProgram extends Component {
                                                         multi
                                                         options={this.state.regionList}
                                                         value={this.state.program.regionArray}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.regionId}</FormFeedback>
                                                 </FormGroup>

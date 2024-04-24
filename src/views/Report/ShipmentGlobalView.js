@@ -1516,6 +1516,8 @@ class ShipmentGlobalView extends Component {
                                                 onChange={(e) => { this.handleChange(e) }}
                                                 options={countryList && countryList.length > 0 ? countryList : []}
                                                 disabled={this.state.loading}
+                                                overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')}}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1533,6 +1535,8 @@ class ShipmentGlobalView extends Component {
                                                 onChange={(e) => { this.handleChangeProgram(e) }}
                                                 options={programList && programList.length > 0 ? programList : []}
                                                 disabled={this.state.loading}
+                                                overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')}}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1616,6 +1620,8 @@ class ShipmentGlobalView extends Component {
                                                     value={this.state.procurementAgentValues}
                                                     onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1630,6 +1636,8 @@ class ShipmentGlobalView extends Component {
                                                     value={this.state.procurementAgentTypeValues}
                                                     onChange={(e) => { this.handleProcurementAgentTypeChange(e) }}
                                                     options={procurementAgentTypeList && procurementAgentTypeList.length > 0 ? procurementAgentTypeList : []}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1645,6 +1653,8 @@ class ShipmentGlobalView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>

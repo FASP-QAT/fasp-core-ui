@@ -2553,6 +2553,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>
