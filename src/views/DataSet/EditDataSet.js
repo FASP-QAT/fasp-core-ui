@@ -49,7 +49,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required('Enter forecasting program name'),
+            .required(i18n.t('static.dataSet.forecastingProgramName')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()

@@ -2536,7 +2536,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Toggle info popup
-     */ 
+     */
     toggleWillClientsShareOnePU() {
         this.setState({
             popoverOpenWillClientsShareOnePU: !this.state.popoverOpenWillClientsShareOnePU,
@@ -2544,7 +2544,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Toggle info popup
-     */ 
+     */
     toggleConsumptionIntervalEveryXMonths() {
         this.setState({
             popoverOpenConsumptionIntervalEveryXMonths: !this.state.popoverOpenConsumptionIntervalEveryXMonths,
@@ -4317,7 +4317,13 @@ export default class BuildTree extends Component {
             var data = []
             var stopDate = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
             var data2 = (i == 0) ? moment(stopDate, "YYYY-MM-DD").subtract(6, "months").format("YYYY-MM-DD") : stopDate;
-            data[0] = "Monthly change for " + map.get("7") + " - " + moment(data2).format("MMM YYYY") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            // data[0] = "Monthly change for " + map.get("7") + " - " + moment(data2).format("MMM YYYY") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            var startDate = map.get("7");
+            var stopDate = moment(data2).format("MMM YYYY");
+            var dateRange = map.get("0");
+            var enteredTarget = addCommas(map.get("1"));
+            var calculatedTarget = addCommas(map.get("4"));
+            data[0] = i18n.t('static.tree.discription', { startDate, stopDate, dateRange, enteredTarget, calculatedTarget });
             data[1] = moment("01 " + map.get("7"), "DD MMM YYYY").format("YYYY-MM-DD");
             data[2] = data2;
             data[3] = '';
@@ -4752,8 +4758,8 @@ export default class BuildTree extends Component {
                     title: '+/-',
                     type: 'dropdown',
                     source: [
-                        { id: 1, name: "Increase" },
-                        { id: -1, name: "Decrease" }
+                        { id: 1, name: i18n.t('static.tree.increase') },
+                        { id: -1, name: i18n.t('static.tree.decrease') }
                     ]
                 },
                 {
@@ -5131,7 +5137,7 @@ export default class BuildTree extends Component {
      * @param {number} x - The x-coordinate of the changed cell.
      * @param {number} y - The y-coordinate of the changed cell.
      * @param {any} value - The new value of the changed cell.
-     */ 
+     */
     changed1 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
             this.setState({ isChanged: true });
@@ -5830,7 +5836,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Exports data in PDF format
-     */ 
+     */
     exportPDF = () => {
         let treeLevel = this.state.items.length;
         var treeLevelItems = [];
@@ -8341,7 +8347,7 @@ export default class BuildTree extends Component {
     /**
      * Removes an item from the tree by its ID.
      * @param {number} id - ID of the item to be removed.
-     */ 
+     */
     onRemoveItem(id) {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
@@ -9822,7 +9828,7 @@ export default class BuildTree extends Component {
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-6">
-                                                                    <Label htmlFor="currencyId">Consumption Interval (Reference)<i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionInterval')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
                                                                         id="interval"
                                                                         name="interval"
@@ -10560,15 +10566,15 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6" >
                                             <div className="check inline  pl-lg-1 pt-lg-2">
                                                 {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
-                                                    <Label htmlFor="select">Target</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.tree.target')}</Label>
                                                     <Input
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
                                                         disabled={(this.state.currentModelingType == 2 || this.state.currentModelingType == 3 || this.state.currentModelingType == 4) ? false : this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
-                                                        <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
-                                                        <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
+                                                        <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{i18n.t('static.tree.annualTarget')}</option>
+                                                        <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{i18n.t('static.tree.endingValueTarget')}</option>
                                                     </Input>
                                                 </div>}
                                             </div>
@@ -10725,7 +10731,7 @@ export default class BuildTree extends Component {
                                             <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                             <FormGroup className="col-md-5">
                                                 <Label htmlFor="currencyId">
-                                                    {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
+                                                    {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? i18n.t('static.tree.changePerPoints') : i18n.t('static.tree.targetChangePer')}
                                                     <span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="text"
                                                     id="currentTargetChangePercentage"

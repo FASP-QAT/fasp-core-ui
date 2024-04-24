@@ -3243,5 +3243,19 @@
     "static.importIntoSP.dataExists": "Data already exists in Supply Plan Program",
     "static.importIntoSP.dataExistsGray": "Data exists in Supply Plan Program and is past {{month}} months, so it cannot be imported.",
     "static.forecastMonthlyErrorReport.showConsumption": "Show consumption adjusted for stock out?",
-    "static.common.allItemsSelected": "All items are selected"
+    "static.common.allItemsSelected": "All items are selected",
+    "static.dataSet.forecastingProgramName": "Enter forecasting program name",
+    "static.dataSet.forecastPeriodInMonth": "Enter forecast period (months)",
+    "static.dataSet.forecastperiodInMonthRequired": "Forecast period should not contain negative number, decimal numbers, characters & special symbols",
+    "static.tree.target": "Target",
+    "static.tree.annualTarget": "Annual Target",
+    "static.tree.endingValueTarget": "Ending Value Target / Change",
+    "static.tree.increase": "Increase",
+    "static.tree.decrease": "Decrease",
+    "static.tree.discription": "Monthly change for {{startDate}} - {{stopDate}};\nConsiders: {{dateRange}} Entered Target = {{enteredTarget}}\nCalculated Target = {{calculatedTarget}}",
+    "static.treeTemplate.monthSelector": "Month Selector",
+    "static.tree.consumptionInterval": "Consumption Interval (Reference)",
+    "static.treeTemplate.returnToList": "Return To List",
+    "static.tree.targetChangePer": "Target change (%)",
+    "static.tree.changePerPoints": "Change (% points)"
 }

@@ -51,14 +51,14 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required('Enter forecasting program name'),
+            .required(i18n.t('static.dataSet.forecastingProgramName')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         regionId: Yup.string()
             .required(i18n.t('static.program.validRegionstext')),
         forecastProgramInMonth: Yup.string()
-            .matches(/^[0-9]{0,5}$/, 'Forecast period should not contain negative number, decimal numbers, characters & special symbols')
-            .required('Enter forecast period (months)'),
+            .matches(/^[0-9]{0,5}$/, i18n.t('static.dateSet.forecastperiodInMonthRequired'))
+            .required(i18n.t('static.dataSet.forecastPeriodInMonth')),
     })
 }
 /**

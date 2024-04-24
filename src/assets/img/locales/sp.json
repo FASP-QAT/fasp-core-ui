@@ -3243,5 +3243,19 @@
     "static.importIntoSP.dataExists": "Los datos ya existen en el programa del plan de suministro.",
     "static.importIntoSP.dataExistsGray": "Los datos existen en el programa del plan de suministro y ya pasaron {{month}} meses, por lo que no se puede importar.",
     "static.forecastMonthlyErrorReport.showConsumption": "¿Mostrar el consumo ajustado por desabastecimiento?",
-    "static.common.allItemsSelected": "Todos los artículos están seleccionados"
+    "static.common.allitemsselected": "Todos los artículos están seleccionados",
+    "static.dataSet.forecastingProgramName": "Ingrese el nombre del programa de pronóstico",
+    "static.dataSet.forecastPeriodInMonth": "Ingrese el período de pronóstico (meses)",
+    "static.dataSet.forecastperiodInMonthRequired": "El período de pronóstico no debe contener números negativos, números decimales, caracteres ni símbolos especiales.",
+    "static.tree.target": "Objetivo",
+    "static.tree.annualTarget": "Meta Anual",
+    "static.tree.endingValueTarget": "Valor final objetivo/cambio",
+    "static.tree.increase": "Aumentar",
+    "static.tree.decrease": "Disminuir",
+    "static.tree.discription": "Cambio mensual para {{startDate}} - {{stopDate}};\nConsidera: {{dateRange}} Objetivo ingresado = {{enteredTarget}}\nObjetivo calculado = {{calculatedTarget}}",
+    "static.treeTemplate.monthSelector": "Selector de mes",
+    "static.tree.consumptionInterval":"Intervalo de consumo (Referencia)",
+    "static.treeTemplate.returnToList": "Volver a la lista",
+    "static.tree.targetChangePer": "Cambio de objetivo (%)",
+    "static.tree.changePerPoints": "Cambio (puntos porcentuales)"
 }
