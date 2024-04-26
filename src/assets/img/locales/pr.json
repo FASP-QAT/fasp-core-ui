@@ -3236,5 +3236,6 @@
     "static.currency.conversionrateusd": "Taxa de câmbio para 1 USD",
     "static.logout.confirmLogout": "Tem certeza que deseja sair?",
     "static.common.node": "Nó",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.errorPage.validUserComment": "Insira a descrição"
 }
