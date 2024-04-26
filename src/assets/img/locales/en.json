@@ -3257,5 +3257,6 @@
     "static.tree.consumptionInterval": "Consumption Interval (Reference)",
     "static.treeTemplate.returnToList": "Return To List",
     "static.tree.targetChangePer": "Target change (%)",
-    "static.tree.changePerPoints": "Change (% points)"
+    "static.tree.changePerPoints": "Change (% points)",
+    "static.errorPage.validUserComment": "Enter Description"
 }

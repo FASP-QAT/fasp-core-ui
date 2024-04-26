@@ -3257,5 +3257,6 @@
     "static.tree.consumptionInterval":"Intervalle de consommation (référence)",
     "static.treeTemplate.returnToList": "Retour à la liste",
     "static.tree.targetChangePer": "Changement cible (%)",
-    "static.tree.changePerPoints": "Variation (points de %)"
+    "static.tree.changePerPoints": "Variation (points de %)",
+    "static.errorPage.validUserComment": "Entrez la description"
 }
