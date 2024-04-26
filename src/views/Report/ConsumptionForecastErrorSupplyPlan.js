@@ -73,7 +73,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitValues: [],
             planningUnitLabels: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
             // isEquUnitChecked:false,
@@ -123,7 +123,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnits: [],
             planningUnitIds: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             forecastingUnitIds: [],
             matricsList: [],
             regions: [],
@@ -299,7 +299,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => {
@@ -314,7 +314,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedVersionList(programId) })
@@ -334,7 +334,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 versions: [],
                 planningUnits: [],
                 forecastingUnits: [],
-                allForecastingUnits:[],
+                allForecastingUnits: [],
                 show: false,
                 loading: false
             })
@@ -429,7 +429,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => {
@@ -446,7 +446,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedRegionList(programId) })
@@ -592,7 +592,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             planningUnits: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             show: false,
             loading: true
         }, () => {
@@ -672,7 +672,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: newPlanningUnitList,
                                     forecastingUnits: newForecastingUnitList,
-                                    allForecastingUnits:forecastingUnitList1,
+                                    allForecastingUnits: forecastingUnitList1,
                                     planningUnitValues: newPlanningUnitList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -709,7 +709,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: proList,
                                     forecastingUnits: forecastingUnitList1,
-                                    allForecastingUnits:forecastingUnitList1,
+                                    allForecastingUnits: forecastingUnitList1,
                                     planningUnitValues: proList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                     }, this),
@@ -796,7 +796,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
-                                allForecastingUnits:forecastingUnitList,
+                                allForecastingUnits: forecastingUnitList,
                                 planningUnitValues: newPlanningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -831,7 +831,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
-                                allForecastingUnits:forecastingUnitList,
+                                allForecastingUnits: forecastingUnitList,
                                 planningUnitValues: planningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                 }, this),
@@ -911,7 +911,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             dataList: [],
             planningUnits: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             loading: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", this.state.versionId);
@@ -1371,7 +1371,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var daysOfStockOut = "";
                                     actualConsumptionListForCurrentMonth.map(item => {
                                         if (consumptionAdjForStockOutId) {
-                                            if(noOfDays!=item.dayOfStockOut){
+                                            if (noOfDays != item.dayOfStockOut) {
                                                 actualQty = Number(actualQty) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
                                             }
                                             daysOfStockOut = item.dayOfStockOut;
@@ -1390,8 +1390,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var sumOfActualQty = "";
                                     actualConsumptionListForLastXMonths.map(item => {
                                         if (consumptionAdjForStockOutId) {
-                                            if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                            sumOfActualQty = Number(sumOfActualQty) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                            if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                sumOfActualQty = Number(sumOfActualQty) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                             }
                                         } else {
                                             sumOfActualQty = Number(sumOfActualQty) + Number(item.consumptionQty)
@@ -1405,8 +1405,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var actualQtyForMic = "";
                                             actualConsumptionListForMic.map(item => {
                                                 if (consumptionAdjForStockOutId) {
-                                                    if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                                    actualQtyForMic = Number(actualQtyForMic) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                    if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                        actualQtyForMic = Number(actualQtyForMic) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                                     }
                                                 } else {
                                                     actualQtyForMic = Number(actualQtyForMic) + Number(item.consumptionQty)
@@ -1448,7 +1448,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var actualQtyAllRegion = "";
                                 actualConsumptionListForCurrentMonthAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        if(Number(noOfDays)!=Number(item.dayOfStockOut)){
+                                        if (Number(noOfDays) != Number(item.dayOfStockOut)) {
                                             actualQtyAllRegion = Number(actualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
                                         }
                                     } else {
@@ -1466,7 +1466,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var sumOfActualQtyAllRegion = "";
                                 actualConsumptionListForLastXMonthsAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
+                                        if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
                                             sumOfActualQtyAllRegion = Number(sumOfActualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                         }
                                     } else {
@@ -1481,8 +1481,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         var actualQtyForMicAllRegion = "";
                                         actualConsumptionListForMicAllRegion.map(item => {
                                             if (consumptionAdjForStockOutId) {
-                                                if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                                actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                    actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                                 }
                                             } else {
                                                 actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + Number(item.consumptionQty)
@@ -1638,7 +1638,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + "No").replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.timeWindow') + ': ' + (document.getElementById("timeWindow").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         if (document.getElementById("yaxisEquUnit").value > 0) {
-            csvRow.push('"' + ("Y-axis in equivalency unit" + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         }
         csvRow.push('');
         var columns = [];
@@ -1718,7 +1718,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             });
 
             // Region daysOfStockOut     
-            this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 && 
+            this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 &&
                 this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
                     var datacsv = [];
                     var totalRegion = 0;
@@ -1917,7 +1917,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         align: 'left'
                     })
                     if (document.getElementById("yaxisEquUnit").value > 0) {
-                        doc.text("Y-axis in equivalency unit" + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
+                        doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
                             align: 'left'
                         })
                     }
@@ -2388,7 +2388,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }
             datasetListForGraph.push({
                 label: 'Error',
-                data: this.state.dataList.map(item => (item.errorPerc !== "" && item.errorPerc!=null ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
+                data: this.state.dataList.map(item => (item.errorPerc !== "" && item.errorPerc != null ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
                 type: 'line',
                 yAxisID: 'B',
                 // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
@@ -2553,6 +2553,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -2575,7 +2577,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2714,29 +2716,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Show consumption adjusted for stock out?
+                                                        {i18n.t('static.forecastMonthlyErrorReport.showConsumption')}
                                                     </Label>
                                                 </div>
                                             </FormGroup>
-
-                                            {/* <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1" style={{ marginTop: '30px' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="yaxisEquUnitCb"
-                                                        name="yaxisEquUnitCb"
-                                                        // checked={true}
-                                                        // checked={this.state.yaxisEquUnit}
-                                                        onClick={(e) => { this.yaxisEquUnitCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Y-axis in equivalency unit?
-                                                    </Label>
-                                                </div>
-                                            </FormGroup> */}
                                         </div>
                                     </div>
                                 </Form>
@@ -2754,9 +2737,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     <div className="col-md-12">
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
-                                               <ul className="legendcommitversion">
-                                                <li style={{marginLeft:'40px'}}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
-                                                </ul> 
+                                                <ul className="legendcommitversion">
+                                                    <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
+                                                </ul>
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>

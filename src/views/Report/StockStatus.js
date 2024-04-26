@@ -37,7 +37,7 @@ export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
 const ref = React.createRef();
 const pickerLang = {
-  months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
 /**
@@ -270,11 +270,11 @@ class StockStatus extends Component {
       }
     }
     const unit = "pt";
-    const size = "A4"; 
-    const orientation = "landscape"; 
+    const size = "A4";
+    const orientation = "landscape";
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(8);    
+    doc.setFontSize(8);
     var pageArray = [];
     var list = this.state.PlanningUnitDataForExport
     var count = 0;
@@ -762,6 +762,7 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+                          console.log("shiplist", shiplist)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -2349,8 +2350,8 @@ class StockStatus extends Component {
             var listArray = response.data;
             var planningUnitsMulti = []
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); 
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); 
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
               return itemLabelA > itemLabelB ? 1 : -1;
             }).map(item => {
               planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
@@ -2555,20 +2556,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
         , intersect: false
@@ -2638,7 +2639,7 @@ class StockStatus extends Component {
         }]
       },
       tooltips: {
-        mode:'nearest',
+        mode: 'nearest',
         intersect: false,
         // enabled: false,
         // custom: CustomTooltips,
@@ -2646,20 +2647,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
       },
@@ -3097,7 +3098,7 @@ class StockStatus extends Component {
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                return (<tr  ><td padding="0">{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${getLabelText(item.shipmentStatus.label, this.state.lang)}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null

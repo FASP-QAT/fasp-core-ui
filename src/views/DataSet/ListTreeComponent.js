@@ -2732,6 +2732,7 @@ export default class ListTreeComponent extends Component {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
+            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         });
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0

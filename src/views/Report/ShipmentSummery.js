@@ -2821,6 +2821,8 @@ class ShipmentSummery extends Component {
                                 : []
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -2868,6 +2870,8 @@ class ShipmentSummery extends Component {
                               }, this)
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -2895,6 +2899,8 @@ class ShipmentSummery extends Component {
                                   };
                                 }, this)
                               }
+                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')}}
                             />
                           </div>
                         </FormGroup>

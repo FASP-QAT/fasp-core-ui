@@ -1431,7 +1431,11 @@ class AnnualShipmentCost extends Component {
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         disabled={this.state.loading}
-                                                    />     </div></FormGroup>
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                    />     
+                                                    </div>
+                                                    </FormGroup>
                                             {procurementAgents.length > 0 && <FormGroup className="col-md-3" >
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1447,6 +1451,8 @@ class AnnualShipmentCost extends Component {
                                                                 return ({ label: item.code, value: item.id })
                                                             }, this)}
                                                         disabled={this.state.loading}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>}
@@ -1467,6 +1473,8 @@ class AnnualShipmentCost extends Component {
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -1487,6 +1495,8 @@ class AnnualShipmentCost extends Component {
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     /></div>
                                             </FormGroup>
                                         </div>
