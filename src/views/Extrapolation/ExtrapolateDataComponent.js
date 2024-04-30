@@ -1016,6 +1016,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         } else {
             this.setState({
                 versions: [],
+                planningUnitList: [],
+                regionList: []
             }, () => { })
         }
     }
@@ -3121,7 +3123,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
-                                    {this.state.showDate && <><FormGroup className="col-md-12">
+                                    {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
                                         <h5>
                                             {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
                                                 document.getElementById("planningUnitId").selectedOptions[0].text}</b>
@@ -3155,7 +3157,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 </div>
                             </div>
                         </Form>
-                        <Formik
+                        {this.state.forecastProgramId != 0 && <Formik
                             enableReinitialize={true}
                             initialValues={{
                                 noOfMonthsId: this.state.monthsForMovingAverage,
@@ -3835,7 +3837,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         </FormGroup>
                                     </Form>
-                                )} />
+                                )} />}
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
