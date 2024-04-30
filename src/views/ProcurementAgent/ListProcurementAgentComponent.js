@@ -14,7 +14,11 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.procurementagent.procurementagent')
+/**
+ * Component for listing Procurement Agent details.
+ */
 class ListProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -34,19 +38,33 @@ class ListProcurementAgentComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Redirect to Procurement Agent & Planning Unit mapping screen
+     * @param {*} event 
+     * @param {*} cell 
+     */
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
@@ -55,6 +73,11 @@ class ListProcurementAgentComponent extends Component {
             });
         }
     }
+    /**
+     * Redirect to Procurement Agent & Procurement Unit mapping screen
+     * @param {*} event 
+     * @param {*} cell 
+     */
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
@@ -63,9 +86,15 @@ class ListProcurementAgentComponent extends Component {
             });
         }
     }
+    /**
+     * Redirects to the Add Procurement Agent screen
+     */
     addNewProcurementAgent() {
         this.props.history.push("/procurementAgent/addProcurementAgent");
     }
+    /**
+     * Filters the Procurement Agent list according to the realmId & builds the jexcel.
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -83,6 +112,9 @@ class ListProcurementAgentComponent extends Component {
             });
         }
     }
+    /**
+     * Builds the jexcel component to display the Procurement Agent list.
+     */
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
         let procurementAgentArray = [];
@@ -109,7 +141,7 @@ class ListProcurementAgentComponent extends Component {
         var data = procurementAgentArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 80, 100, 130, 80, 80, 80, 0, 80, 100, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -219,6 +251,15 @@ class ListProcurementAgentComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Redirects to the edit procurement agent screen on row click with procurementAgentId for editing.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     * @param {Event} e - The selected event.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -231,11 +272,23 @@ class ListProcurementAgentComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Fetches Realm list and Procurement Agent list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
+        //Fetch all realm list
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -296,6 +349,7 @@ class ListProcurementAgentComponent extends Component {
                     }
                 }
             );
+        //Fetch all Procurement Agent list
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -355,6 +409,10 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the Procurement Agent list.
+     * @returns {JSX.Element} - Procurement Agent list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

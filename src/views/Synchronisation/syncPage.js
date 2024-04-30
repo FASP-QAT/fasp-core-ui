@@ -37,16 +37,26 @@ import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.commitVersion')
+// Initial values for form fields
 const initialValues = {
   notes: ''
 }
+/**
+ * Defines the validation schema for commit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values, t) {
   return Yup.object().shape({
     notes: Yup.string()
       .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
   })
 }
+/**
+ * This component is used to allow users to commit(push) the local changes on to the server
+ */
 export default class syncPage extends Component {
   constructor(props) {
     super(props);
@@ -107,32 +117,53 @@ export default class syncPage extends Component {
     this.notesChange = this.notesChange.bind(this);
     this.checkLastModifiedDateForProgram = this.checkLastModifiedDateForProgram.bind(this)
   }
+  /**
+   * This function is called on notes change to update the notes in state
+   * @param {*} event This is the on change event
+   */
   notesChange(event) {
     this.setState({
       notes: event.target.value
     })
   }
-  
+  /**
+   * This function is called on version type change to update the notes in state
+   * @param {*} event This is the on change event
+   */
   versionTypeChanged(event) {
     this.setState({
       versionType: event.target.value
     })
   }
+  /**
+   * This function is used to hide the messages that are there in div1 after 30 seconds
+   */
   hideFirstComponent() {
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
   }
+  /**
+   * This function is used to hide the messages that are there in div2 after 30 seconds
+   */
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
+  /**
+   * This function is called when component is about to change to clear the timeout
+   */
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
+  /**
+   * This function is used to toggle the tab
+   * @param {*} tabPane
+   * @param {*} tab This is the value of the tab selected by the user
+   */
   toggle(tabPane, tab) {
     const newArray = this.state.activeTab.slice()
     newArray[tabPane] = tab
@@ -140,6 +171,13 @@ export default class syncPage extends Component {
       activeTab: newArray,
     });
   }
+  /**
+   * This function is called to toggle the conflict resolution screen for consumption
+   * @param {*} oldData This is the local data for the consumption record
+   * @param {*} latestData This is the latest data for the consumption record
+   * @param {*} index This is the index for the consumption record
+   * @param {*} page This is the page from which the toggle is called
+   */
   toggleLarge(oldData, latestData, index, page) {
     this.setState({
       conflicts: !this.state.conflicts
@@ -148,6 +186,13 @@ export default class syncPage extends Component {
       this.showConsumptionData(oldData, latestData, index);
     }
   }
+  /**
+   * This function is called to toggle the conflict resolution screen for inventory
+   * @param {*} oldData This is the local data for the inventory record
+   * @param {*} latestData This is the latest data for the inventory record
+   * @param {*} index This is the index for the inventory record
+   * @param {*} page This is the page from which the toggle is called
+   */
   toggleLargeInventory(oldData, latestData, index, page) {
     this.setState({
       conflictsInventory: !this.state.conflictsInventory
@@ -156,6 +201,13 @@ export default class syncPage extends Component {
       this.showInventoryData(oldData, latestData, index);
     }
   }
+  /**
+   * This function is called to toggle the conflict resolution screen for shipment
+   * @param {*} oldData This is the local data for the shipment record
+   * @param {*} latestData This is the latest data for the shipment record
+   * @param {*} index This is the index for the shipment record
+   * @param {*} page This is the page from which the toggle is called
+   */
   toggleLargeShipment(oldData, latestData, index, page) {
     this.setState({
       conflictsShipment: !this.state.conflictsShipment
@@ -164,6 +216,13 @@ export default class syncPage extends Component {
       this.showShipmentData(oldData, latestData, index);
     }
   }
+  /**
+   * This function is called to toggle the conflict resolution screen for problem list
+   * @param {*} oldData This is the local data for the problem list record
+   * @param {*} latestData This is the latest data for the problem list record
+   * @param {*} index This is the index for the problem list record
+   * @param {*} page This is the page from which the toggle is called
+   */
   toggleLargeProblem(oldData, latestData, index, page) {
     this.setState({
       conflictsProblem: !this.state.conflictsProblem
@@ -172,6 +231,12 @@ export default class syncPage extends Component {
       this.showProblemData(oldData, latestData, index);
     }
   }
+  /**
+   * This function is used to display the jexcel table for consumption conflict resolution
+   * @param {*} oldData This is the local data for the consumption record
+   * @param {*} latestData This is the latest server data for the consumption record
+   * @param {*} index This is the index for the consumption record
+   */
   showConsumptionData(oldData, latestData, index) {
     var data = [];
     data.push(oldData);
@@ -221,6 +286,10 @@ export default class syncPage extends Component {
     })
     document.getElementById("index").value = index;
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedResolveConflicts = function (instance) {
     let target = document.getElementById('resolveConflictsTable');
     target.classList.add("removeOddColor")
@@ -255,6 +324,9 @@ export default class syncPage extends Component {
     }
     elInstance.options.editable = false;
   }
+  /**
+   * This function is called when user clicks on accept local changes from conflict resolution screen for consumption record
+   */
   acceptCurrentChanges() {
     this.setState({ loading: true });
     var resolveConflictsInstance = this.state.resolveConflict;
@@ -297,6 +369,9 @@ export default class syncPage extends Component {
     this.toggleLarge('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is called when user clicks on accept latest server changes from conflict resolution screen for consumption record
+   */
   acceptIncomingChanges() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflict;
@@ -339,6 +414,12 @@ export default class syncPage extends Component {
     this.toggleLarge('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is used to display the jexcel table for inventory conflict resolution
+   * @param {*} oldData This is the local data for the inventory record
+   * @param {*} latestData This is the latest server data for the inventory record
+   * @param {*} index This is the index for the inventory record
+   */
   showInventoryData(oldData, latestData, index) {
     var data = [];
     data.push(oldData);
@@ -389,6 +470,10 @@ export default class syncPage extends Component {
     })
     document.getElementById("indexInventory").value = index;
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedResolveConflictsInventory = function (instance) {
     let target = document.getElementById('resolveConflictsInventoryTable');
     target.classList.add("removeOddColor")
@@ -423,6 +508,9 @@ export default class syncPage extends Component {
     }
     elInstance.options.editable = false;
   }
+  /**
+   * This function is called when user clicks on accept local changes from conflict resolution screen for inventory record
+   */
   acceptCurrentChangesInventory() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
@@ -465,6 +553,9 @@ export default class syncPage extends Component {
     this.toggleLargeInventory('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is called when user clicks on accept latest server changes from conflict resolution screen for inventory record
+   */
   acceptIncomingChangesInventory() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictInventory;
@@ -507,6 +598,12 @@ export default class syncPage extends Component {
     this.toggleLargeInventory('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is used to display the jexcel table for shipment conflict resolution
+   * @param {*} oldData This is the local data for the shipment record
+   * @param {*} latestData This is the latest server data for the shipment record
+   * @param {*} index This is the index for the shipment record
+   */
   showShipmentData(oldData, latestData, index) {
     var data = [];
     data.push(oldData);
@@ -574,6 +671,12 @@ export default class syncPage extends Component {
     })
     document.getElementById("indexShipment").value = index;
   }
+  /**
+   * This function is used to display the jexcel table for problem list conflict resolution
+   * @param {*} oldData This is the local data for the problem list record
+   * @param {*} latestData This is the latest server data for the problem list record
+   * @param {*} index This is the index for the problem list record
+   */
   showProblemData(oldData, latestData, index) {
     var data = [];
     data.push(oldData);
@@ -678,6 +781,10 @@ export default class syncPage extends Component {
     })
     document.getElementById("indexProblem").value = index;
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedResolveConflictsShipment = function (instance) {
     let target = document.getElementById('resolveConflictsShipmentTable');
     target.classList.add("removeOddColor")
@@ -712,6 +819,9 @@ export default class syncPage extends Component {
     }
     elInstance.options.editable = false;
   }
+  /**
+   * This function is called when user clicks on accept local changes from conflict resolution screen for shipment record
+   */
   acceptCurrentChangesShipment() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
@@ -754,6 +864,9 @@ export default class syncPage extends Component {
     this.toggleLargeShipment('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is called when user clicks on accept latest server changes from conflict resolution screen for shipment record
+   */
   acceptIncomingChangesShipment() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictShipment;
@@ -796,6 +909,10 @@ export default class syncPage extends Component {
     this.toggleLargeShipment('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedResolveConflictsProblem = function (instance) {
     let target = document.getElementById('resolveConflictsProblemTable');
     target.classList.add("removeOddColor")
@@ -821,6 +938,9 @@ export default class syncPage extends Component {
     }
     elInstance.options.editable = false;
   }
+  /**
+   * This function is called when user clicks on accept local changes from conflict resolution screen for problem record
+   */
   acceptCurrentChangesProblem() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictProblem;
@@ -864,6 +984,9 @@ export default class syncPage extends Component {
     this.toggleLargeProblem('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is called when user clicks on accept latest server changes from conflict resolution screen for problem record
+   */
   acceptIncomingChangesProblem() {
     this.setState({ loading: true })
     var resolveConflictsInstance = this.state.resolveConflictProblem;
@@ -913,6 +1036,9 @@ export default class syncPage extends Component {
     this.toggleLargeProblem('', '', 0, '');
     this.setState({ loading: false })
   }
+  /**
+   * This function is called after conflicts for consumption, inventory and shipments are solved to build the QPL based on latest data
+   */
   generateDataAfterResolveConflictsForQPL() {
     this.setState({ loading: true });
     var db1;
@@ -1166,6 +1292,9 @@ export default class syncPage extends Component {
       }.bind(this);
     }.bind(this);
   }
+  /**
+   * This function is used to get list of programs that are loaded by user, list of version type on page load
+   */
   componentDidMount() {
     var db1;
     getDatabase();
@@ -1299,6 +1428,10 @@ export default class syncPage extends Component {
     }.bind(this);
     document.getElementById("detailsDiv").style.display = "none";
   }
+  /**
+   * This function is used to get the last modified date for the program to check if someother user have tried comitting in between
+   * @param {*} value This is the program Id which user is trying to commit
+   */
   checkLastModifiedDateForProgram(value) {
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
@@ -1407,6 +1540,10 @@ export default class syncPage extends Component {
       })
     }
   }
+  /**
+   * This function is used to get the latest version data for the program selected by the user
+   * @param {*} value This is the program Id which user is trying to commit
+   */
   getDataForCompare(value) {
     var programId = value != "" && value != undefined ? value.value : 0;
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
@@ -1804,7 +1941,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedConsumptionJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -1963,7 +2100,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedInventoryJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -2106,7 +2243,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedShipmentJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 columns: [
                                                   { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
@@ -2291,7 +2428,7 @@ export default class syncPage extends Component {
                                               }
                                               var options = {
                                                 data: mergedShipmentLinkedJexcel,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 nestedHeaders: [
                                                   [{
                                                     title: '',
@@ -2623,6 +2760,10 @@ export default class syncPage extends Component {
       this.setState({ loading: false })
     }
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedFunctionForMerge = function (instance) {
     let target = document.getElementById('mergedVersionConsumption');
     target.classList.add("removeOddColor")
@@ -2730,6 +2871,10 @@ export default class syncPage extends Component {
     elInstance.orderBy(18, 0);
     elInstance.options.editable = false;
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedFunctionForMergeInventory = function (instance) {
     let target = document.getElementById('mergedVersionInventory');
     target.classList.add("removeOddColor")
@@ -2837,6 +2982,10 @@ export default class syncPage extends Component {
     elInstance.orderBy(19, 0);
     elInstance.options.editable = false;
   }
+  /**
+   * This function is used to generate conflicts recursively for shipment linking
+   * @param {*} instance 
+   */
   recursiveConflictsForShipmentLinking(instance) {
     var elInstance = instance;
     var jsonData = elInstance.getJson();
@@ -3087,12 +3236,20 @@ export default class syncPage extends Component {
       this.generateDataAfterResolveConflictsForQPL();
     }
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedFunctionForMergeShipmentLinked = function (instance) {
     let target = document.getElementById('mergedVersionShipmentLinked');
     target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 3);
     this.recursiveConflictsForShipmentLinking(instance.worksheets[0])
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedFunctionForMergeShipment = function (instance) {
     let target = document.getElementById('mergedVersionShipment');
     target.classList.add("removeOddColor")
@@ -3206,6 +3363,12 @@ export default class syncPage extends Component {
     elInstance.orderBy(36, 0);
     elInstance.options.editable = false;
   }
+  /**
+   * This function is used to show the notes of the problem
+   * @param {*} row This is instance of the row for which notes should be visible
+   * @param {*} lang This is the name of the language in which notes should be displayed
+   * @returns Returns the latest notes for a problem
+   */
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
     if (transList.length == 0) {
@@ -3215,6 +3378,10 @@ export default class syncPage extends Component {
       return transList[listLength - 1].notes;
     }
   }
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   */
   loadedFunctionForMergeProblemList = function (instance) {
     let target = document.getElementById('mergedVersionProblemList');
     target.classList.add("removeOddColor")
@@ -3353,6 +3520,10 @@ export default class syncPage extends Component {
       })
     }
   }
+  /**
+   * This function is used to display multiple tabs on the screen
+   * @returns Returns multiple tabs
+   */
   tabPane() {
     return (
       <>
@@ -3415,6 +3586,10 @@ export default class syncPage extends Component {
       </>
     );
   }
+  /**
+   * This is used to display the content
+   * @returns It returns the commit screen
+   */
   render = () => {
     jexcel.setDictionary({
       Show: " ",
@@ -3744,6 +3919,9 @@ export default class syncPage extends Component {
       </div>
     );
   };
+  /**
+   * This function is called when user clicks on commit button to send the data on server
+   */
   synchronize() {
     this.setState({ loading: true });
     var checkValidations = true;
@@ -3964,10 +4142,17 @@ export default class syncPage extends Component {
       this.hideSecondComponent();
     }
   }
+  /**
+   * This function is called when user clicks on the cancel button and is redirected to dashboard
+   */
   cancelClicked() {
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
+  /**
+   * This function is used to check the status of commit and once the commit is sucessful then call the load the latest version function
+   * @param {*} commitRequestId This is the commit request Id that is auto generated when user commits a version
+   */
   redirectToDashbaord(commitRequestId) {
     this.setState({ loading: true });
     AuthenticationService.setupAxiosInterceptors();
@@ -4031,6 +4216,10 @@ export default class syncPage extends Component {
         this.redirectToDashbaord(commitRequestId)
       })
   }
+  /**
+   * This function is used to get the latest program version
+   * @param {*} notificationDetails This is the program Id which user is trying to commit
+   */
   getLatestProgram(notificationDetails) {
     this.setState({ loading: true });
     var checkboxesChecked = [];
@@ -4218,14 +4407,26 @@ export default class syncPage extends Component {
         }.bind(this);
       })
   }
+  /**
+   * This function is used to redirect user to master data sync screen after the latest version is loaded
+   * @param {*} programIds This is the program Id which user is trying to commit
+   */
   goToMasterDataSync(programIds) {
     this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
+  /**
+   * This function is used to update the state of this component from any other component
+   * @param {*} parameterName This is the name of the key
+   * @param {*} value This is the value for the key
+   */
   updateState(parameterName, value) {
     this.setState({
       [parameterName]: value
     })
   }
+  /**
+   * This function is used to build the jexcel tables for consumption, inventory, shipment, erp linked shipments and problem list
+   */
   fetchData() {
     var db1;
     getDatabase();
@@ -4350,7 +4551,7 @@ export default class syncPage extends Component {
         }
         var options = {
           data: mergedProblemListJexcel,
-          columnDrag: true,
+          columnDrag: false,
           colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
           colHeaderClasses: ["Reqasterisk"],
           columns: [

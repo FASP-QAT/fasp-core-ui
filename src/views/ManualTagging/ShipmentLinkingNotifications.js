@@ -18,7 +18,12 @@ import ManualTaggingService from '../../api/ManualTaggingService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
+/**
+ * Component for shipment linking notification
+ */
 export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
@@ -40,8 +45,6 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         this.displayButton = this.displayButton.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.getProgramList = this.getProgramList.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -59,6 +62,11 @@ export default class ShipmentLinkingNotifications extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.selected = this.selected.bind(this);
     }
+    /**
+     * Retrieves planning unit data from the state, transforms it into an array of label-value pairs,
+     * and updates the state with the resulting array. It then triggers the filtering of data based on
+     * the planning unit array.
+     */
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
@@ -71,6 +79,9 @@ export default class ShipmentLinkingNotifications extends Component {
             this.filterData(planningUnitArray);
         })
     }
+    /**
+     * Checks the validation status and updates the state to control the visibility of the submit button.
+     */
     displayButton() {
         var validation = true;
         var tableJson = this.el.getJson(null, false).filter(c => c[19] == 1);
@@ -84,9 +95,16 @@ export default class ShipmentLinkingNotifications extends Component {
             })
         }
     }
+    /**
+     * Updates the filtered data based on the current planning unit IDs.
+     * This function is a wrapper for the filterData function, passing the current planning unit IDs as parameters.
+     */
     filterData1() {
         this.filterData(this.state.planningUnitIds);
     }
+    /**
+     * Redirects to application dashboard screen on cancel button clicked
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.actionCancelled'))
@@ -118,7 +136,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         displaySubmitButton: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                             this.getNotificationSummary(0);
                         })
                 }).catch(
@@ -130,7 +148,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 loading: false,
                                 loading1: false
                             }, () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -149,7 +167,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading1: false,
                                         color: '#BA0C2F',
                                     }, () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     });
                                     break;
                                 case 412:
@@ -159,7 +177,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading1: false,
                                         color: '#BA0C2F',
                                     }, () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     });
                                     break;
                                 default:
@@ -169,7 +187,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading1: false,
                                         color: '#BA0C2F',
                                     }, () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     });
                                     break;
                             }
@@ -178,15 +196,36 @@ export default class ShipmentLinkingNotifications extends Component {
                 );
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 0) {
             this.el.setValueFromCoords(19, y, 1, true);
         }
         this.displayButton();
     }.bind(this);
+    /**
+     * Function to handle cell edits in jexcel.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object being edited.
+     * @param {number} x - The x-coordinate of the edited cell.
+     * @param {number} y - The y-coordinate of the edited cell.
+     * @param {any} value - The new value of the edited cell.
+     */
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
+    /**
+     * Handles the change event when the user selects a different program.
+     * It updates the program ID in the local storage and state, and triggers fetching of the planning unit list.
+     * @param {Event} event - The event object triggered by the program selection change.
+     */
     programChange(event) {
         if (event.target.value != -1) {
             localStorage.setItem("sesProgramId", event.target.value);
@@ -198,23 +237,26 @@ export default class ShipmentLinkingNotifications extends Component {
             this.getPlanningUnitList();
         })
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Calls getNotificationSummary function on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getNotificationSummary(1);
     }
+    /**
+     * Filters and processes data based on selected planning unit IDs.
+     * Fetches shipment linking notification data, filters it based on addressed status and planning unit IDs, and constructs the output list.
+     * Retrieves additional shipment and program data based on RO number and RO prime line number.
+     * Updates the state with the processed output list and triggers building of the JExcel table.
+     * @param {Array} planningUnitIds - An array of planning unit IDs selected for filtering.
+     */
     filterData = (planningUnitIds) => {
         document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
@@ -303,7 +345,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -321,7 +363,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             color: '#BA0C2F',
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                         break;
                                     case 412:
@@ -330,7 +372,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             color: '#BA0C2F',
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                         break;
                                     default:
@@ -339,7 +381,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             color: '#BA0C2F',
                                             loading: false
                                         }, () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                         break;
                                 }
@@ -358,6 +400,9 @@ export default class ShipmentLinkingNotifications extends Component {
             }
         })
     }
+    /**
+     * Reterives program list from indexed db
+     */
     getProgramList() {
         var db1;
         getDatabase();
@@ -423,6 +468,10 @@ export default class ShipmentLinkingNotifications extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
         let manualTaggingArray = [];
@@ -457,7 +506,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var data = manualTaggingArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [40, 40, 0, 50, 0, 80, 80, 30, 35, 25, 35, 35, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -605,7 +654,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 }, () => {
-                                                    this.hideSecondComponent()
+                                                    hideSecondComponent()
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -622,7 +671,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                             message: error.response.data.messageCode,
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent()
+                                                            hideSecondComponent()
                                                         });
                                                         break;
                                                     case 412:
@@ -630,7 +679,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                             message: error.response.data.messageCode,
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent()
+                                                            hideSecondComponent()
                                                         });
                                                         break;
                                                     default:
@@ -638,7 +687,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                             message: 'static.unkownError',
                                                             loading: false
                                                         }, () => {
-                                                            this.hideSecondComponent()
+                                                            hideSecondComponent()
                                                         });
                                                         break;
                                                 }
@@ -658,6 +707,10 @@ export default class ShipmentLinkingNotifications extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildNotificationSummaryJExcel() {
         let notificationSummaryList = this.state.notificationSummary;
         let notificationSummaryArray = [];
@@ -675,7 +728,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var data = notificationSummaryArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [10, 10],
             columns: [
                 {
@@ -725,6 +778,9 @@ export default class ShipmentLinkingNotifications extends Component {
             instance, loading: false
         })
     }
+    /**
+     * Redirects to the manual tagging screen on row click.
+     */
     selectedForNotification = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (y != 0) {
@@ -734,6 +790,9 @@ export default class ShipmentLinkingNotifications extends Component {
             }
         }
     }
+    /**
+     * Sets program Id and get planning unit list on row click
+     */
     selected = function (instance, cell, x, y, value, e) {
         var instance = (instance).jexcel;
         if (e.buttons == 1) {
@@ -751,12 +810,26 @@ export default class ShipmentLinkingNotifications extends Component {
             }
         }
     }.bind(this)
-    loaded1 = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded1 = function (instance, cell) {
         jExcelLoadedFunction(instance, 0);
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance, 1);
     }
+    /**
+     * Reterives notification summary from server
+     * @param {boolean} callGetProgram Flag to call getProgramList function
+     */
     getNotificationSummary(callGetProgram) {
         ManualTaggingService.getNotificationSummary()
             .then(response => {
@@ -786,7 +859,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -797,7 +870,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             color: '#BA0C2F',
                             loading: false
                         }, () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -815,7 +888,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                             case 412:
@@ -824,7 +897,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                             default:
@@ -833,7 +906,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                         }
@@ -841,6 +914,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             );
     }
+    /**
+     * Toggle manual tag modal
+     */
     toggleLarge() {
         this.setState({
             manualTag: !this.state.manualTag,
@@ -849,6 +925,9 @@ export default class ShipmentLinkingNotifications extends Component {
             this.sampleFunction();
         })
     }
+    /**
+     * Calls the buildJexcel function
+     */
     sampleFunction() {
         this.setState({
             test: 10
@@ -856,6 +935,10 @@ export default class ShipmentLinkingNotifications extends Component {
             this.buildJexcel()
         })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         try {
             this.el = jexcel(document.getElementById("tableDivOrderDetails"), '');
@@ -883,7 +966,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.manualTagging.erpPlanningUnit'), type: 'text', width: 200 },
@@ -950,7 +1033,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.mt.roNoAndRoLineNo'), type: 'text', width: 150 },
                 { title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
@@ -992,18 +1075,31 @@ export default class ShipmentLinkingNotifications extends Component {
         var elVar = jexcel(document.getElementById("tableDivShipmentDetails"), options);
         this.el = elVar;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedOrderHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedShipmentHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[3].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
     }
+    /**
+     * Retrives planning unit from server
+     */
     getPlanningUnitList() {
         var programId = this.state.programId != -1 && this.state.programId != undefined ? this.state.programId.toString().split("_")[0] : -1;
         if (programId != -1) {
@@ -1052,7 +1148,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         color: '#BA0C2F'
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -1063,7 +1159,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             color: '#BA0C2F',
                             loading: false
                         }, () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1081,7 +1177,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                             case 412:
@@ -1090,7 +1186,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                             default:
@@ -1099,7 +1195,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     color: '#BA0C2F',
                                     loading: false
                                 }, () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 });
                                 break;
                         }
@@ -1118,6 +1214,10 @@ export default class ShipmentLinkingNotifications extends Component {
             })
         }
     }
+    /**
+     * Renders the shipment linking notification.
+     * @returns {JSX.Element} - Shipment linking notification.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

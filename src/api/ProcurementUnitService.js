@@ -6,7 +6,7 @@ class ProcurementUnitService {
         });
     }
     addProcurementUnit(json) {
-        return axios.post(`${API_URL}/api/procurementUnit/`, json, {}
+        return axios.post(`${API_URL}/api/procurementUnit`, json, {}
         );
     }
     getProcurementUnitById(json) {
@@ -14,7 +14,7 @@ class ProcurementUnitService {
         );
     }
     editProcurementUnit(json) {
-        return axios.put(`${API_URL}/api/procurementUnit/`, json, {}
+        return axios.put(`${API_URL}/api/procurementUnit`, json, {}
         );
     }
 }

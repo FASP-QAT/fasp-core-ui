@@ -21,7 +21,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProductService from '../../api/ProductService';
@@ -33,6 +33,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -185,6 +186,9 @@ const optionsPie = {
         }
     },
 }
+/**
+ * Component for Shipment Global Demand View Report.
+ */
 class ShipmentGlobalDemandView extends Component {
     constructor(props) {
         super(props);
@@ -233,28 +237,23 @@ class ShipmentGlobalDemandView extends Component {
             message: '',
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: [],
             procurementAgentTypeId: false,
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPrograms = this.getPrograms.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.handleChange = this.handleChange.bind(this)
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         if (localStorage.getItem("sessionType") === 'Online') {
             this.state.countryLabels.map(ele =>
@@ -304,11 +303,11 @@ class ShipmentGlobalDemandView extends Component {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
             tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
-            A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
+            A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
-                A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
+                A.push([addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -318,10 +317,13 @@ class ShipmentGlobalDemandView extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -352,7 +354,7 @@ class ShipmentGlobalDemandView extends Component {
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                 }
@@ -462,6 +464,9 @@ class ShipmentGlobalDemandView extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + ".pdf")
     }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -804,6 +809,9 @@ class ShipmentGlobalDemandView extends Component {
             }
         }
     }
+    /**
+     * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
+     */
     componentDidMount() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
@@ -816,6 +824,9 @@ class ShipmentGlobalDemandView extends Component {
             this.getShipmentStatusList();
         }
     }
+    /**
+     * Retrieves the list of countries based on the realm ID and updates the state with the list.
+     */
     getCountrys = () => {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getRealmCountryDropdownList(realmId)
@@ -872,17 +883,33 @@ class ShipmentGlobalDemandView extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for countries.
+     * @param {Array} countrysId - An array containing the selected country IDs.
+     */
     handleChange = (countrysId) => {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
         this.setState({
             countryValues: countrysId.map(ele => ele),
-            countryLabels: countrysId.map(ele => ele.label)
+            countryLabels: countrysId.map(ele => ele.label),
+            programValues: [],
+            programLabels: [],
+            data: [],
+            fundingSourceSplit: [],
+            planningUnitSplit: [],
+            procurementAgentSplit: [],
+            table1Headers: [],
+            programLst:[]
         }, () => {
             this.getPrograms();
         })
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram = (programIds) => {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -895,6 +922,9 @@ class ShipmentGlobalDemandView extends Component {
             this.getPlanningUnit();
         })
     }
+    /**
+     * Retrieves the list of shipment statuses.
+     */
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -970,6 +1000,9 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this)
         }
     }
+    /**
+     * Retrieves the list of funding sources.
+     */
     getFundingSource = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             FundingSourceService.getFundingSourceListAll()
@@ -1023,6 +1056,9 @@ class ShipmentGlobalDemandView extends Component {
             this.consolidatedFundingSourceList()
         }
     }
+    /**
+     * Consolidates the list of funding source obtained from Server and local programs.
+     */
     consolidatedFundingSourceList = () => {
         const { fundingSources } = this.state
         var proList = fundingSources;
@@ -1064,10 +1100,14 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
+            if(newCountryList.length>0){
             DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
                 .then(response => {
                     var listArray = response.data;
@@ -1121,10 +1161,14 @@ class ShipmentGlobalDemandView extends Component {
                         }
                     }
                 );
+            }
         } else {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of program obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programLst } = this.state
         var proList = programLst;
@@ -1161,6 +1205,12 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
@@ -1192,6 +1242,13 @@ class ShipmentGlobalDemandView extends Component {
             })
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -1229,6 +1286,9 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Retrieves the list of planning units for a selected program.
+     */
     getPlanningUnit = () => {
         this.setState({
             planningUnits: [],
@@ -1337,6 +1397,10 @@ class ShipmentGlobalDemandView extends Component {
             }
         });
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} event - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1348,17 +1412,30 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => { this.fetchData(); })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+     */
     handleFundingSourceChange(fundingSourceIds) {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1370,6 +1447,10 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Handles the change event for shipment statuses.
+     * @param {Array} fundingSourceIds - An array containing the selected shipment status IDs.
+     */
     handleShipmentStatusChange(shipmentStatusIds) {
         shipmentStatusIds = shipmentStatusIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1381,6 +1462,10 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Sets the procurement agent type ID based on the checkbox state.
+     * @param {object} e - The event object containing checkbox information.
+     */
     setProcurementAgentTypeId(e) {
         var procurementAgentTypeId = e.target.checked;
         this.setState({
@@ -1389,6 +1474,10 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Renders the Shipment Global Demand View report table.
+     * @returns {JSX.Element} - Shipment Global Demand View report table.
+     */
     render() {
         const { versions } = this.state;
         let versionList = versions.length > 0
@@ -1442,7 +1531,6 @@ class ShipmentGlobalDemandView extends Component {
                     </option>
                 )
             }, this);
-        
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
@@ -1482,7 +1570,6 @@ class ShipmentGlobalDemandView extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-        
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >
@@ -1513,10 +1600,9 @@ class ShipmentGlobalDemandView extends Component {
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
-                                                    onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
-                                                    <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>
                                             </div>
                                         </FormGroup>

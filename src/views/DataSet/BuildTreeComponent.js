@@ -18,7 +18,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -59,6 +59,7 @@ import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import PlanningUnitService from '../../api/PlanningUnitService';
+// Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 const pickerLang = {
@@ -68,6 +69,11 @@ const pickerLang = {
 const ItemTypes = {
     NODE: i18n.t('static.tree.node')
 }
+/**
+ * Defines the validation schema for node details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaNodeData = function (values) {
     return Yup.object().shape({
         nodeTypeId: Yup.string()
@@ -268,6 +274,11 @@ const validationSchemaNodeData = function (values) {
                 }),
     })
 }
+/**
+ * Defines the validation schema for tree details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethodId: Yup.string()
@@ -279,6 +290,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.regiontext')),
     })
 }
+/**
+ * Defines the validation schema for tree scenario details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaScenario = function (values) {
     return Yup.object().shape({
         scenarioName: Yup.string()
@@ -286,12 +302,22 @@ const validationSchemaScenario = function (values) {
             .required('Please enter scenario name.'),
     })
 }
+/**
+ * Defines the validation schema for using branch template.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaBranch = function (values) {
     return Yup.object().shape({
         branchTemplateId: Yup.string()
             .required('Please enter template.'),
     })
 }
+/**
+ * Defines the validation schema for level details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaLevel = function (values) {
     return Yup.object().shape({
         levelName: Yup.string()
@@ -299,6 +325,12 @@ const validationSchemaLevel = function (values) {
             .required('Please enter level name.'),
     })
 }
+/**
+ * Formats a numerical value by adding commas as thousand separators and truncating to 8 decimal places.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators and truncated to 8 decimal places.
+ */
 function addCommasWith8Decimals(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -314,6 +346,12 @@ function addCommasWith8Decimals(cell1, row) {
         return "";
     }
 }
+/**
+ * Formats a numerical value by adding commas as thousand separators.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators.
+ */
 function addCommas(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -329,6 +367,12 @@ function addCommas(cell1, row) {
         return "";
     }
 }
+/**
+ * Formats a numerical value by adding commas as thousand separators.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators.
+ */
 function addCommasNodeValue(cell1, row) {
     if (cell1 != null && cell1 !== "") {
         cell1 += '';
@@ -344,6 +388,12 @@ function addCommasNodeValue(cell1, row) {
         return "";
     }
 }
+/**
+ * Formats a numerical value by adding commas as thousand separators and truncating to two decimal places.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators and truncated to two decimal places.
+ */
 function addCommasTwoDecimal(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -359,6 +409,12 @@ function addCommasTwoDecimal(cell1, row) {
         return "";
     }
 }
+/**
+ * Formats a numerical value by adding commas as thousand separators and truncating to three decimal places.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators and truncated to three decimal places.
+ */
 function addCommasThreeDecimal(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -374,6 +430,9 @@ function addCommasThreeDecimal(cell1, row) {
         return "";
     }
 }
+/**
+ * Component for create tree
+ */
 export default class BuildTree extends Component {
     constructor(props) {
         super(props);
@@ -556,6 +615,8 @@ export default class BuildTree extends Component {
             minDateValue: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            stopMinDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+
             treeTemplate: {
                 treeTemplateId: 0,
                 label: {
@@ -668,7 +729,8 @@ export default class BuildTree extends Component {
             modelingChangedOrAdded: false,
             addNodeError: false,
             currentNodeTypeId: "",
-            deleteChildNodes:false
+            deleteChildNodes: false,
+            branchTemplateNotes: ""
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -770,7 +832,6 @@ export default class BuildTree extends Component {
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
         this.openScenarioModal = this.openScenarioModal.bind(this);
-        this.getStartValueForMonth = this.getStartValueForMonth.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
@@ -818,6 +879,10 @@ export default class BuildTree extends Component {
         this.validFieldData = this.validFieldData.bind(this);
         this.acceptValue1 = this.acceptValue1.bind(this);
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidationForMissingPUs() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -973,6 +1038,9 @@ export default class BuildTree extends Component {
         }
         return valid;
     }
+    /**
+     * Saves missing planning units on submission
+     */
     saveMissingPUs() {
         var validation = this.checkValidationForMissingPUs();
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1108,6 +1176,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Saves planning units on submission
+     */
     updateMissingPUs() {
         var validation = this.checkValidation();
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1208,6 +1279,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Reterives procurement agent list
+     */
     procurementAgentList() {
         const lan = 'en';
         var db1;
@@ -1263,6 +1337,14 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changedMissingPU = function (instance, cell, x, y, value) {
         if (x == 18) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
@@ -1479,6 +1561,12 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepageMissingPU(el, pageNo, oldPageNo) {
         if (!localStorage.getItem('sessionType') === 'Online') {
             var elInstance = el;
@@ -1516,6 +1604,9 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Reterives planning unit list with procurement agent price
+     */
     getPlanningUnitWithPricesByIds() {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
@@ -1560,6 +1651,10 @@ export default class BuildTree extends Component {
                 }
             );
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildMissingPUJexcel() {
         if (localStorage.getItem('sessionType') === 'Online') {
             this.getPlanningUnitWithPricesByIds();
@@ -1606,7 +1701,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -1764,7 +1859,12 @@ export default class BuildTree extends Component {
         }
         );
     }
-    loadedMissingPU = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedMissingPU = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1817,6 +1917,9 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Get missing planning unit list for branch template
+     */
     getMissingPuListBranchTemplate() {
         if (this.state.branchTemplateId != "") {
             var missingPUList = [];
@@ -1899,6 +2002,11 @@ export default class BuildTree extends Component {
             })
         }
     }
+    /**
+     * Retrieves the start value (momValue) for the specified start date from the item's mom list or the default data value if not found.
+     * @param {string} startDate - The start date for the mom value.
+     * @returns {number} - The mom start value for the given date.
+     */
     getMomValueForDateRange(startDate) {
         var startValue = 0;
         var items = this.state.items;
@@ -1916,6 +2024,12 @@ export default class BuildTree extends Component {
         }
         return startValue;
     }
+    /**
+     * Calculates the parent value from the Month-on-Month (MOM) data for the given month.
+     * Updates the current item's calculated data value based on the percentage of the parent value.
+     * 
+     * @param {string} month - The month for which to calculate the parent value from MOM data.
+     */
     calculateParentValueFromMOM(month) {
         var parentValue = 0;
         var currentItemConfig = this.state.currentItemConfig;
@@ -1941,6 +2055,11 @@ export default class BuildTree extends Component {
         this.setState({ parentValue, currentItemConfig, currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0] }, () => {
         });
     }
+    /**
+     * Calculates the planning unit usage per visit (PU per visit) based on the current item's configuration and usage type.
+     * Updates the PU per visit value in the current item's node data map.
+     * @param {number} type - The type of calculation to perform. 1 for refill months calculation, 2 for standard calculation.
+     */
     qatCalculatedPUPerVisit(type) {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
@@ -1967,6 +2086,10 @@ export default class BuildTree extends Component {
         }
         this.setState({ qatCalculatedPUPerVisit });
     }
+    /**
+     * Handles the click event for a level. Extracts information about the clicked level from the provided data and updates the component state with the level's name, number, and unit. If the provided data is empty, no action is taken.
+     * @param {Object} data The data object containing information about the clicked level.
+     */
     levelClicked(data) {
         var name = "";
         var unit = "";
@@ -1987,17 +2110,28 @@ export default class BuildTree extends Component {
             levelUnit: unit
         })
     }
+    /**
+     * Updates the component state with the new name for a level when the name input field is changed.
+     * @param {Object} e The event object representing the input change event.
+     */
     levelNameChanged(e) {
         this.setState({
             levelName: e.target.value
         })
     }
+    /**
+     * Updates the component state with the new unit ID for a level when the unit selection is changed.
+     * @param {Object} e The event object representing the unit selection change event.
+     */
     levelUnitChange(e) {
         var nodeUnitId = e.target.value;
         this.setState({
             levelUnit: e.target.value
         })
     }
+    /**
+     * Saves level details in state
+     */
     levelDeatilsSaved() {
         const { curTreeObj } = this.state;
         var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
@@ -2072,6 +2206,12 @@ export default class BuildTree extends Component {
             this.saveTreeData(false, false)
         });
     }
+    /**
+     * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
+     * Updates the PU per visit value in the current scenario's node data map.
+     * @param {boolean} isRefillMonth - Indicates whether the calculation is for refill months. 
+     * If true, the refill months value will be used; otherwise, the standard calculation will be performed.
+     */
     calculatePUPerVisit(isRefillMonth) {
         var currentScenario = this.state.currentScenario;
         var parentScenario = this.state.parentScenario;
@@ -2091,6 +2231,11 @@ export default class BuildTree extends Component {
         currentScenario = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
         this.setState({ currentItemConfig, currentScenario });
     }
+    /**
+     * Rounds a given numeric value to the nearest integer using custom rounding logic.
+     * @param {number} value - The numeric value to round.
+     * @returns {number} The rounded integer value.
+     */
     round(value) {
         var result = (value - Math.floor(value)).toFixed(4);
         if (result > `${ROUNDING_NUMBER}`) {
@@ -2103,6 +2248,10 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Finds max node data Id
+     * @returns Max node data Id
+     */
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
         var items = this.state.items;
@@ -2121,6 +2270,31 @@ export default class BuildTree extends Component {
         maxNodeDataId = parseInt(maxNodeDataId + 1);
         return maxNodeDataId;
     }
+    /**
+     * Function to validate node data based on node type
+     * @returns True if validation passes, false otherwise.
+     */
+    validation1 = function () {
+
+        var nodeTypeId = document.getElementById("nodeTypeId").value;
+        var nodeTitle = document.getElementById("nodeTitle").value;
+        var nodeValue = document.getElementById("nodeValue").value;
+        var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
+            return false;
+        } else if (nodeTitle == "" || testTitle == false) {
+            return false;
+        } else if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Show loading screen on form submit and call formSubmit function
+     */
     formSubmitLoader() {
         this.setState({
             modelingJexcelLoader: true
@@ -2130,18 +2304,29 @@ export default class BuildTree extends Component {
             }, 0);
         })
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Hides the message in div3 after 30 seconds.
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Calls modeling data calculation function to calculate month on month data
+     * @param {*} nodeId Node Id for which the month on month should be built
+     * @param {*} type Type of the node
+     */
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
@@ -2169,6 +2354,10 @@ export default class BuildTree extends Component {
             })
         }
     }
+    /**
+     * Fetches tracer category list from program data and updates state accordingly.
+     * @param {Object} programData - The program data containing planning unit list.
+     */
     fetchTracerCategoryList(programData) {
         var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
         var updatedPlanningUnitList = [];
@@ -2222,8 +2411,14 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Function to show alerts 
+     */
     alertfunction() {
     }
+    /**
+     * Resets the node details on reset button clicked
+     */
     resetNodeData() {
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
         var nodeTypeId;
@@ -2264,6 +2459,10 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Updates calculated data values in the tree based on the selected scenario and updates state accordingly.
+     * @param {number} scenarioId - The ID of the selected scenario.
+     */
     callAfterScenarioChange(scenarioId) {
         let { curTreeObj } = this.state;
         var items = curTreeObj.tree.flatList;
@@ -2287,182 +2486,290 @@ export default class BuildTree extends Component {
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleStartValueModelingTool() {
         this.setState({
             popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
         })
     }
+    /**
+     * Toggle show guidance popup
+     */
     toggleShowGuidanceNodeData() {
         this.setState({
             showGuidanceNodeData: !this.state.showGuidanceNodeData
         })
     }
+    /**
+     * Toggle show guidance popup
+     */
     toggleShowGuidanceModelingTransfer() {
         this.setState({
             showGuidanceModelingTransfer: !this.state.showGuidanceModelingTransfer
         })
     }
+    /**
+     * Toggle show guidance popup
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Toggle dropdown settings
+     */
     toggleDeropdownSetting(i) {
         const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
         this.setState({
             dropdownOpen: newArray,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleHowManyPUperIntervalPer() {
         this.setState({
             popoverOpenHowManyPUperIntervalPer: !this.state.popoverOpenHowManyPUperIntervalPer,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleWillClientsShareOnePU() {
         this.setState({
             popoverOpenWillClientsShareOnePU: !this.state.popoverOpenWillClientsShareOnePU,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleConsumptionIntervalEveryXMonths() {
         this.setState({
             popoverOpenConsumptionIntervalEveryXMonths: !this.state.popoverOpenConsumptionIntervalEveryXMonths,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleQATEstimateForInterval() {
         this.setState({
             popoverOpenQATEstimateForInterval: !this.state.popoverOpenQATEstimateForInterval,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleNoOfPUUsage() {
         this.setState({
             popoverOpenNoOfPUUsage: !this.state.popoverOpenNoOfPUUsage,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleConversionFactorFUPU() {
         this.setState({
             popoverOpenConversionFactorFUPU: !this.state.popoverOpenConversionFactorFUPU,
         });
     }
+    /**
+     * Toggle info popup
+     */
     togglePlanningUnitNode() {
         this.setState({
             popoverOpenPlanningUnitNode: !this.state.popoverOpenPlanningUnitNode,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleHashOfUMonth() {
         this.setState({
             popoverOpenHashOfUMonth: !this.state.popoverOpenHashOfUMonth,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleForecastingUnitPU() {
         this.setState({
             popoverOpenForecastingUnitPU: !this.state.popoverOpenForecastingUnitPU,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTypeOfUsePU() {
         this.setState({
             popoverOpenTypeOfUsePU: !this.state.popoverOpenTypeOfUsePU,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleSingleUse() {
         this.setState({
             popoverOpenSingleUse: !this.state.popoverOpenSingleUse,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleLagInMonth() {
         this.setState({
             popoverOpenLagInMonth: !this.state.popoverOpenLagInMonth,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTypeOfUse() {
         this.setState({
             popoverOpenTypeOfUse: !this.state.popoverOpenTypeOfUse,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleCopyFromTemplate() {
         this.setState({
             popoverOpenCopyFromTemplate: !this.state.popoverOpenCopyFromTemplate,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggletracercategoryModelingType() {
         this.setState({
             popoverOpentracercategoryModelingType: !this.state.popoverOpentracercategoryModelingType,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleParentValue() {
         this.setState({
             popoverOpenParentValue: !this.state.popoverOpenParentValue,
         });
     }
+    /**
+     * Toggle info popup
+     */
     togglePercentageOfParent() {
         this.setState({
             popoverOpenPercentageOfParent: !this.state.popoverOpenPercentageOfParent,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleParent() {
         this.setState({
             popoverOpenParent: !this.state.popoverOpenParent,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleCalculatedMonthOnMonthChnage() {
         this.setState({
             popoverOpenCalculatedMonthOnMonthChnage: !this.state.popoverOpenCalculatedMonthOnMonthChnage,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTargetChangeHash() {
         this.setState({
             popoverOpenTargetChangeHash: !this.state.popoverOpenTargetChangeHash,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTargetChangePercent() {
         this.setState({
             popoverOpenTargetChangePercent: !this.state.popoverOpenTargetChangePercent,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTargetEndingValue() {
         this.setState({
             popoverOpenTargetEndingValue: !this.state.popoverOpenTargetEndingValue,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleMonth() {
         this.setState({
             popoverOpenMonth: !this.state.popoverOpenMonth,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleFirstMonthOfTarget() {
         this.setState({
             popoverOpenFirstMonthOfTarget: !this.state.popoverOpenFirstMonthOfTarget
         })
     }
+    /**
+     * Toggle info popup
+     */
     toggleYearsOfTarget() {
         this.setState({
             popoverOpenYearsOfTarget: !this.state.popoverOpenYearsOfTarget
         })
     }
+    /**
+     * Toggle info popup
+     */
     toggleNodeValue() {
         this.setState({
             popoverOpenNodeValue: !this.state.popoverOpenNodeValue,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleNodeType() {
         this.setState({
             popoverOpenNodeType: !this.state.popoverOpenNodeType,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleNodeTitle() {
         this.setState({
             popoverOpenNodeTitle: !this.state.popoverOpenNodeTitle,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleSenariotree() {
         this.setState({
             popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggleTooltipAuto() {
         this.setState({
             popoverTooltipAuto: !this.state.popoverTooltipAuto,
         });
     }
+    /**
+     * Toggles the visibility of a branch based on the state of `treeId`.
+     */
     toggleCollapse() {
         var treeId = this.state.treeId;
         if (treeId != null && treeId != "") {
@@ -2480,16 +2787,29 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Toggles the visibility of a dropdown menu.
+     */
     toggleDropdown() {
         this.setState({
             showDiv1: !this.state.showDiv1
         })
     }
+    /**
+     * Updates a specific parameter in the component state.
+     * @param {string} parameterName - The name of the parameter to be updated.
+     * @param {*} value - The new value of the parameter.
+     */
     updateExtrapolationData(parameterName, value) {
         this.setState({
             [parameterName]: value
         });
     }
+    /**
+     * Updates a specific parameter in the component state and triggers additional actions based on the updated parameter.
+     * @param {string} parameterName - The name of the parameter to be updated.
+     * @param {*} value - The new value of the parameter.
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
@@ -2546,6 +2866,9 @@ export default class BuildTree extends Component {
             }
         })
     }
+    /**
+     * Calculates and updates display data values in the tree after drag and drop operation.
+     */
     calculateAfterDragDrop() {
         var items = this.state.curTreeObj.tree.flatList;
         for (let i = 0; i < items.length; i++) {
@@ -2557,6 +2880,11 @@ export default class BuildTree extends Component {
             items,
         })
     }
+    /**
+     * Saves the updated tree data to the database.
+     * @param {boolean} flag - Flag indicating whether to perform additional actions after saving the tree data.
+     * @param {boolean} collapseFlag - Flag indicating whether to collapse the component while saving the tree data.
+     */
     saveTreeData(flag, collapseFlag) {
         this.setState({ loading: collapseFlag ? false : true }, () => {
             var curTreeObj = this.state.curTreeObj;
@@ -2670,6 +2998,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         });
     }
+    /**
+     * Creates or updates a tree based on the current state.
+     * If treeId is not null, it updates the existing tree; otherwise, it creates a new tree.
+    */
     createOrUpdateTree() {
         if (this.state.treeId != null) {
             this.setState({
@@ -2780,6 +3112,12 @@ export default class BuildTree extends Component {
             })
         }
     }
+    /**
+     * Filters scaling data by month and updates the modeling elements accordingly.
+     * Calculates the scaling difference for the specified date and updates the state with the total difference and the scaling month.
+     * @param {string} date - The date for which scaling data needs to be filtered.
+     * @param {array} nodeDataMomListParam - (Optional) The node data mom list to use for filtering. If not provided, uses the node data mom list from the current item configuration.
+     */
     filterScalingDataByMonth(date, nodeDataMomListParam) {
         var json = this.state.modelingEl.getJson(null, false);
         var scalingTotal = 0;
@@ -2836,6 +3174,9 @@ export default class BuildTree extends Component {
         }
         this.setState({ scalingTotal });
     }
+    /**
+     * Updates months on months data after manual change and seasonality perc change
+     */
     updateMomDataInDataSet() {
         this.setState({
             momJexcelLoader: true
@@ -2900,8 +3241,13 @@ export default class BuildTree extends Component {
             }, 0);
         });
     }
-    getStartValueForMonth(dateValue) {
-    }
+    /**
+     * Opens a modal for scenario management based on the specified action type.
+     * @param {number} type - The type of action to be performed:
+     *                        - 1: Add new scenario
+     *                        - 2: Edit existing scenario
+     *                        - 3: Delete scenario
+     */
     openScenarioModal(type) {
         var scenarioId = this.state.selectedScenario;
         this.setState({
@@ -2972,6 +3318,9 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Builds jexcel table for modeling in percentage node or forecasting unit node or planning unit node
+     */
     buildMomJexcelPercent() {
         var momList = this.state.momListPer == undefined ? [] : this.state.momListPer;
         var momListParent = this.state.momListPerParent == undefined ? [] : this.state.momListPerParent;
@@ -3037,7 +3386,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0;
+            data[3] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0;
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -3096,7 +3445,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3214,6 +3563,11 @@ export default class BuildTree extends Component {
         }
         );
     };
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         if (instance.worksheets[0].getJson(null, false).length > 0) {
@@ -3221,6 +3575,9 @@ export default class BuildTree extends Component {
             cell.classList.add('readonly');
         }
     }
+    /**
+     * Builds jexcel table for modeling in number node or aggregation
+     */
     buildMomJexcel() {
         var momList = this.state.momList == undefined ? [] : this.state.momList;
         var dataArray = [];
@@ -3232,7 +3589,7 @@ export default class BuildTree extends Component {
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
+            data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
             data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentScenario.manualChangesEffectFuture;
@@ -3250,7 +3607,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 80, 80, 80, 80, 80, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -3329,14 +3686,10 @@ export default class BuildTree extends Component {
                 return false;
             }.bind(this),
         };
-        console.log("Options Test@123",options)
-        console.log("Mom Jexcel Test@123",document.getElementById("momJexcel"));
         if (document.getElementById("momJexcel") != null) {
-            console.log("In if Test@123");
             var momEl = jexcel(document.getElementById("momJexcel"), options);
             this.el = momEl;
         } else {
-            console.log("In else Test@123")
             var momEl = "";
         }
         this.setState({
@@ -3344,6 +3697,9 @@ export default class BuildTree extends Component {
         }
         );
     };
+    /**
+     * Displays the MOM data for the current node or its parent node.
+     */
     showMomData() {
         var getMomDataForCurrentNode = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : [];
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -3369,6 +3725,10 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Sets the start and stop date of the program and initializes necessary data based on the provided programId.
+     * @param {string} programId - The unique identifier of the program.
+     */
     setStartAndStopDateOfProgram(programId) {
         this.setState({
             scenarioList: []
@@ -3404,6 +3764,7 @@ export default class BuildTree extends Component {
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
                 minDate: { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) },
+                stopMinDate: { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) },
                 maxDate: { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) },
                 showDate: true
             }, () => {
@@ -3447,6 +3808,10 @@ export default class BuildTree extends Component {
         }
         this.getRegionList();
     }
+    /**
+     * Handles the extrapolation checkbox event to toggle extrapolation for the current item configuration.
+     * @param {Object} e - The event object triggered by the checkbox action.
+     */
     extrapolate(e) {
         const { currentItemConfig } = this.state;
         var modelingFlag = false;
@@ -3531,6 +3896,11 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Handles data change for manual change and seasonality checkbox.
+     * @param {Event} event - The change event.
+     * @param {number} type - Type of node. 1 for number node otherwise for percentage node
+     */
     momCheckbox(e, type) {
         var checked = e.target.checked;
         const { currentItemConfig } = this.state;
@@ -3560,6 +3930,9 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Handles form submission of modeling data
+     */
     formSubmit() {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
@@ -3616,14 +3989,16 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
-                                firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
-                                yearsOfTarget: this.state.yearsOfTarget,
-                                actualOrTargetValueList: this.state.actualOrTargetValueList
-                            };
+                            if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                                (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
+                                    firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
+                                    yearsOfTarget: this.state.yearsOfTarget,
+                                    actualOrTargetValueList: this.state.actualOrTargetValueList
+                                };
+                            }
                             if (this.state.lastRowDeleted == true) {
                                 (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                             }
@@ -3658,7 +4033,7 @@ export default class BuildTree extends Component {
                             });
                         }
                     } else {
-                        if ((this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
+                        if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
                             this.setState({
@@ -3676,6 +4051,10 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.state.modelingEl.getJson(null, false);
@@ -3767,7 +4146,7 @@ export default class BuildTree extends Component {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
                 if (rowData[4] != "") {
-                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
                         var value = this.state.modelingEl.getValueFromCoords(6, y);
@@ -3778,8 +4157,15 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                     if (rowData[4] == 2) {
@@ -3792,8 +4178,15 @@ export default class BuildTree extends Component {
                             valid = false;
                         }
                         else {
-                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
-                            this.state.modelingEl.setComments(col, "");
+                            if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                                this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
+                                valid = false;
+                            } else {
+                                this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                                this.state.modelingEl.setComments(col, "");
+                            }
                         }
                     }
                 }
@@ -3801,6 +4194,9 @@ export default class BuildTree extends Component {
         }
         return valid;
     }
+    /**
+     * Function to calculate scaling total
+     */
     calculateScalingTotal() {
         var scalingTotal = 0;
         var tableJson = this.state.modelingEl.getJson(null, false);
@@ -3815,6 +4211,12 @@ export default class BuildTree extends Component {
         }, () => {
         });
     }
+    /**
+     * Accepts the calculated value from the modeling calculator and updates the modeling elements accordingly.
+     * If the current modeling type is 'Incremental Change (%)', updates modeling element values based on the user input.
+     * If the current modeling type is 'Target Change (%)', updates modeling element values based on the user input and calculated target.
+     * Hides the calculator fields after accepting the value.
+     */
     acceptValue1() {
         var elInstance = this.state.modelingEl;
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -3871,6 +4273,12 @@ export default class BuildTree extends Component {
         }
         this.setState({ showCalculatorFields: false });
     }
+    /**
+     * Accepts the value from the modeling calculator.
+     * If the target selection is not disabled, calls the `callJexcelBuildFuntion` function to update the modeling elements.
+     * If the target selection is disabled, prompts a confirmation and calls `callJexcelBuildFuntion` if confirmed.
+     * Resets state variables related to the target selection if not confirmed.
+     */
     acceptValue() {
         if (!this.state.targetSelectDisable) {
             this.callJexcelBuildFuntion();
@@ -3887,6 +4295,12 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Calls the `callJexcelBuildFuntion` function to update the modeling elements based on the calculated value from the modeling calculator.
+     * Updates the data value and calculated data value in the current item configuration.
+     * Deletes rows from the modeling element, sets start and stop dates, and inserts new rows based on the updated values.
+     * Resets state variables related to the modeling calculator and updates the state.
+     */
     callJexcelBuildFuntion() {
         let { currentItemConfig } = this.state;
         var json = this.state.modelingCalculatorEl.getJson(null, false);
@@ -3945,6 +4359,10 @@ export default class BuildTree extends Component {
         }
         );
     }
+    /**
+     * Calculates various metrics such as monthly change, target change number, target change percentage, etc., based on the provided end value and other parameters.
+     * @param {Event} e - The event object
+     */
     calculateMomByEndValue(e) {
         this.setState({
             currentCalculatedMomChange: '',
@@ -3990,6 +4408,10 @@ export default class BuildTree extends Component {
             percentForOneMonth
         });
     }
+    /**
+     * Calculates various metrics such as monthly change, target end value, and target change number based on the provided change in percentage and other parameters.
+     * @param {Event} e - The event object
+     */
     calculateMomByChangeInPercent(e) {
         this.setState({
             currentEndValue: '',
@@ -4035,6 +4457,11 @@ export default class BuildTree extends Component {
             percentForOneMonth
         });
     }
+    /**
+     * Calculates various metrics such as target end value, monthly change, and target change percentage 
+     * based on the provided change in number and other parameters.
+     * @param {Event} e - The event object
+     */
     calculateMomByChangeInNumber(e) {
         this.setState({
             currentEndValue: '',
@@ -4065,6 +4492,13 @@ export default class BuildTree extends Component {
             currentTargetChangePercentage: getValue != '' ? targetChangePer : ''
         });
     }
+    /**
+     * Retrieves a list of nodes at the same level based on the provided parameters.
+     * @param {number} level - The level of the nodes
+     * @param {string} id - The ID of the node
+     * @param {number} nodeTypeId - The type ID of the node
+     * @param {string} parent - The parent of the node
+     */
     getSameLevelNodeList(level, id, nodeTypeId, parent) {
         var sameLevelNodeList = [];
         var sameLevelNodeList1 = [];
@@ -4084,6 +4518,14 @@ export default class BuildTree extends Component {
             sameLevelNodeList1
         });
     }
+    /**
+     * Retrieves a list of node transfer data based on the provided parameters.
+     * @param {number} level - The level of the nodes
+     * @param {string} id - The ID of the node
+     * @param {number} nodeTypeId - The type ID of the node
+     * @param {string} parent - The parent of the node
+     * @param {string} nodeDataId - The ID of the node data
+     */
     getNodeTransferList(level, id, nodeTypeId, parent, nodeDataId) {
         var nodeTransferDataList = [];
         var arr = [];
@@ -4114,6 +4556,9 @@ export default class BuildTree extends Component {
             nodeTransferDataList
         });
     }
+    /**
+     * Reterives region list from indexed db
+     */
     getRegionList() {
         var db1;
         getDatabase();
@@ -4150,6 +4595,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives modeling type list
+     */
     getModelingTypeList() {
         var db1;
         getDatabase();
@@ -4170,6 +4618,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Builds Jexcel table for modeling data
+     */
     buildModelingJexcel() {
         var scalingList = this.state.currentScenario.nodeDataModelingList == undefined ? [] : this.state.currentScenario.nodeDataModelingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
@@ -4268,7 +4719,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -4310,17 +4761,13 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
-                    textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000%',
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000%'
                 },
                 {
                     title: i18n.t('static.tree.MonthlyChange#'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##0.0000', decimal: '.',
-                    textEditor: true,
-                    disabledMaskOnEdition: true
+                    mask: '#,##0.0000', decimal: '.'
                 },
                 {
                     title: i18n.t('static.tree.modelingCalculater'),
@@ -4516,6 +4963,11 @@ export default class BuildTree extends Component {
         }
         );
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -4529,10 +4981,28 @@ export default class BuildTree extends Component {
         tr.children[9].title = i18n.t('static.tooltip.ModelingCalculator');
         tr.children[10].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
     }
+    /**
+     * Function to filter same level node list
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterSameLeveleUnitList = function (instance, cell, c, r, source) {
         var sameLevelNodeList = this.state.sameLevelNodeList1;
         return sameLevelNodeList;
     }.bind(this)
+    /**
+     * Handles the selection of a cell in the grid/table.
+     * @param {object} instance - The instance object.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the selected cell.
+     * @param {number} y - The y-coordinate of the selected cell.
+     * @param {any} value - The value of the selected cell.
+     * @param {object} e - The event object.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
@@ -4642,6 +5112,9 @@ export default class BuildTree extends Component {
             }
         }
     }.bind(this)
+    /**
+     * Resets modeling calculator data on reset button clicked
+     */
     resetModelingCalculatorData = function (instance, cell, x, y, value) {
         this.setState({
             firstMonthOfTarget: this.state.firstMonthOfTargetOriginal,
@@ -4653,16 +5126,40 @@ export default class BuildTree extends Component {
             this.buildModelingCalculatorJexcel();
         })
     }.bind(this);
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed1 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
             this.setState({ isChanged: true });
         }
     }.bind(this);
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed2 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
             this.setState({ isChanged: true });
         }
     }.bind(this);
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({
             modelingChangedOrAdded: true
@@ -4801,12 +5298,18 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
-                    if (rowData[4] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                        if (rowData[4] != 5) {
+                            calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                        } else {
+                            calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        }
                     }
                 }
             }
@@ -4833,8 +5336,14 @@ export default class BuildTree extends Component {
                     instance.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 else {
-                    instance.setStyle(col, "background-color", "transparent");
-                    instance.setComments(col, "");
+                    if (isNaN(Number(value)) || !(reg.test(value)) || (1 == 1 && (1 == 1 ? value < 0 : value <= 0))) {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setStyle(col, "background-color", "yellow");
+                        instance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        instance.setStyle(col, "background-color", "transparent");
+                        instance.setComments(col, "");
+                    }
                 }
             }
         }
@@ -4848,6 +5357,11 @@ export default class BuildTree extends Component {
             })
         }
     }.bind(this);
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         if (instance.worksheets[0].getJson(null, false).length > 0) {
@@ -4857,6 +5371,9 @@ export default class BuildTree extends Component {
             cell.classList.add('readonly');
         }
     }
+    /**
+     * Add new row in jexcel table for modeling
+     */
     addRow = function () {
         if (this.state.modelingChanged == false) {
             this.setState({
@@ -4888,6 +5405,12 @@ export default class BuildTree extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Retrieves data from the payload based on the provided item configuration and type.
+     * @param {Object} itemConfig - The configuration object of the item
+     * @param {number} type - The type of data retrieval operation
+     * @returns {any} - The retrieved data
+     */
     getPayloadData(itemConfig, type) {
         var data = [];
         data = itemConfig.payload.nodeDataMap;
@@ -5093,6 +5616,9 @@ export default class BuildTree extends Component {
             return "";
         }
     }
+    /**
+     * Export tree in word file
+     */
     exportDoc() {
         var item1 = this.state.items;
         var sortOrderArray = [...new Set(item1.map(ele => (ele.sortOrder)))];
@@ -5235,11 +5761,17 @@ export default class BuildTree extends Component {
             saveAs(blob, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + "TreeValidation" + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".docx");
         });
     }
+    /**
+     * Toggle info popup
+     */
     toggle() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
         });
     }
+    /**
+     * Reterives forecast program list
+     */
     getDatasetList() {
         this.setState({ loading: true });
         var db1;
@@ -5260,7 +5792,9 @@ export default class BuildTree extends Component {
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
-                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                myResult = getRequest.result.filter(c => c.userId == userId);
                 this.setState({
                     datasetList: myResult,
                     programId: this.state.programId != null ? this.state.programId : (myResult.length == 1 ? myResult[0].id : "")
@@ -5272,10 +5806,11 @@ export default class BuildTree extends Component {
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
+                        var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var maxDate = { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) };
                         var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
                         this.setState({
-                            dataSetObj: dataEnc, minDate, maxDate,
+                            dataSetObj: dataEnc, minDate, maxDate, stopMinDate,
                             forecastStartDate: programData.currentVersion.forecastStartDate,
                             forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod,
                             singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 },
@@ -5296,6 +5831,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Exports data in PDF format
+     */
     exportPDF = () => {
         let treeLevel = this.state.items.length;
         var treeLevelItems = [];
@@ -5460,6 +5998,11 @@ export default class BuildTree extends Component {
             newItems.push(e)
         }
     }
+    /**
+     * Handle region change function.
+     * This function updates the state with the selected region values and generates a list of regions.
+     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+     */
     handleRegionChange = (regionIds) => {
         const { curTreeObj } = this.state;
         this.setState({
@@ -5482,6 +6025,11 @@ export default class BuildTree extends Component {
             this.setState({ curTreeObj });
         })
     }
+    /**
+     * Handles the change event when a forecasting unit (FU) is selected.
+     * Updates the state with the selected forecasting unit values and triggers related actions.
+     * @param {object} regionIds - The selected forecasting unit region IDs.
+     */
     handleFUChange = (regionIds) => {
         const { currentItemConfig } = this.state;
         this.setState({
@@ -5509,6 +6057,10 @@ export default class BuildTree extends Component {
             this.setState({ currentItemConfig });
         })
     }
+    /**
+     * Reterives tree template details by tree template Id
+     * @param {*} treeTemplateId - Id for which tree template details must be fetched
+     */
     getTreeTemplateById(treeTemplateId) {
         var db1;
         getDatabase();
@@ -5566,6 +6118,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives tree details by tree Id
+     * @param {*} treeTemplateId - Id for which tree details must be fetched
+     */
     getTreeByTreeId(treeId) {
         if (treeId != "" && treeId != null && treeId != 0) {
             var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
@@ -5637,8 +6193,14 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Reterives scenario list
+     */
     getScenarioList() {
     }
+    /**
+     * Reterives tree list
+     */
     getTreeList() {
         var proList = [];
         var db1;
@@ -5727,12 +6289,20 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Retrives conversion factor for planning unit
+     * @param {*} planningUnitId - Planning unit for which conversion factor should be reterived
+     */
     getConversionFactor(planningUnitId) {
         var pu = (this.state.updatedPlanningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
         this.setState({
             conversionFactor: pu.multiplier
         });
     }
+    /**
+     * Reterives next allowed node types list
+     * @param {*} nodeTypeId Current node type Id
+     */
     getNodeTypeFollowUpList(nodeTypeId) {
         var nodeType;
         var nodeTypeList = [];
@@ -5767,6 +6337,9 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Retervies node type list
+     */
     getNodeTyeList() {
         var db1;
         getDatabase();
@@ -5789,6 +6362,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Function to duplicate the node in the tree
+     * @param {*} itemConfig Configuration and data of selected node
+     */
     duplicateNode(itemConfig) {
         var items1 = this.state.items;
         const { items } = this.state;
@@ -5870,9 +6447,16 @@ export default class BuildTree extends Component {
             this.calculateMOMData(itemConfig.parent, 2);
         });
     }
+    /**
+     * Redirects to list tree template screen on cancel button clicked
+     */
     cancelClicked() {
         this.props.history.push(`/dataset/listTree/`)
     }
+    /**
+     * Reterives planning unit list based on forecasting unit Id
+     * @param {*} forecastingUnitId Forecasting unit Id for which planning units should be retrived
+     */
     getPlanningUnitListByFUId(forecastingUnitId) {
         var planningUnitList = this.state.updatedPlanningUnitList.filter(x => x.forecastingUnit.id == forecastingUnitId);
         this.setState({
@@ -5911,6 +6495,10 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Retrives unit of forecasting unit
+     * @param {*} forecastingUnitId Forecasting unit Id for which unit should be reterived
+     */
     getForecastingUnitUnitByFUId(forecastingUnitId) {
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.id == forecastingUnitId));
@@ -5921,6 +6509,9 @@ export default class BuildTree extends Component {
             currentItemConfig
         });
     }
+    /**
+     * Calculates no of forecasting unit patients
+     */
     getNoOfFUPatient() {
         var scenarioId = this.state.selectedScenario;
         var noOfFUPatient;
@@ -5934,6 +6525,9 @@ export default class BuildTree extends Component {
         }, () => {
         })
     }
+    /**
+     * Reterives the node unit of parent node
+     */
     getNodeUnitOfPrent() {
         var id;
         id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
@@ -5942,6 +6536,10 @@ export default class BuildTree extends Component {
         }, () => {
         });
     }
+    /**
+     * Function to copy data from usage template
+     * @param {Event} event The change event
+     */
     copyDataFromUsageTemplate(event) {
         var usageTemplate = (this.state.usageTemplateList.filter(c => c.usageTemplateId == event.target.value))[0];
         const { currentItemConfig } = this.state;
@@ -5975,6 +6573,9 @@ export default class BuildTree extends Component {
             this.getUsageText();
         });
     }
+    /**
+     * Function to calculate no of forecasting units required
+     */
     getNoFURequired() {
         var usagePeriodId;
         var usageTypeId;
@@ -6046,6 +6647,9 @@ export default class BuildTree extends Component {
         }, () => {
         });
     }
+    /**
+     * Function to calculate no of months in usage period
+     */
     getNoOfMonthsInUsagePeriod() {
         var usagePeriodId;
         var usageTypeId;
@@ -6102,6 +6706,9 @@ export default class BuildTree extends Component {
         }, () => {
         });
     }
+    /**
+     * Function to build usage text
+     */
     getUsageText() {
         try {
             var usageText = '';
@@ -6171,6 +6778,11 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Retrieves the forecasting unit list based on the tracer category ID.
+     * @param {number} type - Type 0 to set the forecasting unit value
+     * @param {boolean} isUsageTemplate - Indicates whether it's a usage template.
+     */
     getForecastingUnitListByTracerCategoryId(type, isUsageTemplate) {
         var scenarioId = this.state.selectedScenario;
         var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
@@ -6228,11 +6840,19 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Toggles the visibility of modeling validation messages.
+     * @param {Object} e - The event object triggered by the checkbox action.
+     */
     hideTreeValidation(e) {
         this.setState({
             showModelingValidation: e.target.checked == true ? false : true
         })
     }
+    /**
+     * Toggles the auto-calculation feature and triggers calculation if enabled.
+     * @param {Object} e - The event object triggered by the checkbox action.
+     */
     autoCalculate(e) {
         var val = (e.target.checked);
         var prevVal = this.state.autoCalculate;
@@ -6248,6 +6868,11 @@ export default class BuildTree extends Component {
             }
         })
     }
+    /**
+     * Recalculates modeling data for a specific node.
+     * @param {string} nodeId - The ID of the node to recalculate.
+     * @param {string} type - The type of recalculation (if applicable).
+     */
     recalculate(nodeId, type) {
         this.setState({
             loading: true
@@ -6266,11 +6891,19 @@ export default class BuildTree extends Component {
         dataSetObj.programData = programData;
         calculateModelingData(dataSetObj, this, '', 0, this.state.selectedScenario, type, this.state.treeId, false, false, true);
     }
+    /**
+     * Toggles the visibility of action buttons.
+     * @param {Object} e - The event object triggered by the checkbox action.
+     */
     hideActionButtons(e) {
         this.setState({
             hideActionButtons: e.target.checked
         })
     }
+    /**
+     * Filters planning unit nodes based on user input.
+     * @param {object} e - The event object representing user input.
+     */
     filterPlanningUnitNode(e) {
         var itemsList = this.state.items;
         var arr = [];
@@ -6294,6 +6927,10 @@ export default class BuildTree extends Component {
             hidePUNode: e.target.checked
         });
     }
+    /**
+     * Filters planning unit and forecasting unit nodes based on user input.
+     * @param {object} e - The event object representing user input.
+     */
     filterPlanningUnitAndForecastingUnitNodes(e) {
         var itemsList = this.state.items;
         var arr = [];
@@ -6313,6 +6950,10 @@ export default class BuildTree extends Component {
             hideFUPUNode: e.target.checked
         });
     }
+    /**
+     * Expand or collapse a node
+     * @param {Event} e The click event
+     */
     expandCollapse(e) {
         var updatedItems = this.state.items;
         var tempToggleArray = this.state.toggleArray;
@@ -6336,16 +6977,31 @@ export default class BuildTree extends Component {
         }
         this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
     }
+    /**
+     * Gets the value of a node based on its type.
+     * @param {number} nodeTypeId - The ID of the node type.
+     * @returns {any} The value of the node.
+     */
     getNodeValue(nodeTypeId) {
         if (nodeTypeId == 2 && this.state.currentItemConfig.context.payload.nodeDataMap != null && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario] != null && this.state.currentScenario != null) {
             return this.state.currentScenario.dataValue;
         }
     }
+    /**
+     * Retrieves notes associated with the current item configuration.
+     * @returns {string} The notes associated with the current item configuration.
+     */
     getNotes() {
         return this.state.currentScenario.notes;
     }
+    /**
+     * Calculate node value
+     */
     calculateNodeValue() {
     }
+    /**
+     * Reterives tracer category list
+     */
     getTracerCategoryList() {
         const lan = 'en';
         var db1;
@@ -6371,6 +7027,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Reterives forecast method list
+     */
     getForecastMethodList() {
         const lan = 'en';
         var db1;
@@ -6395,6 +7054,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Reterives unit list for dimension Id 4
+     */
     getUnitListForDimensionIdFour() {
         const lan = 'en';
         var db1;
@@ -6425,6 +7087,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Reterives unit list
+     */
     getUnitList() {
         const lan = 'en';
         var db1;
@@ -6458,6 +7123,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves a list of branch templates based on the item configuration.
+     * @param {object} itemConfig - The configuration of the item.
+     */
     getBranchTemplateList(itemConfig) {
         var nodeTypeId = itemConfig.payload.nodeType.id;
         const lan = 'en';
@@ -6514,6 +7183,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Generates a branch from a selected template.
+     * @param {string} treeTemplateId - The ID of the selected tree template.
+     */
     generateBranchFromTemplate(treeTemplateId) {
         var items = this.state.items;
         var parentItem = JSON.parse(JSON.stringify(this.state.items.filter(x => x.id == this.state.parentNodeIdForBranch)[0]));
@@ -6584,7 +7257,15 @@ export default class BuildTree extends Component {
             items[findNodeIndex].level = parseInt(parentLevel + 1);
             parentLevel++;
         }
+        let { curTreeObj } = this.state;
+        if (treeTemplateId != "") {
+            var branchTemplateDesc = document.getElementById("branchTemplateId").selectedOptions[0].text;
+            var branchTemplateNotes = document.getElementById("branchTemplateNotes").value;
+            var notes = "Branch Note for " + branchTemplateDesc + ": " + branchTemplateNotes;
+            curTreeObj.notes = curTreeObj.notes != "" ? curTreeObj.notes + " | " + notes : notes;
+        }
         this.setState({
+            curTreeObj,
             items,
             isBranchTemplateModalOpen: false,
             branchTemplateId: "",
@@ -6593,6 +7274,9 @@ export default class BuildTree extends Component {
             this.calculateMOMData(this.state.parentNodeIdForBranch, 2);
         });
     }
+    /**
+     * Reterives usage period list
+     */
     getUsagePeriodList() {
         const lan = 'en';
         var db1;
@@ -6618,6 +7302,9 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Reterives usage type list
+     */
     getUsageTypeList() {
         const lan = 'en';
         var db1;
@@ -6643,6 +7330,11 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Filters the usage template list based on tracer category ID and forecasting unit ID.
+     * @param {number} tracerCategoryId - The ID of the tracer category.
+     * @param {number} forecastingUnitId - The ID of the forecasting unit.
+     */
     filterUsageTemplateList(tracerCategoryId, forecastingUnitId) {
         var usageTemplateList = [];
         if (forecastingUnitId > 0) {
@@ -6658,6 +7350,9 @@ export default class BuildTree extends Component {
         }, () => {
         });
     }
+    /**
+     * Reterives usage template list
+     */
     getUsageTemplateList(fuIdArray) {
         const lan = 'en';
         var db1;
@@ -6687,6 +7382,10 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Reterives forecasting unit Id based on tracer category Id
+     * @param {number} tracerCategoryId - The ID of the tracer category.
+     */
     getForecastingUnitListByTracerCategory(tracerCategoryId) {
         const lan = 'en';
         var db1;
@@ -6717,10 +7416,16 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
             window.onbeforeunload = () => true
@@ -6728,6 +7433,9 @@ export default class BuildTree extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Calls multiple function on component mount
+     */
     componentDidMount() {
         this.setState({
             treeId: this.props.match.params.treeId,
@@ -6746,6 +7454,9 @@ export default class BuildTree extends Component {
             this.procurementAgentList();
         })
     }
+    /**
+     * Adds a new scenario to the tab list.
+     */
     addScenario() {
         const { scenario, curTreeObj } = this.state;
         var scenarioList = this.state.scenarioList;
@@ -6825,6 +7536,10 @@ export default class BuildTree extends Component {
             alert(i18n.t('static.tree.duplicateScenarioName'));
         }
     }
+    /**
+     * Handles changes in node type selection.
+     * @param {number} value - The new value of the selected node type.
+     */
     nodeTypeChange(value) {
         var nodeTypeId = value;
         var { currentItemConfig } = this.state;
@@ -6905,6 +7620,11 @@ export default class BuildTree extends Component {
             this.getSameLevelNodeList(parseInt(currentItemConfig.context.level + 1), 0, nodeTypeId, currentItemConfig.context.parent);
         }
     }
+    /**
+     * Toggles the active tab in the modal.
+     * @param {number} tabPane - The index of the tab pane to toggle.
+     * @param {number} tab - The new active tab index.
+     */
     toggleModal(tabPane, tab) {
         const newArray = this.state.activeTab1.slice()
         newArray[tabPane] = tab
@@ -6975,9 +7695,16 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Resets the tree component.
+     */
     resetTree() {
         this.componentDidMount();
     }
+    /**
+     * Handles changes in scenario name and description fields.
+     * @param {Object} event - The event object triggered by the change in input fields.
+     */
     scenarioChange(event) {
         const { scenario } = this.state;
         if (event.target.name === "scenarioName") {
@@ -6991,6 +7718,10 @@ export default class BuildTree extends Component {
             scenario
         });
     }
+    /**
+     * Handles changes in tree data fields.
+     * @param {Object} event - The event object triggered by the change in input fields.
+     */
     treeDataChange(event) {
         let { curTreeObj } = this.state;
         if (event.target.name === "treeName") {
@@ -7017,6 +7748,10 @@ export default class BuildTree extends Component {
         this.setState({ curTreeObj, isTreeDataChanged: true }, () => {
         });
     }
+    /**
+     * Handles changes in data input fields.
+     * @param {Event} event - The event object containing information about the data change.
+     */
     dataChange(event) {
         var flag = false;
         let { curTreeObj } = this.state;
@@ -7028,6 +7763,9 @@ export default class BuildTree extends Component {
             this.setState({ branchTemplateId: event.target.value }, () => {
                 this.getMissingPuListBranchTemplate();
             });
+        }
+        if (event.target.name === "branchTemplateNotes") {
+            this.setState({ branchTemplateNotes: event.target.value });
         }
         if (event.target.name === "currentEndValue") {
             this.setState({
@@ -7297,11 +8035,15 @@ export default class BuildTree extends Component {
                 this.qatCalculatedPUPerVisit(0);
             });
         }
+        if (event.target.name != "treeId" && event.target.name != "datasetId" && event.target.name != "scenarioId" && event.target.name != "monthPicker") {
+           this.setState({
+                isChanged:true
+            })
+        }
         if (event.target.name != "treeId") {
             this.setState({
                 currentItemConfig,
-                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
-                isChanged: true
+                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 if (flag) {
                     if (event.target.name === "planningUnitId") {
@@ -7315,6 +8057,14 @@ export default class BuildTree extends Component {
             });
         }
     }
+    /**
+     * Creates a new planning unit node and adds it to the tree.
+     * This function generates a new planning unit node based on the provided item configuration and parent node.
+     * It assigns a unique ID to the new node, updates its level and payload properties, and sets its sort order.
+     * The function also updates the tree template with new level information and sets the state with the updated items and tree template.
+     * @param {Object} itemConfig - The configuration object for the new planning unit node.
+     * @param {Object} parent - The parent node of the new planning unit node.
+     */
     createPUNode(itemConfig, parent) {
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
@@ -7402,6 +8152,16 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Handles the click event when adding a new item to the tree.
+     * This function creates a new item based on the provided item configuration and adds it to the tree.
+     * It assigns a unique ID to the new item, updates its level, payload, sort order, and visibility properties.
+     * The function also updates the tree template with new level information and sets the state with the updated items and tree template.
+     * @param {Object} itemConfig - The configuration object for the new item.
+     * @param {boolean} addNode - Indicates whether to add a node.
+     * @param {Object} data - Data associated with the new item.
+     * @returns {void}
+     */
     onAddButtonClick(itemConfig, addNode, data) {
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
@@ -7490,6 +8250,10 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Calculate values for aggregation node
+     * @param {Array} items - The array of tree items.
+     */
     calculateValuesForAggregateNode(items) {
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
@@ -7526,6 +8290,10 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Remove the node from tree on delete node
+     * @param {*} itemConfig The configuration object that needs to be deleted
+     */
     onRemoveButtonClick(itemConfig) {
         var { items } = this.state;
         const ids = items.map(o => o.id)
@@ -7533,14 +8301,17 @@ export default class BuildTree extends Component {
         items = filtered;
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
-                if(itemConfig.payload.nodeType.id==2){
+                if (itemConfig.payload.nodeType.id == 2) {
                     this.calculateMOMData(itemConfig.parent, 2);
-                }else{
+                } else {
                     this.calculateMOMData(itemConfig.id, 2);
                 }
             }, 0);
         });
     }
+    /**
+     * Updates tree on moving a node
+     */
     onMoveItem(parentid, itemid) {
         const { items } = this.state;
         this.setState({
@@ -7556,6 +8327,12 @@ export default class BuildTree extends Component {
             }))
         })
     }
+    /**
+     * Determines whether an item can be dropped into a specific parent node.
+     * @param {number} parentid - ID of the parent node.
+     * @param {number} itemid - ID of the item node.
+     * @returns {boolean} - True if item can be dropped into parent, false otherwise.
+     */
     canDropItem(parentid, itemid) {
         const { items } = this.state;
         const tree = this.getTree(items);
@@ -7568,10 +8345,20 @@ export default class BuildTree extends Component {
         });
         return result;
     }
+    /**
+     * Removes an item from the tree by its ID.
+     * @param {number} id - ID of the item to be removed.
+     */
     onRemoveItem(id) {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
     }
+    /**
+     * Retrieves updated item list with specified items removed and cursor parent item.
+     * @param {Array} items - Array of tree items.
+     * @param {Array} deletedItems - Array of IDs of items to be removed.
+     * @returns {Object} - Updated items array and cursor parent item.
+     */
     getDeletedItems(items = [], deletedItems = []) {
         const tree = this.getTree(items);
         const hash = deletedItems.reduce((agg, itemid) => {
@@ -7591,6 +8378,13 @@ export default class BuildTree extends Component {
             cursorItem: cursorParent
         };
     }
+    /**
+     * Retrieves parent item of deleted items to set as cursor item.
+     * @param {Tree} tree - Tree data structure representing items.
+     * @param {Array} deletedItems - Array of IDs of items to be removed.
+     * @param {Set} deletedHash - Set containing IDs of items to be removed.
+     * @returns {number|null} - ID of cursor parent item, or null if not found.
+     */
     getDeletedItemsParent(tree, deletedItems, deletedHash) {
         let result = null;
         const lca = LCA(tree);
@@ -7607,6 +8401,11 @@ export default class BuildTree extends Component {
         }
         return result;
     }
+    /**
+     * Constructs a tree data structure from array of tree items.
+     * @param {Array} items - Array of tree items.
+     * @returns {Tree} - Tree data structure.
+     */
     getTree(items = []) {
         const tree = Tree();
         for (let index = 0; index < items.length; index += 1) {
@@ -7615,6 +8414,12 @@ export default class BuildTree extends Component {
         }
         return tree;
     }
+
+    /**
+     * Handles the event when the highlight changes and updates the state accordingly.
+     * @param {Event} event - The event triggering the highlight change.
+     * @param {Object} data - Data containing the context of the item.
+     */
     onHighlightChanged(event, data) {
         const { context: item } = data;
         const { config } = this.state;
@@ -7630,6 +8435,11 @@ export default class BuildTree extends Component {
             })
         }
     };
+    /**
+     * Handles the event when the cursor changes and updates the state accordingly.
+     * @param {Event} event - The event triggering the cursor change.
+     * @param {Object} data - Data containing the context of the item.
+     */
     onCursoChanged(event, data) {
         const { context: item } = data;
         if (item != null) {
@@ -7737,6 +8547,10 @@ export default class BuildTree extends Component {
             })
         }
     };
+    /**
+     * Function to update the node info in json
+     * @param {*} currentItemConfig The item configuration object that needs to be updated
+     */
     updateNodeInfoInJson(currentItemConfig) {
         var nodes = this.state.items;
         if (currentItemConfig.context.level == 0 && currentItemConfig.context.newTree) {
@@ -7806,6 +8620,9 @@ export default class BuildTree extends Component {
             this.calculateMOMData(currentItemConfig.context.id, 0);
         });
     }
+    /**
+     * Builds jexcel table for annual target calculator
+     */
     buildModelingCalculatorJexcel() {
         jexcel.destroy(document.getElementById("modelingCalculatorJexcel"), true);
         var dataArray = [];
@@ -7827,7 +8644,7 @@ export default class BuildTree extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [90, 160, 80, 80, 90, 90, 80, 80, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -7932,6 +8749,10 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     validFieldData() {
         var json = this.state.modelingCalculatorEl.getJson(null, false);
         var valid = true;
@@ -7955,6 +8776,14 @@ export default class BuildTree extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed3(isCalculateClicked) {
         var elInstance = this.state.modelingCalculatorEl;
         var validation = this.validFieldData();
@@ -8028,7 +8857,12 @@ export default class BuildTree extends Component {
             }
         }
     }
-    loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedModelingCalculatorJexcel = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var elInstance = instance.worksheets[0];
         elInstance.setValueFromCoords(2, 0, "", true)
@@ -8057,6 +8891,14 @@ export default class BuildTree extends Component {
         var cell = elInstance.getCell("G1");
         cell.classList.add('shipmentEntryDoNotInclude');
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changeModelingCalculatorJexcel = function (instance, cell, x, y, value) {
         if (x == 1) {
             if (this.state.isCalculateClicked != 1) {
@@ -8064,6 +8906,10 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Renders node details and modeling details tab
+     * @returns {JSX.Element} - Node details and modeling data.
+     */
     tabPane1() {
         var chartOptions = {
             title: {
@@ -8186,7 +9032,7 @@ export default class BuildTree extends Component {
                             labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                 this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                     this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode != null && this.state.currentScenario.fuNode.forecastingUnit != null && this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
-                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode!=undefined && this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
                                             : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
                                 : "",
@@ -8348,7 +9194,7 @@ export default class BuildTree extends Component {
                             usageFrequencyCon: "",
                             usageFrequencyDis: "",
                             oneTimeUsage: "",
-                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
+                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]!=undefined ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
                         }}
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -8358,14 +9204,14 @@ export default class BuildTree extends Component {
                                 if (cf == true) {
                                     save = true;
                                     this.setState({
-                                        deleteChildNodes:true
+                                        deleteChildNodes: true
                                     })
                                 } else {
                                 }
                             } else {
                                 save = true;
                                 this.setState({
-                                    deleteChildNodes:false
+                                    deleteChildNodes: false
                                 })
                             }
                             if (save) {
@@ -9817,11 +10663,11 @@ export default class BuildTree extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
                                                 <Picker
                                                     ref={this.pickAMonth5}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.stopMinDate, max: this.state.maxDate }}
                                                     value={{ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
-                                                    onChange={this.handleAMonthChange5}
-                                                    onDismiss={this.handleAMonthDissmis5}
+                                                    key={JSON.stringify(this.state.currentCalculatorStopDate)}
+                                                    onChange={this.handleAMonthChange6}
                                                 >
                                                     <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                                 </Picker>
@@ -10013,7 +10859,7 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({ showMomData: false,isChanged: false,viewMonthlyData: true })
+                                        this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
@@ -10112,10 +10958,20 @@ export default class BuildTree extends Component {
             </>
         );
     }
+    /**
+     * Formats the selected month and year into text.
+     * @param {object} m - The selected month and year object.
+     * @returns {string} - The formatted text representing the selected month and year.
+     */
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange1 = (year, month) => {
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
@@ -10127,26 +10983,59 @@ export default class BuildTree extends Component {
         this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
         });
     }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis1 = (value) => {
         let month = value.year + '-' + value.month + '-01';
         this.calculateParentValueFromMOM(month);
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox1 = (e) => {
         this.pickAMonth1.current.show()
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox2 = (e) => {
         this.pickAMonth2.current.show()
     }
-
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox5 = (e) => {
         this.pickAMonth5.current.show()
     }
-
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox6 = (e) => {
         this.pickAMonth6.current.show()
     }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange2 = (year, month) => {
     }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis2 = (value) => {
         let startDate = value.year + '-' + value.month + '-01';
         if (!this.state.modelingChanged) {
@@ -10158,8 +11047,18 @@ export default class BuildTree extends Component {
         this.setState({ scalingMonth: value }, () => {
         });
     }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange3 = (year, month) => {
     }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis3 = (value, type) => {
         var date = value.year + "-" + value.month + "-" + "01"
         this.updateTreeData(date);
@@ -10172,12 +11071,27 @@ export default class BuildTree extends Component {
             }
         }
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox3 = (e) => {
         this.pickAMonth3.current.show()
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox4 = (e) => {
         this.pickAMonth4.current.show()
     }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange4 = (year, month) => {
         var date = year + "-" + month + "-01";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
@@ -10200,22 +11114,71 @@ export default class BuildTree extends Component {
             }
         });
     }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange5 = (year, month) => {
         var date = year + "-" + month + "-01";
+        var stopDate = this.state.currentCalculatorStopDate;
+        var mStart = moment(date);
+        var mEnd = moment(stopDate);
+        stopDate = mStart.isSameOrBefore(mEnd) ? stopDate : "";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
-            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-            } else {
-                if (!this.state.currentEndValueEdit) {
-                    this.calculateMomByEndValue();
-                } else if (!this.state.currentTargetChangePercentageEdit) {
-                    this.calculateMomByChangeInPercent();
-                } else if (!this.state.currentTargetChangeNumberEdit) {
-                    this.calculateMomByChangeInNumber();
-                }
+        var stopMinDate = { year: year, month: month }
+        this.setState({
+            stopMinDate: stopMinDate,
+            currentCalculatorStartDate: date,
+            currentCalculatorStopDate: stopDate,
+            currentCalculatorStartValue
+        }, () => {
+            if (mStart.isSameOrBefore(mEnd)) {
+                this.dateChangeCalculations();
             }
         });
     }
+
+    /**
+     * Based on Start and Target Date change calculation different calculations for Modeling Calculator
+     */
+    dateChangeCalculations() {
+        if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+        } else {
+            if (!this.state.currentEndValueEdit) {
+                this.calculateMomByEndValue();
+            } else if (!this.state.currentTargetChangePercentageEdit) {
+                this.calculateMomByChangeInPercent();
+            } else if (!this.state.currentTargetChangeNumberEdit) {
+                this.calculateMomByChangeInNumber();
+            }
+        }
+    }
+
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
+    handleAMonthChange6 = (year, month) => {
+        var date = year + "-" + month + "-01";
+        var startDate = this.state.currentCalculatorStartDate;
+        var mStart = moment(startDate);
+        var mEnd = moment(date);
+        date = mStart.isSameOrBefore(mEnd) ? date : "";
+        this.setState({
+            currentCalculatorStopDate: date,
+        }, () => {
+            if (mStart.isSameOrBefore(mEnd)) {
+                this.dateChangeCalculations();
+            }
+        });
+    }
+
+    /**
+     * Updates the data values displayed in the tree based on the selected scenario and date.
+     * @param {Date} date - The date for which the data values need to be updated.
+     */
     updateTreeData(date) {
         var items = this.state.items;
         for (let i = 0; i < items.length; i++) {
@@ -10285,6 +11248,10 @@ export default class BuildTree extends Component {
         }, () => {
         })
     }
+    /**
+     * Renders the create tree screen.
+     * @returns {JSX.Element} - Create Tree screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -10620,7 +11587,7 @@ export default class BuildTree extends Component {
                                     this.setState({
                                         modelingEl: "",
                                         modelingTabChanged: false,
-                                        currentNodeTypeId:""
+                                        currentNodeTypeId: ""
                                     }, () => {
                                         try {
                                             jexcel.destroy(document.getElementById('modelingJexcel'), true);
@@ -10688,7 +11655,7 @@ export default class BuildTree extends Component {
                                         }
                                         this.setState({
                                             addNodeError: true,
-                                            isValidError: true,
+                                            isValidError: "true",
                                             showMomDataPercent: false,
                                             showMomData: false,
                                             viewMonthlyData: true,
@@ -11347,6 +12314,15 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                                     <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <FormGroup className="col-md-5">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <Input type="textarea"
+                                                                    id="branchTemplateNotes"
+                                                                    name="branchTemplateNotes"
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                    value={this.state.branchTemplateNotes != "" ? this.state.branchTemplateNotes : ""}
+                                                                ></Input>
+                                                            </FormGroup>
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>

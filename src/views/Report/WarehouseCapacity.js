@@ -14,7 +14,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -25,6 +24,11 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+/**
+ * Component for Warehouse Capacity Report.
+ */
 class warehouseCapacity extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +53,10 @@ class warehouseCapacity extends Component {
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
+    /**
+     * Sets the program id in the component state on change and fetches data accordingly.
+     * @param {object} event - The event object containing the target value.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value
@@ -56,6 +64,9 @@ class warehouseCapacity extends Component {
             this.fetchData();
         })
     }
+    /**
+     * This function is used to call either function for country list or program list based on online and offline status
+     */
     componentDidMount() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrylist();
@@ -63,9 +74,9 @@ class warehouseCapacity extends Component {
             this.getPrograms();
         }
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to CSV format.
+     */
     exportCSV() {
         var csvRow = [];
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -82,10 +93,10 @@ class warehouseCapacity extends Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
-        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
+        var A = [addDoubleQuoteToRowContent([(i18n.t('static.region.country')).replaceAll(' ', '%20'), (i18n.t('static.region.region')).replaceAll(' ', '%20'), (i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.region.gln')).replaceAll(' ', '%20'), (i18n.t('static.region.capacitycbm')).replaceAll(' ', '%20')])]
         re = this.state.data;
         for (var item = 0; item < re.length; item++) {
-            A.push(this.addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
+            A.push(addDoubleQuoteToRowContent([(getLabelText(re[item].realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (re[item].programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n').replaceAll(' ', '%20'), re[item].gln == null ? '' : re[item].gln, re[item].capacityCbm]))
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -98,6 +109,10 @@ class warehouseCapacity extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to PDF format.
+     * @param {array} columns - The columns to be included in the PDF.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -183,8 +198,12 @@ class warehouseCapacity extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.warehouseCapacity') + ".pdf")
     }
+    /**
+     * Retrieves the list of countries.
+     */
     getCountrylist() {
         let realmId = AuthenticationService.getRealmId();
+        // Implementation for getting country list
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -243,6 +262,10 @@ class warehouseCapacity extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for country selection.
+     * @param {array} countrysId - The array of selected country IDs.
+     */
     handleChange(countrysId) {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -254,6 +277,10 @@ class warehouseCapacity extends Component {
             this.getPrograms();
         })
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -265,6 +292,9 @@ class warehouseCapacity extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map(ele => ele.value);
@@ -337,6 +367,9 @@ class warehouseCapacity extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         var db1;
         getDatabase();
@@ -389,6 +422,9 @@ class warehouseCapacity extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Fetches report data based on the selected program and country.
+     */ 
     fetchData(e) {
         if (localStorage.getItem("sessionType") === 'Online') {
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
@@ -531,6 +567,9 @@ class warehouseCapacity extends Component {
             }
         }
     }
+    /**
+     * Builds the Jexcel table with the fetched data.
+     */
     buildJexcel = () => {
         let regionList = this.state.data;
         let regionListArray = [];
@@ -550,7 +589,7 @@ class warehouseCapacity extends Component {
         var data = regionListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -575,7 +614,7 @@ class warehouseCapacity extends Component {
                 }
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -601,9 +640,10 @@ class warehouseCapacity extends Component {
             regionEl: regionEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Renders the warehouse capacity report table.
+     * @returns {JSX.Element} - Warehouse capacity report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

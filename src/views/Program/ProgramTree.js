@@ -16,7 +16,7 @@ import {
     Row
 } from 'reactstrap';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { decompressJson, hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
@@ -26,7 +26,11 @@ import cleanUp from '../../assets/img/cleanUp.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.downloadprogram')
+/**
+ * Component used for downloading the programs on local system
+ */
 class Program extends Component {
     constructor(props) {
         super(props);
@@ -48,12 +52,16 @@ class Program extends Component {
             loading: true,
             programList: []
         };
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
+    /**
+     * Fetches more versions of a program from the server.
+     * @param {string} programId - The ID of the program for which more versions are to be fetched.
+     * @param {number} pageNo - The page number of the versions to be fetched.
+     */
     getMoreVersions(programId, pageNo) {
         ProgramService.loadMoreProgramList(programId, pageNo)
             .then(response => {
@@ -72,7 +80,7 @@ class Program extends Component {
                         loading: false,
                         color: "red"
                     }, () => {
-                        this.hideFirstComponent()
+                        hideFirstComponent()
                     })
                 }
             }).catch(
@@ -83,7 +91,7 @@ class Program extends Component {
                             loading: false,
                             color: "red"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -101,7 +109,7 @@ class Program extends Component {
                                     loading: false,
                                     color: "red"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                             case 412:
@@ -110,7 +118,7 @@ class Program extends Component {
                                     loading: false,
                                     color: "red"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                             default:
@@ -119,7 +127,7 @@ class Program extends Component {
                                     loading: false,
                                     color: "red"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                         }
@@ -127,6 +135,10 @@ class Program extends Component {
                 }
             );
     }
+    /**
+     * Checks for newer versions of programs.
+     * @param {Array} programs - An array of programs to check for newer versions.
+     */
     checkNewerVersions(programs) {
         if (localStorage.getItem("sessionType") === 'Online') {
             ProgramService.checkNewerVersions(programs)
@@ -136,13 +148,9 @@ class Program extends Component {
                 })
         }
     }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        clearTimeout(this.state.timeout);
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Calls getLocalPrograms and getPrograms function and load the realm list on component mount
+     */
     componentDidMount() {
         this.getLocalPrograms();
         this.getPrograms();
@@ -165,7 +173,7 @@ class Program extends Component {
                         this.setState({
                             message: response.data.messageCode, loading: false, color: "red"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     }
                 }).catch(
@@ -176,7 +184,7 @@ class Program extends Component {
                                 loading: false,
                                 color: "red"
                             }, () => {
-                                this.hideFirstComponent()
+                                hideFirstComponent()
                             })
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -194,7 +202,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 case 412:
@@ -203,7 +211,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 default:
@@ -212,7 +220,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                             }
@@ -227,6 +235,9 @@ class Program extends Component {
             this.getTree();
         }
     }
+    /**
+     * Retrieves local programs from IndexedDB.
+     */
     getLocalPrograms() {
         var db1;
         getDatabase();
@@ -237,7 +248,7 @@ class Program extends Component {
                 loading: false,
                 color: "red"
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -270,6 +281,9 @@ class Program extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Reterives realm country, load program from server
+     */
     getTree() {
         this.setState({ loading: true })
         document.getElementById("treeDiv").style.display = "block";
@@ -301,7 +315,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                 }
                             }).catch(
@@ -312,7 +326,7 @@ class Program extends Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         })
                                     } else {
                                         switch (error.response ? error.response.status : "") {
@@ -330,7 +344,7 @@ class Program extends Component {
                                                     loading: false,
                                                     color: "red"
                                                 }, () => {
-                                                    this.hideFirstComponent()
+                                                    hideFirstComponent()
                                                 })
                                                 break;
                                             case 412:
@@ -339,7 +353,7 @@ class Program extends Component {
                                                     loading: false,
                                                     color: "red"
                                                 }, () => {
-                                                    this.hideFirstComponent()
+                                                    hideFirstComponent()
                                                 })
                                                 break;
                                             default:
@@ -348,7 +362,7 @@ class Program extends Component {
                                                     loading: false,
                                                     color: "red"
                                                 }, () => {
-                                                    this.hideFirstComponent()
+                                                    hideFirstComponent()
                                                 })
                                                 break;
                                         }
@@ -360,7 +374,7 @@ class Program extends Component {
                             message: response.data.messageCode,
                             loading: false, color: "red"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     }
                 }).catch(
@@ -371,7 +385,7 @@ class Program extends Component {
                                 loading: false,
                                 color: "red"
                             }, () => {
-                                this.hideFirstComponent()
+                                hideFirstComponent()
                             })
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -389,7 +403,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 case 412:
@@ -398,7 +412,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 default:
@@ -407,7 +421,7 @@ class Program extends Component {
                                         loading: false,
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                             }
@@ -420,17 +434,24 @@ class Program extends Component {
                 message: i18n.t('static.common.realmtext'),
                 color: "red"
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
             this.setState({ loading: false });
         }
     }
+    /**
+     * Handles data change events triggered by form inputs.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
         this.getTree();
     };
+    /**
+     * Retrieves programs from the indexedDB.
+     */
     getPrograms() {
         var db1;
         getDatabase();
@@ -440,7 +461,7 @@ class Program extends Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -455,7 +476,7 @@ class Program extends Component {
                     color: 'red',
                     loading: false
                 }, () => {
-                    this.hideFirstComponent()
+                    hideFirstComponent()
                 })
             }.bind(this);
             getRequest.onsuccess = function (event) {
@@ -476,7 +497,17 @@ class Program extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Prompts the user to confirm the deletion of a local version of a program.
+     * If confirmed, deletes the local version from indexedDB and updates the state accordingly.
+     * @param {string} programId - The ID of the program.
+     * @param {string} versionId - The ID of the version.
+     * @param {number} changed - Indicates whether changes are unsaved (1) or not (0).
+     */
     deleteLocalVersion(programId, versionId, changed) {
         confirmAlert({
             title: i18n.t('static.program.confirm'),
@@ -515,7 +546,7 @@ class Program extends Component {
                                             message: "Program delete succesfully.",
                                             color: 'green'
                                         }, () => {
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         })
                                         this.getPrograms();
                                         this.getLocalPrograms();
@@ -531,7 +562,7 @@ class Program extends Component {
                             message: i18n.t('static.actionCancelled'), loading: false, color: "red"
                         })
                         this.setState({ loading: false, color: "red" }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         this.props.history.push(`/program/downloadProgram`)
                     }
@@ -539,6 +570,10 @@ class Program extends Component {
             ]
         })
     }
+    /**
+     * Renders the load program screen.
+     * @returns {JSX.Element} - Load Program screen.
+     */
     render() {
         const { realmList } = this.state;
         let realms = realmList.length > 0
@@ -668,10 +703,19 @@ class Program extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Deletes a program from indexedDB based on its ID.
+     * @param {string} id - The ID of the program to delete.
+     * @param {number} i - The index of the program being deleted.
+     * @param {number} length - The total number of programs to delete.
+     */
     deleteProgramById(id, i, length) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var db1;
@@ -699,7 +743,7 @@ class Program extends Component {
                                 message: "Program delete succesfully.",
                                 color: 'green'
                             }, () => {
-                                this.hideFirstComponent()
+                                hideFirstComponent()
                             })
                             this.getPrograms();
                             this.getLocalPrograms();
@@ -709,6 +753,10 @@ class Program extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Deletes older versions of a program except for the latest one based on the program ID.
+     * @param {string} programId - The ID of the program for which older versions will be deleted.
+     */
     deleteCleanUpIcon(programId) {
         let versionListForSelectedProgram = this.state.prgList.filter(c => c.program.id == programId)[0].versionList;
         let versionListRemoveMaxVersionId = versionListForSelectedProgram.filter(c => c.versionId != Math.max.apply(Math, versionListForSelectedProgram.map(a => a.versionId)));
@@ -736,7 +784,7 @@ class Program extends Component {
                             message: i18n.t('static.actionCancelled'), color: "red", loading: false
                         })
                         this.setState({ loading: false, color: "red" }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         this.props.history.push(`/program/downloadProgram`)
                     }
@@ -744,6 +792,9 @@ class Program extends Component {
             ]
         })
     }
+    /**
+     * Initiates the download process for selected programs and versions and Saves downloaded program data to indexedDB for offline access.
+     */
     downloadClicked() {
         this.setState({ loading: true })
         var programCheckboxes = document.getElementsByName("programCheckBox");
@@ -807,7 +858,7 @@ class Program extends Component {
                 loading: false, color: "red"
             },
                 () => {
-                    this.hideFirstComponent();
+                    hideFirstComponent();
                 })
         }
         else {
@@ -962,7 +1013,7 @@ class Program extends Component {
                                                                     color: 'green',
                                                                     loading: false
                                                                 }, () => {
-                                                                    this.hideFirstComponent()
+                                                                    hideFirstComponent()
                                                                 })
                                                                 this.setState({ loading: false })
                                                                 this.getPrograms();
@@ -979,7 +1030,7 @@ class Program extends Component {
                                                         message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
                                                     })
                                                     this.setState({ loading: false, color: "red" }, () => {
-                                                        this.hideFirstComponent()
+                                                        hideFirstComponent()
                                                     })
                                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                 }
@@ -1056,7 +1107,7 @@ class Program extends Component {
                                                     color: 'green',
                                                     loading: false
                                                 })
-                                                this.hideFirstComponent();
+                                                hideFirstComponent();
                                                 this.setState({ loading: false })
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
@@ -1076,7 +1127,7 @@ class Program extends Component {
                                     loading: false,
                                     color: "red"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -1094,7 +1145,7 @@ class Program extends Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         })
                                         break;
                                     case 412:
@@ -1103,7 +1154,7 @@ class Program extends Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         })
                                         break;
                                     default:
@@ -1112,7 +1163,7 @@ class Program extends Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            this.hideFirstComponent()
+                                            hideFirstComponent()
                                         })
                                         break;
                                 }
@@ -1121,7 +1172,7 @@ class Program extends Component {
                     );
             } else {
                 this.setState({ loading: false, color: "red" }, () => {
-                    this.hideFirstComponent()
+                    hideFirstComponent()
                 })
                 alert(i18n.t('static.common.online'))
             }

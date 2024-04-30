@@ -6,7 +6,14 @@ import { API_URL } from '../../Constants.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+// Localized entity name
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
+/**
+ * Defines the validation schema for data source type details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -14,6 +21,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
+/**
+ * Component for editing data source type details.
+ */
 export default class UpdateDataSourceTypeComponent extends Component {
     constructor(props) {
         super(props);
@@ -41,16 +51,13 @@ export default class UpdateDataSourceTypeComponent extends Component {
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { dataSourceType } = this.state
         if (event.target.name === "label") {
@@ -65,7 +72,9 @@ export default class UpdateDataSourceTypeComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Fetches the data source type details on component mount
+     */
     componentDidMount() {
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             if (response.status == 200) {
@@ -78,7 +87,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -122,12 +131,10 @@ export default class UpdateDataSourceTypeComponent extends Component {
                 }
             );
     }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { dataSourceType } = this.state
-            dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
+    /**
+     * Renders the data source type details form.
+     * @returns {JSX.Element} - Data source type details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -155,7 +162,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -233,7 +240,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={touched.label && !!errors.label || this.state.dataSourceType.label.label_en == ''}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.dataSourceType.label.label_en}
                                                         required />
@@ -304,9 +311,15 @@ export default class UpdateDataSourceTypeComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list data source type screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSourceType/listDataSourceType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the data source type details when reset button is clicked.
+     */
     resetClicked() {
         DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
             this.setState({

@@ -16,7 +16,7 @@ import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCom
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
@@ -24,6 +24,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, dateFormatterCSV, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -93,6 +94,9 @@ const chartoptions =
         }
     }
 }
+/**
+ * Component for Expired Inventory Report.
+ */
 class Budgets extends Component {
     constructor(props) {
         super(props);
@@ -112,7 +116,7 @@ class Budgets extends Component {
             loading: true,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             fundingSourceValues: [],
             fundingSourceLabels: [],
             fundingSources: [],
@@ -123,21 +127,29 @@ class Budgets extends Component {
         this.formatDate = this.formatDate.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.filterData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Retrieves the list of funding sources.
+     */
     getFundingSource = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             DropdownService.getFundingSourceDropdownList()
@@ -188,10 +200,10 @@ class Budgets extends Component {
             this.setState({ loading: false })
         }
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+     */
     handleFundingSourceChange = (fundingSourceIds) => {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -203,12 +215,13 @@ class Budgets extends Component {
             this.filterData()
         })
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV = (columns) => {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         this.state.fundingSourceLabels.map(ele =>
@@ -219,8 +232,8 @@ class Budgets extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDateCSV(ele.startDate), this.formatDateCSV(ele.stopDate)])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -232,6 +245,10 @@ class Budgets extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -262,7 +279,7 @@ class Budgets extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -306,6 +323,9 @@ class Budgets extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.budgetheader') + ".pdf")
     }
+    /**
+     * Fetches and filters data based on selected program, version, funsing source, and date range.
+     */
     filterData() {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -371,6 +391,11 @@ class Budgets extends Component {
             this.setState({ selBudget: [], message: i18n.t('static.fundingSource.selectFundingSource') });
         }
     }
+    /**
+     * Formats a date value into the format 'DD-MMM-YY' (e.g., '20 Jan 22').
+     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
+     * @returns {string} - The formatted date string in the 'DD-MMM-YY' format.
+        */
     formatDate(cell) {
         if (cell != null && cell != "") {
             var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
@@ -379,14 +404,9 @@ class Budgets extends Component {
             return "";
         }
     }
-    formatDateCSV(cell) {
-        if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`);
-            return modifiedDate;
-        } else {
-            return "";
-        }
-    }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -457,15 +477,27 @@ class Budgets extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Calls the get programs and get funding source function on page load
+     */
     componentDidMount() {
         this.getPrograms()
         this.getFundingSource();
     }
+    /**
+     * Formats a numerical value into a string with thousands separators.
+     * @param {*} value - The numerical value to be formatted. 
+     * @returns - The formatted string with thousands separators. 
+     */
     formatterValue = value => {
         if (value != null) {
             return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         }
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram = (programIds) => {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -477,6 +509,12 @@ class Budgets extends Component {
             this.filterData()
         })
     }
+    /**
+     * Filters the options based on the provided filter string and sort the options.
+     * @param {Array} options - The array of options to filter.
+     * @param {string} filter - The filter string to apply.
+     * @returns {Array} - The filtered array of options.
+     */
     filterOptions = async (options, filter) => {
         if (filter) {
             return options.filter((i) =>
@@ -486,6 +524,10 @@ class Budgets extends Component {
             return options;
         }
     };
+    /**
+     * Renders the budget report table.
+     * @returns {JSX.Element} - Budget report table.
+     */
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -655,10 +697,9 @@ class Budgets extends Component {
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
-                                            onChange={this.handleRangeChange}
                                             onDismiss={this.handleRangeDissmis}
                                         >
-                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
@@ -737,6 +778,9 @@ class Budgets extends Component {
             </div >
         )
     }
+    /**
+     * Builds the jexcel table based on the output list.
+     */
     buildJexcel() {
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
@@ -801,7 +845,12 @@ class Budgets extends Component {
             jexcel.destroy(document.getElementById("budgetTable"), true);
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
 }

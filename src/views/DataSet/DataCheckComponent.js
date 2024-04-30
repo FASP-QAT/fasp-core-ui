@@ -10,6 +10,12 @@ import { DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINA
 import { DATE_FORMAT_CAP, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
+/**
+ * Performs data validation and processing based on the provided dataset JSON.
+ * Updates component state with relevant information for further handling.
+ * @param {Object} props - Props object containing necessary properties and methods of parent component.
+ * @param {Object} datasetJson - Dataset JSON containing information to be checked and processed.
+ */
 export function dataCheck(props, datasetJson) {
     var PgmTreeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
     var treeScenarioNotes = [];
@@ -287,6 +293,10 @@ export function dataCheck(props, datasetJson) {
     props.updateState("loading", false)
     props.updateState("consumptionExtrapolationList",consumptionExtrapolationList)
 }
+/**
+ * Builds jExcel table for the provided data and updates component state accordingly.
+ * @param {Object} props - Props object containing necessary properties and methods of parent component.
+ */
 export function buildJxl1(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
@@ -338,6 +348,10 @@ export function buildJxl1(props) {
     props.updateState("loading", false);
     props.updateState("treeScenarioListNotHaving100PerChild", treeScenarioListNotHaving100PerChild);
 }
+/**
+ * Builds jExcel table for the provided data and updates component state accordingly.
+ * @param {Object} props - Props object containing necessary properties and methods of parent component.
+ */
 export function buildJxl(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
@@ -385,7 +399,7 @@ export function buildJxl(props) {
             treeScenarioListFilter[tsl].dataArray = childrenArray;
             var options = {
                 data: childrenArray,
-                columnDrag: true,
+                columnDrag: false,
                 colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columnsArray,
@@ -428,6 +442,10 @@ export function buildJxl(props) {
     props.updateState("loading", false);
     props.updateState("treeScenarioListFilter", treeScenarioListFilter);
 }
+/**
+ * Exports data in PDF file format
+ * @param {Object} props - Props object containing necessary properties and methods of parent component.
+ */
 export function exportPDF(props) {
     const addFooters = doc => {
         const pageCount = doc.internal.getNumberOfPages()
@@ -1092,16 +1110,32 @@ export function exportPDF(props) {
     addFooters(doc)
     doc.save(props.state.programCode + "-" + i18n.t("static.supplyPlan.v") + (props.state.version) + "-" + props.state.pageName + "-" + i18n.t('static.commitTree.forecastValidation') + ".pdf")
 }
+/**
+ * Opens a new window for entering missing months data for the specified planning unit.
+ * @param {string} planningUnitId - The ID of the planning unit for which missing months data is to be entered.
+ * @param {Object} props - Props object containing necessary properties and methods.
+ */
 export function missingMonthsClicked(planningUnitId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
     win.focus();
 }
+/**
+ * Opens a new window for viewing node data with percentage children for the specified tree and scenario.
+ * @param {string} treeId - The ID of the tree.
+ * @param {string} scenarioId - The ID of the scenario.
+ * @param {Object} props - Props object containing necessary properties and methods.
+ */
 export function nodeWithPercentageChildrenClicked(treeId, scenarioId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}/${scenarioId}`, "_blank");
     win.focus();
 }
+/**
+ * Opens a new window for viewing consumption extrapolation notes for the specified planning unit.
+ * @param {string} planningUnitId - The ID of the planning unit.
+ * @param {Object} props - Props object containing necessary properties and methods.
+ */
 export function consumptionExtrapolationNotesClicked(planningUnitId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open("/#/extrapolation/extrapolateData/" + planningUnitId, "_blank");

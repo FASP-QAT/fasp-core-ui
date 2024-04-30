@@ -32,7 +32,11 @@ import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
+/**
+ * Component for list of equivalency unit details.
+ */
 class EquivalancyUnit extends Component {
     constructor(props) {
         super(props);
@@ -91,6 +95,14 @@ class EquivalancyUnit extends Component {
         this.checkValidation1 = this.checkValidation1.bind(this);
         this.onchangepage = this.onchangepage.bind(this)
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
     loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
@@ -99,11 +111,27 @@ class EquivalancyUnit extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when cell value is edited & mark change in row.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     oneditionend1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
         elInstance.setValueFromCoords(9, y, 1, true);
     }
+    /**
+     * Validate cell values on change.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     changed1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
@@ -159,18 +187,30 @@ class EquivalancyUnit extends Component {
         }
         this.setState({ isChanged1: true })
     }.bind(this);
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Hides the message in div3 after 30 seconds i.e inside Manage Equivalency Unit popup.
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -231,6 +271,9 @@ class EquivalancyUnit extends Component {
             }
         }
     }
+    /**
+     * Builds the jexcel component to display Equivalency Unit list on popup.
+     */
     buildJexcel1() {
         var papuList = this.state.equivalancyUnitAllList;
         var data = [];
@@ -260,7 +303,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 70],
             columns: [
                 {
@@ -413,7 +456,8 @@ class EquivalancyUnit extends Component {
                 if (y == null) {
                 } else {
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT_MAPPING')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                        || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -445,6 +489,9 @@ class EquivalancyUnit extends Component {
             () => {
             })
     }
+    /**
+     * This function is used to filter the health area list
+     */
     filterHealthArea = function (instance, cell, c, r, source) {
         var mylist = this.state.technicalAreaList.filter(c => c.id != '' && c.id != null);
         return mylist.sort(function (a, b) {
@@ -453,6 +500,9 @@ class EquivalancyUnit extends Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * Reterives Equivalency unit list from server
+     */
     getEquivalancyUnitAll() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
@@ -521,6 +571,9 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * Toggles the modal open/close state and retrieves equivalency unit data if the modal is opened.
+     */
     modelOpenClose() {
         if (!this.state.isModalOpen) {
             this.getEquivalancyUnitAll();
@@ -532,6 +585,9 @@ class EquivalancyUnit extends Component {
             () => {
             })
     }
+    /**
+     * Builds the jexcel component to display equivalency unit list.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -567,7 +623,7 @@ class EquivalancyUnit extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 50],
             columns: [
                 {
@@ -626,7 +682,7 @@ class EquivalancyUnit extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##',
+                    mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     required: true,
                     number: true,
@@ -712,7 +768,8 @@ class EquivalancyUnit extends Component {
                 if (y == null) {
                 } else {
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                        || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -744,6 +801,9 @@ class EquivalancyUnit extends Component {
             countVar: count
         })
     }
+    /**
+     * This function is used to filter the forecasting unit list based on tracer category
+     */
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.table1Instance.getJson(null, false)[r])[3];
@@ -756,10 +816,16 @@ class EquivalancyUnit extends Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the equivalency unit list based on active
+     */
     filterEquivalancyUnit = function (instance, cell, c, r, source) {
         let mylist = this.state.equivalancyUnitList.filter(c => c.active.toString() == "true");
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the technical area(Health Area) list based on equivalency unit
+     */
     filterTechnicalAreaList = function (instance, cell, c, r, source) {
         var selectedEquivalencyUnitId = (this.state.table1Instance.getJson(null, false)[r])[1];
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
@@ -770,6 +836,9 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the tracer category list based on health area
+     */
     filterTracerCategoryList = function (instance, cell, c, r, source) {
         var selectedHealthAreaId = (this.state.table1Instance.getJson(null, false)[r])[2].toString().split(';');
         let mylist = [];
@@ -781,6 +850,9 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the forecast program list based on the business function
+     */
     filterDataset1 = function (instance, cell, c, r, source) {
         var mylist = this.state.typeList1;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
@@ -788,6 +860,9 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the forecast program list based on the business function
+     */
     filterDataset = function (instance, cell, c, r, source) {
         let mylist = this.state.typeList;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
@@ -804,6 +879,9 @@ class EquivalancyUnit extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * Reterives equivalency unit mapping list from server
+     */
     getEquivalancyUnitMappingData() {
         this.hideSecondComponent();
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
@@ -877,6 +955,9 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * Reterives forecasting unit list based on tracer category Ids from server
+     */
     getForecastingUnitByTracerCategoriesId() {
         let healthAreaList = [];
         let equivalancyUnitList = this.state.equivalancyUnitList;
@@ -969,6 +1050,9 @@ class EquivalancyUnit extends Component {
             }
         );
     }
+    /**
+     * Reterives tracer category list from server
+     */
     getTracerCategory() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -1046,6 +1130,9 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * Reterives unit list from server
+     */
     getUnit() {
         UnitService.getUnitListAll().then(response => {
             if (response.status == 200) {
@@ -1120,6 +1207,9 @@ class EquivalancyUnit extends Component {
             }
         );
     }
+    /**
+     * Reterives forecast program list from server
+     */
     getType() {
         ProgramService.getDataSetList()
             .then(response => {
@@ -1227,6 +1317,9 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * Reterives equivalency unit list from server
+     */
     getEquivalancyUnit() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
@@ -1309,10 +1402,16 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged == true || this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -1320,6 +1419,9 @@ class EquivalancyUnit extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Calls getHealthArea function on component mount
+     */
     componentDidMount() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -1335,6 +1437,9 @@ class EquivalancyUnit extends Component {
                 this.getHealthArea();
             })
     }
+    /**
+     * Reterives health area list from server
+     */
     getHealthArea() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getHealthAreaDropdownList(realmId)
@@ -1412,6 +1517,14 @@ class EquivalancyUnit extends Component {
                 }
             );
     }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell or to update the value
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = this.state.table1Instance;
         var rowData = elInstance.getRowData(y);
@@ -1419,6 +1532,9 @@ class EquivalancyUnit extends Component {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         }
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow1 = function () {
         var elInstance = this.state.table2Instance;
         var json = elInstance.getJson(null, false);
@@ -1438,6 +1554,9 @@ class EquivalancyUnit extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var elInstance = this.state.table1Instance;
         var json = elInstance.getJson(null, false);
@@ -1464,6 +1583,9 @@ class EquivalancyUnit extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit1 = function () {
         var validation = this.checkValidation1();
         var elInstance = this.state.table2Instance
@@ -1570,6 +1692,10 @@ class EquivalancyUnit extends Component {
         } else {
         }
     }
+    /**
+     * Function to check duplicates
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
     checkAndMarkDuplicate() {
         var elInstance = this.state.table1Instance;
         var tableJson = elInstance.getJson(null, false);
@@ -1618,6 +1744,9 @@ class EquivalancyUnit extends Component {
             return false;
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         var elInstance = this.state.table1Instance;
@@ -1711,7 +1840,12 @@ class EquivalancyUnit extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1783,6 +1917,14 @@ class EquivalancyUnit extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         var elInstance = this.state.table1Instance;
         changed(elInstance, cell, x, y, value)
@@ -1825,6 +1967,10 @@ class EquivalancyUnit extends Component {
             isChanged: true,
         }, () => { });
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation1 = function () {
         var valid = true;
         var elInstance = this.state.table2Instance;
@@ -1905,6 +2051,10 @@ class EquivalancyUnit extends Component {
         }
         return valid;
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var elInstance = this.state.table1Instance;
@@ -1926,6 +2076,9 @@ class EquivalancyUnit extends Component {
         }
         return valid;
     }
+    /**
+     * Used to filter the equivalency unit list based on the different filters
+     */
     filterData() {
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
         let typeId = document.getElementById("typeId").value;
@@ -1976,11 +2129,18 @@ class EquivalancyUnit extends Component {
                 () => { this.buildJexcel() });
         }
     }
+    /**
+     * Toggles the showGuidance state between true and false.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Renders the equivalency unit list.
+     * @returns {JSX.Element} - Equivalency unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -2150,6 +2310,9 @@ class EquivalancyUnit extends Component {
             </div>
         )
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))

@@ -16,7 +16,7 @@ import {
     Row
 } from 'reactstrap';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import DatasetService from "../../api/DatasetService";
@@ -26,7 +26,11 @@ import cleanUp from '../../assets/img/cleanUp.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.downloadprogram')
+/**
+ * Component used for downloading the forecast programs on local system
+ */
 class LoadDeleteDataSet extends Component {
     constructor(props) {
         super(props);
@@ -34,7 +38,6 @@ class LoadDeleteDataSet extends Component {
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.state = {
             popoverOpen: false,
             loading: true,
@@ -51,13 +54,17 @@ class LoadDeleteDataSet extends Component {
             loading: true,
             programList: []
         };
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
         this.programCheckboxChecked = this.programCheckboxChecked.bind(this);
     }
+    /**
+     * Handles the checkbox state changes for a specific program.
+     * Disables or enables checkboxes associated with the given program ID based on the main checkbox state.
+     * @param {string} programId - The ID of the program whose checkboxes need to be handled.
+     */
     programCheckboxChecked(programId) {
         var checkBoxValue = document.getElementById('checkbox_442557.0');
         var txtpid = document.getElementsByName("versionCheckBox" + programId);
@@ -72,6 +79,11 @@ class LoadDeleteDataSet extends Component {
             }
         }
     }
+    /**
+     * Fetches more versions of a program from the server.
+     * @param {string} programId - The ID of the program for which more versions are to be fetched.
+     * @param {number} pageNo - The page number of the versions to be fetched.
+     */
     getMoreVersions(programId, pageNo) {
         DatasetService.loadMoreDatasetList(programId, pageNo)
             .then(response => {
@@ -90,7 +102,7 @@ class LoadDeleteDataSet extends Component {
                         loading: false,
                         color: "#BA0C2F"
                     }, () => {
-                        this.hideFirstComponent()
+                        hideFirstComponent()
                     })
                 }
             }).catch(
@@ -101,7 +113,7 @@ class LoadDeleteDataSet extends Component {
                             loading: false,
                             color: "#BA0C2F"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -119,7 +131,7 @@ class LoadDeleteDataSet extends Component {
                                     loading: false,
                                     color: "#BA0C2F"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                             case 412:
@@ -128,7 +140,7 @@ class LoadDeleteDataSet extends Component {
                                     loading: false,
                                     color: "#BA0C2F"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                             default:
@@ -137,7 +149,7 @@ class LoadDeleteDataSet extends Component {
                                     loading: false,
                                     color: "#BA0C2F"
                                 }, () => {
-                                    this.hideFirstComponent()
+                                    hideFirstComponent()
                                 })
                                 break;
                         }
@@ -145,6 +157,10 @@ class LoadDeleteDataSet extends Component {
                 }
             );
     }
+    /**
+     * Checks for newer versions of programs.
+     * @param {Array} programs - An array of programs to check for newer versions.
+     */
     checkNewerVersions(programs) {
         if (localStorage.getItem("sessionType") === 'Online') {
             AuthenticationService.setupAxiosInterceptors()
@@ -155,20 +171,11 @@ class LoadDeleteDataSet extends Component {
                 })
         }
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        clearTimeout(this.state.timeout);
-        this.state.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Calls getLocalPrograms and getPrograms function and load the realm list on component mount
+     */
     componentDidMount() {
-        this.hideSecondComponent()
+        hideSecondComponent()
         this.getLocalPrograms();
         this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
@@ -190,7 +197,7 @@ class LoadDeleteDataSet extends Component {
                         this.setState({
                             message: response.data.messageCode, loading: false, color: "#BA0C2F"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     }
                 }).catch(
@@ -201,7 +208,7 @@ class LoadDeleteDataSet extends Component {
                                 loading: false,
                                 color: "#BA0C2F"
                             }, () => {
-                                this.hideFirstComponent()
+                                hideFirstComponent()
                             })
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -219,7 +226,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 case 412:
@@ -228,7 +235,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 default:
@@ -237,7 +244,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                             }
@@ -252,6 +259,9 @@ class LoadDeleteDataSet extends Component {
             this.getTree();
         }
     }
+    /**
+     * Retrieves local programs from IndexedDB.
+     */
     getLocalPrograms() {
         var db1;
         getDatabase();
@@ -262,7 +272,7 @@ class LoadDeleteDataSet extends Component {
                 loading: false,
                 color: "#BA0C2F"
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -296,6 +306,9 @@ class LoadDeleteDataSet extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Reterives realm country, load program from server
+     */
     getTree() {
         this.setState({ loading: true })
         document.getElementById("treeDiv").style.display = "block";
@@ -319,7 +332,7 @@ class LoadDeleteDataSet extends Component {
                             loading: false,
                             color: "#BA0C2F"
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                     }
                 }).catch(
@@ -330,7 +343,7 @@ class LoadDeleteDataSet extends Component {
                                 loading: false,
                                 color: "#BA0C2F"
                             }, () => {
-                                this.hideFirstComponent()
+                                hideFirstComponent()
                             })
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -348,7 +361,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 case 412:
@@ -357,7 +370,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                                 default:
@@ -366,7 +379,7 @@ class LoadDeleteDataSet extends Component {
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     break;
                             }
@@ -379,22 +392,32 @@ class LoadDeleteDataSet extends Component {
                 message: i18n.t('static.common.realmtext'),
                 color: "#BA0C2F"
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
             this.setState({ loading: false });
         }
     }
+    /**
+     * Toggle tooltips
+     */
     toggletooltip() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
         });
     }
+    /**
+     * Handles data change events triggered by form inputs.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name === "realmId") {
             this.state.realmId = event.target.value;
         }
         this.getTree();
     };
+    /**
+     * Retrieves programs from the indexedDB.
+     */
     getPrograms() {
         var db1;
         getDatabase();
@@ -404,7 +427,7 @@ class LoadDeleteDataSet extends Component {
                 message: i18n.t('static.program.errortext'),
                 color: '#BA0C2F'
             }, () => {
-                this.hideFirstComponent()
+                hideFirstComponent()
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -419,7 +442,7 @@ class LoadDeleteDataSet extends Component {
                     color: '#BA0C2F',
                     loading: false
                 }, () => {
-                    this.hideFirstComponent()
+                    hideFirstComponent()
                 })
             }.bind(this);
             getRequest.onsuccess = function (event) {
@@ -441,7 +464,14 @@ class LoadDeleteDataSet extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Renders the load forecast program screen.
+     * @returns {JSX.Element} - Load forecast Program screen.
+     */
     render() {
         const { realmList } = this.state;
         let realms = realmList.length > 0
@@ -497,8 +527,11 @@ class LoadDeleteDataSet extends Component {
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
-                                                                    this.state.prgList.filter(c =>
-                                                                        c.realmCountry.id == item.realmCountry.id)
+                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).sort(function (a, b) {
+                                                                        a = getLabelText(a.program.label, this.state.lang).toLowerCase();
+                                                                        b = getLabelText(b.program.label, this.state.lang).toLowerCase();
+                                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                                    }.bind(this))
                                                                         .map(item2 => (
                                                                             <li>
                                                                                 <span className="tree_label">
@@ -564,10 +597,19 @@ class LoadDeleteDataSet extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.loadDelDataset.loadDeleteDatasetSctionCancell'));
     }
+    /**
+     * Deletes a program from indexedDB based on its ID.
+     * @param {string} id - The ID of the program to delete.
+     * @param {number} i - The index of the program being deleted.
+     * @param {number} length - The total number of programs to delete.
+     */
     deleteProgramById(id, i, length) {
         var db1;
         getDatabase();
@@ -590,7 +632,7 @@ class LoadDeleteDataSet extends Component {
                             message: "Dataset delete succesfully.",
                             color: 'green'
                         }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         this.getPrograms();
                         this.getLocalPrograms();
@@ -599,6 +641,10 @@ class LoadDeleteDataSet extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Deletes older versions of a program except for the latest one based on the program ID.
+     * @param {string} programId - The ID of the program for which older versions will be deleted.
+     */
     deleteCleanUpIcon(programId) {
         let versionListForSelectedProgram = this.state.prgList.filter(c => c.program.id == programId)[0].versionList;
         let versionListRemoveMaxVersionId = versionListForSelectedProgram.filter(c => c.versionId != Math.max.apply(Math, versionListForSelectedProgram.map(a => a.versionId)));
@@ -626,7 +672,7 @@ class LoadDeleteDataSet extends Component {
                             message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
                         })
                         this.setState({ loading: false, color: "#BA0C2F" }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         this.props.history.push(`/dataSet/loadDeleteDataSet`)
                     }
@@ -634,6 +680,13 @@ class LoadDeleteDataSet extends Component {
             ]
         })
     }
+    /**
+     * Prompts the user to confirm the deletion of a local version of a program.
+     * If confirmed, deletes the local version from indexedDB and updates the state accordingly.
+     * @param {string} programId - The ID of the program.
+     * @param {string} versionId - The ID of the version.
+     * @param {number} changed - Indicates whether changes are unsaved (1) or not (0).
+     */
     deleteLocalVersion(programId, versionId, changed) {
         confirmAlert({
             title: i18n.t('static.program.confirm'),
@@ -668,7 +721,7 @@ class LoadDeleteDataSet extends Component {
                                         message: "Dataset delete succesfully.",
                                         color: 'green'
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                     this.getPrograms();
                                     this.getLocalPrograms();
@@ -683,7 +736,7 @@ class LoadDeleteDataSet extends Component {
                             message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
                         })
                         this.setState({ loading: false, color: "#BA0C2F" }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         this.props.history.push(`/dataSet/loadDeleteDataSet`)
                     }
@@ -691,6 +744,9 @@ class LoadDeleteDataSet extends Component {
             ]
         })
     }
+    /**
+     * Initiates the download process for selected programs and versions and Saves downloaded program data to indexedDB for offline access.
+     */
     downloadClicked() {
         this.setState({ loading: true })
         var db1;
@@ -770,7 +826,7 @@ class LoadDeleteDataSet extends Component {
                         loading: false, color: "#BA0C2F"
                     },
                         () => {
-                            this.hideFirstComponent();
+                            hideFirstComponent();
                         })
                 } else {
                     var continueToLoad = 0;
@@ -886,7 +942,7 @@ class LoadDeleteDataSet extends Component {
                                                         color: 'green',
                                                         loading: false
                                                     }, () => {
-                                                        this.hideFirstComponent()
+                                                        hideFirstComponent()
                                                     })
                                                     this.setState({ loading: false })
                                                     this.getPrograms();
@@ -902,7 +958,7 @@ class LoadDeleteDataSet extends Component {
                                         message: i18n.t("static.program.errortext"),
                                         color: "red"
                                     }, () => {
-                                        this.hideFirstComponent()
+                                        hideFirstComponent()
                                     })
                                 })
                         } else {
@@ -910,7 +966,7 @@ class LoadDeleteDataSet extends Component {
                         }
                     } else {
                         this.setState({ loading: false, color: "#BA0C2F" }, () => {
-                            this.hideFirstComponent()
+                            hideFirstComponent()
                         })
                         alert(i18n.t('static.common.online'))
                     }

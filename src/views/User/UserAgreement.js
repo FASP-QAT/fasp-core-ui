@@ -4,6 +4,9 @@ import { API_URL } from '../../Constants';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+/**
+ * This component is used to show the end user liceance agreement for the users who are logging in for the first time
+ */
 export default class UserAgreementComponent extends Component {
     constructor(props) {
         super(props);
@@ -14,6 +17,9 @@ export default class UserAgreementComponent extends Component {
         this.accept = this.accept.bind(this);
         this.decline = this.decline.bind(this);
     }
+    /**
+     * This function is called when user accepts the user agreement
+     */
     accept() {
 
         UserService.acceptUserAgreement().then(response => {
@@ -60,11 +66,18 @@ export default class UserAgreementComponent extends Component {
             }
         );
     }
+    /**
+     * This function is called when user decline the user agreement
+     */
     decline() {
         let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "user-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sessionType"];
         keysToRemove.forEach(k => localStorage.removeItem(k));
         this.props.history.push(`/login`)
     }
+    /**
+     * This is used to display the content
+     * @returns This returns user agreement screen
+     */
     render() {
         return (
             <div className="animated fadeIn">

@@ -11,6 +11,9 @@ import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, ACTUAL_CONSUMPTION_MODIFIED, ACTUA
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+/**
+ * This component is used to display the consumption data in the form of table for supply plan, scenario planning, supply planning comparision and supply plan version and review screen
+ */
 export default class ConsumptionInSupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -37,6 +40,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             consumptionBatchInfoTableEl: ""
         }
     }
+    /**
+     * This function is used to update the data when some records are pasted in the consumption sheet
+     * @param {*} instance This is the sheet where the data is being placed
+     * @param {*} data This is the data that is being pasted
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -68,6 +76,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to update the data when some records are pasted in the consumption batch info sheet
+     * @param {*} instance This is the sheet where the data is being placed
+     * @param {*} data This is the data that is being pasted
+     */
     onPasteForBatchInfo(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -83,8 +96,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    componentDidMount() {
-    }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -94,6 +113,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
         }
     }
+    /**
+     * This function is used to build the Jexcel table with all the data based on the filters and based on all the dropdowns
+     */
     showConsumptionData() {
         var realmId = AuthenticationService.getRealmId();
         var planningUnitId = document.getElementById("planningUnitId").value;
@@ -281,7 +303,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
                     var options = {
                         data: consumptionDataArr,
-                        columnDrag: true,
+                        columnDrag: false,
                         columns: [
                             { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
@@ -335,7 +357,101 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         onsearch: function (el) {
                         },
                         onfilter: function (el) {
-                        },
+                            var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var j = 0; j < jsonLength; j++) {
+                    try {
+                        var rowData = elInstance.getRowData(j);
+                        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                var lastEditableDate = "";
+                if (rowData[2] == 1) {
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+                } else {
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+                }
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[15] > 0) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    }
+                }else{
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
+                } else {
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                    if (rowData[10] == false) {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                            cell.classList.add('shipmentEntryDoNotInclude');
+                        }
+                    } else {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                            cell.classList.remove('shipmentEntryDoNotInclude');
+                        }
+                    }
+                }
+            } else {
+                if (rowData[2] == 2) {
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.remove('readonly');
+                }
+                if (rowData[15] > 0) {
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.remove('readonly');
+                }
+                if (rowData[10] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
+            }
+                    } catch (err) {
+                    }
+                }
+                        }.bind(this),
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y != null) {
@@ -388,6 +504,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }.bind(this);
     }.bind(this);
     }
+    /**
+     * This function is used when user clicks on the show batch details for a particular consumption record
+     * @param {*} obj This is the sheet where the data is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} e This is mouse event handler
+     * @param {*} consumptionEditable This is the value of the flag that indicates whether table should be editable or not
+     */
     batchDetailsClicked(obj, x, y, e, consumptionEditable) {
         this.props.updateState("loading", true);
         var rowData = obj.getRowData(y);
@@ -471,7 +595,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
@@ -544,6 +668,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.setState({ consumptionBatchInfoTableEl: elVar });
         this.props.updateState("loading", false);
     }
+    /**
+     * This function is used when users click on the add row in the consumption table
+     */
     addRowInJexcel() {
         var obj = this.state.consumptionEl;
         var json = obj.getJson(null, false);
@@ -580,6 +707,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used when users click on the add row in the consumption batch table
+     */
     addBatchRowInJexcel() {
         var obj = this.state.consumptionBatchInfoTableEl;
         var rowData = obj.getRowData(0);
@@ -592,7 +722,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[5] = rowData[5];
         obj.insertRow(data);
     }
-    loadedConsumption = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the consumption table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedConsumption = function (instance, cell) {
         if (this.props.consumptionPage != "consumptionDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -710,6 +845,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -810,6 +951,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to filter the data source list based on consumption type and active flag
+     */
     filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source, conf) {
         var mylist = [];
         var value = (this.state.consumptionEl.getJson(null, false)[r])[2];
@@ -824,6 +968,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the alternate reporting unit list based on active flag
+     */
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
         return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -831,12 +978,25 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this);
+    /**
+     * This function is used when some value of the formula cell is changed
+     * @param {*} instance This is the object of the DOM element
+     * @param {*} executions This is object of the formula cell that is being edited
+     */
     formulaChanged = function (instance, executions) {
         var executions = executions;
         for (var e = 0; e < executions.length; e++) {
             this.consumptionChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
+    /**
+     * This function is called when something in the consumption table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
         var rowData = elInstance.getRowData(y);
@@ -1027,6 +1187,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to filter the batch list based on expiry date and created date
+     */
     filterBatchInfoForExistingDataForConsumption = function (instance, cell, c, r, source) {
         var mylist = [];
         var json = this.state.consumptionBatchInfoTableEl.getJson(null, false)
@@ -1034,13 +1197,26 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
-    loadedBatchInfoConsumption = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the consumption batch info table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedBatchInfoConsumption = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when something in the consumption batch info table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     batchInfoChangedConsumption = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionBatchInfoTableEl;
         var rowData = elInstance.getRowData(y);
@@ -1063,6 +1239,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         }
     }
+    /**
+     * This function is called before saving the consumption batch info to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationConsumptionBatchInfo() {
         var valid = true;
         var elInstance = this.state.consumptionBatchInfoTableEl;
@@ -1116,6 +1296,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the consumption batch info is clicked and is used to save consumption batch info if all the data is successfully validated.
+     */
     saveConsumptionBatchInfo() {
         this.props.updateState("loading", true);
         var validation = this.checkValidationConsumptionBatchInfo();
@@ -1183,6 +1366,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             this.props.hideThirdComponent();
         }
     }
+    /**
+     * This function is called before saving the consumption data to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationConsumption() {
         var valid = true;
         var elInstance = this.state.consumptionEl;
@@ -1336,6 +1523,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the consumption is clicked and is used to save consumption if all the data is successfully validated.
+     */
     saveConsumption() {
         this.props.updateState("consumptionError", "");
         this.props.updateState("loading", true);

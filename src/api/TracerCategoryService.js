@@ -2,15 +2,15 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class TracerCategoryService {
     addTracerCategory(json) {
-        return axios.post(`${API_URL}/api/tracerCategory/`, json, {}
+        return axios.post(`${API_URL}/api/tracerCategory`, json, {}
         );
     }
     getTracerCategoryListAll() {
-        return axios.get(`${API_URL}/api/tracerCategory/`, {
+        return axios.get(`${API_URL}/api/tracerCategory`, {
         });
     }
     updateTracerCategory(json) {
-        return axios.put(`${API_URL}/api/tracerCategory/`, json, {
+        return axios.put(`${API_URL}/api/tracerCategory`, json, {
         });
     }
     getTracerCategoryById(json) {
@@ -22,7 +22,7 @@ class TracerCategoryService {
         );
     }
     getTracerCategoryByProgramIds(realmId, programIds) {
-        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds/`, programIds, {}
+        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds`, programIds, {}
         );
     }
 }

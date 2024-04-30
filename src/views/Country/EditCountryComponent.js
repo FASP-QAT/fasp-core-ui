@@ -9,13 +9,20 @@ import CurrencyService from '../../api/CurrencyService.js';
 import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.country.countryMaster');
+// Initial values for form fields
 let initialValues = {
     label: '',
     countryCode: '',
     countryCode2: '',
     currencyId: '',
 }
+/**
+ * Defines the validation schema for country details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -31,6 +38,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.country.currencytext')),
     })
 }
+/**
+ * Component for editing country details.
+ */
 export default class UpdateCountryComponent extends Component {
     constructor(props) {
         super(props);
@@ -61,17 +71,33 @@ export default class UpdateCountryComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
     }
+    /**
+     * Changes the loader value
+     * @param {*} loading 
+     */
     changeLoading(loading) {
+        //this method is not called
         this.setState({ loading: loading })
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Changes the message value
+     * @param {*} message 
+     */
     changeMessage(message) {
         this.setState({ message: message })
     }
+    /**
+     * Handles data change in the country form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { country } = this.state
         if (event.target.name === "label") {
@@ -95,8 +121,11 @@ export default class UpdateCountryComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Fetches Country details and Currency list on component mount.
+     */
     componentDidMount() {
+        //Fetch country details by countryId to show on form
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -111,9 +140,11 @@ export default class UpdateCountryComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
+            //Fetch active currency list
             CurrencyService.getCurrencyListActive().then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
+                    console.log('listArray: '+JSON.stringify(listArray));
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
@@ -208,12 +239,20 @@ export default class UpdateCountryComponent extends Component {
                 }
             );
     }
+    /**
+     * Capitalizes the first letter of the country name.
+     * @param {string} str - The country name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { country } = this.state
             country.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
+    /**
+     * Renders the country details form.
+     * @returns {JSX.Element} - country details form.
+     */
     render() {
         const { currencyList } = this.state;
         let currencyItems = currencyList.length > 0
@@ -434,14 +473,22 @@ export default class UpdateCountryComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list country screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/country/listCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the country details form when reset button is clicked. Also fetches active currency list
+     */
     resetClicked() {
+        //Fetch country details by countryId
         CountryService.getCountryById(this.props.match.params.countryId).then(response => {
             this.setState({
                 country: response.data
             });
+            //Fetch active language list
             LanguageService.getLanguageListActive().then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -492,6 +539,7 @@ export default class UpdateCountryComponent extends Component {
                         }
                     }
                 );
+            //Fetch active currency list    
             CurrencyService.getCurrencyListActive().then(response => {
                 if (response.status == 200) {
                     this.setState({

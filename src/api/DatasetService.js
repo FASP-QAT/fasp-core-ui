@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DatasetService {
     loadDataset() {
-        return axios.get(`${API_URL}/api/loadDataset/`, {
+        return axios.get(`${API_URL}/api/loadDataset`, {
         });
     }
     loadMoreDatasetList(programId, page) {
@@ -14,7 +14,7 @@ class DatasetService {
         });
     }
     getTreeTemplateList() {
-        return axios.get(`${API_URL}/api/treeTemplate/`, {
+        return axios.get(`${API_URL}/api/treeTemplate`, {
         });
     }
     getTreeTemplateById(treeTemplateId) {

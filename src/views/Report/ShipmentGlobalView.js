@@ -1,5 +1,4 @@
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
@@ -19,25 +18,20 @@ import {
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import FundingSourceService from '../../api/FundingSourceService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import ProductService from '../../api/ProductService';
-import ProgramService from '../../api/ProgramService';
-import RealmService from '../../api/RealmService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
-const pickerLang = {
-    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-    from: 'From', to: 'To',
-}
 const backgroundColor = [
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -47,6 +41,9 @@ const backgroundColor = [
     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
 ]
+/**
+ * Component for Shipment Global View Report.
+ */
 class ShipmentGlobalView extends Component {
     constructor(props) {
         super(props);
@@ -100,7 +97,7 @@ class ShipmentGlobalView extends Component {
             viewby: 1,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: [],
             puUnit: {
@@ -111,7 +108,6 @@ class ShipmentGlobalView extends Component {
         };
         this.getCountrys = this.getCountrys.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.handleChange = this.handleChange.bind(this)
@@ -119,16 +115,12 @@ class ShipmentGlobalView extends Component {
         this.getProductCategories = this.getProductCategories.bind(this)
         this.filterProgram = this.filterProgram.bind(this);
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.countryLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
@@ -169,10 +161,10 @@ class ShipmentGlobalView extends Component {
             for (var i = 0; i < tableHead.length; i++) {
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
+            A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.table1Body
             for (var item = 0; item < re.length; item++) {
-                A.push([[('"' + getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20') + '"', this.addDoubleQuoteToRowContent(re[item].amount)]])
+                A.push([[('"' + getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20') + '"', addDoubleQuoteToRowContent(re[item].amount)]])
             }
             for (var i = 0; i < A.length; i++) {
                 csvRow.push(A[i].join(","))
@@ -190,10 +182,10 @@ class ShipmentGlobalView extends Component {
             } else if (viewby == 3) {
                 tempLabel = i18n.t('static.dashboard.procurementagentType');
             }
-            var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
+            var B = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
             for (var item = 0; item < re.length; item++) {
-                B.push([this.addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
+                B.push([addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
             }
             for (var i = 0; i < B.length; i++) {
                 csvRow.push(B[i].join(","))
@@ -203,10 +195,13 @@ class ShipmentGlobalView extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentGlobalViewheader') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentGlobalViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -237,7 +232,7 @@ class ShipmentGlobalView extends Component {
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
@@ -281,8 +276,8 @@ class ShipmentGlobalView extends Component {
             }
         }
         const unit = "pt";
-        const size = "A4"; 
-        const orientation = "landscape"; 
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(10);
@@ -343,6 +338,10 @@ class ShipmentGlobalView extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.shipmentGlobalViewheader').concat('.pdf'));
     }
+    /**
+     * Handles the change event for program selection.
+     * @param {array} programIds - The array of selected program IDs.
+     */
     handleChangeProgram(programIds) {
         this.getProcurementAgent(programIds.map(ele => ele.value));
         programIds = programIds.sort(function (a, b) {
@@ -355,6 +354,9 @@ class ShipmentGlobalView extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Retrieves the list of countries based on the realm ID and updates the state with the list.
+     */
     getCountrys() {
         this.setState({
             loading: true
@@ -364,8 +366,8 @@ class ShipmentGlobalView extends Component {
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -414,6 +416,9 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
+    /**
+     * Retrieves the list of planning units for a selected product category.
+     */
     getPlanningUnit() {
         this.setState({ loading: true })
         let productCategoryId = document.getElementById("productCategoryId").value;
@@ -421,7 +426,7 @@ class ShipmentGlobalView extends Component {
         if (productCategoryId != -1) {
             PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
                 (response.data).sort(function (a, b) {
-                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); 
+                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang));
                 });
                 this.setState({
                     planningUnits: response.data, loading: false
@@ -473,6 +478,9 @@ class ShipmentGlobalView extends Component {
             );
         }
     }
+    /**
+     * Toggles the view based on the selected option.
+     */
     toggleView = () => {
         let viewby = document.getElementById("viewById").value;
         this.setState({
@@ -507,11 +515,17 @@ class ShipmentGlobalView extends Component {
             })
         }
     }
+    /**
+     * Calls the get countrys function on page load
+     */
     componentDidMount() {
         this.getCountrys();
         document.getElementById("procurementAgentDiv").style.display = "none";
         document.getElementById("procurementAgentTypeDiv").style.display = "none";
     }
+    /**
+     * Retrieves the list of planning units for a selected programs.
+     */
     getProcurementAgent = (programIds) => {
         this.setState({ loading: true })
         var programJson = programIds
@@ -519,8 +533,8 @@ class ShipmentGlobalView extends Component {
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.code.toUpperCase(); 
-                    var itemLabelB = b.code.toUpperCase(); 
+                    var itemLabelA = a.code.toUpperCase();
+                    var itemLabelB = b.code.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -553,6 +567,9 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
+    /**
+     * Retrieves the list of procurement agent types.
+     */
     getProcurementAgentType = () => {
         this.setState({ loading: true })
         ProcurementAgentService.getProcurementAgentTypeListAll()
@@ -560,8 +577,8 @@ class ShipmentGlobalView extends Component {
                 let realmId = AuthenticationService.getRealmId();
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -594,14 +611,17 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
+    /**
+     * Retrieves the list of funding sources.
+     */
     getFundingSource = () => {
         this.setState({ loading: true })
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.fundingSourceCode.toUpperCase(); 
-                    var itemLabelB = b.fundingSourceCode.toUpperCase(); 
+                    var itemLabelA = a.fundingSourceCode.toUpperCase();
+                    var itemLabelB = b.fundingSourceCode.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -650,6 +670,9 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
+    /**
+     * Retrieves the list of product categories based on the realm ID and updates the state with the list.
+     */
     getProductCategories() {
         this.setState({
             loading: true
@@ -658,11 +681,11 @@ class ShipmentGlobalView extends Component {
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 var list = response.data;
-                list.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); 
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                // list.sort((a, b) => {
+                //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); 
+                //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); 
+                //     return itemLabelA > itemLabelB ? 1 : -1;
+                // });
                 this.setState({
                     productCategories: list, loading: false
                 }, () => { this.getFundingSource(); })
@@ -709,18 +732,30 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
         this.fetchData();
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()
@@ -956,6 +991,10 @@ class ShipmentGlobalView extends Component {
             });
         }
     }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {Array} procurementAgentIds - An array containing the selected procurement agent IDs.
+     */
     handleProcurementAgentChange(procurementAgentIds) {
         procurementAgentIds = procurementAgentIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -971,6 +1010,10 @@ class ShipmentGlobalView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Handles the change event for procurement agent types.
+     * @param {Array} procurementAgentTypeIds - An array containing the selected procurement agent type IDs.
+     */
     handleProcurementAgentTypeChange(procurementAgentTypeIds) {
         procurementAgentTypeIds = procurementAgentTypeIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -986,6 +1029,10 @@ class ShipmentGlobalView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+     */
     handleFundingSourceChange(fundingSourceIds) {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1001,6 +1048,10 @@ class ShipmentGlobalView extends Component {
             this.fetchData();
         })
     }
+    /**
+     * Handles the change event for countries.
+     * @param {Array} countrysId - An array containing the selected country IDs.
+     */
     handleChange(countrysId) {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1012,6 +1063,9 @@ class ShipmentGlobalView extends Component {
             this.filterProgram();
         })
     }
+    /**
+     * Filters programs based on selected countries.
+     */
     filterProgram = () => {
         let countryIds = this.state.countryValues.map(ele => ele.value);
         this.setState({
@@ -1027,8 +1081,8 @@ class ShipmentGlobalView extends Component {
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.code.toUpperCase(); 
-                            var itemLabelB = b.code.toUpperCase(); 
+                            var itemLabelA = a.code.toUpperCase();
+                            var itemLabelB = b.code.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         if (listArray.length > 0) {
@@ -1095,33 +1149,10 @@ class ShipmentGlobalView extends Component {
             }
         })
     }
-    dateFormatterLanguage = value => {
-        if (moment(value).format('MM') === '01') {
-            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '02') {
-            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '03') {
-            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '04') {
-            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '05') {
-            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '06') {
-            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '07') {
-            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '08') {
-            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '09') {
-            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '10') {
-            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-        } else if (moment(value).format('MM') === '11') {
-            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-        } else {
-            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-        }
-    }
+    /**
+     * Renders the Shipment Global View report table.
+     * @returns {JSX.Element} - Shipment Global View report table.
+     */
     render() {
         const { planningUnits } = this.state;
         let planningUnitList = [];
@@ -1434,7 +1465,7 @@ class ShipmentGlobalView extends Component {
         var bar1 = []
         const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
         bar1 = {
-            labels: [...new Set(this.state.dateSplitList.map(ele => (this.dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
+            labels: [...new Set(this.state.dateSplitList.map(ele => (dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
         }
         return (
@@ -1468,7 +1499,6 @@ class ShipmentGlobalView extends Component {
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
-                                                    onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

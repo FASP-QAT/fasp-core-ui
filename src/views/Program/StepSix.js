@@ -20,6 +20,7 @@ import step4 from '../../assets/img/4-step.png';
 import step5 from '../../assets/img/5-step.png';
 import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
+// Initial values for form fields
 const initialValuesSix = {
     programName: '',
     userId: '',
@@ -37,6 +38,11 @@ const initialValuesSix = {
     programCode: '',
     programCode1: ''
 }
+/**
+ * Defines the validation schema for step six of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
@@ -87,7 +93,7 @@ const validationSchemaSix = function (values) {
         programCode1: Yup.string()
             .test('programCode', i18n.t('static.programValidation.programCode'),
                 function (value) {
-                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                    if (parseInt(document.getElementById("programCode").value.length + (value ? value.length : 0)) > MAX_PROGRAM_CODE_LENGTH) {
                         return false;
                     } else {
                         return true;
@@ -95,6 +101,9 @@ const validationSchemaSix = function (values) {
                 }),
     })
 }
+/**
+ * Component for program Onboarding step six for taking the program details
+ */
 export default class StepSix extends Component {
     constructor(props) {
         super(props);
@@ -102,9 +111,9 @@ export default class StepSix extends Component {
             programManagerList: []
         }
     }
-    
-    componentDidMount() {
-    }
+    /**
+     * Reterived the program managers list from server
+     */
     getProgramManagerList() {
         ProgramService.getProgramManagerList(this.props.items.program.realm.realmId)
             .then(response => {
@@ -125,6 +134,10 @@ export default class StepSix extends Component {
                 }
             })
     }
+    /**
+     * Renders the program onboarding step six screen.
+     * @returns {JSX.Element} - Program onboarding step six screen.
+     */
     render() {
         const { programManagerList } = this.state;
         let programManagers = programManagerList.length > 0

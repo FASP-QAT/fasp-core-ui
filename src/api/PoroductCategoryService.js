@@ -6,7 +6,7 @@ class ProductCategoryService {
         );
     }
     addProductCategory(json) {
-        return axios.put(`${API_URL}/api/productCategory/`, json, {}
+        return axios.put(`${API_URL}/api/productCategory`, json, {}
         );
     }
 }

@@ -7,13 +7,15 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-
+/**
+ * Component for Import from QAT supply plan step two for the import
+ */
 export default class StepTwoImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -30,10 +32,16 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -41,6 +49,9 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Builds the json for region data
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -66,6 +77,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         } else {
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -92,6 +107,14 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
         if (x == 3) {
@@ -113,11 +136,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             }
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
-    componentDidMount() {
-    }
+    /**
+     * Filters and sets data based on the selected program and forecast program.
+     * Retrieves program and dataset information from component props.
+     * Sets the program region list, forecast program region list, and source data.
+     * Updates the component's state accordingly and triggers the building of the Jexcel component.
+     */
     filterData() {
         let programId = this.props.items.programId
         let forecastProgramId = this.props.items.forecastProgramId
@@ -135,6 +159,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 this.buildJexcel();
             })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -172,7 +200,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100],
             columns: [
                 {
@@ -239,7 +267,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -253,6 +281,9 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
+    /**
+     * Build options for import and do not import region dropdown
+     */
     filterImport = function (instance, cell, c, r, source) {
         var mylist = [
             { id: 1, name: i18n.t('static.importFromQATSupplyPlan.Import') },
@@ -260,6 +291,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         ];
         return mylist;
     }.bind(this)
+    /**
+     * Renders the import from QAT supply plan step two screen.
+     * @returns {JSX.Element} - Import from QAT supply plan step two screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -274,7 +309,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
                 <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-                    <div id="mapRegion">
+                    <div id="mapRegion" style={{width:'100%'}}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

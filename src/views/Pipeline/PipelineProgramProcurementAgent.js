@@ -8,6 +8,9 @@ import PipelineService from '../../api/PipelineService.js';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import procurement agent details
+ */
 export default class PipelineProgramProcurementAgent extends Component {
     constructor(props) {
         super(props);
@@ -23,12 +26,21 @@ export default class PipelineProgramProcurementAgent extends Component {
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.procurementAgentList;
         var json = this.el.getJson(null, false);
@@ -45,6 +57,14 @@ export default class PipelineProgramProcurementAgent extends Component {
             }
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
             var json = this.el.getJson(null, false);
@@ -59,6 +79,10 @@ export default class PipelineProgramProcurementAgent extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var reg = /^[0-9\b]+$/;
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
@@ -80,6 +104,9 @@ export default class PipelineProgramProcurementAgent extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveProcurementAgent() {
         var list = this.state.procurementAgentList;
         var json = this.el.getJson(null, false);
@@ -100,6 +127,9 @@ export default class PipelineProgramProcurementAgent extends Component {
         }
         return procurementAgentArray;
     }
+    /**
+     * Reterives procurement agent list on component mount
+     */
     componentDidMount() {
         var ProcurementAgentListQat = [];
         ProcurementAgentService.getProcurementAgentListAll()
@@ -138,7 +168,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [250, 250],
                                         columns: [
                                             {
@@ -265,9 +295,18 @@ export default class PipelineProgramProcurementAgent extends Component {
                 }
             );
     }
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunction = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Renders the pipeline program import procurement agent details screen.
+     * @returns {JSX.Element} - Pipeline program import procurement agent details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -20,7 +20,14 @@ import i18n from '../../i18n';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = 'Tree Template';
+/**
+ * Defines the validation schema for tree template.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         treeTemplateName: Yup.string()
@@ -28,6 +35,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.tree.templateNameRequired')),
     })
 }
+/**
+ * Defines the validation schema for tree details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaCreateTree = function (values) {
     return Yup.object().shape({
         datasetIdModal: Yup.string()
@@ -56,10 +68,10 @@ const validationSchemaCreateTree = function (values) {
             .typeError(i18n.t('static.common.regiontext')),
     })
 }
-const initialValues = {
-    treeTemplateName: "",
-}
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+/**
+ * Component for list tree template
+ */
 export default class ListTreeTemplate extends Component {
     constructor(props) {
         super(props);
@@ -98,7 +110,6 @@ export default class ListTreeTemplate extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: ''
         }
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.addTreeTemplate = this.addTreeTemplate.bind(this);
         this.copyDeleteTree = this.copyDeleteTree.bind(this);
@@ -110,14 +121,20 @@ export default class ListTreeTemplate extends Component {
         this.saveMissingPUs = this.saveMissingPUs.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.hideThirdComponent=this.hideThirdComponent.bind(this);
+        this.hideThirdComponent = this.hideThirdComponent.bind(this);
     }
+    /**
+     * Hides the message in div3 after 30 seconds.
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Toggle modal for create tree
+     */
     modelOpenCloseCreateTree() {
         this.setState({
             isModalCreateTree: !this.state.isModalCreateTree,
@@ -138,7 +155,9 @@ export default class ListTreeTemplate extends Component {
             treeTemplate: {}
         })
     }
-   
+    /**
+     * Reterives tree template list
+     */
     getTreeTemplateList() {
         DatasetService.getTreeTemplateList().then(response => {
             var treeTemplateList = response.data.sort((a, b) => {
@@ -248,11 +267,18 @@ export default class ListTreeTemplate extends Component {
                 }
             );
     }
+    /**
+     * Toggle model for tree template
+     */
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name == "treeTemplateName") {
             this.setState({
@@ -301,6 +327,10 @@ export default class ListTreeTemplate extends Component {
             });
         }
     };
+    /**
+     * Retrives region list for forecast program Id
+     * @param {String} datasetId Forecast program Id
+     */
     getRegionList(datasetId) {
         var regionList = [];
         var regionMultiList = [];
@@ -338,6 +368,9 @@ export default class ListTreeTemplate extends Component {
             });
         }
     }
+    /**
+     * Function to find missing planning units while create tree from tree template
+     */
     findMissingPUs() {
         var missingPUList = [];
         var json;
@@ -417,6 +450,10 @@ export default class ListTreeTemplate extends Component {
             this.buildMissingPUJexcel();
         });
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildMissingPUJexcel() {
         this.getPlanningUnitWithPricesByIds();
         var missingPUList = this.state.missingPUList;
@@ -453,7 +490,7 @@ export default class ListTreeTemplate extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -609,6 +646,14 @@ export default class ListTreeTemplate extends Component {
         }
         );
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 18) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
@@ -829,7 +874,12 @@ export default class ListTreeTemplate extends Component {
             isChanged1: true,
         });
     }
-    loadedMissingPU = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedMissingPU = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -846,6 +896,9 @@ export default class ListTreeTemplate extends Component {
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
     }
+    /**
+     * Reterives planning unit list with procurement agent price
+     */
     getPlanningUnitWithPricesByIds() {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
@@ -889,6 +942,9 @@ export default class ListTreeTemplate extends Component {
                 }
             );
     }
+    /**
+     * Reterives procurement agent list
+     */
     procurementAgentList() {
         const lan = 'en';
         var db1;
@@ -904,7 +960,7 @@ export default class ListTreeTemplate extends Component {
                     message: 'unknown error occured', loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             };
             procurementAgentRequest.onsuccess = function (e) {
@@ -942,6 +998,10 @@ export default class ListTreeTemplate extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -1097,6 +1157,9 @@ export default class ListTreeTemplate extends Component {
         }
         return valid;
     }
+    /**
+     * Saves missing planning units on submission
+     */
     saveMissingPUs() {
         var validation = this.checkValidation();
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1152,7 +1215,7 @@ export default class ListTreeTemplate extends Component {
                         "consumptionDataType": 2,
                         "otherUnit": map1.get("15") == "" ? null : map1.get("15"),
                         "selectedForecastMap": map1.get("14"),
-                        "createdBy":map1.get("16")==""?{"userId": curUser}:map1.get("16"), 
+                        "createdBy": map1.get("16") == "" ? { "userId": curUser } : map1.get("16"),
                         "createdDate": map1.get("17") == "" ? curDate : map1.get("17"),
                         "active": true,
                     }
@@ -1229,6 +1292,11 @@ export default class ListTreeTemplate extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Handle region change function.
+     * This function updates the state with the selected region values and generates a list of regions.
+     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+     */
     handleRegionChange = (regionIds) => {
         this.setState({
             regionValues: regionIds.map(ele => ele),
@@ -1247,37 +1315,85 @@ export default class ListTreeTemplate extends Component {
             this.setState({ regionList });
         })
     }
-   
+    /**
+     * Function to copy tree or to delete the tree
+     * @param {*} treeTemplateId Tree template Id that should be copies
+     */
     copyDeleteTree(treeTemplateId) {
-        var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
-        treeTemplate.label.label_en = this.state.treeTemplateName;
-        DatasetService.addTreeTemplate(treeTemplate)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        message: i18n.t('static.message.addTreeTemplate'),
-                        color: 'green',
-                        loading: false,
-                        isSubmitClicked: false
-                    }, () => {
-                        this.getTreeTemplateList();
-                        this.hideSecondComponent();
-                    });
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            }).catch(
+        // Call API
+        DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
+            var treeTemplate=response.data;
+            treeTemplate.label.label_en = this.state.treeTemplateName;
+            DatasetService.addTreeTemplate(treeTemplate)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            message: i18n.t('static.message.addTreeTemplate'),
+                            color: 'green',
+                            loading: false,
+                            isSubmitClicked: false
+                        }, () => {
+                            this.getTreeTemplateList();
+                            hideSecondComponent();
+                        });
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false,
+                                isSubmitClicked: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        isSubmitClicked: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false,
-                            isSubmitClicked: false
+                            loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1292,22 +1408,19 @@ export default class ListTreeTemplate extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false,
-                                    isSubmitClicked: false
+                                    loading: false
                                 });
                                 break;
                         }
@@ -1315,11 +1428,18 @@ export default class ListTreeTemplate extends Component {
                 }
             );
     }
-    addTreeTemplate(event) {
+    /**
+     * Redirects to the add tree template screen.
+     */
+    addTreeTemplate() {
         this.props.history.push({
             pathname: `/dataSet/createTreeTemplate/-1`,
         });
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         let treeTemplateList = this.state.treeTemplateList;
         let treeTemplateArray = [];
@@ -1333,7 +1453,7 @@ export default class ListTreeTemplate extends Component {
             data[2] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
-            data[5] = getLabelText(treeTemplateList[j].flatList[0].payload.nodeType.label, this.state.lang);
+            data[5] = getLabelText(treeTemplateList[j].rootNodeType.label, this.state.lang);
             data[6] = treeTemplateList[j].notes;
             data[7] = treeTemplateList[j].active;
             data[8] = treeTemplateList[j].lastModifiedBy.username;
@@ -1354,7 +1474,7 @@ export default class ListTreeTemplate extends Component {
         var data = treeTemplateArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1441,33 +1561,75 @@ export default class ListTreeTemplate extends Component {
                                 }.bind(this)
                             });
                         }
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id == 2)) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 2)) {
                             items.push({
                                 title: "Create tree from this template",
                                 onclick: function () {
-                                    this.setState({
-                                        isModalCreateTree: !this.state.isModalCreateTree,
-                                        treeTemplate: this.state.treeEl.getValueFromCoords(10, y),
-                                        treeName: this.state.treeEl.getValueFromCoords(10, y).label.label_en,
-                                        active: this.state.treeEl.getValueFromCoords(10, y).active,
-                                        forecastMethod: this.state.treeEl.getValueFromCoords(10, y).forecastMethod,
-                                        regionId: '',
-                                        regionList: [],
-                                        regionValues: [],
-                                        notes: this.state.treeEl.getValueFromCoords(10, y).notes,
-                                        missingPUList: [],
-                                        datasetIdModal: ""
-                                    }, () => {
-                                        if (this.state.programList.length == 1) {
-                                            var event = {
-                                                target: {
-                                                    name: "datasetIdModal",
-                                                    value: this.state.programList[0].id,
+                                    var treeTemplateId=this.state.treeEl.getValueFromCoords(0, y);
+                                    DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
+                                        this.setState({
+                                            isModalCreateTree: !this.state.isModalCreateTree,
+                                            treeTemplate: response.data,
+                                            treeName: response.data.label.label_en,
+                                            active: response.data.active,
+                                            forecastMethod: response.data.forecastMethod,
+                                            regionId: '',
+                                            regionList: [],
+                                            regionValues: [],
+                                            notes: response.data.notes,
+                                            missingPUList: [],
+                                            datasetIdModal: ""
+                                        }, () => {
+                                            if (this.state.programList.length == 1) {
+                                                var event = {
+                                                    target: {
+                                                        name: "datasetIdModal",
+                                                        value: this.state.programList[0].id,
+                                                    }
+                                                }
+                                                this.dataChange(event)
+                                            }
+                                        })
+                                    })
+                                    .catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
                                                 }
                                             }
-                                            this.dataChange(event)
                                         }
-                                    })
+                                    );
                                 }.bind(this)
                             });
                         }
@@ -1482,27 +1644,31 @@ export default class ListTreeTemplate extends Component {
             treeEl: treeEl, loading: false
         })
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Calls get tree template list and get procurement agent list functions on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getTreeTemplateList();
         this.procurementAgentList();
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Redirects to the edit tree template screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
@@ -1516,6 +1682,9 @@ export default class ListTreeTemplate extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Function to create tree from tree template
+     */
     createTree() {
         var program = this.state.datasetListJexcel;
         let tempProgram = JSON.parse(JSON.stringify(program))
@@ -1586,6 +1755,11 @@ export default class ListTreeTemplate extends Component {
         programCopy.programData = tempProgram;
         calculateModelingData(programCopy, this, this.state.datasetIdModal, 0, 1, 1, treeId, false, true, true);
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         if (parameterName != "loading") {
             this.setState({
@@ -1629,6 +1803,16 @@ export default class ListTreeTemplate extends Component {
             })
         }
     }
+    /**
+     * Saves tree data to IndexedDB.
+     * This function encrypts and saves the provided tree data along with associated metadata to IndexedDB.
+     * @param {string} operationId - The operation ID indicating the type of operation (e.g., save, update).
+     * @param {object} tempProgram - The temporary program object to be saved.
+     * @param {string} treeTemplateId - The ID of the tree template.
+     * @param {string} programId - The ID of the program.
+     * @param {string} treeId - The ID of the tree.
+     * @param {boolean} programCopy - Indicates whether the program is being copied.
+     */
     saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1641,7 +1825,7 @@ export default class ListTreeTemplate extends Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             })
-            this.hideFirstComponent()
+            hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -1691,11 +1875,15 @@ export default class ListTreeTemplate extends Component {
                     loading: false,
                     color: "red",
                 }, () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 });
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Renders the tree template list.
+     * @returns {JSX.Element} - Tree template list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -2026,9 +2214,9 @@ export default class ListTreeTemplate extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <h5 className="green" style={{display:"none"}} id="div3">
-                                                    {this.state.missingPUList.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
-                                                    {this.state.missingPUList.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
+                                                    <h5 className="green" style={{ display: "none" }} id="div3">
+                                                        {this.state.missingPUList.length > 0 && i18n.t("static.treeTemplate.addSuccessMessageSelected")}
+                                                        {this.state.missingPUList.length == 0 && i18n.t("static.treeTemplate.addSuccessMessageAll")}
                                                     </h5>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

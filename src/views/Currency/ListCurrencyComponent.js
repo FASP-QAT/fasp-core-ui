@@ -13,7 +13,11 @@ import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.currency.currencyMaster');
+/**
+ * Component for list of currency details.
+ */
 export default class CurrencyListComponent extends Component {
     constructor(props) {
         super(props);
@@ -27,19 +31,31 @@ export default class CurrencyListComponent extends Component {
         this.addNewCurrency = this.addNewCurrency.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Fetches the currency list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
         CurrencyService.getCurrencyList().then(response => {
@@ -69,7 +85,7 @@ export default class CurrencyListComponent extends Component {
                         var data = currencyArray;
                         var options = {
                             data: data,
-                            columnDrag: true,
+                            columnDrag: false,
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
                                 {
@@ -175,6 +191,15 @@ export default class CurrencyListComponent extends Component {
                 }
             );
     }
+    /**
+     * Redirects to the edit currency screen on row click with currencyId for editing.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     * @param {Event} e - The selected event.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -187,6 +212,9 @@ export default class CurrencyListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add currency screen
+     */
     addNewCurrency() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/currency/addCurrency`)
@@ -194,9 +222,21 @@ export default class CurrencyListComponent extends Component {
             alert("You must be Online.")
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the currency list.
+     * @returns {JSX.Element} - currency list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

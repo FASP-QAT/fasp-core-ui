@@ -12,6 +12,9 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import RealmCountryService from '../../api/RealmCountryService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import consumption details
+ */
 export default class PipelineProgramConsumption extends Component {
     constructor(props) {
         super(props);
@@ -27,12 +30,22 @@ export default class PipelineProgramConsumption extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ abc: true, loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ abc: false, loading: false });
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -104,6 +117,14 @@ export default class PipelineProgramConsumption extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
             var json = this.el.getJson(null, false);
@@ -191,6 +212,9 @@ export default class PipelineProgramConsumption extends Component {
             }
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.consumptionList;
         var json = this.el.getJson(null, false);
@@ -245,6 +269,9 @@ export default class PipelineProgramConsumption extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveConsumption() {
         var json = this.el.getJson(null, false);
         this.setState({ abc: true });
@@ -275,6 +302,9 @@ export default class PipelineProgramConsumption extends Component {
         }
         return consumptionArray;
     }
+    /**
+     * Reterives region, realm country planning unit, data source, planning unit, consumptions list and builds jexcel table to display consumption data
+     */
     componentDidMount() {
         PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
             var regionList = [];
@@ -351,7 +381,7 @@ export default class PipelineProgramConsumption extends Component {
                                     var data = consumptionDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [150, 150, 150, 150, 90, 90, 90, 90, 150, 90],
                                         columns: [
                                             {
@@ -639,9 +669,22 @@ export default class PipelineProgramConsumption extends Component {
             }
         );
     }
-    loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunctionTwo = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -653,6 +696,10 @@ export default class PipelineProgramConsumption extends Component {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         }
     }
+    /**
+     * Renders the pipeline program import consumption details screen.
+     * @returns {JSX.Element} - Pipeline program import consumption details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -7,6 +7,9 @@ import i18n from '../../../i18n';
 import AuthenticationService from '../../Common/AuthenticationService';
 import ErrorMessageBg from '../../../../src/assets/img/E1.png';
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png';
+/**
+ * Component to display any unknown error
+ */
 class PageError extends Component {
   constructor(props) {
     super(props);
@@ -24,6 +27,10 @@ class PageError extends Component {
     this.submitBug = this.submitBug.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
   }
+  /**
+   * Toggle popup to display ticket created msg
+   * @param {String} msg Ticket code
+   */
   toggleSmall(msg) {
     confirmAlert({
       message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
@@ -34,6 +41,10 @@ class PageError extends Component {
       ]
     });
   }
+  /**
+   * Submits a bug report to the Jira system.
+   * @param {Event} e - The event object.
+   */
   submitBug(e) {
     let userComments = document.getElementById("userComments").value;
     let desc = "\nUser Comments - " + userComments + "\nError Page - " + e.location.state.errorPage + "\nError Stack - " + e.location.state.errorStack;
@@ -101,6 +112,10 @@ class PageError extends Component {
       }
     );
   }
+  /**
+   * Renders the Error page.
+   * @returns {JSX.Element} - Error page.
+   */
   render() {
     return (
       <div className="app flex-row align-items-center ErrorBg" style={{ backgroundImage: "url(" + ErrorMessageBg + ")" }}>

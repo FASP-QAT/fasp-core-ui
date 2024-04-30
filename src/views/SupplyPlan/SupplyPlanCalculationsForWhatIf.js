@@ -5,6 +5,21 @@ import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonCompone
 import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from "../../Constants";
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+/**
+ * This function is used to convert suggested shipments into planned shipments and to recalculate the supply plan
+ * @param {*} startDate This is start date from where suggested shipments should be converted to planned shipments
+ * @param {*} stopDate This is start date till when suggested shipments should be converted to planned shipments
+ * @param {*} programJson This is the content of program i.e it has the information about consumption, inventory and shipments in the form of json from the data that user has downloaded
+ * @param {*} generalProgramJson This is the content of the general information of the program that user has downloaded
+ * @param {*} props This is the props of the page from which this function is called
+ * @param {*} planningUnitId This is the planning unit Id for which supply plan has to be build 
+ * @param {*} programPlanningUnitList This is the list of program planning units for a partcular program
+ * @param {*} regionList This is the region list for a program
+ * @param {*} programIdParam This is the program Id for which supply plan has to be build
+ * @param {*} programJsonForStoringTheResult This is json that will be used to store the updated data
+ * @param {*} programDataJson This is the program data json
+ * @param {*} programRequest This is the request which will be used to save the data in local indexed db
+ */
 export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJson, generalProgramJson, props, planningUnitId, programPlanningUnitList, regionList, programIdParam, programJsonForStoringTheResult, programDataJson, programRequest) {
     props.updateState("scenarioId", '');
     var curDate = moment(startDate).format("YYYY-MM-DD");

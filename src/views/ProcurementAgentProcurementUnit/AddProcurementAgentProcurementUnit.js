@@ -17,7 +17,12 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
+/**
+ * Component for mapping procurement agent and procurement unit.
+ */
 export default class AddProcurementAgentProcurementUnit extends Component {
     constructor(props) {
         super(props);
@@ -43,7 +48,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
@@ -51,6 +55,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRowInJexcel = function () {
         var json = this.el.getJson(null, false);
         var data = [];
@@ -66,6 +73,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             data
         );
     }
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -80,12 +92,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to check for duplicate procurement units.
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
         let count = 0;
@@ -100,13 +110,16 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 changedFlag: 0,
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
             return false;
         } else {
             return true;
         }
     }
+    /**
+     * Function to handle form submission and save data on server.
+     */
     submitForm() {
         var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
@@ -149,7 +162,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             message: response.data.messageCode, loading: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -194,6 +207,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         } else {
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -264,6 +281,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({
             changedFlag: 1
@@ -336,9 +361,20 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         }
     }
+    /**
+     * Function to filter procurement unit list based on active flag
+     */
     filterProcurmentUnitList = function (instance, cell, c, r, source) {
         return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -349,6 +385,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         }
         this.el.setValueFromCoords(7, y, 1, true);
     }
+    /**
+     * Reterives procurement agent and procurement unit list and build jexcel table on component mount
+     */
     componentDidMount() {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
@@ -414,7 +453,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     var data = productDataArr;
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [200, 290, 170, 170, 170, 170, 200, 50],
                                         columns: [
                                             {
@@ -574,7 +613,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         message: response.data.messageCode
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                             }).catch(
@@ -621,7 +660,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 message: response.data.messageCode
                             },
                                 () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 })
                         }
                     }).catch(
@@ -668,7 +707,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                         message: response.data.messageCode
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -711,7 +750,12 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -720,6 +764,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * Renders the Procurement agent procurement unit mapping list.
+     * @returns {JSX.Element} - Procurement agent procurement unit mapping list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -761,6 +809,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement agent screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

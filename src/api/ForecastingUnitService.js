@@ -2,19 +2,19 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class ForecastingUnitService {
     addForecastingUnit(json) {
-        return axios.post(`${API_URL}/api/forecastingUnit/`, json, {}
+        return axios.post(`${API_URL}/api/forecastingUnit`, json, {}
         );
     }
     getForecastingUnitList() {
-        return axios.get(`${API_URL}/api/forecastingUnit/`, {
+        return axios.get(`${API_URL}/api/forecastingUnit`, {
         });
     }
     getForecastingUnitListAll() {
-        return axios.get(`${API_URL}/api/forecastingUnit/all/`, {
+        return axios.get(`${API_URL}/api/forecastingUnit/all`, {
         });
     }
     editForecastingUnit(json) {
-        return axios.put(`${API_URL}/api/forecastingUnit/`, json, {
+        return axios.put(`${API_URL}/api/forecastingUnit`, json, {
         });
     }
     getForcastingUnitById(json) {

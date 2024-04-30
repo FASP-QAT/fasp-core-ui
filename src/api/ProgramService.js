@@ -10,15 +10,15 @@ class ProgramService {
         });
     }
     getProgramList() {
-        return axios.get(`${API_URL}/api/program/`, {
+        return axios.get(`${API_URL}/api/program`, {
         });
     }
     getDataSetList() {
-        return axios.get(`${API_URL}/api/dataset/`, {
+        return axios.get(`${API_URL}/api/dataset`, {
         });
     }
     loadProgramList() {
-        return axios.get(`${API_URL}/api/loadProgram/`, {
+        return axios.get(`${API_URL}/api/loadProgram`, {
         });
     }
     loadMoreProgramList(programId, page) {
@@ -26,11 +26,11 @@ class ProgramService {
         });
     }
     addProgram(json) {
-        return axios.post(`${API_URL}/api/program/`, json, {}
+        return axios.post(`${API_URL}/api/program`, json, {}
         );
     }
     editProgram(json) {
-        return axios.put(`${API_URL}/api/program/`, json, {}
+        return axios.put(`${API_URL}/api/program`, json, {}
         );
     }
     getRealmCountryList(json) {
@@ -50,11 +50,11 @@ class ProgramService {
         );
     }
     getProgramPlaningUnitListByProgramId(json) {
-        return axios.get(`${API_URL}/api/program/${json}/planningUnit/all/`, {}
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit/all`, {}
         );
     }
     addprogramPlanningUnitMapping(json) {
-        return axios.put(`${API_URL}/api/program/planningUnit/`, json, {}
+        return axios.put(`${API_URL}/api/program/planningUnit`, json, {}
         );
     }
     getProgramById(json) {
@@ -70,7 +70,7 @@ class ProgramService {
         );
     }
     programInitialize(json) {
-        return axios.post(`${API_URL}/api/program/initialize/`, json, {}
+        return axios.post(`${API_URL}/api/program/initialize`, json, {}
         );
     }
     getVersionStatusList() {
@@ -82,7 +82,7 @@ class ProgramService {
             reviewedProblemList: reviewedProblemList,
             notes: json.currentVersion.notes
         }
-        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
+        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}`, obj, {}
         );
     }
     getVersionTypeList() {
@@ -90,7 +90,7 @@ class ProgramService {
         );
     }
     checkNewerVersions(json) {
-        return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
+        return axios.post(`${API_URL}/api/programData/checkNewerVersions`, json, {}
         );
     }
     getHealthAreaListByRealmCountryId(json) {
@@ -102,7 +102,7 @@ class ProgramService {
         );
     }
     getActiveProgramPlaningUnitListByProgramId(json) {
-        return axios.get(`${API_URL}/api/program/${json}/planningUnit/`, {}
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit`, {}
         );
     }
     getPlanningUnitByProgramTracerCategory(programId, json) {
@@ -114,7 +114,7 @@ class ProgramService {
         );
     }
     getLatestVersionsForPrograms(programIds) {
-        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`, programIds, {}
+        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms`, programIds, {}
         );
     }
     getLastModifiedDateForProgram(programId, versionId) {
@@ -122,7 +122,7 @@ class ProgramService {
         );
     }
     addDataset(json) {
-        return axios.post(`${API_URL}/api/dataset/`, json, {}
+        return axios.post(`${API_URL}/api/dataset`, json, {}
         );
     }
     getDatasetById(json) {
@@ -130,7 +130,7 @@ class ProgramService {
         );
     }
     editDataset(json) {
-        return axios.put(`${API_URL}/api/dataset/`, json, {}
+        return axios.put(`${API_URL}/api/dataset`, json, {}
         );
     }
     getActualConsumptionData(json) {
@@ -161,7 +161,7 @@ class ProgramService {
         );
     }
     getDatasetVersions(json) {
-        return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
+        return axios.post(`${API_URL}/api/dataset/versions`, json, {});
     }
     getProgramListByRealmCountryIdList(realmCountryIds) {
         return axios.post(`${API_URL}/api/program/realmCountryList`, realmCountryIds, {});

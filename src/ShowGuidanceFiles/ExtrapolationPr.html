@@ -176,19 +176,44 @@
 	<p class="pl-lg-3" style="font-size: 13px;">O QAT calcula automaticamente as métricas de erro de previsão usando 
 		vários métodos. Esses incluem:
 		<ul style="font-size: 13px;">
-			<li>MAPE (Erro de Porcentagem Absoluta Média)</li>
-			<li>WAPE (Erro de Porcentagem Absoluta Ponderada)</li>
-			<li>RMSE (Erro ao quadrado médio da raiz)</li>
-			<li>MSE (Erro Quadrado Médio)<br>Em geral, quanto menor a pontuação de erro, mais 
-				próximo o resultado do método de previsão se ajusta aos dados históricos. Em 
-				modelos em que se espera que os padrões históricos em um conjunto de dados 
-				sejam refletidos nos valores futuros, um valor de erro baixo pode ser usado 
-				para ajudar a selecionar um método de extrapolação preferido, e o QAT destacará 
-				esses melhores ajustes em uma tabela. No entanto, se forem previstas mudanças 
-				substanciais, a extrapolação de melhor ajuste pode não ser a previsão selecionada 
-				pelo usuário.
-			</li>
-			<br>
+			<li>MAPE (erro percentual médio absoluto):pode ser interpretado como a porcentagem média
+				diferença entre as previsões e os alvos pretendidos no conjunto de dados. Por exemplo, se
+				MAPE é de 15%, então suas previsões estão em média 15% distantes dos valores reais.</li>
+				<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MAPE.png"><br>
+
+				<li style="margin-top: 20px;">WAPE (erro percentual absoluto ponderado): WAPE é uma métrica apropriada para quando o
+					o conjunto de dados usado tem valores baixos ou intermitentes. Uma porcentagem WAPE de 5 significa que o
+					a previsão estava errada em 5% em todo o conjunto de dados para um determinado período de avaliação. Dependendo
+					No caso de uso, é recomendado escolher um modelo que forneça o menor valor WAPE.</li>
+					<br><img class="img-fluid" src="../ShowGuidanceFiles/img/WAPE.png"><br>
+
+					<li style="margin-top: 20px;">RMSE (erro quadrático médio): O RMSE pode ser interpretado como o erro médio que o
+						as previsões do modelo têm em comparação com o real, com peso extra adicionado a maiores
+						erros de previsão. Geralmente, quanto mais próximo o RMSE estiver de zero, mais preciso será o modelo.</li>
+						<br><img class="img-fluid" src="../ShowGuidanceFiles/img/RMSE.png"><br>
+
+						<li style="margin-top: 20px;">MSE (erro quadrático médio): MSE é a média agregada da diferença quadrática entre
+							os fatos reais e as previsões. Grandes erros são destacados devido a esta quadratura. MSE é útil
+							ao trabalhar em modelos onde grandes erros ocasionais devem ser minimizados. Geralmente, o
+							mais próximo de 0, mais preciso é o modelo.</li>
+							<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MSE.png"><br>
+						<li style="margin-top: 20px;">R 2 (a correlação quadrática entre a variável dependente e os valores ajustados):
+							R 2 = 1 - [soma quadrada da regressão (SSR) / soma total dos quadrados (SST)], onde a soma
+							ao quadrado dos resíduos da regressão (SSR) é a soma de seus resíduos ao quadrado, e o
+							soma total dos quadrados (SST) é a soma da distância que os dados estão longe da média, todos
+							ao quadrado. O valor R 2 é sempre um número entre 0 e 1. R 2 é uma medida do ajuste de um
+							linha de regressão para uma série de observações históricas com valores mais próximos de 1 indicando uma
+							correspondência mais forte entre os valores reais e previstos (modelo de regressão). Isso é
+							não é uma medida de erro e não deve ser usada por si só para avaliar a adequação de uma previsão,
+							mas em combinação com outras métricas de erro e o conhecimento do programa pelo usuário.</li>
+								<br><img class="img-fluid" src="../ShowGuidanceFiles/img/r2.png"><br>
+								
+								<p style="margin-top: 20px;">Além de R 2, quanto menor a pontuação, mais próximo o resultado do método de previsão se ajusta ao histórico
+									dados. Em modelos onde se espera que os padrões históricos em um conjunto de dados sejam refletidos no futuro
+									valores, um valor de erro baixo poderia ser usado para ajudar a selecionar um método de extrapolação preferido, e QAT
+									destacará esses melhores ajustes em uma tabela. No entanto, se ocorrerem alterações substanciais que não se enquadrem no contexto histórico
+									Se os dados forem antecipados, a extrapolação mais adequada pode não ser a previsão mais apropriada a ser selecionada.
+									</p>
 			<p>Para fazer a melhor seleção entre os métodos de extrapolação para o seu propósito, 
 				o mais importante é primeiro entender qual método de extrapolação é mais 
 				apropriado para o padrão esperado nos dados. Os métodos de previsão no QAT são 

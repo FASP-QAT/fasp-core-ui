@@ -17,7 +17,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ProductService from '../../api/ProductService';
 import ReportService from '../../api/ReportService';
@@ -26,11 +26,15 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Annual Shipment Cost Report.
+ */
 class AnnualShipmentCost extends Component {
     constructor(props) {
         super(props);
@@ -63,7 +67,7 @@ class AnnualShipmentCost extends Component {
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             outPutList: [],
             message: '',
             programId: '',
@@ -72,7 +76,6 @@ class AnnualShipmentCost extends Component {
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -83,13 +86,9 @@ class AnnualShipmentCost extends Component {
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
     }
-    roundN = num => {
-        if (num != '') {
-            return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-        } else {
-            return ''
-        }
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData() {
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
@@ -240,7 +239,7 @@ class AnnualShipmentCost extends Component {
                                                         for (var k = 0; k < list2.length; k++) {
                                                             cost += Number(list2[k].productCost * list2[k].currency.conversionRateToUsd) + Number(list2[k].freightCost * list2[k].currency.conversionRateToUsd);
                                                         }
-                                                        json[from] = this.roundN(cost)
+                                                        json[from] = roundN2(cost)
                                                         monthstartfrom = 1;
                                                     }
                                                     outPutList.push(json);
@@ -326,6 +325,9 @@ class AnnualShipmentCost extends Component {
             }
         })
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -372,6 +374,9 @@ class AnnualShipmentCost extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -429,30 +434,27 @@ class AnnualShipmentCost extends Component {
             }.bind(this);
         }.bind(this);
     }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Initializes the document by adding headers, footers, and content.
+     */
     initalisedoc = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -496,7 +498,7 @@ class AnnualShipmentCost extends Component {
                     doc.text(i18n.t('static.common.productFreight'), doc.internal.pageSize.width / 2, 90, {
                         align: 'center'
                     })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
                         align: 'center'
                     })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -605,11 +607,11 @@ class AnnualShipmentCost extends Component {
                         doc.setFont('helvetica', 'normal')
                         if (yindex - 40 > doc.internal.pageSize.height - 110) {
                             doc.addPage();
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, 80, {
+                            doc.text(formatter(values[n],0).toString(), initalvalue, 80, {
                                 align: 'left'
                             })
                         } else {
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 0, {
+                            doc.text(formatter(values[n],0).toString(), initalvalue, yindex - 0, {
                                 align: 'left'
                             })
                         }
@@ -620,11 +622,11 @@ class AnnualShipmentCost extends Component {
             if (yindex - 40 > doc.internal.pageSize.height - 110) {
                 doc.addPage();
                 yindex = 80;
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, 80, {
+                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, 80, {
                     align: 'left',
                 });
             } else {
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 0, {
+                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, yindex - 0, {
                     align: 'left',
                 });
             }
@@ -649,7 +651,7 @@ class AnnualShipmentCost extends Component {
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
                         Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                        doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
+                        doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                         totalAmount[l] = 0;
@@ -674,7 +676,7 @@ class AnnualShipmentCost extends Component {
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
                     Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                    doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
+                    doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
                 }
@@ -698,11 +700,11 @@ class AnnualShipmentCost extends Component {
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             initalvalue += index;
             Gtotal = Gtotal + GrandTotalAmount[l]
-            doc.text(this.formatter(this.roundN(GrandTotalAmount[l])).toString(), initalvalue, yindex, {
+            doc.text(formatter(roundN2(GrandTotalAmount[l]),0).toString(), initalvalue, yindex, {
                 align: 'left'
             })
         }
-        doc.text(this.formatter(this.roundN(Gtotal)).toString(), initalvalue + index, yindex, {
+        doc.text(formatter(roundN2(Gtotal),0).toString(), initalvalue + index, yindex, {
             align: 'left'
         });
         doc.setFontSize(8);
@@ -711,23 +713,28 @@ class AnnualShipmentCost extends Component {
         doc.autoTable({ pagesplit: true })
         return doc;
     }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         var doc = this.initalisedoc()
         doc.save(i18n.t('static.report.annualshipmentcost').concat('.pdf'));
     }
+    /**
+     * Generates a PDF document and displays it on the page.
+     */
     previewPDF = () => {
         var doc = this.initalisedoc()
         var string = doc.output('datauristring');
         var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
         document.getElementById("pdf").innerHTML = embed
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -811,6 +818,13 @@ class AnnualShipmentCost extends Component {
             })
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -870,6 +884,9 @@ class AnnualShipmentCost extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves the list of planning units for a selected program and version.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -961,6 +978,9 @@ class AnnualShipmentCost extends Component {
             }
         });
     }
+    /**
+     * Retrieves the list of funding sources.
+     */
     getFundingSourceList() {
         const { fundingSources } = this.state
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -1032,6 +1052,9 @@ class AnnualShipmentCost extends Component {
             }.bind(this)
         }
     }
+    /**
+     * Retrieves the list of procurement agents.
+     */
     getProcurementAgentList() {
         let programId = document.getElementById("programId").value;
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -1106,6 +1129,9 @@ class AnnualShipmentCost extends Component {
             }.bind(this)
         }
     }
+    /**
+     * Retrieves the list of shipment statuses.
+     */
     getShipmentStatusList() {
         if (localStorage.getItem("sessionType") === 'Online') {
             ShipmentStatusService.getShipmentStatusListActive()
@@ -1163,6 +1189,10 @@ class AnnualShipmentCost extends Component {
             }.bind(this)
         }
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1174,6 +1204,10 @@ class AnnualShipmentCost extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {array} procurementAgentIds - The selected procurement agent IDs.
+     */
     handleProcurementAgentChange = (procurementAgentIds) => {
         procurementAgentIds = procurementAgentIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1185,6 +1219,10 @@ class AnnualShipmentCost extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+     */
     handleFundingSourceChange = (fundingSourceIds) => {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1196,6 +1234,10 @@ class AnnualShipmentCost extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Handles the change event for shipment status.
+     * @param {Array} fundingSourceIds - An array containing the selected shipment status IDs.
+     */
     handleStatusChange = (statusIds) => {
         statusIds = statusIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1207,11 +1249,18 @@ class AnnualShipmentCost extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Calls the get programs, get funding source and get shipment status function on page load
+     */
     componentDidMount() {
         this.getPrograms();
         this.getFundingSourceList()
         this.getShipmentStatusList()
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -1222,6 +1271,10 @@ class AnnualShipmentCost extends Component {
             this.filterVersion();
         })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         if (this.state.versionId != '' || this.state.versionId != undefined) {
             this.setState({
@@ -1238,6 +1291,10 @@ class AnnualShipmentCost extends Component {
             })
         }
     }
+    /**
+     * Renders the Annual Shipment Cost report table.
+     * @returns {JSX.Element} - Annual Shipment Cost report table.
+     */
     render() {
         const { versions } = this.state;
         let versionList = versions.length > 0
@@ -1320,7 +1377,6 @@ class AnnualShipmentCost extends Component {
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
-                                                        onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
                                                         <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

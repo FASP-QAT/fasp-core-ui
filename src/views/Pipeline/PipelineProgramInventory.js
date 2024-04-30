@@ -11,6 +11,9 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import RealmCountryService from '../../api/RealmCountryService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import inventory details
+ */
 export default class PipelineProgramInventory extends Component {
     constructor(props) {
         super(props);
@@ -26,12 +29,27 @@ export default class PipelineProgramInventory extends Component {
         this.stopLoading = this.stopLoading.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
+    /**
+     * Function to filter realm country planning unit based on planning unit
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (instance, cell, c, r, source) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
@@ -46,6 +64,10 @@ export default class PipelineProgramInventory extends Component {
         }
         return mylist;
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -132,6 +154,14 @@ export default class PipelineProgramInventory extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -234,6 +264,9 @@ export default class PipelineProgramInventory extends Component {
             }
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.inventoryList;
         var json = this.el.getJson(null, false);
@@ -271,6 +304,9 @@ export default class PipelineProgramInventory extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveInventory() {
         var json = this.el.getJson(null, false);
         this.setState({ loading: true });
@@ -300,6 +336,9 @@ export default class PipelineProgramInventory extends Component {
         }
         return inventoryArray;
     }
+    /**
+     * Reterives region, realm country planning unit, data source, planning unit, inventory list and builds jexcel table to display consumption data
+     */
     componentDidMount() {
         var realmCounryId = document.getElementById("realmCountryId").value;
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
@@ -373,7 +412,7 @@ export default class PipelineProgramInventory extends Component {
                                 var data = inventoryDataArr;
                                 var options = {
                                     data: data,
-                                    columnDrag: true,
+                                    columnDrag: false,
                                     colWidths: [190, 130, 100, 120, 100, 150, 100, 130, 100],
                                     columns: [
                                         {
@@ -651,6 +690,14 @@ export default class PipelineProgramInventory extends Component {
             }
         );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -662,9 +709,18 @@ export default class PipelineProgramInventory extends Component {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         }
     }
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunction = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Renders the pipeline program import inventory details screen.
+     * @returns {JSX.Element} - Pipeline program import inventory details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

@@ -2,15 +2,15 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class ProcurementAgentService {
     addProcurementAgent(json) {
-        return axios.post(`${API_URL}/api/procurementAgent/`, json, {}
+        return axios.post(`${API_URL}/api/procurementAgent`, json, {}
         );
     }
     getProcurementAgentListAll() {
-        return axios.get(`${API_URL}/api/procurementAgent/`, {
+        return axios.get(`${API_URL}/api/procurementAgent`, {
         });
     }
     updateProcurementAgent(json) {
-        return axios.put(`${API_URL}/api/procurementAgent/`, json, {
+        return axios.put(`${API_URL}/api/procurementAgent`, json, {
         });
     }
     getProcurementAgentPlaningUnitList(json) {
@@ -22,11 +22,11 @@ class ProcurementAgentService {
         );
     }
     addprocurementAgentPlanningUnitMapping(json) {
-        return axios.put(`${API_URL}/api/procurementAgent/planningUnit/`, json, {}
+        return axios.put(`${API_URL}/api/procurementAgent/planningUnit`, json, {}
         );
     }
     savePlanningUnitProgramPriceForProcurementAgent(json) {
-        return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent/`, json, {}
+        return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent`, json, {}
         );
     }
     getProcurementAgentById(json) {
@@ -34,7 +34,7 @@ class ProcurementAgentService {
         );
     }
     addprocurementAgentProcurementUnitMapping(json) {
-        return axios.put(`${API_URL}/api/procurementAgent/procurementUnit/`, json, {}
+        return axios.put(`${API_URL}/api/procurementAgent/procurementUnit`, json, {}
         );
     }
     getProcurementAgentProcurementUnitList(json) {
@@ -46,11 +46,11 @@ class ProcurementAgentService {
         );
     }
     addProcurementAgentType(json) {
-        return axios.post(`${API_URL}/api/procurementAgentType/`, json, {}
+        return axios.post(`${API_URL}/api/procurementAgentType`, json, {}
         );
     }
     getProcurementAgentTypeListAll() {
-        return axios.get(`${API_URL}/api/procurementAgentType/`, {
+        return axios.get(`${API_URL}/api/procurementAgentType`, {
         });
     }
     getProcurementAgentTypeById(json) {
@@ -58,7 +58,7 @@ class ProcurementAgentService {
         );
     }
     updateProcurementAgentType(json) {
-        return axios.put(`${API_URL}/api/procurementAgentType/`, json, {
+        return axios.put(`${API_URL}/api/procurementAgentType`, json, {
         });
     }
     getProcurementAgentForProgram(json) {

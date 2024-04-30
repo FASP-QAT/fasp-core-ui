@@ -20,7 +20,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import {
-  jExcelLoadedFunction
+  loadedForNonEditableTables
 } from "../../CommonComponent/JExcelCommonFunctions.js";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import MonthBox from "../../CommonComponent/MonthBox.js";
@@ -31,6 +31,7 @@ import {
   INDEXED_DB_VERSION,
   JEXCEL_PAGINATION_OPTION,
   JEXCEL_PRO_KEY,
+  MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
   PROGRAM_TYPE_SUPPLY_PLAN,
   REPORT_DATEPICKER_END_MONTH,
   REPORT_DATEPICKER_START_MONTH,
@@ -45,6 +46,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+import { addDoubleQuoteToRowContent, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -63,6 +65,9 @@ const pickerLang = {
   from: "From",
   to: "To",
 };
+/**
+ * Component for Procurement Agent Export Report.
+ */
 class ProcurementAgentExport extends Component {
   constructor(props) {
     super(props);
@@ -98,7 +103,7 @@ class ProcurementAgentExport extends Component {
         month: new Date().getMonth() + 1,
       },
       maxDate: {
-        year: new Date().getFullYear() + 10,
+        year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
         month: new Date().getMonth() + 1,
       },
       loading: true,
@@ -106,17 +111,14 @@ class ProcurementAgentExport extends Component {
       versionId: "",
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
   }
-  makeText = (m) => {
-    if (m && m.year && m.month)
-      return pickerLang.months[m.month - 1] + ". " + m.year;
-    return "?";
-  };
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -201,6 +203,9 @@ class ProcurementAgentExport extends Component {
       this.setState({ loading: false });
     }
   };
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state;
     var proList = programs;
@@ -270,6 +275,9 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Retrieves the list of procurement agents for a selected program.
+   */
   getProcurementAgent = () => {
     let programId = document.getElementById("programId").value;
     this.setState({ loading: true });
@@ -363,6 +371,9 @@ class ProcurementAgentExport extends Component {
       this.setState({ loading: false });
     }
   };
+  /**
+   * Consolidates the list of procurement agents obtained from server and local.
+   */
   consolidatedProcurementAgentList = () => {
     const { procurementAgents } = this.state;
     var proList = procurementAgents;
@@ -424,6 +435,12 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -534,6 +551,13 @@ class ProcurementAgentExport extends Component {
     }
     this.fetchData();
   };
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state;
     var verList = versions;
@@ -616,6 +640,9 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Retrieves the list of planning units for a selected program and version.
+   */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -777,6 +804,10 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
+  /**
+   * Handles the change event for planning units.
+   * @param {array} planningUnitIds - The selected planning unit IDs.
+   */
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -791,6 +822,10 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
+  /**
+   * Handles the change event for procurement agents.
+   * @param {array} procurementAgentIds - The selected procurement agent IDs.
+   */
   handleProcurementAgentChange = (procurementAgentIds) => {
     procurementAgentIds = procurementAgentIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -805,6 +840,10 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
+  /**
+   * Handles the change event for funding sources.
+   * @param {array} fundingSourceIds - The selected funding source IDs.
+   */
   handleFundingSourceChange = (fundingSourceIds) => {
     fundingSourceIds = fundingSourceIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -819,19 +858,28 @@ class ProcurementAgentExport extends Component {
       }
     );
   };
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
       this.fetchData();
     });
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show();
   }
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map((ele) => '"' + ele + '"');
-  };
+  /**
+   * Exports the data to a CSV file.
+   * @param {array} columns - The columns to be exported.
+   */
   exportCSV(columns) {
     let viewby = document.getElementById("viewById").value;
     var csvRow = [];
@@ -840,9 +888,9 @@ class ProcurementAgentExport extends Component {
       (
         i18n.t("static.report.dateRange") +
         " : " +
-        this.makeText(this.state.rangeValue.from) +
+        makeText(this.state.rangeValue.from) +
         " ~ " +
-        this.makeText(this.state.rangeValue.to)
+        makeText(this.state.rangeValue.to)
       ).replaceAll(" ", "%20") +
       '"'
     );
@@ -933,11 +981,11 @@ class ProcurementAgentExport extends Component {
         headers[idx] = item.text.replaceAll(" ", "%20");
       });
     }
-    var A = [this.addDoubleQuoteToRowContent(headers)];
+    var A = [addDoubleQuoteToRowContent(headers)];
     if (viewby == 1) {
       this.state.data.map((ele) =>
         A.push(
-          this.addDoubleQuoteToRowContent([
+          addDoubleQuoteToRowContent([
             getLabelText(ele.procurementAgent.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
@@ -959,7 +1007,7 @@ class ProcurementAgentExport extends Component {
     } else if (viewby == 2) {
       this.state.data.map((ele) =>
         A.push(
-          this.addDoubleQuoteToRowContent([
+          addDoubleQuoteToRowContent([
             getLabelText(ele.fundingSource.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
@@ -979,7 +1027,7 @@ class ProcurementAgentExport extends Component {
     } else {
       this.state.data.map((ele) =>
         A.push(
-          this.addDoubleQuoteToRowContent([
+          addDoubleQuoteToRowContent([
             ele.planningUnit.id,
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
@@ -1015,6 +1063,10 @@ class ProcurementAgentExport extends Component {
     document.body.appendChild(a);
     a.click();
   }
+  /**
+   * Exports the data to a PDF file.
+   * @param {array} columns - The columns to be exported.
+   */
   exportPDF = (columns) => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -1068,9 +1120,9 @@ class ProcurementAgentExport extends Component {
           doc.text(
             i18n.t("static.report.dateRange") +
             " : " +
-            this.makeText(this.state.rangeValue.from) +
+            makeText(this.state.rangeValue.from) +
             " ~ " +
-            this.makeText(this.state.rangeValue.to),
+            makeText(this.state.rangeValue.to),
             doc.internal.pageSize.width / 8,
             90,
             {
@@ -1270,6 +1322,9 @@ class ProcurementAgentExport extends Component {
       ".pdf"
     );
   };
+  /**
+   * Builds the jexcel table based on the data list.
+   */
   buildJExcel() {
     let shipmentCosttList = this.state.data;
     let shipmentCostArray = [];
@@ -1340,7 +1395,7 @@ class ProcurementAgentExport extends Component {
     }
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [150, 80, 150, 80, 80, 80, 80, 80],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
@@ -1381,7 +1436,7 @@ class ProcurementAgentExport extends Component {
         },
       ],
       editable: false,
-      onload: this.loaded,
+      onload: loadedForNonEditableTables,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
@@ -1408,9 +1463,9 @@ class ProcurementAgentExport extends Component {
       loading: false,
     });
   }
-  loaded = function (instance, cell, x, y, value) {
-    jExcelLoadedFunction(instance);
-  };
+  /**
+   * Fetches data based on selected programs, planning units, and procurement agents.
+   */
   fetchData = () => {
     let versionId = document.getElementById("versionId").value;
     let programId = document.getElementById("programId").value;
@@ -2545,6 +2600,9 @@ class ProcurementAgentExport extends Component {
       }
     }
   };
+  /**
+   * Toggles the view based on the selected option.
+   */
   toggleView = () => {
     let viewby = document.getElementById("viewById").value;
     this.setState({
@@ -2591,6 +2649,9 @@ class ProcurementAgentExport extends Component {
       );
     }
   };
+  /**
+   * Calls the get programs and funding source function on page load
+   */
   componentDidMount() {
     this.getFundingSource();
     this.getPrograms();
@@ -2600,6 +2661,10 @@ class ProcurementAgentExport extends Component {
       viewby: viewby,
     });
   }
+  /**
+   * Sets the selected program ID and triggers fetching of procurement agents and filter versions.
+   * @param {object} event - The event object containing information about the program selection.
+   */
   setProgramId(event) {
     this.setState(
       {
@@ -2613,6 +2678,10 @@ class ProcurementAgentExport extends Component {
       }
     );
   }
+  /**
+   * Sets the version ID and calls the fetch data function.
+   * @param {Object} event - The event object containing the version ID value.
+   */
   setVersionId(event) {
     if (this.state.versionId != "" || this.state.versionId != undefined) {
       this.setState(
@@ -2635,6 +2704,9 @@ class ProcurementAgentExport extends Component {
       );
     }
   }
+  /**
+   * Retrieves the list of funding sources.
+   */
   getFundingSource = () => {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -2709,6 +2781,9 @@ class ProcurementAgentExport extends Component {
       this.setState({ loading: false });
     }
   };
+  /**
+   * Consolidates the list of funding source obtained from Server and local programs.
+   */
   consolidatedFundingSourceList = () => {
     const { fundingSources } = this.state;
     var proList = fundingSources;
@@ -2755,6 +2830,10 @@ class ProcurementAgentExport extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Renders the Procurement agent export table.
+   * @returns {JSX.Element} - Procurement agent export table.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -2930,14 +3009,13 @@ class ProcurementAgentExport extends Component {
                       }}
                       value={rangeValue}
                       lang={pickerLang}
-                      onChange={this.handleRangeChange}
                       onDismiss={this.handleRangeDissmis}
                     >
                       <MonthBox
                         value={
-                          this.makeText(rangeValue.from) +
+                          makeText(rangeValue.from) +
                           " ~ " +
-                          this.makeText(rangeValue.to)
+                          makeText(rangeValue.to)
                         }
                         onClick={this._handleClickRangeBox}
                       />

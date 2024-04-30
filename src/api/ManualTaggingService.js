@@ -6,7 +6,7 @@ class ManualTaggingSerice {
         });
     }
     updateNotification(json) {
-        return axios.put(`${API_URL}/api/erpLinking/updateNotification/`, json, {
+        return axios.put(`${API_URL}/api/erpLinking/updateNotification`, json, {
         });
     }
     getARTMISHistory(roNo, roPrimeLineNo) {
@@ -18,7 +18,7 @@ class ManualTaggingSerice {
         });
     }
     getNotificationSummary() {
-        return axios.get(`${API_URL}/api/erpLinking/getNotificationSummary/`, {
+        return axios.get(`${API_URL}/api/erpLinking/getNotificationSummary`, {
         });
     }
     getNotLinkedQatShipments(programId, versionId, json) {
