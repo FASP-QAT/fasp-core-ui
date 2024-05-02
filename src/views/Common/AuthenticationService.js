@@ -1240,6 +1240,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataset/recalculateTreeAndScenario":
+                        // if (bfunction.includes("ROLE_BF_ADD_LANGUAGE")) {
+                            return true;
+                        // }
+                        break;
                     default:
                         return false;
                 }

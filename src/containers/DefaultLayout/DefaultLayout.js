@@ -190,6 +190,7 @@ const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSet
 const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
+const RecalculateTreeAndScenarioComponent = React.lazy(() => import('../../views/DataSet/RecalculateTreeAndScenarioComponent'));
 /**
  * Array of all the routes
  */
@@ -434,6 +435,7 @@ const routes = [
   { path: '/forecastReport/forecastOutput/:programId/:versionId', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
   { path: '/forecastReport/forecastSummary', exact: true, name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
   { path: '/forecastReport/forecastSummary/:programId/:versionId', name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
+  { path: '/dataset/recalculateTreeAndScenario', name: 'static.UpdateversionSettings.UpdateversionSettings', component: RecalculateTreeAndScenarioComponent },
 ];
 /**
  * This is the default component of the application that consists of default header, footer etc

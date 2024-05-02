@@ -311,7 +311,9 @@ class VersionSettingsComponent extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changed = function (instance, cell, x, y, value) {
+        console.log('value of x:'+x+' , y:'+y+ ', value:'+value);
         if (x == 7) {
+            console.log('inside if x == 7');
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -320,6 +322,7 @@ class VersionSettingsComponent extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                this.el.setValueFromCoords(19, y, 1, true);//forecast period changed
             }
         }
         if (x == 8) {
@@ -343,6 +346,7 @@ class VersionSettingsComponent extends Component {
         var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         var stopDate = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         if (x == 9) {
+            console.log('inside if x == 9');
             var col = ("J").concat(parseInt(y) + 1);
             var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
@@ -358,6 +362,7 @@ class VersionSettingsComponent extends Component {
             else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                this.el.setValueFromCoords(19, y, 1, true);//forecast period changed
             }
         }
         if (x != 12) {
@@ -477,12 +482,25 @@ class VersionSettingsComponent extends Component {
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
-            var cont = false;
-            var cf = window.confirm(i18n.t("static.versionSettings.confirmUpdate"));
-            if (cf == true) {
-                cont = true;
-            } else {
+            var cont = true;
+            var tableJsonTemp = this.el.getJson(null, false);
+            var forecastPeriodChanged = false;
+            loop1: for (var i = 0; i < tableJsonTemp.length; i++) {
+                var map1 = new Map(Object.entries(tableJsonTemp[i]));
+                if (parseInt(map1.get("12")) === 1 && parseInt(map1.get("19")) === 1) {
+                    //if forecast period changed
+                    forecastPeriodChanged = true;
+                    var cf = window.confirm(i18n.t("static.versionSettings.confirmUpdate"));
+                    if (cf == true) {
+                        cont = true;
+                    } else {
+                        cont = false;
+                    }
+                    break loop1;
+                }
             }
+            console.log('cont: '+cont);
+            
             if (cont) {
                 this.setState({
                     loading: true
@@ -546,6 +564,21 @@ class VersionSettingsComponent extends Component {
                                     }
                                 }
                             })
+
+                            //redirect to new page form here.
+                            if(forecastPeriodChanged) {
+                                // this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+                                this.setState({
+                                    loading: false,
+                                    // message: i18n.t('static.mt.dataUpdateSuccess'),
+                                    // color: "green",
+                                    isChanged: false
+                                }, () => {
+                                    hideSecondComponent();
+                                });
+                                this.props.history.push(`/dataset/recalculateTreeAndScenario`);
+                            }                            
+
                             this.setState({
                                 loading: false,
                                 message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -902,6 +935,7 @@ class VersionSettingsComponent extends Component {
                 data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
                 data[17] = 0;
                 data[18] = pd;
+                data[19] = 0;
                 if (versionTypeId == "") {
                     versionSettingsArray[count] = data;
                     count++;
@@ -1022,6 +1056,10 @@ class VersionSettingsComponent extends Component {
                     title: 'datasetData',
                     type: 'hidden',
                 },
+                {
+                    title: 'forecastPeriodChanged',
+                    type: 'hidden',
+                }
             ],
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
