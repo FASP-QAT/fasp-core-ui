@@ -750,7 +750,7 @@ class usageTemplate extends Component {
                         autocomplete: true,
                         remoteSearch: true,
                         onbeforesearch: function(instance, request) {
-                            if(this.state.tracerCategoryLoading == false){
+                            if(this.state.tracerCategoryLoading == false  && instance.search.length > 2){
                                 request.method = 'GET';                                
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
