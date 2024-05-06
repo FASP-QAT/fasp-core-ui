@@ -425,8 +425,10 @@ class ModelingValidation extends Component {
     getScenarioList() {
         this.setState({ loading: true })
         var treeList = this.state.treeList;
+        console.log('treeList: '+JSON.stringify(treeList));
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
+            console.log('treeListFiltered: '+JSON.stringify(treeListFiltered));
             var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
             if (treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 4).length > 0) {
                 levelList.push(-1);
@@ -614,6 +616,8 @@ class ModelingValidation extends Component {
             var dataArr = [];
             var dataArr2 = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
+            console.log('this.state.nodeVal: '+ JSON.stringify(this.state.nodeVal));
+            console.log('this.state.xAxisDisplayBy: '+this.state.xAxisDisplayBy);
             if (this.state.xAxisDisplayBy == 1) {
                 for (var j = 0; j < monthList.length; j++) {
                     data = [];
@@ -658,6 +662,7 @@ class ModelingValidation extends Component {
                     data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                     dataArr.push(data);
                 }
+                console.log('dataArr: '+JSON.stringify(dataArr));
             } else {
                 let mL = this.state.xAxisDisplayBy == 9 ? monthList.length - 12 : monthList.length;
                 for (var j = 0; j < mL; j += 12) {
@@ -853,6 +858,7 @@ class ModelingValidation extends Component {
         localStorage.setItem("sesLevelId", levelId);
         var levelUnit = "";
         if (levelId !== "") {
+            console.log('\nflatDataForLevel before filter : '+JSON.stringify(this.state.treeListFiltered.tree.flatList));
             var treeListFiltered = this.state.treeListFiltered;
             var flatDataForLevel = [];
             if (levelId == -1) {
@@ -869,6 +875,7 @@ class ModelingValidation extends Component {
             var nodeVal = [];
             var nodeIdArr = [];
             var nodeLabelArr = [];
+            console.log('flatDataForLevel after filter : '+JSON.stringify(flatDataForLevel));
             for (var fdfl = 0; fdfl < flatDataForLevel.length; fdfl++) {
                 if (nodeList.findIndex(c => c.label == getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)) == -1) {
                     nodeList.push({

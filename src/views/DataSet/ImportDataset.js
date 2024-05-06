@@ -149,6 +149,7 @@ export default class ImportDataset extends Component {
                     getRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = getRequest.result;
+                        console.log('myResult...:', myResult);
                         var programDataJson = this.state.programListArray;
                         for (var i = 0; i < myResult.length; i++) {
                             for (var j = 0; j < programDataJson.length; j++) {
@@ -171,6 +172,7 @@ export default class ImportDataset extends Component {
                                             if (selectedPrgArr[j].value == filename) {
                                                 db1 = e.target.result;
                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
+                                                console.log('json...: ' + JSON.stringify(json));
                                                 var countryList = json.countryList;
                                                 delete json.countryList;
                                                 var forecastingUnitList = json.forecastingUnitList;
@@ -188,6 +190,7 @@ export default class ImportDataset extends Component {
                                                 var procurementAgentProcurementUnitList = json.procurementAgentProcurementUnitList;
                                                 delete json.procurementAgentProcurementUnitList;
                                                 var programList = json.programList;
+                                                console.log('programList: ', programList);
                                                 delete json.programList;
                                                 var programPlanningUnitList = json.programPlanningUnitList;
                                                 delete json.programPlanningUnitList;
@@ -276,6 +279,48 @@ export default class ImportDataset extends Component {
                                                 var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
                                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                 var programJson = JSON.parse(programData);
+
+                                                //manupulate data of tree
+                                                var treeListTemp = programJson.treeList;
+                                                var nodeIdArr = [3, 4, 5, 7, 6, 8, 9, 10, 11, 12, 13, 14];
+                                                /*console.log('treeListTemp[t].tree.flatList ');
+                                                for (var t = 0; t < treeListTemp.length; t++) {
+                                                    console.log('treeId: ' + treeListTemp[t].treeId);
+                                                    if (treeListTemp[t].treeId == 3) {
+                                                        var flatListTemp = treeListTemp[t].tree.flatList;
+                                                        for (var flt = 0; flt < flatListTemp.length; flt++) {
+                                                            if (flatListTemp[flt].level > 0) {
+                                                                
+                                                                var numberToCheck = 10;
+                                                                if (nodeIdArr.includes(flatListTemp[flt].payload.nodeId)) {
+                                                                    console.log('Array contains the nodeId: '+flatListTemp[flt].payload.nodeId);
+                                                                    flatListTemp[flt].level = flatListTemp[flt].level - 1;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }*/
+
+                                                /*console.log('\ntreeListTemp[t].flatList..... ');
+                                                for (var t = 0; t < treeListTemp.length; t++) {
+                                                    console.log('treeId: ' + treeListTemp[t].treeId);
+                                                    if (treeListTemp[t].treeId == 3) {
+                                                        // var flatListTemp = treeListTemp[t].tree.flatList;
+                                                        var flatListTemp = treeListTemp[t].flatList;
+                                                        for (var flt = 0; flt < flatListTemp.length; flt++) {
+                                                            if (flatListTemp[flt].level > 0) {
+                                                                
+                                                                var numberToCheck = 10;
+                                                                if (nodeIdArr.includes(flatListTemp[flt].payload.nodeId)) {
+                                                                    console.log('Array contains the nodeId: '+flatListTemp[flt].payload.nodeId);
+                                                                    flatListTemp[flt].level = flatListTemp[flt].level - 1;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }*/
+
+                                                console.log('programData updated: ' + JSON.stringify(programJson));
                                                 json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                 var programn = transactionn.objectStore('datasetData');
