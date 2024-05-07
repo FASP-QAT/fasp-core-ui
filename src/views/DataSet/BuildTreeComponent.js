@@ -3585,12 +3585,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}),2)`
-            data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}))`
+            data[2] = parseFloat(momList[j].difference)
+            data[3] = `=(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})))`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
             data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
-            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
+            data[6] = `=(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1})`
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentScenario.manualChangesEffectFuture;
             dataArray[count] = data;

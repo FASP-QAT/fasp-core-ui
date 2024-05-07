@@ -67,6 +67,7 @@
     "static.mt.dataReceivedOn": "Données reçues le",
     "static.common.uatNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que uat-api.quantificationanalytics.org/# et uat.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
     "static.planningUnit.labelMultiplier": "Facteur de conversion (de la planification à la prévision)\n",
+    "static.common.typeAtleast3": "Tapez au moins 3 caractères pour rechercher",
     "static.dataEntryAndAdjustments.YellowCellsIndicating": "sinon, vous verrez des cellules jaunes indiquant qu'aucune donnée de consommation n'a été saisie. Par défaut, les produits et la consommation sont affichés en unités de planification. L'utilisateur peut également développer chaque ligne du tableau pour afficher la consommation par région, s'il gère un programme multi-régions.",
     "static.problemReport.approvedDesc": "Le plan d`approvisionnement soumis a été approuvé. Les problèmes traités et / ou les notes ajoutées par l`utilisateur du programme sont jugés acceptables par le réviseur du plan d`approvisionnement. Les plans d`approvisionnement approuvés peuvent être partagés avec des parties prenantes externes, selon le domaine.",
     "static.extrapolation.TripleExponentialTextTwo": "Les prévisions utilisant le triple lissage exponentiel ont trois paramètres. Le lissage exponentiel utilise des données plus anciennes à des poids décroissants de manière exponentielle au fil du temps.",
