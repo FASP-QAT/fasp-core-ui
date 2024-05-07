@@ -67,6 +67,7 @@
     "static.mt.dataReceivedOn": "Datos recibidos el",
     "static.common.uatNetworkErrorMessage": "Error de red. Verifique su conexión a Internet o comuníquese con el departamento de TI de su organización para asegurarse de que uat-api.quantificationanalytics.org/# y uat.quantificationanalytics.org/# estén en la lista blanca para el acceso al firewall.",
     "static.planningUnit.labelMultiplier": "Factor de conversión (Producto a Producto (estimación))",
+    "static.common.typeAtleast3": "Escribe al menos 3 caracteres para buscar",
     "static.dataEntryAndAdjustments.YellowCellsIndicating": "de lo contrario, verá celdas amarillas que indican que no se han ingresado datos de consumo. Por defecto, los productos y el consumo se muestran en productos. El usuario también puede expandir cada fila de la tabla para mostrar el consumo por región, si maneja un programa multi-región.",
     "static.problemReport.approvedDesc": "El plan de suministro sometido ha sido aprobado. El revisor considera aceptables los problemas tratados y/o las notas agregadas por el usuario. Los planes de suministro aprobados se pueden compartir con partes interesadas.",
     "static.extrapolation.TripleExponentialTextTwo": "Los estimaciones que utilizan el suavizado exponencial triple tienen tres parámetros. El suavizado exponencial utiliza datos más antiguos con pesos que disminuyen exponencialmente a lo largo del tiempo.",
