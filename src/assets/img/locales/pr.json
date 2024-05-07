@@ -67,6 +67,7 @@
     "static.mt.dataReceivedOn": "Dados recebidos em",
     "static.common.uatNetworkErrorMessage": "Erro de rede. Verifique sua conexão com a Internet ou entre em contato com o departamento de TI organizacional para garantir que uat-api.quantificationanalytics.org/# e uat.quantificationanalytics.org/# estejam na lista de permissões para acesso ao firewall.",
     "static.planningUnit.labelMultiplier": "Fator de conversão (planeamento para previsão)\n",
+    "static.common.typeAtleast3": "Digite pelo menos 3 caracteres para pesquisar",
     "static.dataEntryAndAdjustments.YellowCellsIndicating": "caso contrário, você verá células amarelas indicando que nenhum dado de consumo foi inserido. Por padrão, os produtos e o consumo são mostrados em unidades de planejamento. O usuário também pode expandir cada linha da tabela para exibir o consumo por região, se estiver gerenciando um programa multirregional.",
     "static.problemReport.approvedDesc": "O plano de suprimento submetido foi aprovado. Todos os problemas foram marcados como 'Em-Conformidade' ou considerados aceitáveis ​​pelo revisor do plano de suprimento. Os planos de suprimento aprovados podem ser compartilhados com as partes interessadas externas, dependendo do reino.",
     "static.extrapolation.TripleExponentialTextTwo": "As previsões que usam suavização exponencial tripla têm três parâmetros. A suavização exponencial usa dados mais antigos com pesos exponencialmente decrescentes ao longo do tempo.",

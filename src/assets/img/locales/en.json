@@ -67,6 +67,7 @@
     "static.mt.dataReceivedOn": "Data Received On",
     "static.common.uatNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure uat-api.quantificationanalytics.org/# and uat.quantificationanalytics.org/# are whitelisted for firewall access.",
     "static.planningUnit.labelMultiplier": "Conversion Factor (Planning to Forecasting)",
+    "static.common.typeAtleast3": "Type at least 3 characters to search",
     "static.dataEntryAndAdjustments.YellowCellsIndicating": "otherwise you will see yellow cells indicating that no consumption data has been entered. By default, the products and consumption are shown in planning units. The user can also expand each row of the table to display the consumption by region, if managing a multi-region program.",
     "static.problemReport.approvedDesc": "The submitted supply plan has been approved. All problems have been marked as 'In-Compliance' or deemed acceptable by the Supply Plan Reviewer. Approved supply plans may be shared with external stakeholders, depending on the realm.",
     "static.extrapolation.TripleExponentialTextTwo": "Forecasts using triple exponential smoothing have three parameters. Exponential smoothing uses older data at exponentially decreasing weights over time.",

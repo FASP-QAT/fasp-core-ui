@@ -487,7 +487,7 @@ export default class AddRealmComponent extends Component {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
-                                                    <FormGroup check inline>
+                                                    <FormGroup className='form-check form-check-inline' style={{paddingLeft:'13%'}}>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"

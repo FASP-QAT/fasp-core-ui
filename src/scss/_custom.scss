@@ -522,7 +522,7 @@ label.arrow_label:after {
 
 // radio button
 .form-check {
-  padding-left: 1.25rem !important;
+  padding-left: 1.25rem;
 }
 
 // table dropdown footer
@@ -10688,25 +10688,25 @@ legend.scheduler-border {
 }
 
 .typing-en::before {
-  content: "Start typing to search";
+  content: "Type at least 3 characters to search";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-fr::before {
-  content: "Commencez à taper pour rechercher";
+  content: "Tapez au moins 3 caractères pour rechercher";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-sp::before {
-  content: "Empieza a escribir para buscar";
+  content: "Escribe al menos 3 caracteres para buscar";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-pr::before {
-  content: "Comece a digitar para pesquisar";
+  content: "Digite pelo menos 3 caracteres para pesquisar";
   color: #a9a9a9;
   font-style: italic;
 }
