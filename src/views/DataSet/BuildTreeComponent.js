@@ -4034,7 +4034,11 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
-                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            this.setState({
+                                addNodeFlag: false
+                            }, () => {
+                                this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            });
                         } else {
                             this.setState({
                                 modelingJexcelLoader: false
