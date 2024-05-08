@@ -33,8 +33,8 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/active`, {}
         );
     }
-    getActivePlanningUnitByProductCategoryIds(json) {
-        return axios.post(`${API_URL}/api/planningUnit/productCategoryList/active`, json, {}
+    getActivePlanningUnitByProductCategoryIds(json,realmCountryId) {
+        return axios.post(`${API_URL}/api/planningUnit/productCategoryList/active/realmCountryId/${realmCountryId}`, json, {}
         );
     }
     getActivePlanningUnitByRealmCountryId(realmCountryId) {
