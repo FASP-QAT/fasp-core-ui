@@ -574,10 +574,12 @@ export default class ManualTagging extends Component {
      */
     getProductCategories() {
         let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
+        ProductService.getProductCategoryListForErpLinking(this.state.countryId)
             .then(response => {
                 this.setState({
-                    productCategories: response.data.splice(1)
+                    productCategories: response.data
+                },()=>{
+                    this.getPlanningUnitListByProductcategoryIds();
                 })
             }).catch(
                 error => {
@@ -1032,7 +1034,7 @@ export default class ManualTagging extends Component {
                 tempNotes: ''
             }, () => {
                 let realmId = AuthenticationService.getRealmId();
-                this.getProductCategories();
+                // this.getProductCategories();
                 this.getFundingSourceList();
                 RealmCountryService.getRealmCountryForProgram(realmId)
                     .then(response => {
@@ -1332,13 +1334,13 @@ export default class ManualTagging extends Component {
         let planningUnits1 = this.state.planningUnits1;
         localStorage.setItem("sesCountryId", event.target.value);
         this.setState({
+            loading:true,
             planningUnitValues: [],
             productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
-            this.getPlanningUnitListByRealmCountryId();
-            this.filterErpData();
+            this.getProductCategories();
         })
     }
     /**
@@ -2166,11 +2168,7 @@ export default class ManualTagging extends Component {
             planningUnitLabels: [],
             planningUnits1: []
         }, () => {
-            if (productCategoryIds.length > 0) {
-                this.getPlanningUnitListByProductcategoryIds();
-            } else {
-                this.getPlanningUnitListByRealmCountryId();
-            }
+            this.getPlanningUnitListByProductcategoryIds();
             this.filterErpData();
         })
     }
@@ -2178,10 +2176,12 @@ export default class ManualTagging extends Component {
      * Retrieves active planning units based on selected product category IDs.
      */
     getPlanningUnitListByProductcategoryIds = () => {
-        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.length>0?this.state.productCategoryValues.map(ele => (ele.value).toString()):this.state.productCategories.map(ele => (ele.productCategoryId).toString()),this.state.countryId)
             .then(response => {
                 this.setState({
                     planningUnits1: response.data
+                },()=>{
+                    this.filterErpData();
                 })
             }).catch(
                 error => {
@@ -2245,7 +2245,7 @@ export default class ManualTagging extends Component {
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? [] : this.state.productCategoryValues.map(ele => (ele.value).toString()))
             let planningUnitIdList = (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
-            var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.payload.productCategoryId.toString()));
+            var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.productCategoryId.toString()));
             var sortOrderList = [];
             productCategorySortOrder.map(ele => sortOrderList.push(ele.sortOrder))
             var json = {
@@ -4644,7 +4644,7 @@ export default class ManualTagging extends Component {
         }, this);
         const { productCategories } = this.state;
         let productCategoryMultList = productCategories.length > 0 && productCategories.map((item, i) => {
-            return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.productCategoryId })
         }, this);
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
