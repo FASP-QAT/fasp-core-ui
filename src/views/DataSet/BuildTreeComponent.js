@@ -4660,7 +4660,7 @@ export default class BuildTree extends Component {
                 data[3] = scalingList[j].transferNodeDataId + "_T"
                 data[4] = scalingList[j].modelingType.id
                 data[5] = scalingList[j].increaseDecrease
-                data[6] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
+                data[6] = scalingList[j].modelingType.id != 2 ? (scalingList[j].dataValue != '' ? parseFloat(scalingList[j].dataValue).toFixed(4) : '') : '';
                 data[7] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
                 data[8] = cleanUp
                 var nodeValue = this.state.currentScenario.calculatedDataValue;

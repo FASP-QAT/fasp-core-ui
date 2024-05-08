@@ -18,27 +18,6 @@ import classNames from 'classnames';
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 import DropdownService from "../../api/DropdownService";
 import { Capitalize, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
-let initialValues = {
-    programName: '',
-    realmId: '',
-    realmCountryId: '',
-    organisationId: '',
-    userId: '',
-    airFreightPerc: '',
-    seaFreightPerc: '',
-    roadFreightPerc: '',
-    plannedToSubmittedLeadTime: '',
-    submittedToApprovedLeadTime: '',
-    approvedToShippedLeadTime: '',
-    shippedToArrivedByAirLeadTime: '',
-    shippedToArrivedBySeaLeadTime: '',
-    shippedToArrivedByLandLeadTime: '',
-    arrivedToDeliveredLeadTime: '',
-    healthAreaId: [],
-    programNotes: '',
-    regionId: [],
-    programCode1: ''
-}
 // Localized entity name
 const entityname = i18n.t('static.program.programMaster');
 // Initial values for form fields
