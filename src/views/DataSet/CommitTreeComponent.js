@@ -2789,8 +2789,8 @@ export default class CommitTreeComponent extends React.Component {
 
                                 var planningUnitToUpdate = programJson.planningUnitList;
                                 for (var pl = 0; pl < planningUnitToUpdate.length; pl++) {
-                                    if(planningUnitToUpdate[pl].programPlanningUnitId==null){
-                                        planningUnitToUpdate[pl].programPlanningUnitId=0;
+                                    if(planningUnitToUpdate[pl].programPlanningUnitId==""){
+                                        planningUnitToUpdate[pl].programPlanningUnitId=null;
                                     }
                                 }
                                 programJson.planningUnitList = planningUnitToUpdate;
