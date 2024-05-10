@@ -1888,7 +1888,8 @@ export default class BuildTree extends Component {
                 missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
             }
             this.setState({
-                missingPUList
+                missingPUList,
+                branchTemplateNotes: treeTemplate.notes
             }, () => {
                 this.buildMissingPUJexcel();
             });
