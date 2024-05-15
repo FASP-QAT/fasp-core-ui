@@ -2227,11 +2227,13 @@ export default class BuildTree extends Component {
         }
         var scenarioList=this.state.scenarioList;
         for(var i=0;i<scenarioList.length;i++){
+            try{
         currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.puPerVisit = puPerVisit;
         if (!isRefillMonth) {
             currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.refillMonths = refillMonths;
         }
         currentScenario = currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0];
+    }catch(error){}
     }
         this.setState({ currentItemConfig, currentScenario });
     }
@@ -6051,8 +6053,10 @@ export default class BuildTree extends Component {
             if (regionIds != null) {
                 var scenarioList=this.state.scenarioList;
                 for(var i=0;i<scenarioList.length;i++){
+                    try{
                     currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = regionIds.value;
                     currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                    }catch(error){}
                 }
                 if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
                     currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
@@ -6065,8 +6069,10 @@ export default class BuildTree extends Component {
             } else {
                 var scenarioList=this.state.scenarioList;
                 for(var i=0;i<scenarioList.length;i++){
+                    try{
                     currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = "";
                     currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = "";
+                    }catch(error){}
                 }
                 this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
                     this.filterUsageTemplateList(0, 0);
@@ -8033,19 +8039,23 @@ export default class BuildTree extends Component {
                 var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
                 var scenarioList=this.state.scenarioList;
                 for(var i=0;i<scenarioList.length;i++){
+                    try{
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = pu.unit.id;
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = event.target.value;
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = pu.multiplier;
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 1;
+                    }catch(error){}
                 }
                 currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 var scenarioList=this.state.scenarioList;
                 for(var i=0;i<scenarioList.length;i++){
+                    try{
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = '';
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = '';
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = '';
                     (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 0;
+                    }catch(error){}
                 }
                 var label = {
                     label_en: '',
