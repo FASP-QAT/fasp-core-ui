@@ -4003,7 +4003,7 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.validation1() && this.state.isValidError.toString() == "false") {
+                        if (this.validation1() || this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -4035,7 +4035,8 @@ export default class BuildTree extends Component {
                                 activeTab1: new Array(2).fill('2'),
                                 firstMonthOfTarget: "",
                                 yearsOfTarget: "",
-                                actualOrTargetValueList: []
+                                actualOrTargetValueList: [],
+                                modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(this.state.currentItemConfig.context.id, 0);
                             });
@@ -4049,7 +4050,8 @@ export default class BuildTree extends Component {
                     } else {
                         if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
                             this.setState({
-                                addNodeFlag: false
+                                addNodeFlag: false,
+                                modelingChangedOrAdded: false
                             }, () => {
                                 this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                             });
@@ -5185,9 +5187,12 @@ export default class BuildTree extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changed = function (instance, cell, x, y, value) {
-        this.setState({
-            modelingChangedOrAdded: true
-        })
+        if (x != 9 && x != 11 && this.state.modelingChangedOrAdded == false) {
+            this.setState({
+                modelingChangedOrAdded: true
+            })
+        }
+
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
