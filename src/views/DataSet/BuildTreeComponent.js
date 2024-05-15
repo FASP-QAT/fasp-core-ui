@@ -3633,7 +3633,7 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.state.modelingChangedOrAdded || this.validation1() && this.state.isValidError.toString() == "false") {
+                        if (this.validation1() || this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -4700,7 +4700,6 @@ export default class BuildTree extends Component {
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
         if (x != 9 && x != 11 && this.state.modelingChangedOrAdded == false) {
-            console.log("modelingChangedOrAdded", x, "==", y, "==", this.state.modelingChangedOrAdded)
             this.setState({
                 modelingChangedOrAdded: true
             })
