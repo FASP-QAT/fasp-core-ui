@@ -325,107 +325,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         });
     }
     /**
-     * Reterives the forecast program list from indexed db on component mount
+     * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
         this.setState({ loading: true })
         var db1;
         getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onerror = function (event) {
-        //     this.setState({
-        //         message: i18n.t('static.program.errortext'),
-        //         color: 'red'
-        //     })
-        //     hideFirstComponent()
-        // }.bind(this);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
-        //     var programDataOs = programDataTransaction.objectStore('datasetData');
-        //     var programRequest = programDataOs.getAll();
-        //     programRequest.onerror = function (event) {
-        //         this.setState({
-        //             message: i18n.t('static.program.errortext'),
-        //             color: 'red'
-        //         })
-        //         hideFirstComponent()
-        //     }.bind(this);
-        //     programRequest.onsuccess = function (e) {
-        //         var forecastProgramList = [];
-        //         var myResult = programRequest.result;
-        //         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        //         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        //         for (var i = 0; i < myResult.length; i++) {
-        //             if (myResult[i].userId == userId) {
-        //                 var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-        //                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-        //                 var datasetJson = JSON.parse(datasetData);
-        //                 var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
-        //                 var regionList = datasetJson.regionList;
-        //                 planningUnitList.sort((a, b) => {
-        //                     var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-        //                     var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-        //                     return itemLabelA > itemLabelB ? 1 : -1;
-        //                 });
-        //                 regionList.sort((a, b) => {
-        //                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-        //                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-        //                     return itemLabelA > itemLabelB ? 1 : -1;
-        //                 });
-        //                 var forecastProgramJson = {
-        //                     name: datasetJson.programCode,
-        //                     id: myResult[i].id,
-        //                     regionList: regionList,
-        //                     planningUnitList: planningUnitList,
-        //                     datasetData: datasetJson
-        //                 }
-        //                 forecastProgramList.push(forecastProgramJson)
-        //             }
-        //         }
-        //         var forecastProgramId = "";
-        //         var event = {
-        //             target: {
-        //                 value: ""
-        //             }
-        //         };
-        //         if (forecastProgramList.length == 1) {
-        //             forecastProgramId = forecastProgramList[0].id;
-        //             event.target.value = forecastProgramList[0].id;
-        //         } else if (localStorage.getItem("sesDatasetId") != "" && forecastProgramList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
-        //             forecastProgramId = localStorage.getItem("sesDatasetId");
-        //             event.target.value = localStorage.getItem("sesDatasetId");
-        //         }
-        //         forecastProgramList = forecastProgramList.sort(function (a, b) {
-        //             a = a.name.toLowerCase();
-        //             b = b.name.toLowerCase();
-        //             return a < b ? -1 : a > b ? 1 : 0;
-        //         });
-        //         let realmId = AuthenticationService.getRealmId();
-        //         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
-        //             .then(response => {
-        //                 for (var i = 0; i < response.data.length; i++) {
-        //                     forecastProgramList.push({
-        //                         name: response.data[i].code,
-        //                         id: response.data[i].id,
-        //                     })
-        //                 }
-        //             }
-        //         );
-        //         this.setState({
-        //             forecastProgramList: forecastProgramList,
-        //             loading: false
-        //         }, () => {
-        //             if (forecastProgramId != "") {
-        //                 this.getPlanningUnitList(event);
-        //             }
-        //         })
-        //     }.bind(this)
-        // }.bind(this)
         this.getPrograms();
         this.getDateDifference();
     }
-
+    /**
+     * Retrieves list of all programs
+     */
     getPrograms() {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
@@ -466,6 +377,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates server and local version of all programs
+     */
     consolidatedProgramList = () => {
         this.setState({ loading: true })
         const lan = 'en';
@@ -1196,6 +1110,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             }, () => { })
         }
     }
+    /**
+     * Retrieves version list of the selected program
+     */
     filterVersion() {
         this.setState({ loading: true })
         let programId = this.state.forecastProgramId;
