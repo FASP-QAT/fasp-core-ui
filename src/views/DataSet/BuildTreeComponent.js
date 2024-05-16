@@ -3216,9 +3216,9 @@ export default class BuildTree extends Component {
                         if (map1.get("3") != '' && map1.get("3") != 0.00) {
                             var overrideData = {
                                 month: map1.get("0"),
-                                seasonalityPerc: 0,
-                                manualChange: map1.get("3").toString().replaceAll(",", "").split("%")[0],
-                                nodeDataId: map1.get("7"),
+                                seasonalityPerc: map1.get("4").toString().replaceAll(",", "").split("%")[0],
+                                manualChange: map1.get("5").toString().replaceAll(",", "").split("%")[0],
+                                nodeDataId: map1.get("9"),
                                 active: true
                             }
                             overrideListArray.push(overrideData);
@@ -3398,19 +3398,21 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),4)`
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(4) : `=ROUND(IF(OR(M1==true,M1==1),G${parseInt(j)},L${parseInt(j)}),4)`
             data[2] = parseFloat(momList[j].difference).toFixed(4)
-            data[3] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0;
-            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),4)`
+            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`;
+            data[4] = momList[j].seasonalityPerc != null ? parseFloat(momList[j].seasonalityPerc).toFixed(2) : 0;
+            data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0;
+            data[6] = `=ROUND(IF((((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}<0,0,(((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}),4)`;
             var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
-            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},4)`;
-            data[7] = this.state.currentScenario.nodeDataId
-            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
-            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
-            data[10] = this.state.currentScenario.manualChangesEffectFuture;
-            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
-            data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
+            data[7] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
+            data[8] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((G${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*N${parseInt(j) + 1},2)` : `=ROUND((G${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},4)`;
+            data[9] = this.state.currentScenario.nodeDataId
+            data[10] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(R${parseInt(j) + 1 - lagInMonths}<0,0,R${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(R${parseInt(j) + 1}<0,0,R${parseInt(j) + 1})`;
+            data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
+            data[12] = this.state.currentScenario.manualChangesEffectFuture;
+            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
+            data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
                 var calculatedValueFromCurMonth = grandParentMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
@@ -3428,11 +3430,11 @@ export default class BuildTree extends Component {
                 } else {
                     dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 }
-                data[13] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
-                data[14] = dataValue;
+                data[15] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
+                data[16] = dataValue;
             } else {
-                data[13] = 0;
-                data[14] = 0;
+                data[15] = 0;
+                data[16] = 0;
             }
             var nodeDataMomListPercForFU = [];
             var fuPercentage = 0;
@@ -3444,7 +3446,7 @@ export default class BuildTree extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=(O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
+            data[17] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=(Q${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(G${parseInt(j) + 1}/100)*${fuPercentage}/100)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(I${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit}` : `=I${parseInt(j) + 1}`;
             dataArray[count] = data;
             count++;
         }
@@ -3480,6 +3482,20 @@ export default class BuildTree extends Component {
                     type: 'numeric',
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
+                },
+                {
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
+                    type: 'numeric',
+                    mask: '#,##0.00', decimal: '.',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.tree.seasonalityIndex'),
+                    type: 'numeric',
+                    disabledMaskOnEdition: true,
+                    textEditor: true,
+                    mask: '#,##0.00%', decimal: '.',
+                    readOnly: false
                 },
                 {
                     title: i18n.t('static.tree.manualChange'),
