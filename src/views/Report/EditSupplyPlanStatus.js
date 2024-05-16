@@ -38,6 +38,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert';
 import DropdownService from '../../api/DropdownService';
+import ProblemListDashboardComponent from './ProblemListDashboard.js';
 const entityname = i18n.t('static.report.problem');
 /**
  * This const is used to define the validation schema for adding a new problem
@@ -3566,7 +3567,8 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
+                    {this.state.program.problemReportList!=undefined && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
                 </TabPane>
