@@ -1321,7 +1321,7 @@ class StockStatus extends Component {
                                 fontColor: 'transparent',
                               },
                               lineTension: 0,
-                              pointStyle: 'line',
+                              pointStyle: 'circle',
                               pointRadius: 0,
                               showInLegend: true,
                               data: data.map((item, index) => (Number(item.closingBalance)))
@@ -1730,7 +1730,7 @@ class StockStatus extends Component {
                     fontColor: 'transparent',
                   },
                   lineTension: 0,
-                  pointStyle: 'line',
+                  pointStyle: 'circle',
                   pointRadius: 0,
                   showInLegend: true,
                   data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
@@ -2806,7 +2806,7 @@ class StockStatus extends Component {
           fontColor: 'transparent',
         },
         lineTension: 0,
-        pointStyle: 'line',
+        pointStyle: 'circle',
         pointRadius: 0,
         showInLegend: true,
         data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
