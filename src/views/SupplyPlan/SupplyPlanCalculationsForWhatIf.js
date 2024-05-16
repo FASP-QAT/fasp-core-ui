@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from "../../Constants";
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from "../../Constants";
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 /**
@@ -167,8 +167,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     accountFlag: true,
                     active: true,
                     dataSource: {
-                        id: NONE_SELECTED_DATA_SOURCE_ID,
-                        label: (props.state.dataSourceListAll).filter(c => c.dataSourceId == NONE_SELECTED_DATA_SOURCE_ID)[0].label
+                        id: QAT_SUGGESTED_DATA_SOURCE_ID,
+                        label: (props.state.dataSourceListAll).filter(c => c.dataSourceId == QAT_SUGGESTED_DATA_SOURCE_ID)[0].label
                     },
                     erpFlag: false,
                     localProcurement: false,
