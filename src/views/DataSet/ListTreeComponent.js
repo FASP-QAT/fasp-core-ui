@@ -20,7 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService.js';
 import DropdownService from '../../api/DropdownService';
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -2314,9 +2314,11 @@ export default class ListTreeComponent extends Component {
                     data[7] = programList.programId
                     data[8] = programList.programId + "_v" + programList.currentVersion.versionId + "_uId_" + userId
                     data[9] = programList.version
-                    data[10] = treeList[k].active
-                    data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
-                    data[12] = JSON.stringify(treeList[k].forecastMethod);
+                    data[10] = treeList[k].lastModifiedBy.username
+                    data[11] = moment(treeList[k].lastModifiedDate).format("YYYY-MM-DD")
+                    data[12] = treeList[k].active
+                    data[13] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
+                    data[14] = JSON.stringify(treeList[k].forecastMethod);
                     if (selStatus != "") {
                         if (tempSelStatus == treeList[k].active) {
                             treeArray[count] = data;
@@ -2380,6 +2382,15 @@ export default class ListTreeComponent extends Component {
                     {
                         title: 'versionId',
                         type: 'hidden',
+                    },
+                    {
+                        title: i18n.t('static.common.lastModifiedBy'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.common.lastModifiedDate'),
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT_SM }
                     },
                     {
                         type: 'dropdown',
@@ -2448,7 +2459,7 @@ export default class ListTreeComponent extends Component {
                                         isModalOpen: !this.state.isModalOpen,
                                         treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
                                         active: true,
-                                        forecastMethod: JSON.parse(this.state.treeEl.getValueFromCoords(12, y)),
+                                        forecastMethod: JSON.parse(this.state.treeEl.getValueFromCoords(14, y)),
                                         regionId: '',
                                         regionList: [],
                                         regionValues: [],
@@ -2592,7 +2603,7 @@ export default class ListTreeComponent extends Component {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
                     var treeId = this.state.treeEl.getValueFromCoords(0, x);
                     var programId = this.state.treeEl.getValueFromCoords(8, x);
-                    var isLocal = this.state.treeEl.getValueFromCoords(11, x);
+                    var isLocal = this.state.treeEl.getValueFromCoords(13, x);
                     if (isLocal == 1) {
                         this.props.history.push({
                             pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
