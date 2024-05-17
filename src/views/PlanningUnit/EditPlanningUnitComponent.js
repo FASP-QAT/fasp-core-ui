@@ -125,8 +125,8 @@ export default class EditPlanningUnitComponent extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -296,9 +296,14 @@ export default class EditPlanningUnitComponent extends Component {
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 406:
+                                                            this.setState({
+                                                                message: i18n.t('static.message.planningUnitAlreadyExists'),
                                                                 loading: false
                                                             });
                                                             break;
@@ -360,22 +365,22 @@ export default class EditPlanningUnitComponent extends Component {
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                        <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.planningUnit.label.label_en}
-                                                            required
-                                                        >
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
+                                                    <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.planningUnit.label.label_en}
+                                                        required
+                                                    >
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
