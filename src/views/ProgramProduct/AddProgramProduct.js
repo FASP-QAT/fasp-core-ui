@@ -9,7 +9,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { checkValidation, changed, jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN } from "../../Constants";
+import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from "../../Constants";
 import DropdownService from '../../api/DropdownService';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
@@ -18,6 +18,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import CryptoJS from 'crypto-js';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 /**
@@ -51,7 +52,10 @@ class AddprogramPlanningUnit extends Component {
             productCategoryList: [],
             programs: [],
             programId: 0,
-            color: ''
+            color: '',
+            tempSortOrder: '',
+            sortOrderLoading: true,
+            dropdownList: []
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -75,26 +79,6 @@ class AddprogramPlanningUnit extends Component {
      */
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
-        var puList = []
-        if (value != -1) {
-            var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
-            var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-            var pcIdArray = [];
-            for (var pcu = 0; pcu < pcList.length; pcu++) {
-                pcIdArray.push(pcList[pcu].payload.productCategoryId);
-            }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
-        } else {
-            puList = this.state.planningUnitList
-        }
-        for (var k = 0; k < puList.length; k++) {
-            var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].id,
-                id: puList[k].id
-            }
-            mylist.push(planningUnitJson);
-        }
         return mylist;
     }
     /**
@@ -236,476 +220,463 @@ class AddprogramPlanningUnit extends Component {
                                     productCategoryListNew.push(productCategoryJson);
                                 }
                                 this.setState({ productCategoryList: response.data });
-                                PlanningUnitService.getPlanningUnitListBasic()
+                                ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                     .then(response => {
                                         if (response.status == 200) {
-                                            this.setState({
-                                                planningUnitList: response.data
+                                            let myReasponse = response.data.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                                                return itemLabelA > itemLabelB ? 1 : -1;
                                             });
-                                            for (var k = 0; k < (response.data).length; k++) {
-                                                var planningUnitJson = {
-                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].id,
-                                                    id: response.data[k].id,
-                                                    active: response.data[k].active
+                                            var productDataArr = []
+                                            this.setState({ rows: myReasponse });
+                                            var data = [];
+                                            let dropdownList = this.state.dropdownList;
+                                            if (myReasponse.length != 0) {
+                                                for (var j = 0; j < myReasponse.length; j++) {
+                                                    data = [];
+                                                    dropdownList[j] = {
+                                                        id: myReasponse[j].planningUnit.id,
+                                                        name: myReasponse[j].planningUnit.label.label_en + " | " + myReasponse[j].planningUnit.id
+                                                    };
+                                                    data[0] = myReasponse[j].productCategory.id;
+                                                    data[1] = myReasponse[j].planningUnit.id;
+                                                    data[2] = myReasponse[j].planBasedOn;
+                                                    data[3] = myReasponse[j].reorderFrequencyInMonths;
+                                                    data[4] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
+                                                    data[5] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].minQty : "";
+                                                    data[6] = myReasponse[j].monthsInFutureForAmc;
+                                                    data[7] = myReasponse[j].monthsInPastForAmc;
+                                                    data[8] = myReasponse[j].localProcurementLeadTime;
+                                                    data[9] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].distributionLeadTime : "";
+                                                    data[10] = myReasponse[j].shelfLife;
+                                                    data[11] = myReasponse[j].catalogPrice;
+                                                    data[12] = myReasponse[j].programPlanningUnitId;
+                                                    data[13] = myReasponse[j].active;
+                                                    data[14] = 0;
+                                                    data[15] = myReasponse[j].program.id;
+                                                    data[16] = myReasponse[j].minMonthsOfStock;
+                                                    data[17] = myReasponse[j].minQty;
+                                                    data[18] = myReasponse[j].distributionLeadTime;
+                                                    productDataArr.push(data);
                                                 }
-                                                list.push(planningUnitJson);
                                             }
-                                            ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        let myReasponse = response.data.sort((a, b) => {
-                                                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        var productDataArr = []
-                                                        this.setState({ rows: myReasponse });
-                                                        var data = [];
-                                                        if (myReasponse.length != 0) {
-                                                            for (var j = 0; j < myReasponse.length; j++) {
-                                                                data = [];
-                                                                data[0] = myReasponse[j].productCategory.id;
-                                                                data[1] = myReasponse[j].planningUnit.id;
-                                                                data[2] = myReasponse[j].planBasedOn;
-                                                                data[3] = myReasponse[j].reorderFrequencyInMonths;
-                                                                data[4] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
-                                                                data[5] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].minQty : "";
-                                                                data[6] = myReasponse[j].monthsInFutureForAmc;
-                                                                data[7] = myReasponse[j].monthsInPastForAmc;
-                                                                data[8] = myReasponse[j].localProcurementLeadTime;
-                                                                data[9] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].distributionLeadTime : "";
-                                                                data[10] = myReasponse[j].shelfLife;
-                                                                data[11] = myReasponse[j].catalogPrice;
-                                                                data[12] = myReasponse[j].programPlanningUnitId;
-                                                                data[13] = myReasponse[j].active;
-                                                                data[14] = 0;
-                                                                data[15] = myReasponse[j].program.id;
-                                                                data[16] = myReasponse[j].minMonthsOfStock;
-                                                                data[17] = myReasponse[j].minQty;
-                                                                data[18] = myReasponse[j].distributionLeadTime;
-                                                                productDataArr.push(data);
-                                                            }
+                                            if (productDataArr.length == 0) {
+                                                data = [];
+                                                data[0] = 0;
+                                                data[1] = "";
+                                                data[2] = 1;
+                                                data[3] = "";
+                                                data[4] = "";
+                                                data[5] = "";
+                                                data[6] = "";
+                                                data[7] = "";
+                                                data[8] = "";
+                                                data[9] = "";
+                                                data[10] = "";
+                                                data[11] = 0;
+                                                data[12] = 0;
+                                                data[13] = 1;
+                                                data[14] = 1;
+                                                data[15] = programId;
+                                                data[16] = "";
+                                                data[17] = "";
+                                                data[18] = "";
+                                                productDataArr[0] = data;
+                                            }
+                                            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+                                            var data = productDataArr;
+                                            this.setState({ dropdownList: dropdownList })
+                                            var options = {
+                                                data: data,
+                                                columnDrag: false,
+                                                columns: [
+                                                    {
+                                                        title: i18n.t('static.productCategory.productCategory'),
+                                                        type: 'dropdown',
+                                                        source: productCategoryListNew,
+                                                        width: 150,
+                                                        required: true
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.dashboard.product'),
+                                                        type: 'dropdown',
+                                                        source: dropdownList,
+                                                        options: {
+                                                            url: `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/searchText/language/sortOrder`,
+                                                            autocomplete: true,
+                                                            remoteSearch: true,
+                                                            onbeforesearch: function (instance, request) {
+                                                                if (this.state.sortOrderLoading == false && instance.search.length > 2) {
+                                                                    request.method = 'GET';
+                                                                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                                                    let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                                                    request.beforeSend = (httpRequest) => {
+                                                                        httpRequest.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
+                                                                    }
+                                                                    const searchText = instance.search;
+                                                                    const language = this.state.lang;
+                                                                    const sortOrder = this.state.tempSortOrder;
+                                                                    request.url = request.url.replace("searchText/language/sortOrder", `${searchText}/${language}/${sortOrder}`);
+                                                                    return request;
+                                                                }
+                                                            }.bind(this),
+                                                        },
+                                                        filter: this.dropdownFilter,
+                                                        width: 150,
+                                                        required: true
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.programPU.planBasedOn'),
+                                                        type: 'dropdown',
+                                                        source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                                        tooltip: i18n.t("static.programPU.planByTooltip"),
+                                                        required: true
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.reorderFrequency'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
+                                                        required: true,
+                                                        number: true,
+                                                        regex: {
+                                                            ex: JEXCEL_INTEGER_REGEX,
+                                                            text: i18n.t('static.message.invalidnumber')
                                                         }
-                                                        if (productDataArr.length == 0) {
-                                                            data = [];
-                                                            data[0] = 0;
-                                                            data[1] = "";
-                                                            data[2] = 1;
-                                                            data[3] = "";
-                                                            data[4] = "";
-                                                            data[5] = "";
-                                                            data[6] = "";
-                                                            data[7] = "";
-                                                            data[8] = "";
-                                                            data[9] = "";
-                                                            data[10] = "";
-                                                            data[11] = 0;
-                                                            data[12] = 0;
-                                                            data[13] = 1;
-                                                            data[14] = 1;
-                                                            data[15] = programId;
-                                                            data[16] = "";
-                                                            data[17] = "";
-                                                            data[18] = "";
-                                                            productDataArr[0] = data;
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.minMonthOfStock'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.minQuantity'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.minQtyTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.program.monthfutureamc'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.monthsInFutureTooltip"),
+                                                        required: true,
+                                                        number: true,
+                                                        regex: {
+                                                            ex: JEXCEL_INTEGER_REGEX,
+                                                            text: i18n.t('static.message.invalidnumber')
                                                         }
-                                                        this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                                        var data = productDataArr;
-                                                        var options = {
-                                                            data: data,
-                                                            columnDrag: false,
-                                                            columns: [
-                                                                {
-                                                                    title: i18n.t('static.productCategory.productCategory'),
-                                                                    type: 'dropdown',
-                                                                    source: productCategoryListNew,
-                                                                    width:150,
-                                                                    required: true
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.dashboard.product'),
-                                                                    type: 'autocomplete',
-                                                                    source: list,
-                                                                    filter: this.dropdownFilter,
-                                                                    width:150,
-                                                                    required: true
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.programPU.planBasedOn'),
-                                                                    type: 'dropdown',
-                                                                    source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
-                                                                    tooltip: i18n.t("static.programPU.planByTooltip"),
-                                                                    required: true
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.reorderFrequency'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip"),
-                                                                    required: true,
-                                                                    number: true,
-                                                                    regex:{
-                                                                        ex: JEXCEL_INTEGER_REGEX,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.minMonthOfStock'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.minQuantity'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.minQtyTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.program.monthfutureamc'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip"),
-                                                                    required: true,
-                                                                    number: true,
-                                                                    regex: {
-                                                                        ex: JEXCEL_INTEGER_REGEX,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.program.monthpastamc'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip"),
-                                                                    required: true,
-                                                                    number: true,
-                                                                    regex: {
-                                                                        ex: JEXCEL_INTEGER_REGEX,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.localProcurementAgentLeadTime'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    decimal: '.',
-                                                                    mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                                                    width: 120,
-                                                                    required: true,
-                                                                    regex: {
-                                                                        ex: JEXCEL_DECIMAL_LEAD_TIME,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.distributionLeadTime'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.report.shelfLife'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
-                                                                    width: 120,
-                                                                    required: true,
-                                                                    number: true,
-                                                                    regex: {
-                                                                        ex: JEXCEL_INTEGER_REGEX,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
-                                                                    width: 120,
-                                                                    required: true,
-                                                                    regex: {
-                                                                        ex: JEXCEL_DECIMAL_CATELOG_PRICE,
-                                                                        text: i18n.t('static.message.invalidnumber')
-                                                                    }
-                                                                },
-                                                                {
-                                                                    title: 'Id',
-                                                                    type: 'hidden',
-                                                                    readOnly: true
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.common.active'),
-                                                                    type: 'checkbox'
-                                                                },
-                                                                {
-                                                                    title: 'Changed Flag',
-                                                                    type: 'hidden'
-                                                                },
-                                                                {
-                                                                    title: 'ProgramId',
-                                                                    type: 'hidden'
-                                                                },
-                                                                {
-                                                                    title: 'Min Mos',
-                                                                    type: 'hidden'
-                                                                },
-                                                                {
-                                                                    title: 'Min Qty',
-                                                                    type: 'hidden'
-                                                                },
-                                                                {
-                                                                    title: 'Distribution Lead Time',
-                                                                    type: 'hidden'
-                                                                }
-                                                            ],
-                                                            updateTable: function (el, cell, x, y, source, value, id) {
-                                                                var elInstance = el;
-                                                                var rowData = elInstance.getRowData(y);
-                                                                var programPlanningUnitId = rowData[12];
-                                                                if (programPlanningUnitId == 0) {
-                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                    cell2.classList.remove('readonly');
-                                                                } else {
-                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                    cell2.classList.add('readonly');
-                                                                }
-                                                                if (rowData[2] == 1) {
-                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                } else {
-                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                }
-                                                            },
-                                                            onsearch: function (el) {
-                                                            },
-                                                            onfilter: function (el) {
-                                                            },
-                                                            pagination: localStorage.getItem("sesRecordCount"),
-                                                            filters: true,
-                                                            search: true,
-                                                            columnSorting: true,
-                                                            wordWrap: true,
-                                                            paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                                            position: 'top',
-                                                            allowInsertColumn: false,
-                                                            allowManualInsertColumn: false,
-                                                            allowDeleteRow: true,
-                                                            onchange: this.changed,
-                                                            copyCompatibility: true,
-                                                            allowManualInsertRow: false,
-                                                            parseFormulas: true,
-                                                            onpaste: this.onPaste,
-                                                            oneditionend: this.oneditionend,
-                                                            onload: this.loaded,
-                                                            license: JEXCEL_PRO_KEY,
-                                                            contextMenu: function (obj, x, y, e) {
-                                                                var items = [];
-                                                                if (y == null) {
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnBefore,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 1);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnAfter,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 0);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    if (obj.options.columnSorting == true) {
-                                                                        items.push({ type: 'line' });
-                                                                        items.push({
-                                                                            title: obj.options.text.orderAscending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 0);
-                                                                            }
-                                                                        });
-                                                                        items.push({
-                                                                            title: obj.options.text.orderDescending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 1);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                } else {
-                                                                    if (obj.options.allowInsertRow == true) {
-                                                                        items.push({
-                                                                            title: i18n.t('static.common.insertNewRowBefore'),
-                                                                            onclick: function () {
-                                                                                var data = [];
-                                                                                data[0] = -1;
-                                                                                data[1] = "";
-                                                                                data[2] = 1;
-                                                                                data[3] = "";
-                                                                                data[4] = "";
-                                                                                data[5] = "";
-                                                                                data[6] = "";
-                                                                                data[7] = "";
-                                                                                data[8] = "";
-                                                                                data[9] = "";
-                                                                                data[10] = "";
-                                                                                data[11] = 0;
-                                                                                data[12] = 0;
-                                                                                data[13] = 1;
-                                                                                data[14] = 1;
-                                                                                data[15] = programId;
-                                                                                data[16] = "";
-                                                                                data[17] = "";
-                                                                                data[18] = "";
-                                                                                obj.insertRow(data, parseInt(y), 1);
-                                                                            }.bind(this)
-                                                                        });
-                                                                    }
-                                                                    if (obj.options.allowInsertRow == true) {
-                                                                        items.push({
-                                                                            title: i18n.t('static.common.insertNewRowAfter'),
-                                                                            onclick: function () {
-                                                                                var data = [];
-                                                                                data[0] = -1;
-                                                                                data[1] = "";
-                                                                                data[2] = 1;
-                                                                                data[3] = "";
-                                                                                data[4] = "";
-                                                                                data[5] = "";
-                                                                                data[6] = "";
-                                                                                data[7] = "";
-                                                                                data[8] = "";
-                                                                                data[9] = "";
-                                                                                data[10] = "";
-                                                                                data[11] = 0;
-                                                                                data[12] = 0;
-                                                                                data[13] = 1;
-                                                                                data[14] = 1;
-                                                                                data[15] = programId;
-                                                                                data[16] = "";
-                                                                                data[17] = "";
-                                                                                data[18] = "";
-                                                                                obj.insertRow(data, parseInt(y));
-                                                                            }.bind(this)
-                                                                        });
-                                                                    }
-                                                                    if (obj.options.allowDeleteRow == true) {
-                                                                        if (obj.getRowData(y)[12] == 0) {
-                                                                            items.push({
-                                                                                title: i18n.t("static.common.deleterow"),
-                                                                                onclick: function () {
-                                                                                    obj.deleteRow(parseInt(y));
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
-                                                                    if (x) {
-                                                                    }
-                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
-                                                                        let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
-                                                                        if (obj.options.allowInsertRow == true) {
-                                                                            if (cordsValue.length != 0) {
-                                                                                items.push({
-                                                                                    title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
-                                                                                    onclick: function () {
-                                                                                        this.props.history.push({
-                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
-                                                                                        });
-                                                                                    }.bind(this)
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                items.push({ type: 'line' });
-                                                                return items;
-                                                            }.bind(this)
-                                                        };
-                                                        var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                                        this.el = elVar;
-                                                        this.setState({ mapPlanningUnitEl: elVar, loading: false });
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.program.monthpastamc'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.monthsInPastTooltip"),
+                                                        required: true,
+                                                        number: true,
+                                                        regex: {
+                                                            ex: JEXCEL_INTEGER_REGEX,
+                                                            text: i18n.t('static.message.invalidnumber')
+                                                        }
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.localProcurementAgentLeadTime'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        decimal: '.',
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                        width: 120,
+                                                        required: true,
+                                                        regex: {
+                                                            ex: JEXCEL_DECIMAL_LEAD_TIME,
+                                                            text: i18n.t('static.message.invalidnumber')
+                                                        }
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.distributionLeadTime'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.report.shelfLife'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                                        width: 120,
+                                                        required: true,
+                                                        number: true,
+                                                        regex: {
+                                                            ex: JEXCEL_INTEGER_REGEX,
+                                                            text: i18n.t('static.message.invalidnumber')
+                                                        }
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                                        width: 120,
+                                                        required: true,
+                                                        regex: {
+                                                            ex: JEXCEL_DECIMAL_CATELOG_PRICE,
+                                                            text: i18n.t('static.message.invalidnumber')
+                                                        }
+                                                    },
+                                                    {
+                                                        title: 'Id',
+                                                        type: 'hidden',
+                                                        readOnly: true
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.common.active'),
+                                                        type: 'checkbox'
+                                                    },
+                                                    {
+                                                        title: 'Changed Flag',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'ProgramId',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Min Mos',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Min Qty',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Distribution Lead Time',
+                                                        type: 'hidden'
+                                                    }
+                                                ],
+                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                    var elInstance = el;
+                                                    var rowData = elInstance.getRowData(y);
+                                                    var programPlanningUnitId = rowData[12];
+                                                    if (programPlanningUnitId == 0) {
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                        var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                        cell2.classList.remove('readonly');
                                                     } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
-                                                        })
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                        var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                        cell2.classList.add('readonly');
                                                     }
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                                loading: false, color: '#BA0C2F'
+                                                    if (rowData[2] == 1) {
+                                                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                    } else {
+                                                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                    }
+                                                },
+                                                onsearch: function (el) {
+                                                },
+                                                onfilter: function (el) {
+                                                },
+                                                oneditionstart: function (instance, cell, x, y, value) {
+                                                    this.setState({ sortOrderLoading: true })
+                                                    let tempId = data[y][0]
+                                                    let sortOrder;
+                                                    if (tempId == -1 || tempId == 0) {
+                                                        sortOrder = "00"
+                                                    } else {
+                                                        sortOrder = this.state.productCategoryList.filter(item => item.payload.productCategoryId == tempId)[0].sortOrder
+                                                    }
+                                                    this.setState({ tempSortOrder: sortOrder }, () => {
+                                                        this.setState({ sortOrderLoading: false })
+                                                    })
+                                                }.bind(this),
+                                                pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
+                                                search: true,
+                                                columnSorting: true,
+                                                wordWrap: true,
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                position: 'top',
+                                                allowInsertColumn: false,
+                                                allowManualInsertColumn: false,
+                                                allowDeleteRow: true,
+                                                onchange: this.changed,
+                                                copyCompatibility: true,
+                                                allowManualInsertRow: false,
+                                                parseFormulas: true,
+                                                onpaste: this.onPaste,
+                                                oneditionend: this.oneditionend,
+                                                onload: this.loaded,
+                                                license: JEXCEL_PRO_KEY,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    var items = [];
+                                                    if (y == null) {
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                }
                                                             });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false, color: '#BA0C2F'
+                                                        }
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                }
+                                                            });
+                                                        }
+                                                        if (obj.options.columnSorting == true) {
+                                                            items.push({ type: 'line' });
+                                                            items.push({
+                                                                title: obj.options.text.orderAscending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 0);
+                                                                }
+                                                            });
+                                                            items.push({
+                                                                title: obj.options.text.orderDescending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 1);
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowBefore'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = -1;
+                                                                    data[1] = "";
+                                                                    data[2] = 1;
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = "";
+                                                                    data[9] = "";
+                                                                    data[10] = "";
+                                                                    data[11] = 0;
+                                                                    data[12] = 0;
+                                                                    data[13] = 1;
+                                                                    data[14] = 1;
+                                                                    data[15] = programId;
+                                                                    data[16] = "";
+                                                                    data[17] = "";
+                                                                    data[18] = "";
+                                                                    obj.insertRow(data, parseInt(y), 1);
+                                                                    obj.getCell(("B").concat(parseInt(y) + 1)).classList.add('typing-' + this.state.lang);
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowAfter'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = -1;
+                                                                    data[1] = "";
+                                                                    data[2] = 1;
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = "";
+                                                                    data[9] = "";
+                                                                    data[10] = "";
+                                                                    data[11] = 0;
+                                                                    data[12] = 0;
+                                                                    data[13] = 1;
+                                                                    data[14] = 1;
+                                                                    data[15] = programId;
+                                                                    data[16] = "";
+                                                                    data[17] = "";
+                                                                    data[18] = "";
+                                                                    obj.insertRow(data, parseInt(y));
+                                                                    obj.getCell(("B").concat(parseInt(y) + 2)).classList.add('typing-' + this.state.lang);
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        if (obj.options.allowDeleteRow == true) {
+                                                            if (obj.getRowData(y)[12] == 0) {
+                                                                items.push({
+                                                                    title: i18n.t("static.common.deleterow"),
+                                                                    onclick: function () {
+                                                                        obj.deleteRow(parseInt(y));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                        if (x) {
+                                                        }
+                                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                            let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
+                                                            if (obj.options.allowInsertRow == true) {
+                                                                if (cordsValue.length != 0) {
+                                                                    items.push({
+                                                                        title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                        onclick: function () {
+                                                                            this.props.history.push({
+                                                                                pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
+                                                                            });
+                                                                        }.bind(this)
                                                                     });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false, color: '#BA0C2F'
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false, color: '#BA0C2F'
-                                                                    });
-                                                                    break;
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                );
+                                                    items.push({ type: 'line' });
+                                                    return items;
+                                                }.bind(this)
+                                            };
+                                            var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                            this.el = elVar;
+                                            if (productDataArr.length == 0) {
+                                                this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
+                                            }
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false });
                                         } else {
-                                            list = [];
-                                            this.setState({ loading: false });
+                                            this.setState({
+                                                message: response.data.messageCode, loading: false, color: '#BA0C2F'
+                                            })
                                         }
                                     }).catch(
                                         error => {
@@ -873,6 +844,7 @@ class AddprogramPlanningUnit extends Component {
         this.el.insertRow(
             data, 0, 1
         );
+        this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
     }
     /**
      * Callback function called when editing of a cell in the jexcel table ends.
@@ -920,6 +892,31 @@ class AddprogramPlanningUnit extends Component {
                     z = data[i].y;
                 }
             }
+            if (data[i].x == 0) {
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if (index == 0) {
+                    (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+                }
+            }
+            if (data[i].x == 1) {
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if (index == 0) {
+                    let temp = data[i].value.split(" | ");
+                    let temp_obj = {
+                        id: parseInt(temp[1]),
+                        name: data[i].value
+                    };
+                    let temp_list = this.state.dropdownList;
+                    temp_list[data[i].y] = temp_obj;
+                    this.setState(
+                        {
+                            dropdownList: temp_list
+                        }, () => {
+                            (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                        }
+                    )
+                }
+            }
         }
     }
     /**
@@ -947,8 +944,8 @@ class AddprogramPlanningUnit extends Component {
                         valid = false;
                     }
                 }
-                
-                
+
+
                 var col = ("E").concat(parseInt(y) + 1);
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX
@@ -1027,6 +1024,7 @@ class AddprogramPlanningUnit extends Component {
             this.el.setValueFromCoords(1, y, "", true);
         }
         else if (x == 1) {
+            this.el.getCell(("B").concat(parseInt(y) + 1)).classList.remove('typing-' + this.state.lang);
             var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
 
@@ -1043,7 +1041,7 @@ class AddprogramPlanningUnit extends Component {
                     i = -1;
                 }
             }
-            
+
         }
         else if (x == 2) {
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -1214,7 +1212,7 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(18, y, value, true);
             }
         }
-        
+
         if (x != 14) {
             this.el.setValueFromCoords(14, y, 1, true);
         }
