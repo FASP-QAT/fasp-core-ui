@@ -233,7 +233,8 @@ class EditSupplyPlanStatus extends Component {
             submitMessage: "",
             submitColor: "",
             planningUnitDropdownList: [],
-            temp_currentVersion_id: ''
+            temp_currentVersion_id: '',
+            loadSummaryTable:false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -2353,7 +2354,8 @@ class EditSupplyPlanStatus extends Component {
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
-                    loading: false
+                    loading: false,
+                    loadSummaryTable:true
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -3567,7 +3569,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.program.problemReportList!=undefined && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -5031,7 +5033,8 @@ class EditSupplyPlanStatus extends Component {
                                                                     submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                                     submitColor: "green",
                                                                     problemReportChanged: 0,
-                                                                    remainingDataChanged: 0
+                                                                    remainingDataChanged: 0,
+                                                                    loadSummaryTable:false
 
                                                                     // isModalOpen: !this.state.isModalOpen,
                                                                 }, () => {
