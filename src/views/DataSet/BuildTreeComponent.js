@@ -3477,7 +3477,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: i18n.t('static.tree.seasonalityIndex'),
-                    type: 'numeric',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
@@ -3485,7 +3485,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: i18n.t('static.tree.manualChange'),
-                    type: 'numeric',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
@@ -3924,7 +3924,7 @@ export default class BuildTree extends Component {
             if (type == 1) {
                 this.state.momEl.setValueFromCoords(8, 0, checked, true);
             } else {
-                this.state.momElPer.setValueFromCoords(10, 0, checked, true);
+                this.state.momElPer.setValueFromCoords(12, 0, checked, true);
             }
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
             var nodes = this.state.items;
@@ -3942,6 +3942,8 @@ export default class BuildTree extends Component {
             }, () => {
                 if (this.state.momEl != "") {
                     this.buildMomJexcel();
+                } else if(this.state.momElPer != "") {
+                    this.buildMomJexcelPercent();
                 }
             });
         }
@@ -10914,6 +10916,21 @@ export default class BuildTree extends Component {
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                         <b>{'Manual Change affects future month'}</b>
+                                                    </Label>
+                                                </div>
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="seasonality"
+                                                        name="seasonality"
+                                                        checked={this.state.seasonality}
+                                                        onClick={(e) => { this.momCheckbox(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Show Seasonality & manual change'}</b>
                                                     </Label>
                                                 </div>
                                             </div>
