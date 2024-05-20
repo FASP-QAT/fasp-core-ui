@@ -266,7 +266,7 @@ export default class SupplyPlanComponent extends React.Component {
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
         localStorage.setItem("sesStartDate", JSON.stringify(value));
-        this.formSubmit(this.state.planningUnit, monthDifference);
+        this.formSubmit(this.state.planningUnit, monthDifference,1);
     }
     /**
      * This function is used to hide the messages that are there in div1 after 30 seconds
@@ -2703,12 +2703,12 @@ export default class SupplyPlanComponent extends React.Component {
      * @param {*} value This is the value of the planning unit
      * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
      */
-    formSubmit(value, monthCount) {
+    formSubmit(value, monthCount,doNotShowLoader) {
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
                 planningUnitChange: true,
                 display: 'block',
-                loading: true
+                loading: doNotShowLoader==1?false:true
             })
         } else {
             this.setState({
@@ -3643,7 +3643,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount,1)
     }
     /**
      * This function is called when scroll to right is clicked on the supply plan table
@@ -3653,7 +3653,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount,1)
     }
     /**
      * This function is called when scroll to left is clicked on the consumption table
