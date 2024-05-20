@@ -3259,5 +3259,6 @@
     "static.treeTemplate.returnToList": "Return To List",
     "static.tree.targetChangePer": "Target change (%)",
     "static.tree.changePerPoints": "Change (% points)",
-    "static.errorPage.validUserComment": "Enter Description"
+    "static.errorPage.validUserComment": "Enter Description",
+    "static.common.erpComboboxError": "Fill either ERP planning unit or RO/Order No. to populate data"
 }

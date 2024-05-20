@@ -2073,6 +2073,7 @@ export default class ManualTagging extends Component {
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     this.setState({
+                        comboBoxError: roNoOrderNo == 0 && erpPlanningUnitId == 0 ? true : false,
                         artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3 != "" ? c.roPrimeLineNo == this.state.roPrimeLineNoForTab3 : true)),
                         displayButton: false
                     }, () => {
@@ -2128,6 +2129,7 @@ export default class ManualTagging extends Component {
                 );
         } else {
             this.setState({
+                comboBoxError: roNoOrderNo == 0 && erpPlanningUnitId == 0 ? true : false,
                 artmisList: [],
                 displayButton: false
             }, () => {
@@ -5188,6 +5190,7 @@ export default class ManualTagging extends Component {
                                                             <div className="controls ">
                                                                 <Autocomplete
                                                                     id="combo-box-demo1"
+                                                                    className={this.state.comboBoxError && this.state.table1Loader ? 'errorBorder' : ''}
                                                                     options={this.state.tracercategoryPlanningUnit}
                                                                     getOptionLabel={(option) => option.label}
                                                                     style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
@@ -5213,6 +5216,7 @@ export default class ManualTagging extends Component {
                                                                         variant="outlined"
                                                                         onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
                                                                 />
+                                                                {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6 pl-0">
@@ -5221,6 +5225,7 @@ export default class ManualTagging extends Component {
                                                             >
                                                                 <Autocomplete
                                                                     id="combo-box-demo"
+                                                                    className={this.state.comboBoxError && this.state.table1Loader ? 'errorBorder' : ''}
                                                                     defaultValue={this.state.roNoOrderNo}
                                                                     options={this.state.autocompleteData}
                                                                     getOptionLabel={(option) => option.label}
@@ -5245,6 +5250,7 @@ export default class ManualTagging extends Component {
                                                                             this.searchErpOrderData(e.target.value)
                                                                         }} />}
                                                                 />
+                                                                {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
                                                     </div>
