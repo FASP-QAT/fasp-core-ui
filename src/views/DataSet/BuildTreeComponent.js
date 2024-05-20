@@ -730,7 +730,11 @@ export default class BuildTree extends Component {
             addNodeError: false,
             currentNodeTypeId: "",
             deleteChildNodes: false,
-            branchTemplateNotes: ""
+            branchTemplateNotes: "",
+            levelReorderJexcelLoader: false,
+            levelReorderEl: "",
+            showReorderJexcel: false,
+            dropdownSources: {}
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -831,6 +835,7 @@ export default class BuildTree extends Component {
         this.showMomData = this.showMomData.bind(this);
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
+        this.buildLevelReorderJexcel = this.buildLevelReorderJexcel.bind(this);
         this.openScenarioModal = this.openScenarioModal.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
@@ -2107,9 +2112,132 @@ export default class BuildTree extends Component {
             levelModal: !this.state.levelModal,
             levelName: name,
             levelNo: levelNo,
-            levelUnit: unit
+            levelUnit: unit,
+            showReorderJexcel: true
+        }, () => {
+            setTimeout(() => {
+                this.buildLevelReorderJexcel();
+            }, 0)  
         })
     }
+    buildLevelReorderJexcel() {
+        var levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+        var dataArray = [];
+        let count = 0;
+        var oldParent = 0;
+        var newParent = 0;
+        var levelCount = 1;
+        var dropdownSources = this.state.dropdownSources;
+        for (var j = 0; j < levelNodes.length; j++) {
+            data = [];
+            newParent = levelNodes[j].parent;
+            if(oldParent != newParent){
+                dropdownSources[count] = [];
+                dropdownSources[count].push({id: 0, name: "Parent Node"});
+                var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
+                levelCount = 1;
+                oldParent = newParent;
+                data[0] = levelNodes[j].sortOrder;
+                data[1] = "Parent Node";
+                data[2] = parentNode[0].payload.label.label_en;
+                dataArray[count] = data;
+                j--;
+            } else {
+                dropdownSources[count] = [];
+                dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
+                data[0] = levelNodes[j].sortOrder;
+                data[1] = levelCount.toString();
+                data[2] = levelNodes[j].payload.label.label_en;
+                dataArray[count] = data;
+                levelCount++;
+            }
+            count++;
+        }
+        this.setState({
+            dropdownSources
+        })
+        if (document.getElementById("levelReorderJexcel") != null) {
+            this.el = jexcel(document.getElementById("levelReorderJexcel"), '');
+        } else {
+            this.el = "";
+        }
+        if (document.getElementById("levelReorderJexcel") != null) {
+            jexcel.destroy(document.getElementById("levelReorderJexcel"), true);
+        }
+        var data = dataArray;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [50, 20, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.tree.monthStartNoSeasonality'),
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Node Position",
+                    type: 'dropdown',
+                    source: [{id: 0, name: "Parent Node"},{id: 1, name: 1},{id: 2, name: 2},{id: 3, name: 3},{id: 4, name: 4},{id: 5, name: 5}],
+                    readOnly: false
+                },
+                {
+                    title: "Node Name",
+                    type: 'text',
+                    readOnly: true
+                },
+            ],
+            editable: true,
+            onload: this.loadedLevelReorder,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onchange: this.changed1,
+            updateTable: function (el, cell, x, y, source, value, id) {
+            }.bind(this),
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        if (document.getElementById("levelReorderJexcel") != null) {
+            var levelReorderEl = jexcel(document.getElementById("levelReorderJexcel"), options);
+            this.el = levelReorderEl;
+        } else {
+            var levelReorderEl = "";
+        }
+        this.setState({
+            levelReorderEl: levelReorderEl
+        });
+    };
+    loadedLevelReorder = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var json = instance.worksheets[0].getJson(null, false);
+        var colArr = ["A", "B", "C"]
+        for (var j = 0; j < json.length; j++) {
+            if (json[j][1] == 0) {
+                for (var i = 0; i < colArr.length; i++) {
+                    var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
+                    cell.classList.add('readonly');
+                    cell.classList.add('productValidationSubTotalClass');
+                }
+            }
+        }
+    }
+    getDropdownSource = (rowIndex) => {
+        const { dropdownSources } = this.state;
+        return dropdownSources[rowIndex] || [];
+      };
     /**
      * Updates the component state with the new name for a level when the name input field is changed.
      * @param {Object} e The event object representing the input change event.
@@ -12769,6 +12897,14 @@ export default class BuildTree extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
+                                    </FormGroup>
+                                    <FormGroup>
+                                    {this.state.showReorderJexcel &&
+                                        <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                            <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            </div>
+                                        </div>
+                                    }
                                     </FormGroup>
                                 </ModalBody>
                                 <ModalFooter>
