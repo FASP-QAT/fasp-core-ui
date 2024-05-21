@@ -654,8 +654,13 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+                if(this.props.takeDataFrom=="programData"){
+                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('programData');
+                }else{
+                    var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+                }
                 var programRequest = programDataOs.get(document.getElementById("programId").value);
                 programRequest.onerror = function (event) {
                     this.setState({
