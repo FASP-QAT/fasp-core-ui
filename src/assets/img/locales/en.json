@@ -2031,7 +2031,7 @@
     "static.procurementAgentPlanningUnit.moqText": "Enter MOQ",
     "static.manualTagging.receipentCountry": "Recipient Country",
     "static.supplyPlan.procAgent": "Proc Agent",
-    "static.whatIf.removePlannedShipmentsNotInLeadTimes": "Remove all Planned shipments that do not comply with the lead time",
+    "static.whatIf.removePlannedShipmentsNotInLeadTimes": "Remove only those shipments that do not comply with the lead time",
     "static.extrapolation.ActualConsumption": "Needs at least 24 months of actual consumption data",
     "static.country.country": "Country name (English)",
     "static.budget.budgetDisplayNameText": "Enter Budget Display Name",
@@ -3260,5 +3260,9 @@
     "static.tree.targetChangePer": "Target change (%)",
     "static.tree.changePerPoints": "Change (% points)",
     "static.errorPage.validUserComment": "Enter Description",
-    "static.common.erpComboboxError": "Fill either ERP planning unit or RO/Order No. to populate data"
+    "static.common.erpComboboxError": "Fill either ERP planning unit or RO/Order No. to populate data",
+    "static.scenarioPlanning.changeAMC":"Change AMC",
+    "static.scenarioPlanning.monthInPastValidation":"Please select Months in Past for AMC",
+    "static.scenarioPlanning.monthInFutureValidation":"Please select Months in Future for AMC",
+    "static.whatIf.removePlannedShipments": "Remove all Planned shipments"
 }
