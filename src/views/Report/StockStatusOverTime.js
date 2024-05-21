@@ -295,7 +295,7 @@ class StockStatusOverTime extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
-                        this.updateMonthsforAMCCalculations()
+                        // this.updateMonthsforAMCCalculations()
                     })
                 } else {
                     this.setState({
@@ -632,7 +632,7 @@ class StockStatusOverTime extends Component {
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
-            this.updateMonthsforAMCCalculations()
+            // this.updateMonthsforAMCCalculations()
         })
     }
     /**
@@ -826,8 +826,8 @@ class StockStatusOverTime extends Component {
                                                 "planningUnit": pu,
                                                 "stock": list[0].closingBalance,
                                                 "consumptionQty": list[0].consumptionQty,
-                                                "monthsInPastForAmc": monthsInPastForAmc,
-                                                "monthsInFutureForAmc": monthsInFutureForAmc,
+                                                "mosPast": monthsInPastForAmc,
+                                                "mosFuture": monthsInFutureForAmc,
                                                 "amc": amcCalcualted,
                                                 // "amcMonthCount": countAMC,
                                                 "mos": mos != null ? roundN(mos) : null
@@ -840,8 +840,8 @@ class StockStatusOverTime extends Component {
                                                 "planningUnit": pu,
                                                 "stock": 0,
                                                 "consumptionQty": 0,
-                                                "monthsInPastForAmc": 0,
-                                                "monthsInFutureForAmc": 0,
+                                                "mosPast": 0,
+                                                "mosFuture": 0,
                                                 "amc": null,
                                                 // "amcMonthCount": 0,
                                                 "mos": null
@@ -872,8 +872,8 @@ class StockStatusOverTime extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "planningUnitIds": planningUnitIds,
-                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == "" ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
-                    "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
+                    // "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == "" ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
+                    // "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
                     "startDate": startDate,
                     "stopDate": stopDate
                 }
@@ -959,7 +959,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
         var A = [addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), (i18n.t('static.report.mospast')).replaceAll(' ', '%20'), (i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), i18n.t('static.report.mos')])]
-        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.monthsInPastForAmc == null ? '' : elt.monthsInPastForAmc, elt.monthsInFutureForAmc == null ? '' : elt.monthsInFutureForAmc, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1050,7 +1050,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.mospast'), i18n.t('static.report.mosfuture'), i18n.t('static.report.amc'), i18n.t('static.report.mos')]];
         const data = [];
         // this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
-        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), elt.monthsInPastForAmc, elt.monthsInFutureForAmc, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1318,10 +1318,10 @@ class StockStatusOverTime extends Component {
                                                                 {formatter(item.consumptionQty,0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.monthsInPastForAmc,0)}
+                                                                {formatter(item.mosPast,0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.monthsInFutureForAmc,0)}
+                                                                {formatter(item.mosFuture,0)}
                                                             </td>
                                                             <td>
                                                                 {formatter(roundAMC(item.amc,0))}
