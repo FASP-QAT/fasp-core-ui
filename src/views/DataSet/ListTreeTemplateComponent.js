@@ -1788,7 +1788,8 @@ export default class ListTreeTemplate extends Component {
                     }
                     tree.flatList = items;
                     tree.lastModifiedBy = {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username:AuthenticationService.getLoggedInUsername()
                     };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     tree.createdBy = {
