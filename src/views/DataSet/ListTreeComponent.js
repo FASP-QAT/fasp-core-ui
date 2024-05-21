@@ -271,7 +271,8 @@ export default class ListTreeComponent extends Component {
                     }
                     tree.flatList = items;
                     tree.lastModifiedBy = {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username: AuthenticationService.getLoggedInUsername()
                     };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     tree.createdBy = {
@@ -1529,7 +1530,7 @@ export default class ListTreeComponent extends Component {
                         "label_fr": null,
                         "label_pr": null
                     };
-                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId() };
+                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
                     treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
                     treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
                     treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
@@ -1585,7 +1586,8 @@ export default class ListTreeComponent extends Component {
                     regionList: this.state.regionList,
                     levelList: treeTemplate.levelList,
                     lastModifiedBy: {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username:AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1691,7 +1693,8 @@ export default class ListTreeComponent extends Component {
                         }
                     }],
                     lastModifiedBy: {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username:AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1750,7 +1753,7 @@ export default class ListTreeComponent extends Component {
                 "label_fr": null,
                 "label_pr": null
             }
-            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId() };
+            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
             treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
             treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
             treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
