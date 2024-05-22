@@ -6,6 +6,7 @@ import "jspdf-autotable";
 import moment from "moment";
 import React, { Component } from 'react';
 import { HorizontalBar, Pie } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
 import {
@@ -40,6 +41,13 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 const options = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -117,6 +125,13 @@ const options = {
     }
 }
 const options1 = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -168,6 +183,31 @@ const options1 = {
     }
 }
 const optionsPie = {
+    layout: {
+        padding: 20,
+    },
+    plugins: {
+        datalabels: {
+          color: '#000',
+          anchor: 'end',
+          align: 'end',
+          offset: 10,
+          font: {
+            weight: 'bold',
+            size: 12,
+          },
+          formatter: (value, context) => {
+            const data = context.chart.data.datasets[0].data;
+            const total = data.reduce((acc, value) => acc + value, 0);
+            const percentage = ((value / total) * 100).toFixed(0);
+            if(percentage == 0){
+                return ``;
+            } else {
+                return `${percentage}%`;
+            }
+          },
+        }
+    },
     title: {
         display: true,
         text: i18n.t('static.fundingSourceHead.fundingSource'),
@@ -186,6 +226,32 @@ const optionsPie = {
         }
     },
 }
+const customPlugin = {
+    id: 'customPlugin',
+    afterDatasetDraw(chart) {
+      const { ctx, chartArea: { top, bottom, left, right } } = chart;
+      const meta = chart.getDatasetMeta(0);
+
+      ctx.save();
+      meta.data.forEach((arc, index) => {
+        const dataset = chart.data.datasets[0];
+        const dataValue = dataset.data[index];
+        const angle = (arc.startAngle + arc.endAngle) / 2;
+        const x = arc.x + Math.cos(angle) * (arc.outerRadius + 10);
+        const y = arc.y + Math.sin(angle) * (arc.outerRadius + 10);
+        const labelX = arc.x + Math.cos(angle) * (arc.outerRadius + 30);
+        const labelY = arc.y + Math.sin(angle) * (arc.outerRadius + 30);
+
+        ctx.beginPath();
+        ctx.moveTo(arc.x, arc.y);
+        ctx.lineTo(x, y);
+        ctx.lineTo(labelX, labelY);
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+      });
+      ctx.restore();
+    },
+  };
 /**
  * Component for Shipment Global Demand View Report.
  */
@@ -1781,7 +1847,7 @@ class ShipmentGlobalDemandView extends Component {
                                             this.state.fundingSourceSplit.length > 0 &&
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
-                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} plugins={[customPlugin]}
                                                     /><br />
                                                 </div>
                                                 <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
