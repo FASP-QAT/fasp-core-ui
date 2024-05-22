@@ -3238,5 +3238,6 @@
     "static.currency.conversionrateusd": "Tasa de cambio a USD",
     "static.logout.confirmLogout": "¿Desea cerrar la sesión?",
     "static.common.node": "Nodo",
-    "static.pipeline.pipelineConvertorLinux": "Linux"
+    "static.pipeline.pipelineConvertorLinux": "Linux",
+    "static.errorPage.validUserComment": "Introduzca la descripción"
 }

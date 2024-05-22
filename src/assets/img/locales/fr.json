@@ -3238,5 +3238,6 @@
     "static.currency.conversionrateusd": "Taux de conversion à 1 USD",
     "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
     "static.common.node": "Nœud",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.errorPage.validUserComment": "Entrez la description"
 }
