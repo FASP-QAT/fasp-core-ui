@@ -792,7 +792,7 @@ class ForecastOutput extends Component {
                                                 let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                                 if (scenarioId != null) {
                                                     for (let m = 0; m < treeList.length; m++) {
-                                                        let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId) : []);
+                                                        let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true") : []);
                                                         if (filteredScenario.length > 0) {
                                                             let flatlist = treeList[m].tree.flatList;
                                                             let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
@@ -900,7 +900,7 @@ class ForecastOutput extends Component {
                                                     let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                                     if (scenarioId != null) {
                                                         for (let m = 0; m < treeList.length; m++) {
-                                                            let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId) : []);
+                                                            let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true") : []);
                                                             if (filteredScenario.length > 0) {
                                                                 let flatlist = treeList[m].tree.flatList;
                                                                 let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 5);

@@ -3238,5 +3238,8 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.tree.deleteScenario": "Delete Scenario",
+    "static.tree.showOnlyActive": "Show Only Active",
+    "static.tree.showInactive": "Show Inactive"
 }
