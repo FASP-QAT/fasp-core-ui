@@ -3590,6 +3590,22 @@ export default class BuildTree extends Component {
             var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[5].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[9].title = i18n.t('static.tooltip.SelectAsForecast');
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
