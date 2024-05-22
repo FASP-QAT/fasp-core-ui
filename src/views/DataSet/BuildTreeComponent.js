@@ -2908,9 +2908,11 @@ export default class BuildTree extends Component {
             curTreeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
             if (curTreeObj.lastModifiedBy != undefined) {
                 curTreeObj.lastModifiedBy.userId = AuthenticationService.getLoggedInUserId();
+                curTreeObj.lastModifiedBy.username = AuthenticationService.getLoggedInUsername();
             } else {
                 curTreeObj.lastModifiedBy = {
-                    "userId": AuthenticationService.getLoggedInUserId()
+                    "userId": AuthenticationService.getLoggedInUserId(),
+                    "username": AuthenticationService.getLoggedInUsername()
                 }
             }
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
