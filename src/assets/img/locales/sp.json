@@ -1916,7 +1916,6 @@
     "static.report.min": "Mín",
     "static.report.fundingSource": "Costo de pedidos por fuente de financiamiento",
     "static.common.loadDeleteDataSet": "Descargar o eliminar programa",
-    "static.importFromQATSupplyPlan.supplyPlanProgram": "Programa de plan de suministros",
     "static.dataEntryAndAdjustments.DaysInMonth": "(# de días en el mes)",
     "static.tree.startValue": "Valor inicial",
     "static.dataentry.otherUnitName": "Ingrese el nombre de otra unidad",
@@ -3260,5 +3259,8 @@
     "static.treeTemplate.returnToList": "Volver a la lista",
     "static.tree.targetChangePer": "Cambio de objetivo (%)",
     "static.tree.changePerPoints": "Cambio (puntos porcentuales)",
-    "static.errorPage.validUserComment": "Introduzca la descripción"
+    "static.errorPage.validUserComment": "Introduzca la descripción",
+    "static.tree.deleteScenario": "Eliminar escenario",
+    "static.tree.showOnlyActive": "Mostrar solo activa",
+    "static.tree.showInactive": "Mostrar inactiva"
 }

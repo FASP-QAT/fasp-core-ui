@@ -205,47 +205,47 @@ class CompareAndSelectScenario extends Component {
                 }
             }
             if (selectedPlanningUnit[0].treeForecast.toString() == "true") {
-            for (var tl = 0; tl < treeList.length; tl++) {
-                var tree = treeList[tl];
-                var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
-                for (var sl = 0; sl < scenarioList.length; sl++) {
-                    try {
-                        var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
-                    } catch (err) {
-                        flatList = []
-                    }
-                    if (colourArrayCount > 10) {
-                        colourArrayCount = 0;
-                    }
-                    var readonly = flatList.length > 0 ? false : true;
-                    dataForPlanningUnit = [];
-                    try {
-                        var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
-                    } catch (err) {
-                        dataForPlanningUnit = []
-                    }
-                    var data = [];
-                    if (dataForPlanningUnit.length > 0) {
-                        for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
-                            if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
-                                data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                for (var tl = 0; tl < treeList.length; tl++) {
+                    var tree = treeList[tl];
+                    var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    for (var sl = 0; sl < scenarioList.length; sl++) {
+                        try {
+                            var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                        } catch (err) {
+                            flatList = []
+                        }
+                        if (colourArrayCount > 10) {
+                            colourArrayCount = 0;
+                        }
+                        var readonly = flatList.length > 0 ? false : true;
+                        dataForPlanningUnit = [];
+                        try {
+                            var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                        } catch (err) {
+                            dataForPlanningUnit = []
+                        }
+                        var data = [];
+                        if (dataForPlanningUnit.length > 0) {
+                            for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
+                                if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
+                                    data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                                }
                             }
                         }
+                        let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
+                            if (!a[month])
+                                a[month] = Object.assign({}, { month, calculatedMmdValue });
+                            else
+                                a[month].calculatedMmdValue += calculatedMmdValue;
+                            return a;
+                        }, {}));
+                        treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
+                        colourArrayCount += 1;
+                        count += 1;
                     }
-                    let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
-                        if (!a[month])
-                            a[month] = Object.assign({}, { month, calculatedMmdValue });
-                        else
-                            a[month].calculatedMmdValue += calculatedMmdValue;
-                        return a;
-                    }, {}));
-                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
-                    colourArrayCount += 1;
-                    count += 1;
                 }
             }
-        }
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined) {
             }
             var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
@@ -503,7 +503,7 @@ class CompareAndSelectScenario extends Component {
             finalData: finalData,
             useForLowestError:useForLowestError
         }, () => {
-            let treeScenarioList1 = this.state.treeScenarioList;
+            let treeScenarioList1 = this.state.treeScenarioList.filter(c => c.scenario.active);
             let dataArray = [];
             let count = 0;
             for (var j = 0; j < treeScenarioList1.length; j++) {
@@ -1222,7 +1222,7 @@ class CompareAndSelectScenario extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changeTable1 = function (instance, cell, x, y, value) {
-        this.setState({            
+        this.setState({
             loading: true
         })
         var elInstance = instance;
@@ -1337,7 +1337,7 @@ class CompareAndSelectScenario extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-            }            
+            }
         } else {
             cont = true;
         }
@@ -1566,7 +1566,7 @@ class CompareAndSelectScenario extends Component {
      * Submits the selected scenario and updates the dataset accordingly.
      */
     submitScenario() {
-        this.setState({dataChangedFlag: 0, loading: true })
+        this.setState({ dataChangedFlag: 0, loading: true })
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         var treeId = this.state.selectedTreeScenarioId.toString().split("~")[0];
         if (scenarioId == undefined) {
@@ -1676,7 +1676,7 @@ class CompareAndSelectScenario extends Component {
                 let id = AuthenticationService.displayDashboardBasedOnRole();
                 this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
             })
-        }        
+        }
     }
     /**
      * Toggles the visibility of guidance in the component state.

@@ -90,7 +90,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
                         if (scenarioId != -1) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                         }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
@@ -153,7 +153,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
                         if (scenarioId != -1) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                         }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
@@ -639,7 +639,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
                         if (scenarioId != -1) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                         }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
