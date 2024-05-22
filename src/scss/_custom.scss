@@ -10827,3 +10827,14 @@ legend.scheduler-border {
 .jss_container {
   width: 100%;
 }
+.StepCardFooter {
+  margin-bottom: -1.25rem;
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  padding: 10px 20px;
+  background-color: #f7f7f7;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
