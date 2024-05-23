@@ -92,7 +92,8 @@ class CompareAndSelectScenario extends Component {
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
             changed: false,
-            dataChangedFlag: 0
+            dataChangedFlag: 0,
+            showFits: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -136,6 +137,15 @@ class CompareAndSelectScenario extends Component {
             showForecastPeriod: e.target.checked
         }, () => {
             this.setMonth1List()
+        })
+    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
+    setShowFits(e) {
+        this.setState({
+            showFits: e.target.checked
         })
     }
     /**
@@ -315,7 +325,7 @@ class CompareAndSelectScenario extends Component {
         var totalArray = [];
         var monthArrayForError = [];
         if (consumptionData.length > 0) {
-            for(var i=0;i<consumptionData.length;i++){
+            for (var i = 0; i < consumptionData.length; i++) {
                 monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
             }
         }
@@ -323,7 +333,7 @@ class CompareAndSelectScenario extends Component {
         var actualMultiplier = 1;
         var actualDiff = [];
         var countArray = [];
-        var useForLowestError=[];
+        var useForLowestError = [];
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             totalArray.push(0);
             actualDiff.push(0);
@@ -338,8 +348,8 @@ class CompareAndSelectScenario extends Component {
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-                    if(scenarioFilter.length>0 && (useForLowestError[tsl]==undefined || useForLowestError[tsl]==null || useForLowestError[tsl]==false)){
-                        useForLowestError[tsl]=true;
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
                     }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue) * multiplier : "")) : 0;
                     if (diff < 0) {
@@ -351,8 +361,8 @@ class CompareAndSelectScenario extends Component {
                     }
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-                    if(scenarioFilter.length>0 && (useForLowestError[tsl]==undefined || useForLowestError[tsl]==null || useForLowestError[tsl]==false)){
-                        useForLowestError[tsl]=true;
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
                     }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : "")) : 0;
                     if (diff < 0) {
@@ -430,7 +440,7 @@ class CompareAndSelectScenario extends Component {
         higherThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdHighPerc);
         lowerThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdLowPerc);
         var finalData = [];
-        var min = Math.min(...actualDiff.filter((c,index) => useForLowestError[index]))
+        var min = Math.min(...actualDiff.filter((c, index) => useForLowestError[index]))
         var treeScenarioList = this.state.treeScenarioList;
         for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
             finalData.push({
@@ -501,7 +511,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             actualDiff: actualDiff,
             finalData: finalData,
-            useForLowestError:useForLowestError
+            useForLowestError: useForLowestError
         }, () => {
             let treeScenarioList1 = this.state.treeScenarioList.filter(c => c.scenario.active);
             let dataArray = [];
@@ -1200,7 +1210,7 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('notSelectedForecast');
                 }
             }
-            if (Math.min(...this.state.actualDiff.filter((c,index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
+            if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
                 var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('lowestError');
             } else {
@@ -1837,7 +1847,8 @@ class CompareAndSelectScenario extends Component {
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
-                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))
+                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null)))
+                        // data: json.map((item, c) => c >= count && item[1] !== "" ? item[1] : null)
                     }
                 )
             })
@@ -2178,6 +2189,23 @@ class CompareAndSelectScenario extends Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>}
+                                                </div>
+                                                <div className={"row check inline pt-lg-3 pl-lg-3"}>
+                                                    <div className="pt-lg-2 col-md-12">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="showFits"
+                                                            name="showFits"
+                                                            checked={this.state.showFits}
+                                                            onClick={(e) => { this.setShowFits(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolations.showFits')}</b>
+                                                        </Label>
+                                                    </div>
                                                     {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
