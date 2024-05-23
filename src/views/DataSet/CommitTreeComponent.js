@@ -2786,6 +2786,14 @@ export default class CommitTreeComponent extends React.Component {
                                     consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
+
+                                var planningUnitToUpdate = programJson.planningUnitList;
+                                for (var pl = 0; pl < planningUnitToUpdate.length; pl++) {
+                                    if(planningUnitToUpdate[pl].programPlanningUnitId==""){
+                                        planningUnitToUpdate[pl].programPlanningUnitId=null;
+                                    }
+                                }
+                                programJson.planningUnitList = planningUnitToUpdate;
                                 programJson.treeList = treeList;
                                 const compressedData = isCompress(programJson);
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
