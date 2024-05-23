@@ -70,6 +70,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPeriod: '',
             selSource1: [],
             selectedForecastProgramDesc: '',
+            toggleDoNotImport: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -87,6 +88,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
+        this.updatePUs = this.updatePUs.bind(this)
     }
     /**
      * Toggles the visibility of the program setting popover.
@@ -533,7 +535,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                         .then(response => {
                             if (response.status == 200) {
-                                console.log("Response Data Test@123",response.data);
                                 var planningUnitList = response.data.filter(c => c.active)
                                 this.setState({
                                     programPlanningUnitList: planningUnitList,
@@ -886,8 +887,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     setVersionId(event) {
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
-        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY")+"-01");
-        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY")+"-01");
+        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY") + "-01");
+        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY") + "-01");
         let defaultForecastStartYear = forecastStartDate.getFullYear();
         let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
         let defaultForecastStopYear = forecastStopDate.getFullYear();
@@ -1083,6 +1084,36 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
     }
     /**
+         * Sets the state to toggle do not import flag.
+         * @param {Event} e - The change event.
+         * @returns {void}
+         */
+    setToggleDoNotImport(e) {
+        this.setState({
+            toggleDoNotImport: e.target.checked
+        }, () => {
+            this.updatePUs()
+        })
+    }
+    updatePUs() {
+        var tableJson = this.el.getJson(null, false);
+        if (this.state.toggleDoNotImport) {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if(rowData[2]===""){
+                    this.el.setValueFromCoords(2,parseInt(i),-1,true);
+                }
+            }
+        } else {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if(rowData[2]===-1){
+                    this.el.setValueFromCoords(2,parseInt(i),"",true);
+                }
+            }
+        }
+    }
+    /**
      * Renders the import into QAT supply plan step one screen.
      * @returns {JSX.Element} - Import into QAT supply plan step one screen.
      */
@@ -1225,6 +1256,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
+                        {this.state.selSource!=undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{"marginLeft":"20px","marginTop":"47px"}}>
+                            <Input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="toggleDoNotImport"
+                                name="toggleDoNotImport"
+                                checked={this.state.toggleDoNotImport}
+                                onClick={(e) => { this.setToggleDoNotImport(e); }}
+                            />
+                            <Label
+                                className="form-check-label"
+                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                {i18n.t('static.import.doNoImportCheckbox')}
+                            </Label>
+                        </FormGroup>}
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >

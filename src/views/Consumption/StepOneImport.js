@@ -59,7 +59,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selectedForecastProgram: '',
             getDatasetFilterList: [],
             selSource1: [],
-            isChanged1: false
+            isChanged1: false,
+            toggleDoNotImport: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -75,6 +76,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.getProgramPlanningUnit = this.getProgramPlanningUnit.bind(this);
+        this.updatePUs = this.updatePUs.bind(this)
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -913,7 +915,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
                 forecastProgramVersionId: 0,
                 selectedForecastProgram: '',
-            },()=>{
+            }, () => {
                 jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             })
         }
@@ -1009,6 +1011,38 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("selSource1", tableJson);
         } else {
+        }
+    }
+    /**
+         * Sets the state to toggle do not import flag.
+         * @param {Event} e - The change event.
+         * @returns {void}
+         */
+    setToggleDoNotImport(e) {
+        this.props.updateStepOneData("loading", true);
+        this.setState({
+            toggleDoNotImport: e.target.checked,
+            loading:true
+        }, () => {
+            this.updatePUs()
+        })
+    }
+    updatePUs() {
+        var tableJson = this.el.getJson(null, false);
+        if (this.state.toggleDoNotImport) {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[7] === "") {
+                    this.el.setValueFromCoords(7, parseInt(i), -1, true);
+                }
+            }
+        } else {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[7] === -1) {
+                    this.el.setValueFromCoords(7, parseInt(i), "", true);
+                }
+            }
         }
     }
     /**
@@ -1127,6 +1161,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
+                            <Input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="toggleDoNotImport"
+                                name="toggleDoNotImport"
+                                checked={this.state.toggleDoNotImport}
+                                onClick={(e) => { this.setToggleDoNotImport(e); }}
+                            />
+                            <Label
+                                className="form-check-label"
+                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                {i18n.t('static.import.doNoImportCheckbox')}
+                            </Label>
+                        </FormGroup>}
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable">
