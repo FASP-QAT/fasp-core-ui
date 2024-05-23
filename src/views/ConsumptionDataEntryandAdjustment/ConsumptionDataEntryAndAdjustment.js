@@ -2654,7 +2654,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 </FormGroup>
                               </div>
                               <div className="row">
-                                <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
+                                <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable DataentryTable">
                                   <div id="tableDiv" className="leftAlignTable">
                                   </div>
                                 </div>

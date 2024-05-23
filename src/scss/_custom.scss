@@ -10317,7 +10317,7 @@ legend.scheduler-border {
 .FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(2) {
   width: 200px !important;
   left: 0 !important;
-  z-index: 4 !important;
+  z-index: 3 !important;
   position: sticky !important;
   //text-align: left !important;
 }
@@ -10335,7 +10335,7 @@ legend.scheduler-border {
   width: 300px !important;
   left:149px!important;
   // left: 90px !important;
-  z-index: 4 !important;
+  z-index: 3 !important;
   position: sticky !important;
 
 }
@@ -10344,7 +10344,7 @@ legend.scheduler-border {
   width: 300px !important;
   // left: 90px !important;
   left:149px!important;
-  z-index: 3 !important;
+  z-index: 2 !important;
   position: sticky !important;
   background: #fff;
 }
@@ -10826,4 +10826,18 @@ legend.scheduler-border {
 }
 .jss_container {
   width: 100%;
+}
+.DataentryTable .jss > thead > tr > td:nth-child(2) {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 4 !important;
+  position: sticky !important;
+}
+.DataentryTable .jss > tbody > tr > td:nth-child(2) {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  // background: #fff;
+
 }

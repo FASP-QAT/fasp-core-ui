@@ -730,7 +730,8 @@ export default class BuildTree extends Component {
             addNodeError: false,
             currentNodeTypeId: "",
             deleteChildNodes: false,
-            branchTemplateNotes: ""
+            branchTemplateNotes: "",
+            calculateAllScenario:false
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -1990,7 +1991,8 @@ export default class BuildTree extends Component {
                 missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
             }
             this.setState({
-                missingPUList
+                missingPUList,
+                branchTemplateNotes: treeTemplate.notes
             }, () => {
                 this.buildMissingPUJexcel();
             });
@@ -2224,11 +2226,16 @@ export default class BuildTree extends Component {
         } else if (parentScenario.fuNode.usageType.id == 1) {
             puPerVisit = parseFloat(this.state.noFURequired / conversionFactor).toFixed(8);
         }
-        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = puPerVisit;
+        var scenarioList=this.state.scenarioList;
+        for(var i=0;i<scenarioList.length;i++){
+            try{
+        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.puPerVisit = puPerVisit;
         if (!isRefillMonth) {
-            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+            currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.refillMonths = refillMonths;
         }
-        currentScenario = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
+        currentScenario = currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0];
+    }catch(error){}
+    }
         this.setState({ currentItemConfig, currentScenario });
     }
     /**
@@ -2343,7 +2350,14 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         if (this.state.autoCalculate) {
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false, this.state.autoCalculate);
+            var scenarioId=this.state.selectedScenario;
+            if(this.state.calculateAllScenario){
+                scenarioId=-1;
+            }
+            this.setState({
+                calculateAllScenario:false
+            })
+            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, this.state.autoCalculate);
         } else {
             this.setState({
                 loading: false,
@@ -3989,7 +4003,7 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.validation1() && this.state.isValidError.toString() == "false") {
+                        if (this.validation1() || this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -4021,7 +4035,8 @@ export default class BuildTree extends Component {
                                 activeTab1: new Array(2).fill('2'),
                                 firstMonthOfTarget: "",
                                 yearsOfTarget: "",
-                                actualOrTargetValueList: []
+                                actualOrTargetValueList: [],
+                                modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(this.state.currentItemConfig.context.id, 0);
                             });
@@ -4034,7 +4049,12 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
-                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            this.setState({
+                                addNodeFlag: false,
+                                modelingChangedOrAdded: false
+                            }, () => {
+                                this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            });
                         } else {
                             this.setState({
                                 modelingJexcelLoader: false
@@ -4222,7 +4242,7 @@ export default class BuildTree extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
-                if (this.state.currentTransferData == "") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4235,7 +4255,7 @@ export default class BuildTree extends Component {
         } else {
             if (this.state.currentModelingType == 2) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
                 var startDate = this.state.currentCalculatorStartDate;
@@ -4249,7 +4269,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4260,7 +4280,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4437,7 +4457,7 @@ export default class BuildTree extends Component {
         }
         if (this.state.currentModelingType == 4) {
             var momValue = (parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference)).toFixed(4);
-            percentForOneMonth = getValue / monthDifference;
+            percentForOneMonth = parseFloat(((Math.pow((1+(getValue/100)),(1/monthDifference)))-1)*100).toFixed(4);
         }
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
@@ -4660,7 +4680,7 @@ export default class BuildTree extends Component {
                 data[3] = scalingList[j].transferNodeDataId + "_T"
                 data[4] = scalingList[j].modelingType.id
                 data[5] = scalingList[j].increaseDecrease
-                data[6] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
+                data[6] = scalingList[j].modelingType.id != 2 ? (scalingList[j].dataValue != '' ? parseFloat(scalingList[j].dataValue).toFixed(4) : '') : '';
                 data[7] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
                 data[8] = cleanUp
                 var nodeValue = this.state.currentScenario.calculatedDataValue;
@@ -5161,9 +5181,12 @@ export default class BuildTree extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changed = function (instance, cell, x, y, value) {
-        this.setState({
-            modelingChangedOrAdded: true
-        })
+        if (x != 9 && x != 11 && this.state.modelingChangedOrAdded == false) {
+            this.setState({
+                modelingChangedOrAdded: true
+            })
+        }
+
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
@@ -6034,11 +6057,17 @@ export default class BuildTree extends Component {
         const { currentItemConfig } = this.state;
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
-            isChanged: true
+            isChanged: true,
+            calculateAllScenario:true
         }, () => {
             if (regionIds != null) {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.value;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                var scenarioList=this.state.scenarioList;
+                for(var i=0;i<scenarioList.length;i++){
+                    try{
+                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = regionIds.value;
+                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                    }catch(error){}
+                }
                 if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
                     currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
                 }
@@ -6048,8 +6077,13 @@ export default class BuildTree extends Component {
                     this.filterUsageTemplateList(0, regionIds.value);
                 });
             } else {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
+                var scenarioList=this.state.scenarioList;
+                for(var i=0;i<scenarioList.length;i++){
+                    try{
+                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = "";
+                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = "";
+                    }catch(error){}
+                }
                 this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
                     this.filterUsageTemplateList(0, 0);
                 });
@@ -8008,18 +8042,31 @@ export default class BuildTree extends Component {
             this.setState({ tempPlanningUnitId: event.target.value });
         }
         if (event.target.name === "planningUnitId") {
+            this.setState({
+                calculateAllScenario:true
+            })
             if (event.target.value != "") {
                 var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = pu.multiplier;
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].isPUMappingCorrect = 1;
+                var scenarioList=this.state.scenarioList;
+                for(var i=0;i<scenarioList.length;i++){
+                    try{
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = pu.unit.id;
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = event.target.value;
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = pu.multiplier;
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 1;
+                    }catch(error){}
+                }
                 currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = '';
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = '';
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = '';
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].isPUMappingCorrect = 0;
+                var scenarioList=this.state.scenarioList;
+                for(var i=0;i<scenarioList.length;i++){
+                    try{
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = '';
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = '';
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = '';
+                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 0;
+                    }catch(error){}
+                }
                 var label = {
                     label_en: '',
                     label_fr: '',
