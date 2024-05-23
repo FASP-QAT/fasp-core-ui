@@ -85,8 +85,6 @@ export default class StepOneImport extends Component {
                                         </div>
                                     </div>
                                     <div className='StepCardFooter'>
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.props.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.props.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="button" id="fileImportButton" size="md" color="info" className="float-right mr-1" onClick={() => this.props.importFile()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </div>

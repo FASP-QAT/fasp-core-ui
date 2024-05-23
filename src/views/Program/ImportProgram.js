@@ -655,34 +655,38 @@ export default class ImportProgram extends Component {
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody>
-                                <ProgressBar
-                                    percent={this.state.progressPer}
-                                    filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
-                                    style={{ width: '75%' }}
-                                >
-                                    <Step transition="scale">
-                                        {({ accomplished }) => (
-                                            <img
-                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="../../../../public/assets/img/numbers/number1.png"
-                                            />
-                                        )}
-                                    </Step>
-                                    <Step transition="scale">
-                                        {({ accomplished }) => (
-                                            <img
-                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="../../../../public/assets/img/numbers/number2.png"
-                                            />
-                                        )}
-                                    </Step>
-                                </ProgressBar>
+                                <Row className='justify-content-center'>
+                                    <Col sm={6} md={6}>
+                                        <ProgressBar
+                                            percent={this.state.progressPer}
+                                            filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                                            style={{ width: '75%' }}
+                                        >
+                                            <Step transition="scale">
+                                                {({ accomplished }) => (
+                                                    <img
+                                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                        width="30"
+                                                        src="../../../../public/assets/img/numbers/number1.png"
+                                                    />
+                                                )}
+                                            </Step>
+                                            <Step transition="scale">
+                                                {({ accomplished }) => (
+                                                    <img
+                                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                        width="30"
+                                                        src="../../../../public/assets/img/numbers/number2.png"
+                                                    />
+                                                )}
+                                            </Step>
+                                        </ProgressBar>
+                                    </Col>
+                                </Row>
                                 <div className="d-sm-down-none  progressbar mr-4">
                                     <ul>
-                                        <li className="progressbartext1Import">{i18n.t('static.chooseFile.chooseFile')}</li>
-                                        <li className="progressbartext3Import">{i18n.t('static.common.selectProgram')}</li>
+                                        <li className="progresdatatext2 ml-4">{i18n.t('static.chooseFile.chooseFile')}</li>
+                                        <li className="progresdatatext4 ml-2">{i18n.t('static.common.selectProgram')}</li>
                                     </ul>
                                 </div>
                                 <br></br>
