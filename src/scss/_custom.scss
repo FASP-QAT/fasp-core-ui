@@ -751,7 +751,12 @@ label.arrow_label:after {
 .jss>tbody>tr>td.readonly.shipmentEntryDoNotInclude {
   background-color: #8C8985 !important;
 }
-
+.jss>tbody>tr>td.doNotImport {
+  background-color: #f48282 !important;
+}
+.jss>tbody>tr>td.readonly.doNotImport {
+  background-color: #f48282 !important;
+}
 .jexcel>tbody>tr>td.readonly.shipmentErp {
   background-color: #CFCDC9 !important;
 }
