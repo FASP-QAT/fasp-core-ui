@@ -331,11 +331,11 @@ export default class ForecastingUnitListComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     var listArray = response.data.filter(c => c.payload.active);
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                    //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
                     this.setState({
                         productCategories: listArray
                     })

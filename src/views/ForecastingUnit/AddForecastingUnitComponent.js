@@ -294,11 +294,11 @@ export default class AddForecastingUnitComponent extends Component {
                 .then(response => {
                     var listArray = response.data.slice(1);
                     listArray = listArray.filter(c => c.payload.active.toString() == "true");
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                    //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
                     this.setState({
                         productcategories: listArray
                     })

@@ -91,7 +91,8 @@ class CompareAndSelectScenario extends Component {
             showForecastPeriod: false,
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
-            changed: false
+            changed: false,
+            dataChangedFlag: 0
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -505,7 +506,7 @@ class CompareAndSelectScenario extends Component {
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
                 data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2),0) : ""
+                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
                 data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined ? countArray[j] + 1 : ""
                 data[7] = finalData[j].compareToConsumptionForecast
                 data[8] = finalData[j].id
@@ -634,40 +635,55 @@ class CompareAndSelectScenario extends Component {
      * @returns {void}
      */
     setPlanningUnitId(e) {
-        localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
-        this.setState({
-            loading: true
-        })
-        if (e.target.value > 0) {
-            var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
-            var planningUnitId = e.target.value;
-            var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
-            var viewById = this.state.viewById;
-            this.setState({
-                planningUnitId: planningUnitId,
-                planningUnitLabel: name.length > 0 ? name[0].planningUnit.label : "",
-                forecastingUnitId: name.length > 0 ? name[0].planningUnit.forecastingUnit.id : "",
-                equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
-                loading: false,
-                viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
-                equivalencyUnitList: equivalencyUnit,
-                changed: false
-            }, () => {
-                if (planningUnitId > 0) {
-                    this.showData();
-                }
-                if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
-                    document.getElementById("equivalencyUnitDiv").style.display = "block";
-                } else if (viewById == 3) {
-                    document.getElementById("equivalencyUnitDiv").style.display = "none";
-                }
-            })
+        var cont = false;
+        if (this.state.dataChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+
         } else {
+            cont = true;
+        }
+
+        if (cont == true) {
+            localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
             this.setState({
-                planningUnitId: planningUnitId,
-                showAllData: false,
-                loading: false
+                dataChangedFlag: 0,
+                loading: true
             })
+            if (e.target.value > 0) {
+                var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
+                var planningUnitId = e.target.value;
+                var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
+                var viewById = this.state.viewById;
+                this.setState({
+                    planningUnitId: planningUnitId,
+                    planningUnitLabel: name.length > 0 ? name[0].planningUnit.label : "",
+                    forecastingUnitId: name.length > 0 ? name[0].planningUnit.forecastingUnit.id : "",
+                    equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
+                    loading: false,
+                    viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
+                    equivalencyUnitList: equivalencyUnit,
+                    changed: false
+                }, () => {
+                    if (planningUnitId > 0) {
+                        this.showData();
+                    }
+                    if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
+                        document.getElementById("equivalencyUnitDiv").style.display = "block";
+                    } else if (viewById == 3) {
+                        document.getElementById("equivalencyUnitDiv").style.display = "none";
+                    }
+                })
+            } else {
+                this.setState({
+                    planningUnitId: planningUnitId,
+                    showAllData: false,
+                    loading: false
+                })
+            }
         }
     }
     /**
@@ -942,10 +958,10 @@ class CompareAndSelectScenario extends Component {
             dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
             ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-            formatter(ele.totalForecast,0),
-            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError,0) : "" : ele.forecastError,
+            formatter(ele.totalForecast, 0),
+            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
             ele.noOfMonths.toString(),
-            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast,0) : ele.compareToConsumptionForecast])
+            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
         )
         let data2 = dataArr3;
         let content1 = {
@@ -980,9 +996,9 @@ class CompareAndSelectScenario extends Component {
                 if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
-                            dataArr.push(formatter(ele[idx],0) + " %");
+                            dataArr.push(formatter(ele[idx], 0) + " %");
                         } else {
-                            dataArr.push(formatter(ele[idx],0));
+                            dataArr.push(formatter(ele[idx], 0));
                         }
                     } else if (item.type == 'calendar') {
                         dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
@@ -1115,6 +1131,23 @@ class CompareAndSelectScenario extends Component {
         this.getDatasets();
     }
     /**
+     * This function is triggered when this component is about to unmount
+     */
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
+    componentDidUpdate = () => {
+        if (this.state.dataChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+    /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
      * @param {*} cell This is the object of the DOM element
@@ -1182,7 +1215,7 @@ class CompareAndSelectScenario extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changeTable1 = function (instance, cell, x, y, value) {
-        this.setState({
+        this.setState({            
             loading: true
         })
         var elInstance = instance;
@@ -1198,6 +1231,7 @@ class CompareAndSelectScenario extends Component {
         }
         if (x == 0) {
             this.setState({
+                dataChangedFlag: 1,
                 changed: true,
                 selectedTreeScenarioId: elInstance.getRowData(y)[8]
             }, () => {
@@ -1290,158 +1324,190 @@ class CompareAndSelectScenario extends Component {
      * @param {object} event - The event object containing the dataset ID value.
      */
     setDatasetId(event) {
-        var datasetId = event.target.value;
-        this.setState({ loading: true })
-        this.setState({
-            datasetId: datasetId,
-            changed: false
-        }, () => {
-            if (datasetId != "") {
-                localStorage.setItem("sesDatasetId", datasetId);
-                localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
-                let versionIdSes = (datasetId.split('_')[1]).replace('v', '') + ' (Local)';
-                localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
-
-                localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
-                localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
-                localStorage.setItem("sesDatasetVersionId", versionIdSes);
-                var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
-                var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
-                var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-                var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-                var curDate = moment(startDate).format("YYYY-MM-DD");
-                var monthList = [];
-                for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
-                    curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                    monthList.push(curDate);
-                }
-                var monthList1 = [];
-                curDate = moment(startDate).format("YYYY-MM-DD");
-                for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
-                    curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                    monthList1.push(curDate);
-                }
-                var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
-                var maxDateForSingleValue = { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) }
-                var regionList = datasetJson.regionList;
-                var forecastingUnitList = [];
-                var planningUnitList = datasetJson.planningUnitList
-                for (var pu = 0; pu < planningUnitList.length; pu++) {
-                    var index = forecastingUnitList.findIndex(c => c.id == planningUnitList[pu].planningUnit.forecastingUnit.id);
-                    if (index == -1) {
-                        forecastingUnitList.push(planningUnitList[pu].planningUnit.forecastingUnit);
-                    }
-                }
-                var planningUnitId = "";
-                var event = {
-                    target: {
-                        value: ""
-                    }
-                };
-                if (planningUnitList.length == 1) {
-                    planningUnitId = planningUnitList[0].planningUnit.id;
-                    event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString() == "true").length > 0) {
-                    planningUnitId = this.props.match.params.planningUnitId;
-                    event.target.value = this.props.match.params.planningUnitId;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId") && c.active.toString() == "true").length > 0) {
-                    planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
-                    event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
-                }
-                var regionId = "";
-                var regionEvent = {
-                    target: {
-                        value: ""
-                    }
-                };
-                if (regionList.length == 1) {
-                    regionId = regionList[0].regionId;
-                    regionEvent.target.value = regionList[0].regionId;
-                } else if (this.props.match.params.regionId != "" && regionList.filter(c => c.regionId == this.props.match.params.regionId).length > 0) {
-                    regionId = this.props.match.params.regionId;
-                    regionEvent.target.value = this.props.match.params.regionId;
-                } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
-                    regionId = localStorage.getItem("sesDatasetRegionId");
-                    regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
-                }
-                this.setState({
-                    datasetJson: datasetJson,
-                    rangeValue: rangeValue,
-                    singleValue2: rangeValue,
-                    maxDateForSingleValue: maxDateForSingleValue,
-                    regionList: regionList.sort(function (a, b) {
-                        a = getLabelText(a.label, this.state.lang).toLowerCase();
-                        b = getLabelText(b.label, this.state.lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }.bind(this)),
-                    planningUnitList: datasetJson.planningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
-                        a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
-                        b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }.bind(this)),
-                    forecastingUnitList: forecastingUnitList,
-                    monthList: monthList,
-                    monthList1: monthList1,
-                    startDate: startDate,
-                    stopDate: stopDate,
-                    forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
-                    forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
-                    planningUnitId: planningUnitId,
-                    loading: false
-                }, () => {
-                    if (planningUnitId != "") {
-                        this.setPlanningUnitId(event);
-                    } else {
-                        this.setState({
-                            planningUnitId: "",
-                            showAllData: false
-                        })
-                    }
-                    if (regionId != "") {
-                        this.setRegionId(regionEvent);
-                    } else {
-                        this.setState({
-                            regionId: "",
-                            showAllData: false
-                        })
-                    }
-                })
+        var cont = false;
+        if (this.state.dataChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
             } else {
-                this.setState({
-                    regionList: [],
-                    regionId: "",
-                    planningUnitList: [],
-                    planningUnitId: "",
-                    forecastingUnitList: [],
-                    forecastingUnitId: "",
-                    equivalencyUnitId: "",
-                    equivalencyUnitList: [],
-                    loading: false,
-                    showAllData: false,
-                    datasetId: ""
-                })
-            }
-        })
+            }            
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                dataChangedFlag: 0
+            });
+            var datasetId = event.target.value;
+            this.setState({ loading: true })
+            this.setState({
+                datasetId: datasetId,
+                changed: false
+            }, () => {
+                if (datasetId != "") {
+                    localStorage.setItem("sesDatasetId", datasetId);
+                    localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
+                    let versionIdSes = (datasetId.split('_')[1]).replace('v', '') + ' (Local)';
+                    localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
+
+                    localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
+                    localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
+                    localStorage.setItem("sesDatasetVersionId", versionIdSes);
+                    var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
+                    var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
+                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                    var datasetJson = JSON.parse(datasetData);
+                    var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                    var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                    var curDate = moment(startDate).format("YYYY-MM-DD");
+                    var monthList = [];
+                    for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
+                        curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                        monthList.push(curDate);
+                    }
+                    var monthList1 = [];
+                    curDate = moment(startDate).format("YYYY-MM-DD");
+                    for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
+                        curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                        monthList1.push(curDate);
+                    }
+                    var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+                    var maxDateForSingleValue = { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) }
+                    var regionList = datasetJson.regionList;
+                    var forecastingUnitList = [];
+                    var planningUnitList = datasetJson.planningUnitList
+                    for (var pu = 0; pu < planningUnitList.length; pu++) {
+                        var index = forecastingUnitList.findIndex(c => c.id == planningUnitList[pu].planningUnit.forecastingUnit.id);
+                        if (index == -1) {
+                            forecastingUnitList.push(planningUnitList[pu].planningUnit.forecastingUnit);
+                        }
+                    }
+                    var planningUnitId = "";
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (planningUnitList.length == 1) {
+                        planningUnitId = planningUnitList[0].planningUnit.id;
+                        event.target.value = planningUnitList[0].planningUnit.id;
+                    } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId && c.active.toString() == "true").length > 0) {
+                        planningUnitId = this.props.match.params.planningUnitId;
+                        event.target.value = this.props.match.params.planningUnitId;
+                    } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId") && c.active.toString() == "true").length > 0) {
+                        planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
+                        event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
+                    }
+                    var regionId = "";
+                    var regionEvent = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (regionList.length == 1) {
+                        regionId = regionList[0].regionId;
+                        regionEvent.target.value = regionList[0].regionId;
+                    } else if (this.props.match.params.regionId != "" && regionList.filter(c => c.regionId == this.props.match.params.regionId).length > 0) {
+                        regionId = this.props.match.params.regionId;
+                        regionEvent.target.value = this.props.match.params.regionId;
+                    } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
+                        regionId = localStorage.getItem("sesDatasetRegionId");
+                        regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
+                    }
+                    this.setState({
+                        datasetJson: datasetJson,
+                        rangeValue: rangeValue,
+                        singleValue2: rangeValue,
+                        maxDateForSingleValue: maxDateForSingleValue,
+                        regionList: regionList.sort(function (a, b) {
+                            a = getLabelText(a.label, this.state.lang).toLowerCase();
+                            b = getLabelText(b.label, this.state.lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }.bind(this)),
+                        planningUnitList: datasetJson.planningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }.bind(this)),
+                        forecastingUnitList: forecastingUnitList,
+                        monthList: monthList,
+                        monthList1: monthList1,
+                        startDate: startDate,
+                        stopDate: stopDate,
+                        forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
+                        forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
+                        planningUnitId: planningUnitId,
+                        loading: false
+                    }, () => {
+                        if (planningUnitId != "") {
+                            this.setPlanningUnitId(event);
+                        } else {
+                            this.setState({
+                                planningUnitId: "",
+                                showAllData: false
+                            })
+                        }
+                        if (regionId != "") {
+                            this.setRegionId(regionEvent);
+                        } else {
+                            this.setState({
+                                regionId: "",
+                                showAllData: false
+                            })
+                        }
+                    })
+                } else {
+                    this.setState({
+                        regionList: [],
+                        regionId: "",
+                        planningUnitList: [],
+                        planningUnitId: "",
+                        forecastingUnitList: [],
+                        forecastingUnitId: "",
+                        equivalencyUnitId: "",
+                        equivalencyUnitList: [],
+                        loading: false,
+                        showAllData: false,
+                        datasetId: ""
+                    })
+                }
+            })
+        }
     }
     /**
      * Sets the region ID and updates the component state with associated data.
      * @param {object} event - The event object containing the region ID value.
      */
     setRegionId(event) {
-        localStorage.setItem("sesDatasetRegionId", event.target.value);
-        var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
-        var regionId = event.target.value;
-        this.setState({
-            regionId: event.target.value,
-            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
-            changed: false
-        }, () => {
-            if (regionId > 0) {
-                this.showData()
+        var cont = false;
+        if (this.state.dataChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
             }
-        })
+
+        } else {
+            cont = true;
+        }
+
+        if (cont == true) {
+            this.setState({
+                dataChangedFlag: 0
+            });
+            localStorage.setItem("sesDatasetRegionId", event.target.value);
+            var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
+            var regionId = event.target.value;
+            this.setState({
+                regionId: event.target.value,
+                regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
+                changed: false
+            }, () => {
+                if (regionId > 0) {
+                    this.showData()
+                }
+            })
+        }
     }
     /**
      * Updates the selected tree scenario ID and triggers the rebuilding of Jexcel.
@@ -1493,7 +1559,7 @@ class CompareAndSelectScenario extends Component {
      * Submits the selected scenario and updates the dataset accordingly.
      */
     submitScenario() {
-        this.setState({ loading: true })
+        this.setState({dataChangedFlag: 0, loading: true })
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         var treeId = this.state.selectedTreeScenarioId.toString().split("~")[0];
         if (scenarioId == undefined) {
@@ -1575,19 +1641,35 @@ class CompareAndSelectScenario extends Component {
     setForecastNotes(e) {
         this.setState({
             forecastNotes: e.target.value,
-            changed: true
+            changed: true,
+            dataChangedFlag: 1
         })
     }
     /**
      * Redirects to the application dashboard screen when cancel button is clicked.
      */
     cancelClicked() {
-        this.setState({
-            changed: false
-        }, () => {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-        })
+        var cont = false;
+        if (this.state.dataChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+
+        } else {
+            cont = true;
+        }
+
+        if (cont == true) {
+            this.setState({
+                dataChangedFlag: 0,
+                changed: false
+            }, () => {
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })
+        }        
     }
     /**
      * Toggles the visibility of guidance in the component state.

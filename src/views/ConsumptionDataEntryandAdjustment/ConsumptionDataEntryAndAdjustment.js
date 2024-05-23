@@ -619,8 +619,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var datasetJson = JSON.parse(datasetData);
           var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
           var regionList = this.state.regionList;
+          var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
           for (var r = 0; r < regionList.length; r++) {
-            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
+            consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
             var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
             var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];

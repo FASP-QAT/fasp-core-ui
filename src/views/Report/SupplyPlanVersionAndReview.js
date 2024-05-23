@@ -264,6 +264,7 @@ class SupplyPlanVersionAndReview extends Component {
         }
         hideFirstComponent();
         this.getCountrylist();
+        this.getPrograms();
         this.getVersionTypeList()
     }
     /**
@@ -353,7 +354,12 @@ class SupplyPlanVersionAndReview extends Component {
             programs: [],
         }, () => {
             if (CountryIds.length != 0) {
-                var newCountryList = [CountryIds];
+                var newCountryList = [];
+                if(CountryIds == -1){
+                    newCountryList = this.state.countries.map(c => c.id);
+                } else {
+                    newCountryList = [CountryIds];
+                }
                 DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
                     .then(response => {
                         var listArray = response.data;

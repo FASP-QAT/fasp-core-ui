@@ -92,6 +92,7 @@ export default class SupplyPlanComponent extends React.Component {
             shippedShipmentsTotalData: [],
             orderedShipmentsTotalData: [],
             plannedShipmentsTotalData: [],
+            onholdShipmentsTotalData: [],
             consumptionDataForAllMonths: [],
             amcTotalData: [],
             consumptionFilteredArray: [],
@@ -490,7 +491,8 @@ export default class SupplyPlanComponent extends React.Component {
             var deliveredShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
             var shippedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
             var orderedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
-            var plannedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
+            var onholdShipmentArr = [...["\"" + ("   " + i18n.t('static.report.hold')).replaceAll(' ', '%20') + "\""], ...ele.data.onholdShipmentsTotalData.map(item => item.qty)]
+            var plannedShipmentArr = [...["\"" + ("   " + i18n.t('static.report.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
             var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...ele.data.inventoryTotalData]
             var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...ele.data.expiredStockArr.map(item => item.qty)]
             var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...ele.data.closingBalanceArray.map(item => item.balance)]
@@ -527,6 +529,7 @@ export default class SupplyPlanComponent extends React.Component {
             A.push(deliveredShipmentArr)
             A.push(shippedShipmentArr)
             A.push(orderedShipmentArr)
+            A.push(onholdShipmentArr)
             A.push(plannedShipmentArr)
             A.push(inventoryArr)
             A.push(expiredStockArr)
@@ -652,7 +655,8 @@ export default class SupplyPlanComponent extends React.Component {
             var deliveredShipmentArr = [...[("   " + i18n.t('static.supplyPlan.delivered'))], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
             var shippedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.shipped'))], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
             var orderedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.submitted'))], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
-            var plannedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
+            var onholdShipmentArr = [...[("   " + i18n.t('static.report.hold'))], ...ele.data.onholdShipmentsTotalData.map(item => item.qty)]
+            var plannedShipmentArr = [...[("   " + i18n.t('static.report.planned'))], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
             var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...ele.data.inventoryTotalData]
             var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...ele.data.expiredStockArr.map(item => item.qty)]
             var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...ele.data.closingBalanceArray.map(item => item.balance)]
@@ -661,7 +665,7 @@ export default class SupplyPlanComponent extends React.Component {
             var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...ele.data.amcTotalData]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
             let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)),
-            deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
+            deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), onholdShipmentArr.map(c => this.formatter(c)) ,plannedShipmentArr.map(c => this.formatter(c)),
             inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
             var canv = document.getElementById("cool-canvas" + count)
             var canvasImg1 = canv.toDataURL("image/png", 1.0);
@@ -1078,7 +1082,19 @@ export default class SupplyPlanComponent extends React.Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
                 },
                 {
-                    label: i18n.t('static.supplyPlan.planned'),
+                    label: i18n.t('static.report.hold'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#6C6463',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.onhold)),
+                },
+                {
+                    label: i18n.t('static.report.planned'),
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#A7C6ED',
@@ -1395,7 +1411,43 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.report.hold')}</td>
+                                            {
+                                                this.state.onholdShipmentsTotalData.map((item1, count) => {
+                                                    if (item1.toString() != "") {
+                                                        var classNameForShipments = "";
+                                                        if (item1.isLocalProcurementAgent) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                            }
+                                                        }
+                                                        if (item1.isErp) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                            }
+                                                        }
+                                                        if (item1.isEmergencyOrder) {
+                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                        }
+                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'onholdShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'onholdShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalShipments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.report.planned')}</td>
                                             {
                                                 this.state.plannedShipmentsTotalData.map((item1, count) => {
                                                     if (item1.toString() != "") {
@@ -2679,6 +2731,7 @@ export default class SupplyPlanComponent extends React.Component {
         var shippedShipmentsTotalData = [];
         var orderedShipmentsTotalData = [];
         var plannedShipmentsTotalData = [];
+        var onholdShipmentsTotalData = [];
         var totalExpiredStockArr = [];
         var amcTotalData = [];
         var minStockMoS = [];
@@ -2805,26 +2858,32 @@ export default class SupplyPlanComponent extends React.Component {
                                 var sd2 = [];
                                 var sd3 = [];
                                 var sd4 = [];
+                                var sd5 = [];
                                 var paColor1 = "";
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+                                var paColor5 = "";
                                 var paColor1Array = [];
                                 var paColor2Array = [];
                                 var paColor3Array = [];
                                 var paColor4Array = [];
+                                var paColor5Array = [];
                                 var isEmergencyOrder1 = 0;
                                 var isEmergencyOrder2 = 0;
                                 var isEmergencyOrder3 = 0;
                                 var isEmergencyOrder4 = 0;
+                                var isEmergencyOrder5 = 0;
                                 var isLocalProcurementAgent1 = 0;
                                 var isLocalProcurementAgent2 = 0;
                                 var isLocalProcurementAgent3 = 0;
                                 var isLocalProcurementAgent4 = 0;
+                                var isLocalProcurementAgent5 = 0;
                                 var isErp1 = 0;
                                 var isErp2 = 0;
                                 var isErp3 = 0;
                                 var isErp4 = 0;
+                                var isErp5 = 0;
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -2932,7 +2991,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             if (shipmentDetails[i].erpFlag.toString() == "true") {
                                                 isErp3 = true;
                                             }
-                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2967,7 +3026,43 @@ export default class SupplyPlanComponent extends React.Component {
                                             if (shipmentDetails[i].erpFlag.toString() == "true") {
                                                 isErp4 = true;
                                             }
+                                        } else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor5);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor5 = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor5 = "#efefef"
+                                                }
+                                            }
+                                            sd5.push(shipmentDetail);
+                                            if (paColor5Array.indexOf(paColor5) === -1) {
+                                                paColor5Array.push(paColor5);
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder5 = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent5 = true;
+                                            }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp5 = true;
+                                            }
                                         }
+
                                     }
                                 }
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
@@ -2997,14 +3092,23 @@ export default class SupplyPlanComponent extends React.Component {
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
                                     if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
+                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
+                                }
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor5;
+                                    if (paColor5Array.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    onholdShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData), month: m[n], shipmentDetail: sd5, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder5, isLocalProcurementAgent: isLocalProcurementAgent5, isErp: isErp5 });
+                                } else {
+                                    onholdShipmentsTotalData.push("")
                                 }
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
@@ -3216,6 +3320,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     stock: jsonList[0].closingBalance,
                                     planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
                                     ,
+                                    onhold: Number(onholdShipmentsTotalData[n] != "" ? onholdShipmentsTotalData[n].qty : 0)
+                                    ,
                                     delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0)
                                     ,
                                     shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0)
@@ -3239,6 +3345,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 shippedShipmentsTotalData.push("");
                                 orderedShipmentsTotalData.push("");
                                 plannedShipmentsTotalData.push("");
+                                onholdShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
@@ -3260,6 +3367,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     consumption: null,
                                     stock: lastClosingBalance,
                                     planned: 0,
+                                    onhold: 0,
                                     delivered: 0,
                                     shipped: 0,
                                     ordered: 0,
@@ -3283,6 +3391,7 @@ export default class SupplyPlanComponent extends React.Component {
                             shippedShipmentsTotalData: shippedShipmentsTotalData,
                             orderedShipmentsTotalData: orderedShipmentsTotalData,
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
+                            onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
@@ -4121,7 +4230,13 @@ export default class SupplyPlanComponent extends React.Component {
                 }
             } else if (supplyPlanType == 'plannedShipments') {
                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
-                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            } else if (supplyPlanType == 'onholdShipments') {
+                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "block"
                 }
@@ -4369,6 +4484,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var shippedShipmentsTotalData = [];
                         var orderedShipmentsTotalData = [];
                         var plannedShipmentsTotalData = [];
+                        var onholdShipmentsTotalData = [];
                         var totalExpiredStockArr = [];
                         var amcTotalData = [];
                         var minStockMoS = [];
@@ -4481,14 +4597,17 @@ export default class SupplyPlanComponent extends React.Component {
                                             var sd2 = [];
                                             var sd3 = [];
                                             var sd4 = [];
+                                            var sd5 = [];
                                             var paColor1 = "";
                                             var paColor2 = "";
                                             var paColor3 = "";
                                             var paColor4 = "";
+                                            var paColor5 = "";
                                             var isEmergencyOrder1 = 0;
                                             var isEmergencyOrder2 = 0;
                                             var isEmergencyOrder3 = 0;
                                             var isEmergencyOrder4 = 0;
+                                            var isEmergencyOrder5 = 0;
                                             if (shipmentDetails != "" && shipmentDetails != undefined) {
                                                 for (var i = 0; i < shipmentDetails.length; i++) {
                                                     if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -4569,7 +4688,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                             isEmergencyOrder3 = true
                                                         }
-                                                    } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                                                         if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                             var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -4594,6 +4713,32 @@ export default class SupplyPlanComponent extends React.Component {
                                                         sd4.push(shipmentDetail);
                                                         if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                             isEmergencyOrder4 = true
+                                                        }
+                                                    }else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                        if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                            paColor5 = procurementAgent.colorHtmlCode;
+                                                            var index = paColors.findIndex(c => c.color == paColor5);
+                                                            if (index == -1) {
+                                                                paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
+                                                            }
+                                                        } else {
+                                                            if (shipmentDetails[i].procurementAgent.id != "") {
+                                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                                paColor5 = "#efefef"
+                                                            } else {
+                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                                paColor5 = "#efefef"
+                                                            }
+                                                        }
+                                                        sd5.push(shipmentDetail);
+                                                        if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                            isEmergencyOrder5 = true
                                                         }
                                                     }
                                                 }
@@ -4625,15 +4770,25 @@ export default class SupplyPlanComponent extends React.Component {
                                             } else {
                                                 orderedShipmentsTotalData.push("")
                                             }
-                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS)).length > 0) {
                                                 var colour = paColor4;
                                                 if (sd4.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
+                                                plannedShipmentsTotalData.push({ qty: Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
                                             } else {
                                                 plannedShipmentsTotalData.push("")
                                             }
+                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                                var colour = paColor5;
+                                                if (sd5.length > 1) {
+                                                    colour = "#d9ead3";
+                                                }
+                                                onholdShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData), month: m[n], shipmentDetail: sd5, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder5 });
+                                            } else {
+                                                onholdShipmentsTotalData.push("")
+                                            }
+
                                             inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                             monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
@@ -4844,6 +4999,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 stock: jsonList[0].closingBalance,
                                                 planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
                                                 ,
+                                                onhold: Number(onholdShipmentsTotalData[n] != "" ? onholdShipmentsTotalData[n].qty : 0)
+                                                ,
                                                 delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0)
                                                 ,
                                                 shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0)
@@ -4867,6 +5024,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             shippedShipmentsTotalData.push("");
                                             orderedShipmentsTotalData.push("");
                                             plannedShipmentsTotalData.push("");
+                                            onholdShipmentsTotalData.push("");
                                             inventoryTotalData.push("");
                                             totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                             monthsOfStockArray.push(null)
@@ -4888,6 +5046,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 consumption: 0,
                                                 stock: lastClosingBalance,
                                                 planned: 0,
+                                                onhold: 0,
                                                 delivered: 0,
                                                 shipped: 0,
                                                 ordered: 0,
@@ -4911,6 +5070,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         shippedShipmentsTotalData: shippedShipmentsTotalData,
                                         orderedShipmentsTotalData: orderedShipmentsTotalData,
                                         plannedShipmentsTotalData: plannedShipmentsTotalData,
+                                        onholdShipmentsTotalData: onholdShipmentsTotalData,
                                         inventoryTotalData: inventoryTotalData,
                                         monthsOfStockArray: monthsOfStockArray,
                                         maxQtyArray: maxQtyArray,
@@ -5014,7 +5174,19 @@ export default class SupplyPlanComponent extends React.Component {
                                             data: jsonArrForGraph.map((item, index) => (item.ordered)),
                                         },
                                         {
-                                            label: i18n.t('static.supplyPlan.planned'),
+                                            label: i18n.t('static.report.hold'),
+                                            stack: 1,
+                                            yAxisID: 'A',
+                                            backgroundColor: '#6C6463',
+                                            borderColor: 'rgba(179,181,198,1)',
+                                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            data: jsonArrForGraph.map((item, index) => (item.onhold)),
+                                        },
+                                        {
+                                            label: i18n.t('static.report.planned'),
                                             stack: 1,
                                             yAxisID: 'A',
                                             backgroundColor: '#a7c6ed',

@@ -615,6 +615,8 @@ export default class BuildTree extends Component {
             minDateValue: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            stopMinDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+
             treeTemplate: {
                 treeTemplateId: 0,
                 label: {
@@ -2275,7 +2277,6 @@ export default class BuildTree extends Component {
     validation1 = function () {
 
         var nodeTypeId = document.getElementById("nodeTypeId").value;
-        console.log("nodeTypeId", nodeTypeId)
         var nodeTitle = document.getElementById("nodeTitle").value;
         var nodeValue = document.getElementById("nodeValue").value;
         var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
@@ -2536,7 +2537,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Toggle info popup
-     */ 
+     */
     toggleWillClientsShareOnePU() {
         this.setState({
             popoverOpenWillClientsShareOnePU: !this.state.popoverOpenWillClientsShareOnePU,
@@ -2544,7 +2545,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Toggle info popup
-     */ 
+     */
     toggleConsumptionIntervalEveryXMonths() {
         this.setState({
             popoverOpenConsumptionIntervalEveryXMonths: !this.state.popoverOpenConsumptionIntervalEveryXMonths,
@@ -3763,6 +3764,7 @@ export default class BuildTree extends Component {
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
                 minDate: { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) },
+                stopMinDate: { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) },
                 maxDate: { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) },
                 showDate: true
             }, () => {
@@ -5131,7 +5133,7 @@ export default class BuildTree extends Component {
      * @param {number} x - The x-coordinate of the changed cell.
      * @param {number} y - The y-coordinate of the changed cell.
      * @param {any} value - The new value of the changed cell.
-     */ 
+     */
     changed1 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
             this.setState({ isChanged: true });
@@ -5804,10 +5806,11 @@ export default class BuildTree extends Component {
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
+                        var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var maxDate = { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) };
                         var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
                         this.setState({
-                            dataSetObj: dataEnc, minDate, maxDate,
+                            dataSetObj: dataEnc, minDate, maxDate, stopMinDate,
                             forecastStartDate: programData.currentVersion.forecastStartDate,
                             forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod,
                             singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 },
@@ -5830,7 +5833,7 @@ export default class BuildTree extends Component {
     }
     /**
      * Exports data in PDF format
-     */ 
+     */
     exportPDF = () => {
         let treeLevel = this.state.items.length;
         var treeLevelItems = [];
@@ -8032,11 +8035,15 @@ export default class BuildTree extends Component {
                 this.qatCalculatedPUPerVisit(0);
             });
         }
+        if (event.target.name != "treeId" && event.target.name != "datasetId" && event.target.name != "scenarioId" && event.target.name != "monthPicker") {
+           this.setState({
+                isChanged:true
+            })
+        }
         if (event.target.name != "treeId") {
             this.setState({
                 currentItemConfig,
-                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
-                isChanged: true
+                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 if (flag) {
                     if (event.target.name === "planningUnitId") {
@@ -8341,7 +8348,7 @@ export default class BuildTree extends Component {
     /**
      * Removes an item from the tree by its ID.
      * @param {number} id - ID of the item to be removed.
-     */ 
+     */
     onRemoveItem(id) {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
@@ -9025,7 +9032,7 @@ export default class BuildTree extends Component {
                             labelString: this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                 this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                     this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode != null && this.state.currentScenario.fuNode.forecastingUnit != null && this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
-                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
+                                        : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode!=undefined && this.state.currentScenario.puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
                                             : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
                                 : "",
@@ -9187,7 +9194,7 @@ export default class BuildTree extends Component {
                             usageFrequencyCon: "",
                             usageFrequencyDis: "",
                             oneTimeUsage: "",
-                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
+                            planningUnitId: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]!=undefined ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id : ""
                         }}
                         validationSchema={validationSchemaNodeData}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -10656,11 +10663,11 @@ export default class BuildTree extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
                                                 <Picker
                                                     ref={this.pickAMonth5}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.stopMinDate, max: this.state.maxDate }}
                                                     value={{ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
-                                                    onChange={this.handleAMonthChange5}
-                                                    onDismiss={this.handleAMonthDissmis5}
+                                                    key={JSON.stringify(this.state.currentCalculatorStopDate)}
+                                                    onChange={this.handleAMonthChange6}
                                                 >
                                                     <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                                 </Picker>
@@ -11114,20 +11121,60 @@ export default class BuildTree extends Component {
      */
     handleAMonthChange5 = (year, month) => {
         var date = year + "-" + month + "-01";
+        var stopDate = this.state.currentCalculatorStopDate;
+        var mStart = moment(date);
+        var mEnd = moment(stopDate);
+        stopDate = mStart.isSameOrBefore(mEnd) ? stopDate : "";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
-            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-            } else {
-                if (!this.state.currentEndValueEdit) {
-                    this.calculateMomByEndValue();
-                } else if (!this.state.currentTargetChangePercentageEdit) {
-                    this.calculateMomByChangeInPercent();
-                } else if (!this.state.currentTargetChangeNumberEdit) {
-                    this.calculateMomByChangeInNumber();
-                }
+        var stopMinDate = { year: year, month: month }
+        this.setState({
+            stopMinDate: stopMinDate,
+            currentCalculatorStartDate: date,
+            currentCalculatorStopDate: stopDate,
+            currentCalculatorStartValue
+        }, () => {
+            if (mStart.isSameOrBefore(mEnd)) {
+                this.dateChangeCalculations();
             }
         });
     }
+
+    /**
+     * Based on Start and Target Date change calculation different calculations for Modeling Calculator
+     */
+    dateChangeCalculations() {
+        if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
+        } else {
+            if (!this.state.currentEndValueEdit) {
+                this.calculateMomByEndValue();
+            } else if (!this.state.currentTargetChangePercentageEdit) {
+                this.calculateMomByChangeInPercent();
+            } else if (!this.state.currentTargetChangeNumberEdit) {
+                this.calculateMomByChangeInNumber();
+            }
+        }
+    }
+
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
+    handleAMonthChange6 = (year, month) => {
+        var date = year + "-" + month + "-01";
+        var startDate = this.state.currentCalculatorStartDate;
+        var mStart = moment(startDate);
+        var mEnd = moment(date);
+        date = mStart.isSameOrBefore(mEnd) ? date : "";
+        this.setState({
+            currentCalculatorStopDate: date,
+        }, () => {
+            if (mStart.isSameOrBefore(mEnd)) {
+                this.dateChangeCalculations();
+            }
+        });
+    }
+
     /**
      * Updates the data values displayed in the tree based on the selected scenario and date.
      * @param {Date} date - The date for which the data values need to be updated.

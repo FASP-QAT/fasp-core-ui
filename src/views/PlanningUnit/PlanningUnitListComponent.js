@@ -110,11 +110,11 @@ export default class PlanningUnitListComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                    //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
                     this.setState({
                         productCategories: listArray,
                         productCategoryListAll: listArray
@@ -415,9 +415,9 @@ export default class PlanningUnitListComponent extends Component {
                         items.push({
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
-                                    this.props.history.push({
-                                        pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
-                                    })
+                                this.props.history.push({
+                                    pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
+                                })
                             }.bind(this)
                         });
                     }
