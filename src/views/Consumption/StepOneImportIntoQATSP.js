@@ -89,6 +89,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.updatePUs = this.updatePUs.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.onchangepage = this.onchangepage.bind(this)
     }
     /**
      * Toggles the visibility of the program setting popover.
@@ -294,6 +296,46 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        if (x == 2 || x == 3 || x == 6 || x == 7 || x == 8) {
+            this.el.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = this.el.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                try{
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+                }catch(err){}
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                var cell11 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                var cell11 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+        }
         changed(instance, cell, x, y, value)
         if (x == 2) {
             let supplyPlanPlanningUnitId = this.el.getValueFromCoords(2, y);
@@ -740,52 +782,53 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     type: 'hidden',
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
-                if (y != null) {
-                    var elInstance = el;
-                    elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
-                    var rowData = elInstance.getRowData(y);
-                    var match = rowData[6];
-                    if (match == 1) {
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-                    }
-                    var doNotImport = rowData[2];
-                    if (doNotImport == -1) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                    }
-                    var noForecastSelected = rowData[7];
-                    if (noForecastSelected) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell11.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                    }
-                    var isForecastBlank = rowData[8];
-                    if (isForecastBlank) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell11.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
+            onfilter: function (el) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var y = 0; y < jsonLength; y++) {
+                    try {
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(y);
+                        var match = rowData[6];
+                        if (match == 1) {
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.remove('readonly');
+                        }
+                        var doNotImport = rowData[2];
+                        if (doNotImport == -1) {
+                            var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.add('doNotImport');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                            try{
+                            var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.remove('doNotImport');
+                            }catch(err){}
+                        }
+                        var noForecastSelected = rowData[7];
+                        if (noForecastSelected) {
+                            var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell11.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                        }
+                        var isForecastBlank = rowData[8];
+                        if (isForecastBlank) {
+                            var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell11.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                        }
+                    } catch (err) {
+
                     }
                 }
             }.bind(this),
@@ -802,7 +845,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: loadedForNonEditableTables,
+            onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1100,16 +1143,141 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (this.state.toggleDoNotImport) {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if(rowData[2]===""){
-                    this.el.setValueFromCoords(2,parseInt(i),-1,true);
+                if (rowData[2] === "") {
+                    this.el.setValueFromCoords(2, parseInt(i), -1, true);
                 }
             }
         } else {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if(rowData[2]===-1){
-                    this.el.setValueFromCoords(2,parseInt(i),"",true);
+                if (rowData[2] === -1) {
+                    this.el.setValueFromCoords(2, parseInt(i), "", true);
                 }
+            }
+        }
+    }
+    /**
+     * This function is used to format the consumption table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var y = 0; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                try{
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+                }catch(err){}
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+
+        }
+    }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                let textColor = contrast('#f48282');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                let textColor = contrast('#f48282');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                let textColor = contrast('#f48282');
+                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
             }
         }
     }
@@ -1256,7 +1424,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.selSource!=undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{"marginLeft":"20px","marginTop":"47px"}}>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
