@@ -21,7 +21,7 @@ let initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     userComments: Yup.string()
-      .required(i18n.t('static.errorPage.validUserComment'))
+      .required(i18n.t('static.label.fieldRequired'))
   })
 }
 
