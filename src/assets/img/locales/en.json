@@ -3267,5 +3267,6 @@
     "static.whatIf.removePlannedShipments": "Remove all Planned shipments",
     "static.tree.deleteScenario": "Delete Scenario",
     "static.tree.showOnlyActive": "Show Only Active",
-    "static.tree.showInactive": "Show Inactive"
+    "static.tree.showInactive": "Show Inactive",
+    "static.import.doNoImportCheckbox":"Toggle do not import"
 }
