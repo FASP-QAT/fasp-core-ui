@@ -880,6 +880,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var progId = e.target.value
         this.setState({
             programId: progId,
+            toggleDoNotImport:false
         }, () => {
             this.getPrograms(progId)
             this.getPlanningUnitList(progId);
@@ -1009,6 +1010,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
         this.setState({
+            toggleDoNotImport:false,
             versionId: event.target.value,
             minDate: { year: updatedForecastStartYear, month: updatedForecastStartMonth },
             maxDate: { year: updatedForecastStopYear, month: updatedForecastStopMonth },
@@ -1031,6 +1033,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
         this.props.updateStepOneData("selectedForecastProgramDesc", selectedForecastProgramDesc);
         this.setState({
+            toggleDoNotImport:false,
             forecastProgramId: e.target.value,
             versionId: '',
             programListFilter: programListFilter.sort(function (a, b) {
@@ -1143,14 +1146,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (this.state.toggleDoNotImport) {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if (rowData[2] === "") {
+                if (rowData[2] == "") {
                     this.el.setValueFromCoords(2, parseInt(i), -1, true);
                 }
             }
         } else {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if (rowData[2] === -1) {
+                if (rowData[2] == -1) {
                     this.el.setValueFromCoords(2, parseInt(i), "", true);
                 }
             }
@@ -1188,13 +1191,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             var doNotImport = rowData[2];
             if (doNotImport == -1) {
-                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                 cell1.classList.add('doNotImport');
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
             } else {
                 try{
-                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                 cell1.classList.remove('doNotImport');
                 }catch(err){}
             }
@@ -1247,20 +1250,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             var doNotImport = rowData[2];
             if (doNotImport == -1) {
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                let textColor = contrast('#f48282');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
             } else {
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
             }
             var noForecastSelected = rowData[7];
             if (noForecastSelected) {
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                let textColor = contrast('#f48282');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
                 var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
                 cell11.classList.add('readonly');
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
@@ -1269,10 +1268,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             var isForecastBlank = rowData[8];
             if (isForecastBlank) {
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                let textColor = contrast('#f48282');
-                elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
                 var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
                 cell11.classList.add('readonly');
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
