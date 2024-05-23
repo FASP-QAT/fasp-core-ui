@@ -831,7 +831,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             programId: event.target.value,
             versionId: '',
             forecastProgramId: '',
-            selSource1: []
+            selSource1: [],
+            toggleDoNotImport:false
         }, () => {
             this.filterVersion();
             this.filterForcastUnit();
@@ -936,7 +937,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     setVersionId(event) {
         this.setState({
-            versionId: event.target.value
+            versionId: event.target.value,
+            toggleDoNotImport:false
         }, () => {
             this.filterData();
         })
@@ -959,7 +961,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 forecastProgramId: event.target.value,
                 rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                 forecastProgramVersionId: forecastProgramVersionId,
-                selectedForecastProgram: selectedForecastProgram
+                selectedForecastProgram: selectedForecastProgram,
+                toggleDoNotImport:false
             }, () => {
                 this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
                 this.filterData();
@@ -974,6 +977,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
                 forecastProgramVersionId: 0,
                 selectedForecastProgram: '',
+                toggleDoNotImport:false
             }, () => {
                 jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             })
@@ -1090,14 +1094,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (this.state.toggleDoNotImport) {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if (rowData[7] === "") {
+                if (rowData[7] == "") {
                     this.el.setValueFromCoords(7, parseInt(i), -1, true);
                 }
             }
         } else {
             for (var i = 0; i < tableJson.length; i++) {
                 var rowData = this.el.getRowData(i);
-                if (rowData[7] === -1) {
+                if (rowData[7] == -1) {
                     this.el.setValueFromCoords(7, parseInt(i), "", true);
                 }
             }
@@ -1135,14 +1139,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             var doNotImport = rowData[7];
             if (doNotImport == -1) {
-                var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                 cell1.classList.add('doNotImport');
                 var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 elInstance.setComments(`J${parseInt(y) + 1}`, "");
             } else {
                 try {
-                    var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                    var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                     cell1.classList.remove('doNotImport');
                 } catch (err) { }
             }
@@ -1179,14 +1183,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             var doNotImport = rowData[7];
             if (doNotImport == -1) {
-                var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                 cell1.classList.add('doNotImport');
                 var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 elInstance.setComments(`J${parseInt(y) + 1}`, "");
             } else {
                 try {
-                    var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                    var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                     cell1.classList.remove('doNotImport');
                 } catch (err) { }
             }
