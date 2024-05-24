@@ -3272,6 +3272,7 @@ export default class BuildTree extends Component {
                 }
             } else if (type == 4) {
                 this.setState({
+                    items: this.state.selectedScenario == "" ? [] : this.state.items,
                     showOnlyActive: !this.state.showOnlyActive
                 })
             } else {
@@ -7475,7 +7476,13 @@ export default class BuildTree extends Component {
         var scenarioId;
         var temNodeDataMap = [];
         var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
-        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3 || type == 4) {
+        var activeScenarios = scenarioList.filter(x => x.active.toString() == "true");
+        var activeScenarios1 = activeScenarios.length > 1 ? activeScenarios.filter(x => x.id == scenario.id) : [];
+        var isActive = (type == 2 && scenario.active.toString() == "false" && activeScenarios1.length == 0) ? 1 : 0;
+
+        if (isActive) {
+            alert("You must have at least one active scenario.");
+        } else if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3 || type == 4) {
             if (type == 1) {
                 var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
@@ -7515,6 +7522,10 @@ export default class BuildTree extends Component {
                 var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
                 if (type == 2) {
                     scenarioList[findNodeIndex] = this.state.scenario;
+                    if (this.state.showOnlyActive && scenario.active.toString() == "false") {
+                        items = [];
+                        scenarioId = '';
+                    }
                 } else if (type == 3) {
                     items = [];
                     scenarioId = '';
@@ -11422,7 +11433,7 @@ export default class BuildTree extends Component {
             && scenarioList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}{(item.active.toString() == "false" ? " (Inactive)" : "")}
                     </option>
                 )
             }, this);
@@ -12579,7 +12590,7 @@ export default class BuildTree extends Component {
                                                 value={this.state.scenario.notes}
                                             ></Input>
                                         </FormGroup>
-                                        {this.state.scenarioActionType == 2 && <FormGroup className="col-md-4 pt-lg-4">
+                                        {this.state.scenarioActionType == 2 && <FormGroup>
                                             <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                             <FormGroup check inline>
                                                 <Input
@@ -12617,7 +12628,7 @@ export default class BuildTree extends Component {
                                         }
                                         <FormGroup className="col-md-6 pt-lg-4 float-right">
                                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {this.state.scenarioActionType == 1 ? i18n.t('static.common.submit') : i18n.t('static.common.update')}</Button>
                                         </FormGroup>
                                     </Form>
                                 )} />
