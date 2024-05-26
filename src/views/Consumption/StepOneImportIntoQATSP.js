@@ -555,6 +555,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Reterives planning unit list based on program and version Id
      */
     filterData(loadJexcel) {
+        this.props.updateStepOneData("loading", true);
         this.setState({
             loading: true
         })
@@ -589,12 +590,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     this.buildJexcel();
                                 })
                             } else {
+                                this.props.updateStepOneData("loading", false);
                                 this.setState({
                                     programPlanningUnitList: []
                                 });
                             }
                         }).catch(
                             error => {
+                                this.props.updateStepOneData("loading", false);
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -634,6 +637,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         );
                 }
             } else {
+                this.props.updateStepOneData("loading", false);
                 this.setState({
                     message: i18n.t('static.importFromQATSupplyPlan.belongsSameCountry'),
                     color: 'red',
@@ -643,6 +647,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     })
             }
         } else if (forecastProgramId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -653,6 +658,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -663,6 +669,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -673,6 +680,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -880,7 +888,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var progId = e.target.value
         this.setState({
             programId: progId,
-            toggleDoNotImport:false
+            toggleDoNotImport:false,
+            selSource1:[],
         }, () => {
             this.getPrograms(progId)
             this.getPlanningUnitList(progId);
@@ -1034,6 +1043,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.props.updateStepOneData("selectedForecastProgramDesc", selectedForecastProgramDesc);
         this.setState({
             toggleDoNotImport:false,
+            selSource1:[],
             forecastProgramId: e.target.value,
             versionId: '',
             programListFilter: programListFilter.sort(function (a, b) {
