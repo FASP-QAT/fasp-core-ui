@@ -6,7 +6,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
+import { formatter, generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_NO_REGEX, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from "../../Constants";
 import i18n from '../../i18n';
@@ -3076,6 +3076,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         var negativeBudget = 0;
         var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered;
+        var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (map.get("27") != -1) {
@@ -3164,6 +3165,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                         var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                         if (availableBudgetAmount < 0) {
+                            if (budgetJson.findIndex(c => c.budget.id == budget.id) == -1) {
+                                budgetJson.push({
+                                    budget: budget,
+                                    amount: Number(0 - Number(availableBudgetAmount)).toFixed(2),
+                                    shipmentList: shipmentList.filter(c=>[...new Set(json.map(ele => ele[2]))].includes(c.shipmentId))
+                                })
+                            }
                             negativeBudget = negativeBudget + 1;
                             inValid("R", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                         } else {
@@ -3376,7 +3384,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         if (negativeBudget > 0 && valid == true) {
-            var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
+            var message="";
+            for(var i=0;i<budgetJson.length;i++){
+                message=message.concat(i18n.t("static.shipment.budgetWarning1")).concat(" ").concat(getLabelText(budgetJson[i].budget.label,this.state.lang)).concat(" (").concat(budgetJson[i].budget.name).concat(i18n.t("static.shipment.budgetWarning2")).concat(formatter(budgetJson[i].amount,0)).concat(" ").concat(i18n.t("static.shipment.budgetWarning3")).concat(" ").concat([...new Set(budgetJson[i].shipmentList.map(ele => ele.shipmentId))].toString()).concat(")\n");
+            }
+            message=message.concat("\n").concat("Do you want to continue?");
+            var cf = window.confirm(message);
             if (cf == true) {
                 return valid;
             } else {
