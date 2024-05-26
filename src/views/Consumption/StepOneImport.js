@@ -938,7 +938,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
     setVersionId(event) {
         this.setState({
             versionId: event.target.value,
-            toggleDoNotImport:false
+            toggleDoNotImport:false,
+            selSource1: [],
         }, () => {
             this.filterData();
         })
@@ -959,6 +960,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
             this.setState({
                 forecastProgramId: event.target.value,
+                selSource1: [],
                 rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                 forecastProgramVersionId: forecastProgramVersionId,
                 selectedForecastProgram: selectedForecastProgram,
