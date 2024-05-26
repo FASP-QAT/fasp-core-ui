@@ -3268,5 +3268,9 @@
     "static.tree.deleteScenario": "Delete Scenario",
     "static.tree.showOnlyActive": "Show Only Active",
     "static.tree.showInactive": "Show Inactive",
-    "static.import.doNoImportCheckbox":"Toggle do not import"
+    "static.import.doNoImportCheckbox":"Toggle do not import",
+    "static.shipment.budgetWarning1":"The budget",
+    "static.shipment.budgetWarning2":") is going over budget by $",
+    "static.shipment.budgetWarning3":"(please see shipment ID",
+    "static.shipment.budgetWarning4":"Do you want to continue?"
 }
