@@ -19,6 +19,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import CryptoJS from 'crypto-js';
+import csvicon from '../../assets/img/csv.png';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 /**
@@ -1350,6 +1352,57 @@ class AddprogramPlanningUnit extends Component {
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
     }
     /**
+     * Exports the data to a CSV file.
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var planningUnitList;
+        // if (response.data.length > 0) {
+        var A = [];
+        let tableHeadTemp = [];
+        tableHeadTemp.push(i18n.t('static.productCategory.productCategory').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.programPU.planBasedOn')).replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.product.reorderFrequency')).replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.product.minMonthOfStock').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.product.minQuantity').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.program.monthfutureamc').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.program.monthpastamc').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.product.localProcurementAgentLeadTime').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.report.shelfLife').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.procurementAgentPlanningUnit.catalogPrice').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.common.active').replaceAll(' ', '%20'));
+        A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+        this.state.mapPlanningUnitEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[2].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''),
+        ele[3].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[4].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[9].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[10].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[11].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
+        ele[13] ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        // }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+"-"+i18n.t('static.Update.PlanningUnits') + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+    /**
      * Renders the mapping of program planning unit list.
      * @returns {JSX.Element} - Mapping of program planning unit list.
      */
@@ -1379,6 +1432,7 @@ class AddprogramPlanningUnit extends Component {
                 <div style={{ flexBasis: 'auto' }}>
                     <Card>
                         <CardBody className="pb-lg-5">
+                        {this.state.programId != "" && this.state.programId != null && this.state.programId != undefined && this.state.programId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
