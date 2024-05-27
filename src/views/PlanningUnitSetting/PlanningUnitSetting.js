@@ -38,6 +38,8 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import csvicon from '../../assets/img/csv.png';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
 //Array of months
 const pickerLang = {
@@ -144,7 +146,6 @@ export default class PlanningUnitSetting extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         valid = checkValidation(this.el)
-        console.log('called... json: '+JSON.stringify(json));
         for (var y = 0; y < json.length; y++) {
             //planning unit
             var col = ("B").concat(parseInt(y) + 1);
@@ -1912,6 +1913,47 @@ export default class PlanningUnitSetting extends Component {
         });
     }
     /**
+     * Exports the data to a CSV file.
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + (this.state.startDateDisplay + ' ~ ' + this.state.endDateDisplay)) + '"')
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var planningUnitList;
+        // if (response.data.length > 0) {
+        var A = [];
+        let tableHeadTemp = [];
+        tableHeadTemp.push(i18n.t('static.productCategory.productCategory').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.dashboard.planningunitheader').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.commitTree.consumptionForecast') + ' ?').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.TreeForecast.TreeForecast') + ' ?').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.forecastReport.priceType').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.forecastReport.unitPrice').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.common.active').replaceAll(' ', '%20'));
+        A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[2] ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[3] ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[15].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16] ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        // }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = (document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20')+"-"+i18n.t('static.updatePlanningUnit.updatePlanningUnit') + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+    /**
      * Renders the Planning Unit list.
      * @returns {JSX.Element} - the Planning Unit list.
      */
@@ -1962,6 +2004,7 @@ export default class PlanningUnitSetting extends Component {
                         <div className="" >
                             <div ref={ref}>
                                 <Col md="12 pl-0">
+                                    {this.state.datasetId != "" && this.state.datasetId != null && this.state.datasetId != undefined && this.state.datasetId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                                     <div className="row">
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>

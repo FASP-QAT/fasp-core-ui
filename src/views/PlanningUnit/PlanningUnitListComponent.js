@@ -38,7 +38,7 @@ export default class PlanningUnitListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang'),
             exportModal: false,
-            loadingModal:false
+            loadingModal: false
         }
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -525,7 +525,7 @@ export default class PlanningUnitListComponent extends Component {
      */
     getDataforExport() {
         this.setState({
-            loadingModal:true
+            loadingModal: true
         })
         var tracerCategoryId = document.getElementById("tracerCategoryIdExport").value;
         var productCategoryId = document.getElementById("productCategoryIdExport").value;
@@ -579,19 +579,19 @@ export default class PlanningUnitListComponent extends Component {
                 document.body.appendChild(a)
                 a.click()
                 this.setState({
-                    loadingModal:false
+                    loadingModal: false
                 })
             } else {
                 this.setState({
                     exportModal: false,
-                    loadingModal:false
+                    loadingModal: false
                 })
             }
         }).catch(
             error => {
                 this.setState({
                     exportModal: false,
-                    loadingModal:false
+                    loadingModal: false
                 })
                 if (error.message === "Network Error") {
                     this.setState({
@@ -722,9 +722,9 @@ export default class PlanningUnitListComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="9 pl-0" style={{ zIndex: '1' }}>
-                            <div className="row">
+                    <CardBody className="pb-lg-5 pt-lg-2">
+                        <Col md="9 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="d-md-flex  Selectdiv2 row">
                                 <FormGroup className="col-md-3" id="realmDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                     <div className="controls">
@@ -800,12 +800,12 @@ export default class PlanningUnitListComponent extends Component {
                         <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                        <div class="spinner-border blue ml-4" role="status">
-                                        </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
                                     </div>
                                 </div>
                             </div>
