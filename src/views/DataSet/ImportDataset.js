@@ -632,7 +632,7 @@ export default class ImportDataset extends Component {
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody>
-                                <Row className='justify-content-center'>
+                                <Row>
                                     <Col sm={6} md={6}>
                                         <ProgressBar
                                             percent={this.state.progressPer}
@@ -660,10 +660,10 @@ export default class ImportDataset extends Component {
                                         </ProgressBar>
                                     </Col>
                                 </Row>
-                                <div className="d-sm-down-none  progressbar mr-4">
+                                <div className="d-sm-down-none progressbar mr-4">
                                     <ul>
-                                        <li className="progresdatatext2 ml-4">{i18n.t('static.chooseFile.chooseFile')}</li>
-                                        <li className="progresdatatext4 ml-2">{i18n.t('static.common.selectProgram')}</li>
+                                        <li className="progressbartext1Import">{i18n.t('static.chooseFile.chooseFile')}</li>
+                                        <li className="progressbartext4Import">{i18n.t('static.common.selectProgram')}</li>
                                     </ul>
                                 </div>
                                 <br></br>
