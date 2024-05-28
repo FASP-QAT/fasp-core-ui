@@ -3498,7 +3498,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="movingAvgId"
                                                                 name="movingAvgId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.movingAvgData.length <= 0}
                                                                 checked={this.state.movingAvgId}
                                                                 value={this.state.movingAvgId}
                                                                 onClick={(e) => { this.setMovingAvgId(e); }}
@@ -3541,7 +3541,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="semiAvgId"
                                                                 name="semiAvgId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.semiAvgData.length <= 0}
                                                                 checked={this.state.semiAvgId}
                                                                 onClick={(e) => { this.setSemiAvgId(e); }}
                                                             />
@@ -3563,7 +3563,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="linearRegressionId"
                                                                 name="linearRegressionId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.linearRegressionData.length <= 0}
                                                                 checked={this.state.linearRegressionId}
                                                                 onClick={(e) => { this.setLinearRegressionId(e); }}
                                                             />
@@ -3618,7 +3618,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="smoothingId"
                                                                 name="smoothingId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.tesData.length <= 0}
                                                                 checked={this.state.smoothingId}
                                                                 onClick={(e) => { this.setSmoothingId(e); }}
                                                             />
@@ -3782,7 +3782,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     type="checkbox"
                                                                     id="arimaId"
                                                                     name="arimaId"
-                                                                    disabled={this.state.isDisabled}
+                                                                    disabled={this.state.isDisabled || this.state.arimaData.length <= 0}
                                                                     checked={this.state.arimaId}
                                                                     onClick={(e) => { this.setArimaId(e); }}
                                                                 />
