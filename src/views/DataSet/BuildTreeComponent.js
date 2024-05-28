@@ -3272,7 +3272,8 @@ export default class BuildTree extends Component {
                 }
             } else if (type == 4) {
                 this.setState({
-                    items: this.state.selectedScenario == "" ? [] : this.state.items,
+                    items: [],
+                    selectedScenario: "",
                     showOnlyActive: !this.state.showOnlyActive
                 })
             } else {
