@@ -1439,6 +1439,7 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Saves consumption extrapolation in indexed db
      */
     saveForecastConsumptionExtrapolation() {
+        var tempForecastProgramId = this.state.forecastProgramId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
         if (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) {
             var cont = false;
             var cf = window.confirm(i18n.t("static.extrapolation.confirmmsg"));
@@ -1462,7 +1463,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     db1 = e.target.result;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
-                    var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                    var datasetRequest = datasetTransaction.get(tempForecastProgramId);
                     datasetRequest.onerror = function (event) {
                     }.bind(this);
                     datasetRequest.onsuccess = function (event) {
@@ -1498,7 +1499,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(tempForecastProgramId);
                             datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
@@ -1542,7 +1543,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 extrapolationMethodRequest.onsuccess = function (event) {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
-                    var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                    var datasetRequest = datasetTransaction.get(tempForecastProgramId);
                     datasetRequest.onerror = function (event) {
                     }.bind(this);
                     datasetRequest.onsuccess = function (event) {
@@ -1722,7 +1723,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(tempForecastProgramId);
                             datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
