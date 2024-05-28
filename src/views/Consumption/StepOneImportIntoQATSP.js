@@ -1429,7 +1429,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.selSource != undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
@@ -1446,8 +1446,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>}
                     </div>
                 </div>
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
+                <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >
+                    <div id="mapPlanningUnit" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0  || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="")  ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
