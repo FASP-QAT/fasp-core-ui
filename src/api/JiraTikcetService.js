@@ -71,14 +71,15 @@ class JiraTicketService {
             fields.summary = json.summary;
         }
         fields.description = this.getDataInFormat(json);
+        console.log('user josn: '+ fields.description);
         fields.project = project;
         fields.issuetype = issuetype;
         fields.reporter = reporter;
         fields.customfield_10063 = json.realm;
         fields.assignee = assignee;
         mainObject.fields = fields;
-        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
-        );
+        // return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        // );
     }
     addIssueAttachment(json, issueId) {
         if (issueId != '') {
