@@ -569,6 +569,11 @@ export default class ExtrapolateDataComponent extends React.Component {
         var linearRegressionDataFilter = [];
         var tesDataFilter = [];
         var arimaDataFilter = [];
+        var movingAvgDataFilter = [];
+        var semiAvgDataFilter = [];
+        var linearRegressionDataFilter = [];
+        var tesDataFilter = [];
+        var arimaDataFilter = [];
         for (var j = 0; j < monthArrayPart2.length; j++) {
             data = [];
             data[0] = monthArrayPart2[j];
@@ -1557,7 +1562,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         var curUser = AuthenticationService.getLoggedInUserId();
-                        var json = this.state.dataEl.getJson(null, false);
+                        var json;
+                        try {
+                            json = this.state.dataEl.getJson(null, false);
+                        } catch (error) {
+                            json = []
+                        }
                         if (this.state.semiAvgId) {
                             var data = [];
                             for (var i = 0; i < json.length; i++) {
@@ -2012,11 +2022,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     beta: beta,
                     gamma: gamma,
                     showData: true,
-                    movingAvgId: movingAvgId,
-                    semiAvgId: semiAvgId,
-                    linearRegressionId: linearRegressionId,
-                    smoothingId: smoothingId,
-                    arimaId: arimaId,
+                    movingAvgId: inputDataMovingAvg.length > 0 ? movingAvgId : false,
+                    semiAvgId: inputDataSemiAverage.length > 0 ? semiAvgId : false,
+                    linearRegressionId: inputDataLinearRegression.length > 0 ? linearRegressionId : false,
+                    smoothingId: inputDataTes.length > 0 ? smoothingId : false,
+                    arimaId: inputDataArima.length > 0 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
@@ -2051,7 +2061,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],  
                     }, () => {
                         this.getDateDifference()
                     })
@@ -2068,7 +2088,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],  
                     }, () => {
                         this.getDateDifference()
                     })
@@ -3494,7 +3524,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="movingAvgId"
                                                                 name="movingAvgId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.movingAvgData.length <= 0}
                                                                 checked={this.state.movingAvgId}
                                                                 value={this.state.movingAvgId}
                                                                 onClick={(e) => { this.setMovingAvgId(e); }}
@@ -3537,7 +3567,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="semiAvgId"
                                                                 name="semiAvgId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.semiAvgData.length <= 0}
                                                                 checked={this.state.semiAvgId}
                                                                 onClick={(e) => { this.setSemiAvgId(e); }}
                                                             />
@@ -3559,7 +3589,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="linearRegressionId"
                                                                 name="linearRegressionId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.linearRegressionData.length <= 0}
                                                                 checked={this.state.linearRegressionId}
                                                                 onClick={(e) => { this.setLinearRegressionId(e); }}
                                                             />
@@ -3614,7 +3644,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="smoothingId"
                                                                 name="smoothingId"
-                                                                disabled={this.state.isDisabled}
+                                                                disabled={this.state.isDisabled || this.state.tesData.length <= 0}
                                                                 checked={this.state.smoothingId}
                                                                 onClick={(e) => { this.setSmoothingId(e); }}
                                                             />
@@ -3778,7 +3808,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     type="checkbox"
                                                                     id="arimaId"
                                                                     name="arimaId"
-                                                                    disabled={this.state.isDisabled}
+                                                                    disabled={this.state.isDisabled || this.state.arimaData.length <= 0}
                                                                     checked={this.state.arimaId}
                                                                     onClick={(e) => { this.setArimaId(e); }}
                                                                 />
