@@ -1562,7 +1562,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         var curUser = AuthenticationService.getLoggedInUserId();
-                        var json = this.state.dataEl.getJson(null, false);
+                        var json;
+                        try {
+                            json = this.state.dataEl.getJson(null, false);
+                        } catch (error) {
+                            json = []
+                        }
                         if (this.state.semiAvgId) {
                             var data = [];
                             for (var i = 0; i < json.length; i++) {
@@ -2017,11 +2022,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     beta: beta,
                     gamma: gamma,
                     showData: true,
-                    movingAvgId: movingAvgId,
-                    semiAvgId: semiAvgId,
-                    linearRegressionId: linearRegressionId,
-                    smoothingId: smoothingId,
-                    arimaId: arimaId,
+                    movingAvgId: inputDataMovingAvg.length > 0 ? movingAvgId : false,
+                    semiAvgId: inputDataSemiAverage.length > 0 ? semiAvgId : false,
+                    linearRegressionId: inputDataLinearRegression.length > 0 ? linearRegressionId : false,
+                    smoothingId: inputDataTes.length > 0 ? smoothingId : false,
+                    arimaId: inputDataArima.length > 0 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
@@ -2056,7 +2061,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],  
                     }, () => {
                         this.getDateDifference()
                     })
@@ -2073,7 +2088,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],  
                     }, () => {
                         this.getDateDifference()
                     })
