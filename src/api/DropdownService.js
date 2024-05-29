@@ -119,5 +119,12 @@ class DropdownService {
       {}
     );
   }
+  getAutocompleteForecastingUnit(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/forecastingUnit/autocomplete`,
+      json,
+      {}
+    );
+  }
 }
 export default new DropdownService();

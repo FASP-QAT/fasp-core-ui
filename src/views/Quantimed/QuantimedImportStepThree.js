@@ -18,10 +18,16 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
+// Initial values for form fields
 let initialValuesThree = {
     regionId: '',
     regionConversionFactor: ''
 }
+/**
+ * Defines the validation schema for quantimed import step one.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaThree = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
@@ -32,6 +38,11 @@ const validationSchemaThree = function (values) {
         ,
     })
 }
+/**
+ * Generates a validation function compatible with Formik based on a dynamically obtained validation schema.
+ * @param {Function} getValidationSchema - A function that returns a Yup validation schema based on the form values.
+ * @returns {Function} - A validation function compatible with Formik.
+ */
 const validateThree = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
@@ -43,6 +54,11 @@ const validateThree = (getValidationSchema) => {
         }
     }
 }
+/**
+ * Extracts errors from a Yup validation error object and returns them in a format compatible with Formik.
+ * @param {Yup.ValidationError} validationError - A Yup validation error object.
+ * @returns {Object} - An object containing validation errors mapped by field name.
+ */
 const getErrorsFromValidationErrorThree = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
@@ -52,6 +68,9 @@ const getErrorsFromValidationErrorThree = (validationError) => {
         }
     }, {})
 }
+/**
+ * Component for Qunatimed Import step three for taking the region details for the import
+ */
 class QuantimedImportStepThree extends Component {
     constructor(props) {
         super(props);
@@ -66,6 +85,10 @@ class QuantimedImportStepThree extends Component {
         this.laodRegionList = this.loadRegionList.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { region } = this.state;
         if (event.target.name == "regionId") {
@@ -80,6 +103,9 @@ class QuantimedImportStepThree extends Component {
             region
         }, () => { });
     }
+    /**
+     * Retrieves list of regions
+     */
     loadRegionList() {
         this.setState({
             loading: true
@@ -123,13 +149,19 @@ class QuantimedImportStepThree extends Component {
             }.bind(this);
         }.bind(this);
     }
-    
+    /**
+     * Sets the initial values for the region conversion factor on component mount
+     */
     componentDidMount() {
         this.state.region.regionConversionFactor = '100'
         initialValuesThree = {
             regionConversionFactor: '100'
         }
     }
+    /**
+     * Renders the quantimed import step three screen.
+     * @returns {JSX.Element} - Quantimed import step three screen.
+     */
     render() {
         const { regionList } = this.state;
         let regions = regionList.length > 0 && regionList.map((item, i) => {

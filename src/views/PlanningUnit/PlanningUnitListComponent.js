@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Button, Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
@@ -16,7 +16,12 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
+/**
+ * Component for list of planning unit details.
+ */
 export default class PlanningUnitListComponent extends Component {
     constructor(props) {
         super(props);
@@ -35,24 +40,19 @@ export default class PlanningUnitListComponent extends Component {
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Filters the data based on selected tracer category and product category.
+     * Updates the state with the filtered forecasting units and planning units.
+     */
     filterData() {
         var forecastingUnitList = this.state.forecastingUnitListAll;
         var tracerCategoryId = document.getElementById("tracerCategoryId").value;
@@ -90,21 +90,31 @@ export default class PlanningUnitListComponent extends Component {
             this.buildJExcel();
         });
     }
+    /**
+     * Event handler for when the realm selection changes.
+     * Sets the loading state to true and calls the filterDataForRealm method to update the data based on the selected realm.
+     * @param {Object} event - The event object containing information about the realm selection change.
+     */
     dataChangeForRealm(event) {
         this.setState({ loading: true })
         this.filterDataForRealm(event.target.value);
     }
+    /**
+     * Filters data based on the selected realm.
+     * Retrieves and updates product categories, tracer categories, forecasting units, and planning units for the selected realm.
+     * @param {string} r - The ID of the selected realm.
+     */
     filterDataForRealm(r) {
         let realmId = r;
         if (realmId != 0) {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                    //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
                     this.setState({
                         productCategories: listArray,
                         productCategoryListAll: listArray
@@ -184,7 +194,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }).catch(
@@ -231,7 +241,7 @@ export default class PlanningUnitListComponent extends Component {
                                     message: response.data.messageCode, loading: false
                                 },
                                     () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     })
                             }
                         }).catch(
@@ -314,6 +324,9 @@ export default class PlanningUnitListComponent extends Component {
                 );
         }
     }
+    /**
+     * Builds the jexcel component to display role list.
+     */
     buildJExcel() {
         let planningUnitList = this.state.selSource;
         let planningUnitArray = [];
@@ -336,7 +349,7 @@ export default class PlanningUnitListComponent extends Component {
         var data = planningUnitArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [70, 150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -379,7 +392,7 @@ export default class PlanningUnitListComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -402,9 +415,9 @@ export default class PlanningUnitListComponent extends Component {
                         items.push({
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
-                                    this.props.history.push({
-                                        pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
-                                    })
+                                this.props.history.push({
+                                    pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
+                                })
                             }.bind(this)
                         });
                     }
@@ -419,6 +432,9 @@ export default class PlanningUnitListComponent extends Component {
             loading: false
         })
     }
+    /**
+     * Redirects to the edit planning unit screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -433,11 +449,11 @@ export default class PlanningUnitListComponent extends Component {
             }
         }
     }.bind(this);
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Reterives the realm list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
             RealmService.getRealmListAll()
@@ -457,7 +473,7 @@ export default class PlanningUnitListComponent extends Component {
                         this.setState({
                             message: response.data.messageCode, loading: false, color: "#BA0C2F"
                         })
-                        this.hideFirstComponent()
+                        hideFirstComponent()
                     }
                 }).catch(
                     error => {
@@ -503,6 +519,9 @@ export default class PlanningUnitListComponent extends Component {
             this.filterDataForRealm(AuthenticationService.getRealmId());
         }
     }
+    /**
+     * Redirects to the add planning unit screen.
+     */
     addNewPlanningUnit() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/planningUnit/addPlanningUnit`)
@@ -510,6 +529,10 @@ export default class PlanningUnitListComponent extends Component {
             alert(i18n.t('static.common.online'))
         }
     }
+    /**
+     * Renders the planning unit list.
+     * @returns {JSX.Element} - Planning Unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

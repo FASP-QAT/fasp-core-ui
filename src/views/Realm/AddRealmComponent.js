@@ -7,7 +7,10 @@ import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONT
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.realm.realm');
+// Initial values for form fields
 const initialValues = {
     realmCode: '',
     label: '',
@@ -23,6 +26,11 @@ const initialValues = {
     minCountForMode: '',
     minPercForMode: ''
 }
+/**
+ * Defines the validation schema for realm details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
@@ -96,6 +104,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
+/**
+ * Component for adding realm details.
+ */
 export default class AddRealmComponent extends Component {
     constructor(props) {
         super(props);
@@ -124,12 +135,14 @@ export default class AddRealmComponent extends Component {
             },
             message: ''
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name === "label") {
@@ -180,19 +193,16 @@ export default class AddRealmComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Show loader on component mount
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        let { realm } = this.state
-        realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Renders the realm details form.
+     * @returns {JSX.Element} - Realm details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -234,7 +244,7 @@ export default class AddRealmComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -301,7 +311,7 @@ export default class AddRealmComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label && this.state.realm.label.label_en != ''}
                                                         invalid={touched.label && !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.realm.label.label_en}
                                                         required />
@@ -477,7 +487,7 @@ export default class AddRealmComponent extends Component {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
-                                                    <FormGroup check inline>
+                                                    <FormGroup className='form-check form-check-inline' style={{paddingLeft:'13%'}}>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"
@@ -536,9 +546,15 @@ export default class AddRealmComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list realm screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the realm details when reset button is clicked.
+     */
     resetClicked() {
         let { realm } = this.state
         realm.label.label_en = ''

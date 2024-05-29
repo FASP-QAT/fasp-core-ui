@@ -17,7 +17,12 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
+/**
+ * Component for mapping program and planning unit.
+ */
 class AddprogramPlanningUnit extends Component {
     constructor(props) {
         super(props);
@@ -50,8 +55,6 @@ class AddprogramPlanningUnit extends Component {
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
@@ -61,6 +64,15 @@ class AddprogramPlanningUnit extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
+    /**
+     * Function to filter planning unit based on product category
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
@@ -85,20 +97,11 @@ class AddprogramPlanningUnit extends Component {
         }
         return mylist;
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    hideFirstComponent() {
-        document.getElementById('div1').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Retrevies the program list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
@@ -117,7 +120,7 @@ class AddprogramPlanningUnit extends Component {
                         message: response.data.messageCode, loading: false, color: '#BA0C2F'
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -173,6 +176,9 @@ class AddprogramPlanningUnit extends Component {
                 })
         }
     }
+    /**
+     * Sets the program id in the component state on change and builds data accordingly.
+     */
     setProgramId() {
         var programId = document.getElementById("programId").value;
         this.setState({
@@ -182,6 +188,10 @@ class AddprogramPlanningUnit extends Component {
                 this.buildJexcel();
             })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var list = [];
         var productCategoryListNew = [];
@@ -306,12 +316,13 @@ class AddprogramPlanningUnit extends Component {
                                                         var data = productDataArr;
                                                         var options = {
                                                             data: data,
-                                                            columnDrag: true,
+                                                            columnDrag: false,
                                                             columns: [
                                                                 {
                                                                     title: i18n.t('static.productCategory.productCategory'),
                                                                     type: 'dropdown',
                                                                     source: productCategoryListNew,
+                                                                    width:150,
                                                                     required: true
                                                                 },
                                                                 {
@@ -319,6 +330,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     type: 'autocomplete',
                                                                     source: list,
                                                                     filter: this.dropdownFilter,
+                                                                    width:150,
                                                                     required: true
                                                                 },
                                                                 {
@@ -834,6 +846,9 @@ class AddprogramPlanningUnit extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
         }
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRowInJexcel = function () {
         var data = [];
         data[0] = "-1";
@@ -859,6 +874,14 @@ class AddprogramPlanningUnit extends Component {
             data, 0, 1
         );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -878,6 +901,11 @@ class AddprogramPlanningUnit extends Component {
             elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
         }
     }
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -894,6 +922,10 @@ class AddprogramPlanningUnit extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -978,6 +1010,14 @@ class AddprogramPlanningUnit extends Component {
         }
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         var valid = true;
         var rowData = this.el.getRowData(y);
@@ -1180,6 +1220,9 @@ class AddprogramPlanningUnit extends Component {
         }
         this.setState({ isValidData: valid, isChanged: true });
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     submitForm() {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -1224,7 +1267,7 @@ class AddprogramPlanningUnit extends Component {
                             message: i18n.t('static.message.planningUnitUpdate'), loading: false, color: 'green', isChanged: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                                 this.buildJexcel();
                             })
                     } else {
@@ -1232,7 +1275,7 @@ class AddprogramPlanningUnit extends Component {
                             message: response.data.messageCode, loading: false, color: '#BA0C2F'
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -1258,7 +1301,7 @@ class AddprogramPlanningUnit extends Component {
                                         loading: false, color: '#BA0C2F'
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                     break;
                                 case 412:
@@ -1267,7 +1310,7 @@ class AddprogramPlanningUnit extends Component {
                                         loading: false, color: '#BA0C2F'
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                     break;
                                 default:
@@ -1276,7 +1319,7 @@ class AddprogramPlanningUnit extends Component {
                                         loading: false, color: '#BA0C2F'
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         });
                                     break;
                             }
@@ -1286,7 +1329,12 @@ class AddprogramPlanningUnit extends Component {
         } else {
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1303,6 +1351,10 @@ class AddprogramPlanningUnit extends Component {
         tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
     }
+    /**
+     * Renders the mapping of program planning unit list.
+     * @returns {JSX.Element} - Mapping of program planning unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1351,7 +1403,7 @@ class AddprogramPlanningUnit extends Component {
                             </Col>
                             <div >
                                 <h4 className="red">{this.props.message}</h4>
-                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                     </div>
                                 </div>
@@ -1381,6 +1433,9 @@ class AddprogramPlanningUnit extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))

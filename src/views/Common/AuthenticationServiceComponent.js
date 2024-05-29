@@ -3,10 +3,16 @@ import CryptoJS from 'crypto-js';
 import React, { Component } from 'react';
 import { SECRET_KEY } from '../../Constants.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
+/**
+ * Component responsible for handling authentication related tasks.
+ */
 export default class AuthenticationServiceComponent extends Component {
     constructor(props) {
         super(props);
     }
+    /**
+     * Handles the session and language change and validates request on component mount
+     */
     componentDidMount = () => {
         var result = AuthenticationService.validateRequest();
         if (result != "") {
@@ -35,6 +41,10 @@ export default class AuthenticationServiceComponent extends Component {
             });
         }
     }
+    /**
+     * Renders the component.
+     * @returns {JSX.Element} - The rendered component.
+     */
     render() {
         return (
             <div className="animated fadeIn">

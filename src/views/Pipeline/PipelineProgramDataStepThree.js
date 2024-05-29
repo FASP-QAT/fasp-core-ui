@@ -16,15 +16,20 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValuesThree = {
-    healthAreaId: ''
-}
+/**
+ * Defines the validation schema for program health area details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaThree = function (values) {
     return Yup.object().shape({
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
     })
 }
+/**
+ * Component for pipeline program import health area details
+ */
 export default class PipelineProgramDataStepThree extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +37,9 @@ export default class PipelineProgramDataStepThree extends Component {
             healthAreaList: []
         }
     }
-    
+    /**
+     * Reterives health area list on component mount
+     */
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         ProgramService.getHealthAreaList(realmId)
@@ -93,6 +100,10 @@ export default class PipelineProgramDataStepThree extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import health area details screen.
+     * @returns {JSX.Element} - Pipeline program import health area details screen.
+     */
     render() {
         return (
             <>

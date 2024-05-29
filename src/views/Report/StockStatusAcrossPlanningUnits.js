@@ -25,6 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { addDoubleQuoteToRowContent, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -38,6 +39,9 @@ const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F",
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 { text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }
 ];
+/**
+ * Component for Stock Status Across Planning Units Report.
+ */
 class StockStatusAcrossPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -65,6 +69,11 @@ class StockStatusAcrossPlanningUnits extends Component {
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
     }
+    /**
+     * Retrieves tracer categories based on the selected program and version.
+     * Fetches from local IndexedDB if version is local, or from server API.
+     * Updates component state with fetched data and handles errors.
+     */
     getTracerCategoryList() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -192,16 +201,13 @@ class StockStatusAcrossPlanningUnits extends Component {
             })
         }
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV = (columns) => {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.month') + ' : ' + makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -214,8 +220,8 @@ class StockStatusAcrossPlanningUnits extends Component {
         var re;
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.jexcelData.map(ele => A.push(this.addDoubleQuoteToRowContent([ele[9], (ele[0].replaceAll(',', ' ')).replaceAll(' ', '%20'), ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2].replaceAll(' ', '%20'), ele[3], ele[4], ele[5], ele[6], ele[7], ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : ''])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.jexcelData.map(ele => A.push(addDoubleQuoteToRowContent([ele[9], (ele[0].replaceAll(',', ' ')).replaceAll(' ', '%20'), ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2].replaceAll(' ', '%20'), ele[3], ele[4], ele[5], ele[6], ele[7], ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : ''])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -227,6 +233,10 @@ class StockStatusAcrossPlanningUnits extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -257,7 +267,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.common.month') + ' : ' + makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -281,7 +291,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatterAMC(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],1), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
@@ -297,6 +307,9 @@ class StockStatusAcrossPlanningUnits extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".pdf")
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -361,6 +374,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -419,6 +435,12 @@ class StockStatusAcrossPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -495,6 +517,13 @@ class StockStatusAcrossPlanningUnits extends Component {
             })
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -554,46 +583,34 @@ class StockStatusAcrossPlanningUnits extends Component {
             }.bind(this);
         }.bind(this)
     }
-    roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-    }
-    formatter = value => {
-        var cell1 = this.round(value)
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    formatterDouble = value => {
-        var cell1 = this.roundN(value)
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = (value, text) => {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
             this.fetchData();
         })
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms()
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -603,6 +620,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             this.filterVersion()
         })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         this.setState({
             versionId: event.target.value
@@ -610,38 +631,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             this.getTracerCategoryList()
         })
     }
-    roundAMC(amc) {
-        if (amc != null) {
-            if (Number(amc).toFixed(0) >= 100) {
-                return Number(amc).toFixed(0);
-            } else if (Number(amc).toFixed(1) >= 10) {
-                return Number(amc).toFixed(1);
-            } else if (Number(amc).toFixed(2) >= 1) {
-                return Number(amc).toFixed(2);
-            } else {
-                return Number(amc).toFixed(3);
-            }
-        } else {
-            return null;
-        }
-    }
-    formatterAMC(value) {
-        if (value != null) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
-        }
-        else {
-            return ''
-        }
-    }
+    /**
+     * Builds the jexcel table based on the data list.
+     */
     buildJExcel() {
         let dataStockStatus = this.state.data;
         let dataArray = [];
@@ -652,12 +644,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (dataStockStatus[j].mos == null) {
                     data1 = i18n.t('static.supplyPlanFormula.na')
                 }
-                else if (this.roundN(dataStockStatus[j].mos) == 0) {
+                else if (roundN(dataStockStatus[j].mos) == 0) {
                     data1 = i18n.t('static.report.stockout')
                 } else {
-                    if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
+                    if (roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
                         data1 = i18n.t('static.report.lowstock')
-                    } else if (this.roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
+                    } else if (roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
                         data1 = i18n.t('static.report.overstock')
                     } else {
                         data1 = i18n.t('static.report.okaystock')
@@ -667,12 +659,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (dataStockStatus[j].stock == null) {
                     data1 = i18n.t('static.supplyPlanFormula.na')
                 }
-                else if (this.roundN(dataStockStatus[j].stock) == 0) {
+                else if (roundN(dataStockStatus[j].stock) == 0) {
                     data1 = i18n.t('static.report.stockout')
                 } else {
-                    if (this.roundN(dataStockStatus[j].stock) < dataStockStatus[j].minMos) {
+                    if (roundN(dataStockStatus[j].stock) < dataStockStatus[j].minMos) {
                         data1 = i18n.t('static.report.lowstock')
-                    } else if (this.roundN(dataStockStatus[j].stock) > dataStockStatus[j].maxMos) {
+                    } else if (roundN(dataStockStatus[j].stock) > dataStockStatus[j].maxMos) {
                         data1 = i18n.t('static.report.overstock')
                     } else {
                         data1 = i18n.t('static.report.okaystock')
@@ -684,10 +676,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             data[1] = dataStockStatus[j].planBasedOn;
             data[2] = data1;
             data[3] = (dataStockStatus[j].stock);
-            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? this.roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
+            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
             data[5] = (dataStockStatus[j].minMos);
             data[6] = (dataStockStatus[j].maxMos);
-            data[7] = this.roundAMC(dataStockStatus[j].amc);
+            data[7] = roundAMC(dataStockStatus[j].amc);
             data[8] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
             data[9] = dataStockStatus[j].planningUnit.id
             dataArray[count] = data;
@@ -698,7 +690,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var data = dataArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 100, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -775,6 +767,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             languageEl: languageEl, loading: false, jexcelData: data
         })
     }
+    /**
+     * Callback function triggered when the Jexcel instance is loaded to format the table.
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
@@ -817,6 +812,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             }
         }
     }
+    /**
+     * Filters data based on the selected stock status and updates the component state.
+     */
     filterDataAsperstatus = () => {
         let stockStatusId = document.getElementById("stockStatusId").value;
         var filteredData = []
@@ -825,19 +823,19 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var min = ele.minMos
                 var max = ele.maxMos
                 if (stockStatusId == 0) {
-                    if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
+                    if ((ele.mos != null && roundN(ele.mos) == 0)) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 1) {
-                    if ((ele.mos != null && this.roundN(ele.mos) != 0 && this.roundN(ele.mos) < min)) {
+                    if ((ele.mos != null && roundN(ele.mos) != 0 && roundN(ele.mos) < min)) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 3) {
-                    if (this.roundN(ele.mos) > max) {
+                    if (roundN(ele.mos) > max) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 2) {
-                    if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
+                    if (roundN(ele.mos) < max && roundN(ele.mos) > min) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 4) {
@@ -853,6 +851,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             data: filteredData
         }, () => { this.buildJExcel(); })
     }
+    /**
+     * Handles the change event for tracer categories.
+     * @param {Array} tracerCategoryIds - An array containing the selected tracer category IDs.
+     */
     handleTracerCategoryChange = (tracerCategoryIds) => {
         tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -864,6 +866,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -962,7 +967,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                             var json = {
                                                 planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
                                                 lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                                mos: includePlanningShipments.toString() == 'true' ? list[0].mos != null ? this.roundN(list[0].mos) : null : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : null,
+                                                mos: includePlanningShipments.toString() == 'true' ? list[0].mos != null ? roundN(list[0].mos) : null : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : null,
                                                 minMos: pu.planBasedOn == 1 ? minStockMoS : list[0].minStock,
                                                 maxMos: pu.planBasedOn == 1 ? maxStockMoS : list[0].maxStock,
                                                 stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
@@ -1074,6 +1079,10 @@ class StockStatusAcrossPlanningUnits extends Component {
             });
         }
     }
+    /**
+     * Renders the Stock Status Across Planning Units table.
+     * @returns {JSX.Element} - Stock Status Across Planning Units table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1174,10 +1183,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         value={singleValue2}
                                                         lang={pickerLang.months}
                                                         theme="dark"
-                                                        onChange={this.handleAMonthChange2}
                                                         onDismiss={this.handleAMonthDissmis2}
                                                     >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                        <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
                                                     </Picker>
                                                 </div>
                                             </FormGroup>

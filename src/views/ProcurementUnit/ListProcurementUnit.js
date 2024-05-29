@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import DropdownService from "../../api/DropdownService";
@@ -13,7 +13,12 @@ import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
+/**
+ * Component for list of procurement unit details.
+ */
 export default class ListProcurementUnit extends Component {
   constructor(props) {
     super(props);
@@ -28,23 +33,17 @@ export default class ListProcurementUnit extends Component {
     }
     this.addNewProcurementUnit = this.addNewProcurementUnit.bind(this);
     this.filterData = this.filterData.bind(this);
-    this.hideFirstComponent = this.hideFirstComponent.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
   }
-  hideFirstComponent() {
-    this.timeout = setTimeout(function () {
-      document.getElementById('div1').style.display = 'none';
-    }, 30000);
-  }
+  /**
+   * Clears the timeout when the component is unmounted.
+   */
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById('div2').style.display = 'none';
-    }, 30000);
-  }
+  /**
+   * Function to filter the procurement unit list based on planning unit
+   */
   filterData() {
     let planningUnitId = document.getElementById("planningUnitId").value;
     if (planningUnitId != 0) {
@@ -62,6 +61,9 @@ export default class ListProcurementUnit extends Component {
       });
     }
   }
+  /**
+   * Builds the jexcel component to display procurement unit list.
+   */
   buildJExcel() {
     let procurementUnitList = this.state.selProcurementUnit;
     let procurementUnitArray = [];
@@ -87,7 +89,7 @@ export default class ListProcurementUnit extends Component {
     var data = procurementUnitArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [0, 150, 150, 80, 60, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
@@ -138,7 +140,7 @@ export default class ListProcurementUnit extends Component {
         },
       ],
       editable: false,
-      onload: this.loaded,
+      onload: loadedForNonEditableTables,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
@@ -165,6 +167,9 @@ export default class ListProcurementUnit extends Component {
       loading: false
     })
   }
+  /**
+   * Redirects to the edit procurement unit screen on row click.
+   */
   selected = function (instance, cell, x, y, value, e) {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || (y == 0)) {
@@ -179,11 +184,11 @@ export default class ListProcurementUnit extends Component {
       }
     }
   }.bind(this);
-  loaded = function (instance, cell, x, y, value) {
-    jExcelLoadedFunction(instance);
-  }
+  /**
+   * Fetches the procurement unit and planning unit list from the server on component mount.
+   */
   componentDidMount() {
-    this.hideFirstComponent();
+    hideFirstComponent();
     ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {
         this.setState({
@@ -197,7 +202,7 @@ export default class ListProcurementUnit extends Component {
           message: response.data.messageCode, loading: false
         },
           () => {
-            this.hideSecondComponent();
+            hideSecondComponent();
           })
       }
     }).catch(
@@ -293,11 +298,18 @@ export default class ListProcurementUnit extends Component {
       }
     );
   }
+  /**
+   * Redirects to the add procurement unit screen.
+   */
   addNewProcurementUnit() {
     this.props.history.push({
       pathname: "/procurementUnit/addProcurementUnit"
     });
   }
+  /**
+   * Renders the procurement unit list.
+   * @returns {JSX.Element} - Procurement Unit list.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",

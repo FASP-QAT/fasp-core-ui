@@ -14,7 +14,11 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.organisationType.organisationType');
+/**
+ * Component for listing Organisation Type details.
+ */
 export default class OrganisationTypeListComponent extends Component {
     constructor(props) {
         super(props);
@@ -32,19 +36,31 @@ export default class OrganisationTypeListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Filters the organization type list according to the realmId & builds the jexcel.
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -60,6 +76,9 @@ export default class OrganisationTypeListComponent extends Component {
                 () => { this.buildJexcel() })
         }
     }
+    /**
+     * Builds the jexcel component to display the organization type list.
+     */
     buildJexcel() {
         let organisationsType = this.state.selSource;
         let organisationsTypeArray = [];
@@ -81,7 +100,7 @@ export default class OrganisationTypeListComponent extends Component {
         var data = organisationsTypeArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -142,8 +161,12 @@ export default class OrganisationTypeListComponent extends Component {
             organisationsTypeEl: organisationsTypeEl, loading: false
         })
     }
+    /**
+     * Fetches Realm list and organization type list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
+        //Fetch all realm list
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -203,6 +226,7 @@ export default class OrganisationTypeListComponent extends Component {
                     }
                 }
             );
+        //Fetch organization type list
         OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
                 if (response.status == 200) {
@@ -257,9 +281,21 @@ export default class OrganisationTypeListComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Renders the organization type list.
+     * @returns {JSX.Element} - organization type list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -332,6 +368,15 @@ export default class OrganisationTypeListComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the edit organization type screen on row click with organizationTypeId for editing.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     * @param {Event} e - The selected event.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -346,6 +391,9 @@ export default class OrganisationTypeListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add organization type screen
+     */
     addOrganisationType() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/organisationType/addOrganisationType`);

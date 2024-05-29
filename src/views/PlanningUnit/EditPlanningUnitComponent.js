@@ -9,7 +9,14 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { API_URL } from '../../Constants.js';
 import UnitService from '../../api/UnitService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
+/**
+ * Defines the validation schema for planning unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -23,6 +30,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.planningUnit.plannignUnitMeasure')),
     })
 }
+/**
+ * Component for editing planning unit details.
+ */
 export default class EditPlanningUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -54,25 +64,30 @@ export default class EditPlanningUnitComponent extends Component {
             },
             loading: true
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Updates the loading state of the component.
+     * @param {boolean} loading - The loading state to be set.
+     */
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
+    /**
+     * Updates the message state with the provided message.
+     * @param {string} message - The message to be set in the component state.
+     */
     changeMessage(message) {
         this.setState({ message: message })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { planningUnit } = this.state
         if (event.target.name === "label") {
@@ -95,16 +110,15 @@ export default class EditPlanningUnitComponent extends Component {
             }
         )
     };
-    
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { planningUnit } = this.state
-            planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
+    /**
+     * Redirects to the list planning unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Reterives unit list on component will mount
+     */
     componentWillMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -128,7 +142,7 @@ export default class EditPlanningUnitComponent extends Component {
                                 message: response.data.messageCode, loading: false
                             },
                                 () => {
-                                    this.hideSecondComponent();
+                                    hideSecondComponent();
                                 })
                         }
                     }).catch(
@@ -176,7 +190,7 @@ export default class EditPlanningUnitComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -219,6 +233,10 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the planning unit details form.
+     * @returns {JSX.Element} - Planning unit details form.
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -258,7 +276,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -350,7 +368,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.label.label_en}
                                                             required
@@ -445,6 +463,9 @@ export default class EditPlanningUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the planning unit details when reset button is clicked.
+     */
     resetClicked() {
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             this.setState({

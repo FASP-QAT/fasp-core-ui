@@ -15,7 +15,13 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import StepOneImport from './StepOneImport';
 import StepThreeImport from './StepThreeImport';
 import StepTwoImport from './StepTwoImport';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.program.programMaster');
+/**
+ * Component for import from QAT supply plan.
+ * Allows users to go through a multi-step form for Import from QAT supply plan.
+ */
 export default class ImportFromQATSupplyPlan extends Component {
     constructor(props) {
         super(props);
@@ -48,13 +54,12 @@ export default class ImportFromQATSupplyPlan extends Component {
         this.previousToStepTwo = this.previousToStepTwo.bind(this);
         this.removeMessageText = this.removeMessageText.bind(this);
         this.updateStepOneData = this.updateStepOneData.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Updates the state with the provided key-value pair.
+     * @param {String} key The key of the state to be updated.
+     * @param {any} value The value to be assigned to the specified key in the state.
+     */
     updateStepOneData(key, value) {
         this.setState({
             [key]: value
@@ -62,12 +67,18 @@ export default class ImportFromQATSupplyPlan extends Component {
             () => {
             })
     }
+    /**
+     * Sets up the initial display state for the steps.
+     */
     componentDidMount() {
-        this.hideSecondComponent();
+        hideSecondComponent();
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
     }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
     finishedStepOne() {
         this.setState({ progressPer: 50, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
@@ -75,6 +86,9 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepThreeImport').style.display = 'none';
         this.refs.countryChild.filterData();
     }
+    /**
+     * Handles the completion of step two and updates the display to show step three.
+     */
     finishedStepTwo() {
         this.setState({ progressPer: 100, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
@@ -82,15 +96,24 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepThreeImport').style.display = 'block';
         this.refs.child.filterData();
     }
+    /**
+     * Handles the completion of step three and updates the display to show step four.
+     */
     finishedStepThree() {
         this.setState({ progressPer: 0, loading: true });
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
     }
+    /**
+     * Updates the state of message to blank
+     */
     removeMessageText() {
         this.setState({ message: '' });
     }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     previousToStepOne() {
         this.setState({ progressPer: 0, loading: true });
         document.getElementById('stepOneImport').style.display = 'block';
@@ -98,6 +121,9 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepThreeImport').style.display = 'none';
         this.refs.stepOneChild.filterData();
     }
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     previousToStepTwo() {
         this.setState({ progressPer: 50, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
@@ -116,6 +142,10 @@ export default class ImportFromQATSupplyPlan extends Component {
         });
         this.refs.countryChild.filterData();
     }
+    /**
+     * Renders the Import from QAT supply plan screen.
+     * @returns {JSX.Element} - Import from QAT supply plan screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -182,7 +212,7 @@ export default class ImportFromQATSupplyPlan extends Component {
                                         <StepTwoImport ref='countryChild' finishedStepTwo={this.finishedStepTwo} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} items={this.state}></StepTwoImport>
                                     </div>
                                     <div id="stepThreeImport">
-                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} updateStepOneData={this.updateStepOneData} previousToStepTwo={this.previousToStepTwo} finishedStepThree={this.finishedStepThree} removeMessageText={this.removeMessageText} hideSecondComponent={this.hideSecondComponent} items={this.state} {...this.props}></StepThreeImport>
+                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} updateStepOneData={this.updateStepOneData} previousToStepTwo={this.previousToStepTwo} finishedStepThree={this.finishedStepThree} removeMessageText={this.removeMessageText} hideSecondComponent={hideSecondComponent} items={this.state} {...this.props}></StepThreeImport>
                                     </div>
                                 </div>
                             </CardBody></Card>

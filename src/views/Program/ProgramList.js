@@ -16,7 +16,7 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
-  jExcelLoadedFunction
+  jExcelLoadedFunction, loadedForNonEditableTables
 } from "../../CommonComponent/JExcelCommonFunctions.js";
 import getLabelText from "../../CommonComponent/getLabelText";
 import {
@@ -30,7 +30,12 @@ import DropdownService from "../../api/DropdownService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Localized entity name
 const entityname = i18n.t("static.program.programMaster");
+/**
+ * Component for list of program details.
+ */
 export default class ProgramList extends Component {
   constructor(props) {
     super(props);
@@ -45,24 +50,18 @@ export default class ProgramList extends Component {
     };
     this.addNewProgram = this.addNewProgram.bind(this);
     this.filterData = this.filterData.bind(this);
-    this.hideFirstComponent = this.hideFirstComponent.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
     this.dataChange = this.dataChange.bind(this);
   }
-  hideFirstComponent() {
-    this.timeout = setTimeout(function () {
-      document.getElementById("div1").style.display = "none";
-    }, 30000);
-  }
+  /**
+   * Clears the timeout when the component is unmounted.
+   */
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
-  hideSecondComponent() {
-    setTimeout(function () {
-      document.getElementById("div2").style.display = "none";
-    }, 30000);
-  }
+  /**
+   * Handles filter change for country.
+   */
   dataChange() {
     localStorage.setItem(
       "SPCountryId",
@@ -73,6 +72,9 @@ export default class ProgramList extends Component {
       document.getElementById("active").value
     );
   }
+  /**
+   * Handles filter change.
+   */
   filterData() {
     let countryId = localStorage.getItem("SPCountryId")
       ? localStorage.getItem("SPCountryId")
@@ -131,6 +133,9 @@ export default class ProgramList extends Component {
       );
     }
   }
+  /**
+   * Builds the jexcel component to display program list.
+   */
   buildJExcel() {
     let programList = this.state.selProgram;
     programList.sort((a, b) => {
@@ -173,7 +178,7 @@ export default class ProgramList extends Component {
     var data = programArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
@@ -216,7 +221,7 @@ export default class ProgramList extends Component {
         },
       ],
       editable: false,
-      onload: this.loaded,
+      onload: loadedForNonEditableTables,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
       columnSorting: true,
@@ -272,6 +277,9 @@ export default class ProgramList extends Component {
       loading: false,
     });
   }
+  /**
+   * Redirects to the edit program screen on row click.
+   */
   selected = function (instance, cell, x, y, value, e) {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
@@ -291,11 +299,11 @@ export default class ProgramList extends Component {
       }
     }
   }.bind(this);
-  loaded = function (instance, cell, x, y, value) {
-    jExcelLoadedFunction(instance);
-  };
+  /**
+   * Retrives the program and realm country list on component mount
+   */
   componentDidMount() {
-    this.hideFirstComponent();
+    hideFirstComponent();
     DropdownService.getUpdateProgramInfoDetailsBasedRealmCountryId(
       PROGRAM_TYPE_SUPPLY_PLAN,
       -1,
@@ -319,7 +327,7 @@ export default class ProgramList extends Component {
               loading: false,
             },
             () => {
-              this.hideSecondComponent();
+              hideSecondComponent();
             }
           );
         }
@@ -431,11 +439,18 @@ export default class ProgramList extends Component {
         }
       });
   }
+  /**
+   * Redirects to the add program screen.
+   */
   addNewProgram() {
     this.props.history.push({
       pathname: "/program/programOnboarding",
     });
   }
+  /**
+   * Renders the program list.
+   * @returns {JSX.Element} - Program list.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",

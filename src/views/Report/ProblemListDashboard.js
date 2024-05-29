@@ -2,6 +2,9 @@ import React from "react";
 import { Table } from "reactstrap";
 import { PROBLEM_STATUS_IN_COMPLIANCE } from "../../Constants";
 import i18n from "../../i18n";
+/**
+ * Component for Problem List Summary.
+ */
 export default class ProblemListDashboardComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -12,6 +15,9 @@ export default class ProblemListDashboardComponent extends React.Component {
             problemDashboardList: []
         }
     }
+    /**
+     * Fetches the data based on selected filters on page load
+     */
     componentDidMount() {
         var problemListUnFilttered = this.props.problemListUnFilttered.filter(c => c.planningUnitActive != false && c.regionActive != false);
         var problemCategoryList = this.props.problemCategoryList;
@@ -73,6 +79,10 @@ export default class ProblemListDashboardComponent extends React.Component {
             problemDashboardList: problemDashboardList
         })
     }
+    /**
+     * Renders the Problem list summary table.
+     * @returns {JSX.Element} - Problem list summary table.
+     */
     render() {
         return (
             <div className="ProblemListDashboardBorder">

@@ -31,12 +31,16 @@ import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/For
 import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
 import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
 import showguidanceforForecastSummarySp from '../../../src/ShowGuidanceFiles/ForecastSummarySp.html'
+import { addDoubleQuoteToRowContent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+/**
+ * Component for forecast summary report
+ */
 class ForecastSummary extends Component {
     constructor(props) {
         super(props);
@@ -113,7 +117,6 @@ class ForecastSummary extends Component {
         this.getPrograms = this.getPrograms.bind(this);
         this.filterData = this.filterData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setViewById = this.setViewById.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
@@ -124,29 +127,28 @@ class ForecastSummary extends Component {
         this.forecastChanged = this.forecastChanged.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.radioChange = this.radioChange.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Redirects to application dashboard screen on cancel button clicked
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
+    /**
+     * Toggles the visibility of a calculation based on the checked state of the event target.
+     * @param {Object} e - The event object containing information about the target element.
+     */
     hideCalculation(e) {
         this.setState({
             hideCalculation: e.target.checked,
             hideColumn: !this.state.hideColumn
         })
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -179,7 +181,7 @@ class ForecastSummary extends Component {
             }
             headers.push((i18n.t('static.forecastReport.ProcurementsNeeded')).replaceAll(' ', '%20') + '(USD)');
             headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
-            var A = [this.addDoubleQuoteToRowContent(headers)]
+            var A = [addDoubleQuoteToRowContent(headers)]
             this.state.summeryData.map(ele => {
                 let propertyName = [];
                 if (!this.state.hideColumn) {
@@ -195,7 +197,7 @@ class ForecastSummary extends Component {
                     propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
                 }
                 return (ele.id != 0 &&
-                    A.push(this.addDoubleQuoteToRowContent([
+                    A.push(addDoubleQuoteToRowContent([
                         ((ele.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         ((ele.planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
@@ -204,7 +206,7 @@ class ForecastSummary extends Component {
             }
             );
             if (!this.state.hideColumn) {
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -219,7 +221,7 @@ class ForecastSummary extends Component {
                     '$ ' + this.state.totalProductCost,
                     ''
                 ]))
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -234,7 +236,7 @@ class ForecastSummary extends Component {
                     '$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -250,7 +252,7 @@ class ForecastSummary extends Component {
                     ''
                 ]))
             } else {
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -258,7 +260,7 @@ class ForecastSummary extends Component {
                     '$ ' + this.state.totalProductCost,
                     ''
                 ]))
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -266,7 +268,7 @@ class ForecastSummary extends Component {
                     '$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
-                A.push(this.addDoubleQuoteToRowContent([
+                A.push(addDoubleQuoteToRowContent([
                     '',
                     '',
                     '',
@@ -299,7 +301,7 @@ class ForecastSummary extends Component {
                     nestedHeaders.push('');
                 }
                 nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
-                var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
+                var A = [addDoubleQuoteToRowContent(nestedHeaders)]
                 const headers = [];
                 headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
                 for (var k = 0; k < regRegionList.length; k++) {
@@ -308,9 +310,9 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
                 headers.push((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20'));
-                A.push([this.addDoubleQuoteToRowContent(headers)]);
+                A.push([addDoubleQuoteToRowContent(headers)]);
                 for (var tc = 0; tc < tcList.length; tc++) {
-                    A.push([this.addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
+                    A.push([addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
                     var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
                     for (var j = 0; j < puListFiltered.length; j++) {
                         let regionArray = [];
@@ -331,7 +333,7 @@ class ForecastSummary extends Component {
                             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Number(filterForecastSelected.totalForecast).toFixed(2)) : ""));
                             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
                         }
-                        A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Number(total).toFixed(2))])));
+                        A.push(addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Number(total).toFixed(2))])));
                     }
                 }
                 for (var i = 0; i < A.length; i++) {
@@ -356,7 +358,7 @@ class ForecastSummary extends Component {
                     nestedHeaders.push('');
                 }
                 nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
-                var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
+                var A = [addDoubleQuoteToRowContent(nestedHeaders)]
                 const headers = [];
                 headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
                 for (var k = 0; k < uniqueRegionList.length; k++) {
@@ -365,7 +367,7 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
                 headers.push((i18n.t('static.forecastOutput.totalForecastQuantity')).replaceAll(' ', '%20'));
-                A.push([this.addDoubleQuoteToRowContent(headers)]);
+                A.push([addDoubleQuoteToRowContent(headers)]);
                 for (var j = 0; j < summeryData.length; j++) {
                     let tempData = [];
                     let regionList = summeryData[j].regionListForSinglePlanningUnit;
@@ -375,7 +377,7 @@ class ForecastSummary extends Component {
                         tempData.push(regionList[k].notes == null ? '' : regionList[k].notes);
                     }
                     tempData.push((summeryData[j].totalForecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-                    A.push(this.addDoubleQuoteToRowContent([((summeryData[j].planningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(tempData)));
+                    A.push(addDoubleQuoteToRowContent([((summeryData[j].planningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(tempData)));
                 }
                 for (var i = 0; i < A.length; i++) {
                     csvRow.push(A[i].join(","))
@@ -390,9 +392,9 @@ class ForecastSummary extends Component {
             }
         }
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -664,7 +666,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    '$ ' + (parseFloat(this.state.totalProductCost + (this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -682,6 +684,9 @@ class ForecastSummary extends Component {
             doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
         }
     }
+    /**
+     * Builds data based on different filters
+     */
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -942,7 +947,11 @@ class ForecastSummary extends Component {
                                 totalProductCost: totalProductCost,
                                 regDatasetJson: filteredProgram,
                                 regPlanningUnitList: planningUnitList,
-                                regRegionList: filteredProgram.regionList,
+                                regRegionList: filteredProgram.regionList.sort(function (a, b) {
+                                    a = a.label.label_en.toLowerCase();
+                                    b = b.label.label_en.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 tracerCategoryList: [...new Set(planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id)))]
                             }, () => {
                                 if (displayId == 2) {
@@ -1085,7 +1094,7 @@ class ForecastSummary extends Component {
                                     })
                                     var options = {
                                         data: dataArray,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         columns: columns,
                                         nestedHeaders: [nestedHeaders],
                                         updateTable: function (el, cell, x, y, source, value, id) {
@@ -1313,7 +1322,7 @@ class ForecastSummary extends Component {
                             })
                             var options = {
                                 data: dataArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: columns,
                                 nestedHeaders: [nestedHeaders],
                                 updateTable: function (el, cell, x, y, source, value, id) {
@@ -1423,6 +1432,14 @@ class ForecastSummary extends Component {
             }
         }
     }
+    /**
+     * Handles changes in forecast values in the table.
+     * @param {Object} instance - The Handsontable instance.
+     * @param {Object} cell - The cell being changed.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {string} value - The new value of the cell.
+     */
     forecastChanged = function (instance, cell, x, y, value) {
         var tableJson = this.el.getJson(null, false);
         var elInstance = this.state.dataEl;
@@ -1474,6 +1491,15 @@ class ForecastSummary extends Component {
             }
         }
     }
+    /**
+     * Filters the list of tree scenario list based on cell values in the table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterTsList(instance, cell, c, r, source) {
         var tsList = this.state.tsList;
         var mylist = [];
@@ -1492,6 +1518,10 @@ class ForecastSummary extends Component {
         }
         return mylist1;
     }
+    /**
+     * Handles the change of the display property for a summary data item based on the provided tempTracerCategoryId.
+     * @param {string} tempTracerCategoryId - The identifier of the temporary tracer category.
+     */
     checkedChanged(tempTracerCategoryId) {
         var summeryData = this.state.summeryData;
         for (var i = 0; i < summeryData.length; i++) {
@@ -1504,6 +1534,9 @@ class ForecastSummary extends Component {
         }, () => {
         })
     }
+    /**
+     * Reterives forecast programs from server
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -1560,6 +1593,9 @@ class ForecastSummary extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates server and local programs from indexed db
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -1654,10 +1690,16 @@ class ForecastSummary extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -1665,6 +1707,9 @@ class ForecastSummary extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Calls getPrograms function and set default values on component mount
+     */
     componentDidMount() {
         document.getElementById("hideCalculationDiv").style.display = "none";
         document.getElementById("hideLegendDiv").style.display = "none";
@@ -1675,6 +1720,10 @@ class ForecastSummary extends Component {
             regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
         })
     }
+    /**
+     * Sets the program ID in the component's state, resets related state variables, and triggers data filtering and version ID retrieval. 
+     * @param {Event} event - The event object containing the selected program ID.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -1684,6 +1733,9 @@ class ForecastSummary extends Component {
             this.getVersionIds();
         })
     }
+    /**
+     * Sets the forecast period based on the selected program ID and version ID, updating the component's state accordingly.
+     */
     setForecastPeriod() {
         let programId = this.state.programId;
         let versionId = this.state.versionId;
@@ -1805,6 +1857,11 @@ class ForecastSummary extends Component {
             })
         }
     }
+    /**
+     * Sets the version ID based on the selected event, updating the component's state accordingly.
+     * If the event is null, empty, or undefined, the function extracts the version ID from the current state.
+     * @param {Event | null | string} event - The event triggered by selecting a version ID or null if not triggered by an event.
+     */
     setVersionId(event) {
         this.setState({
             versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
@@ -1821,6 +1878,9 @@ class ForecastSummary extends Component {
             this.filterData();
         })
     }
+    /**
+     * Reterives version list based on selected program
+     */
     getVersionIds() {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -1896,6 +1956,11 @@ class ForecastSummary extends Component {
             }, () => { })
         }
     }
+    /**
+     * Retrieves and consolidates the list of versions for the specified program ID, including local versions stored in indexedDB.
+     * Updates the component's state with the retrieved version list, sets the version ID based on various conditions, and triggers data filtering and related updates.
+     * @param {string} programId - The ID of the program for which to retrieve the version list.
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -1954,11 +2019,17 @@ class ForecastSummary extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Calls getVersionIds function
+     */
     show() {
         this.getVersionIds()
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         let startDate = value.from.year + '-' + value.from.month + '-01';
         let stopDate = value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate();
@@ -1972,10 +2043,22 @@ class ForecastSummary extends Component {
         this.setState({ rangeValue: value, monthArrayList: monthArrayList }, () => {
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Sets the view mode based on the selected option. Updates the component's state accordingly and triggers related data retrieval and filtering operations.
+     * @param {object} e - The event object representing the change in the selected view mode.
+     */
     setViewById(e) {
         var viewById = e.target.value;
         this.setState({
@@ -1989,6 +2072,9 @@ class ForecastSummary extends Component {
             }
         })
     }
+    /**
+     * Save selected forecast in indexed db
+     */
     saveSelectedForecast() {
         var id = this.state.regDatasetJson.id;
         var json = this.state.dataEl.getJson(null, false).filter(c => c[this.state.regRegionList.length * 3 + 3] == 2);
@@ -2081,12 +2167,17 @@ class ForecastSummary extends Component {
                         color: 'green'
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }.bind(this)
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Handles the change event of the radio button group.
+     * Updates the component state based on the selected radio button.
+     * @param {object} event - The event object representing the radio button change event.
+     */
     radioChange(event) {
         this.setState({
             displayId: event.target.id === "displayId2" ? parseInt(2) : parseInt(1),
@@ -2097,17 +2188,27 @@ class ForecastSummary extends Component {
                 this.filterData();
             })
     }
+    /**
+     * Toggles the visibility of guidance.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Redirects to planning unit settings screen
+     */
     redirectToForecastSummary() {
         localStorage.setItem("sesForecastProgramIdReport", this.state.programId)
         localStorage.setItem("sesForecastVersionIdReport", (this.state.versionId.split('(')[0]).trim())
         const win = window.open(`/#/planningUnitSetting/listPlanningUnitSetting`, "_blank");
         win.focus();
     }
+    /**
+     * Renders the Forecast summary report table.
+     * @returns {JSX.Element} - Forecast summary report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -2248,7 +2349,6 @@ class ForecastSummary extends Component {
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
-                                                        onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
                                                         <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

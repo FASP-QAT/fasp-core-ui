@@ -10,6 +10,11 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
 let summaryText_2 = "Add Procurement Agent"
+/**
+ * This const is used to define the validation schema for procurement agent ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -32,6 +37,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime')),
     })
 }
+/**
+ * This component is used to display the procurement agent form and allow user to submit the add master request in jira
+ */
 export default class ProcurementAgentTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -58,6 +66,10 @@ export default class ProcurementAgentTicketComponent extends Component {
         this.getDisplayName = this.getDisplayName.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { procurementAgent } = this.state
         if (event.target.name == "summary") {
@@ -91,7 +103,9 @@ export default class ProcurementAgentTicketComponent extends Component {
             procurementAgent
         }, () => { })
     };
-    
+    /**
+     * This function is used to get realm list on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -156,11 +170,17 @@ export default class ProcurementAgentTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the procurement agent details
+     */
     resetClicked() {
         let { procurementAgent } = this.state;
         procurementAgent.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -174,6 +194,10 @@ export default class ProcurementAgentTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -181,6 +205,9 @@ export default class ProcurementAgentTicketComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is used to get the display name for procurement agent
+     */
     getDisplayName() {
         let realmId = this.state.realmId;
         let procurementAgentValue = this.state.procurementAgent.procurementAgentName;
@@ -285,6 +312,10 @@ export default class ProcurementAgentTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This is used to display the content
+     * @returns This returns procurement agent details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0

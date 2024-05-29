@@ -10,12 +10,14 @@ import { API_URL } from '../../Constants.js';
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValues = {
-    roleName: "",
-    businessFunctions: [],
-    canCreateRole: []
-}
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.role.role');
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
@@ -27,6 +29,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.role.cancreateroletext'))
     })
 }
+/**
+ * Component for editing role details.
+ */
 class EditRoleComponent extends Component {
     constructor(props) {
         super(props);
@@ -50,24 +55,14 @@ class EditRoleComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { role } = this.state;
         if (event.target.name == "roleName") {
@@ -78,6 +73,10 @@ class EditRoleComponent extends Component {
         },
             () => { });
     };
+    /**
+     * Handles change in selected business functions.
+     * @param {Array} businessFunctionId - Selected business function IDs.
+     */
     businessFunctionChange(businessFunctionId) {
         let { role } = this.state;
         this.setState({ businessFunctionId });
@@ -91,6 +90,10 @@ class EditRoleComponent extends Component {
         },
             () => { });
     }
+    /**
+     * Handles change in selected can create roles.
+     * @param {Array} canCreateRoleId - Selected can create role IDs.
+     */
     canCreateRoleChange(canCreateRoleId) {
         let { role } = this.state;
         this.setState({ canCreateRoleId });
@@ -104,8 +107,11 @@ class EditRoleComponent extends Component {
         },
             () => { });
     }
-    
+    /**
+     * Fetches business function and role list and role details on component mount.
+     */
     componentDidMount() {
+        // Fetch business function list
         UserService.getBusinessFunctionList()
             .then(response => {
                 if (response.status == 200) {
@@ -127,7 +133,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent()
                         })
                 }
             })
@@ -170,6 +176,7 @@ class EditRoleComponent extends Component {
                     }
                 }
             );
+        // Fetch role list
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
@@ -192,7 +199,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -235,6 +242,7 @@ class EditRoleComponent extends Component {
                     }
                 }
             );
+        // Fetch role details by role Id
         UserService.getRoleById(this.props.match.params.roleId)
             .then(response => {
                 if (response.status == 200) {
@@ -248,7 +256,7 @@ class EditRoleComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -292,6 +300,10 @@ class EditRoleComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the role details form.
+     * @returns {JSX.Element} - Role details form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -321,7 +333,7 @@ class EditRoleComponent extends Component {
                                                     message: response.data.messageCode, loadig: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -393,7 +405,7 @@ class EditRoleComponent extends Component {
                                                         onBlur={handleBlur}
                                                         maxLength={45}
                                                         required
-                                                        value={this.Capitalize(this.state.role.label.label_en)}
+                                                        value={Capitalize(this.state.role.label.label_en)}
                                                     />
                                                     <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                 </FormGroup>
@@ -471,9 +483,15 @@ class EditRoleComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list role screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/role/listRole/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the role details when reset button is clicked.
+     */
     resetClicked() {
         UserService.getRoleById(this.props.match.params.roleId)
             .then(response => {

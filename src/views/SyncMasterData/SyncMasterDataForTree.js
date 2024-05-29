@@ -20,6 +20,9 @@ import MasterSyncService from '../../api/MasterSyncService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+/**
+ * This component is used to sync the master data into QAT when user wants to view a tree for the program that is not loaded on user's machine
+ */
 export default class SyncMasterDataForTree extends Component {
     constructor(props) {
         super(props);
@@ -36,15 +39,25 @@ export default class SyncMasterDataForTree extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.fetchData = this.fetchData.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to call sync masters function on page load
+     */
     componentDidMount() {
         document.getElementById("retryButtonDiv").style.display = "none";
         this.syncMasters();
     }
+    /**
+     * This is used to display the content
+     * @returns This returns a progress bar to show progress of the sync
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -82,6 +95,11 @@ export default class SyncMasterDataForTree extends Component {
             </div>
         )
     }
+    /**
+     * This function is used to update the count of progress bar
+     * @param {*} hasPrograms This is true if the progress bar count should be updated for program. False if the progress bar count should be updated for masters
+     * @param {*} programId This is the program Id for which the progress bar count should be updated
+     */
     fetchData(hasPrograms, programId) {
         var realmId = AuthenticationService.getRealmId();
         if (this.state.syncedMasters === this.state.totalMasters) {
@@ -98,6 +116,9 @@ export default class SyncMasterDataForTree extends Component {
             }
         }
     }
+    /**
+     * This function is used to sync all the masters on page load
+     */
     syncMasters() {
         this.setState({ loading: false })
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -356,6 +377,9 @@ export default class SyncMasterDataForTree extends Component {
                 })
         }
     }
+    /**
+     * This function is called when sync fails and user wants to retry the sync
+     */
     retryClicked() {
         this.setState({
             totalMasters: 14,

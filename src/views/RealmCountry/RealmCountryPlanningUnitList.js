@@ -34,7 +34,12 @@ import UnitService from "../../api/UnitService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Localized entity name
 const entityname = i18n.t("static.dashboad.planningunitcountry");
+/**
+ * Component for creating realm country planning units(Alternate Reporting Units).
+ */
 export default class RealmCountryPlanningUnitList extends Component {
   constructor(props) {
     super(props);
@@ -92,21 +97,19 @@ export default class RealmCountryPlanningUnitList extends Component {
       programLabels: [],
     };
     this.filterData = this.filterData.bind(this);
-    this.formatLabel = this.formatLabel.bind(this);
     this.buildJexcel = this.buildJexcel.bind(this);
-    this.addNewEntity = this.addNewEntity.bind(this);
-    this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.addRow = this.addRow.bind(this);
     this.formSubmit = this.formSubmit.bind(this);
-    this.checkDuplicatePlanningUnit =
-      this.checkDuplicatePlanningUnit.bind(this);
     this.checkValidation = this.checkValidation.bind(this);
     this.changed = this.changed.bind(this);
     this.onPaste = this.onPaste.bind(this);
     this.handleChangeProgram = this.handleChangeProgram.bind(this);
     this.oneditionend = this.oneditionend.bind(this);
   }
+  /**
+   * Redirects to the application dashboard screen when cancel button is clicked.
+   */
   cancelClicked() {
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(
@@ -116,12 +119,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       i18n.t("static.message.cancelled", { entityname })
     );
   }
-  hideSecondComponent() {
-    document.getElementById("div2").style.display = "block";
-    setTimeout(function () {
-      document.getElementById("div2").style.display = "none";
-    }, 30000);
-  }
+  /**
+   * Function to add a new row to the jexcel table.
+   */
   addRow = function () {
     var data = [];
     data[0] = "";
@@ -137,6 +137,14 @@ export default class RealmCountryPlanningUnitList extends Component {
     data[10] = "";
     this.el.insertRow(data, 0, 1);
   };
+  /**
+   * Callback function called when editing of a cell in the jexcel table ends.
+   * @param {object} instance - The jexcel instance.
+   * @param {object} cell - The cell object.
+   * @param {number} x - The x-coordinate of the cell.
+   * @param {number} y - The y-coordinate of the cell.
+   * @param {any} value - The new value of the cell.
+   */
   oneditionend = function (instance, cell, x, y, value) {
     var elInstance = instance;
     var rowData = elInstance.getRowData(y);
@@ -149,6 +157,11 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
     this.el.setValueFromCoords(9, y, 1, true);
   };
+  /**
+   * Function to handle paste events in the jexcel table.
+   * @param {Object} instance - The jexcel instance.
+   * @param {Array} data - The data being pasted.
+   */
   onPaste(instance, data) {
     var z = -1;
     for (var i = 0; i < data.length; i++) {
@@ -163,6 +176,10 @@ export default class RealmCountryPlanningUnitList extends Component {
       }
     }
   }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
   handleChangeProgram(programId) {
     programId = programId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -178,6 +195,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       }
     );
   }
+  /**
+   * Function to handle form submission and save the data on server.
+   */
   formSubmit = function () {
     var validation = this.checkValidation();
     if (validation == true) {
@@ -244,7 +264,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
             } else {
@@ -255,7 +275,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
             }
@@ -273,7 +293,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
             } else {
@@ -295,7 +315,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       loading: false,
                     },
                     () => {
-                      this.hideSecondComponent();
+                      hideSecondComponent();
                     }
                   );
                   break;
@@ -307,7 +327,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       loading: false,
                     },
                     () => {
-                      this.hideSecondComponent();
+                      hideSecondComponent();
                     }
                   );
                   break;
@@ -319,7 +339,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       loading: false,
                     },
                     () => {
-                      this.hideSecondComponent();
+                      hideSecondComponent();
                       var json = this.el.getJson(null, false);
                       for (var j = 0; j < json.length; j++) {
                         if (json[j][9] == 1 && json[j][6].toString() == "false" && json[j][10] == 1) {
@@ -340,7 +360,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       loading: false,
                     },
                     () => {
-                      this.hideSecondComponent();
+                      hideSecondComponent();
                     }
                   );
                   break;
@@ -355,32 +375,10 @@ export default class RealmCountryPlanningUnitList extends Component {
     } else {
     }
   };
-  checkDuplicatePlanningUnit = function () {
-    var tableJson = this.el.getJson(null, false);
-    let tempArray = tableJson;
-    var hasDuplicate = false;
-    tempArray
-      .map((v) => parseInt(v[Object.keys(v)[1]]))
-      .sort()
-      .sort((a, b) => {
-        if (a === b) hasDuplicate = true;
-      });
-    if (hasDuplicate) {
-      this.setState(
-        {
-          message: i18n.t("static.country.duplicatePlanningUnit"),
-          color: "#BA0C2F",
-          changedFlag: 0,
-        },
-        () => {
-          this.hideSecondComponent();
-        }
-      );
-      return false;
-    } else {
-      return true;
-    }
-  };
+  /**
+   * Function to check validation of the jexcel table.
+   * @returns {boolean} - True if validation passes, false otherwise.
+   */
   checkValidation = function () {
     var valid = true;
     var json = this.el.getJson(null, false);
@@ -394,7 +392,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   color: 'red'
               },
               () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
               })
       }
         var value = this.el
@@ -406,6 +404,14 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
     return valid;
   };
+  /**
+   * Function to handle changes in jexcel cells.
+   * @param {Object} instance - The jexcel instance.
+   * @param {Object} cell - The cell object that changed.
+   * @param {number} x - The x-coordinate of the changed cell.
+   * @param {number} y - The y-coordinate of the changed cell.
+   * @param {any} value - The new value of the changed cell.
+   */
   changed = function (instance, cell, x, y, value) {
 
     changed(instance, cell, x, y, value)
@@ -415,14 +421,10 @@ export default class RealmCountryPlanningUnitList extends Component {
       this.el.setValueFromCoords(9, y, 1, true);
     }
   }.bind(this);
-  addNewEntity() {
-    let realmCountryId = document.getElementById("realmCountryId").value;
-    if (realmCountryId != 0) {
-      this.props.history.push({
-        pathname: `/realmCountry/realmCountryPlanningUnit/${realmCountryId}`,
-      });
-    }
-  }
+  /**
+   * Function to build a jexcel table.
+   * Constructs and initializes a jexcel table using the provided data and options.
+   */
   buildJexcel() {
     const { planningUnits } = this.state;
     const { units } = this.state;
@@ -502,7 +504,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     var data = papuDataArr;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [100, 100, 100, 100, 100, 100, 100],
       columns: [
         {
@@ -602,8 +604,6 @@ export default class RealmCountryPlanningUnitList extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: true,
       onchange: this.changed,
-      onblur: this.blur,
-      onfocus: this.focus,
       copyCompatibility: true,
       allowManualInsertRow: false,
       parseFormulas: true,
@@ -710,6 +710,12 @@ export default class RealmCountryPlanningUnitList extends Component {
       loading: false,
     });
   }
+  /**
+   * Filters the options based on the provided filter string and sort the options.
+   * @param {Array} options - The array of options to filter.
+   * @param {string} filter - The filter string to apply.
+   * @returns {Array} - The filtered array of options.
+   */
   filterOptions = async (options, filter) => {
     if (filter) {
       return options.filter((i) =>
@@ -719,6 +725,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       return options;
     }
   };
+  /**
+   * Function to filter and fetch data based on selected programs from server.
+   */
   filterData() {
     if (this.state.programValues.length > 0) {
       let programIds = this.state.programValues.map((ele) =>
@@ -817,7 +826,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         loading: false,
                       },
                       () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                       }
                     );
                   } else {
@@ -839,7 +848,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             loading: false,
                           },
                           () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                           }
                         );
                         break;
@@ -850,7 +859,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             loading: false,
                           },
                           () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                           }
                         );
                         break;
@@ -861,7 +870,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             loading: false,
                           },
                           () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                           }
                         );
                         break;
@@ -881,7 +890,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     loading: false,
                   },
                   () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                   }
                 );
               } else {
@@ -903,7 +912,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         loading: false,
                       },
                       () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                       }
                     );
                     break;
@@ -914,7 +923,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         loading: false,
                       },
                       () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                       }
                     );
                     break;
@@ -925,7 +934,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         loading: false,
                       },
                       () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                       }
                     );
                     break;
@@ -945,7 +954,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 loading: false,
               },
               () => {
-                this.hideSecondComponent();
+                hideSecondComponent();
               }
             );
           } else {
@@ -965,7 +974,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     loading: false,
                   },
                   () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                   }
                 );
                 break;
@@ -976,7 +985,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     loading: false,
                   },
                   () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                   }
                 );
                 break;
@@ -987,7 +996,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     loading: false,
                   },
                   () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                   }
                 );
                 break;
@@ -1007,7 +1016,12 @@ export default class RealmCountryPlanningUnitList extends Component {
       );
     }
   }
-  loaded = function (instance, cell, x, y, value) {
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   * @param {*} cell This is the object of the DOM element
+   */
+  loaded = function (instance, cell) {
     jExcelLoadedFunction(instance);
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1020,16 +1034,26 @@ export default class RealmCountryPlanningUnitList extends Component {
     tr.children[6].classList.add("InfoTrAsteriskTheadtrTdImageARU");
     tr.children[6].title = i18n.t("static.tooltip.conversionfactorARU");
   };
-  blur = function (instance) {
-  };
-  focus = function (instance) {
-  };
+  /**
+   * Function to handle cell edits in jexcel.
+   * @param {Object} instance - The jexcel instance.
+   * @param {Object} cell - The cell object being edited.
+   * @param {number} x - The x-coordinate of the edited cell.
+   * @param {number} y - The y-coordinate of the edited cell.
+   * @param {any} value - The new value of the edited cell.
+   */
   onedit = function (instance, cell, x, y, value) {
     this.el.setValueFromCoords(9, y, 1, true);
   }.bind(this);
+  /**
+   * Calls the get programs function on page load
+   */
   componentDidMount() {
     this.getPrograms();
   }
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     DropdownService.getUpdateProgramInfoDetailsBasedRealmCountryId(
       PROGRAM_TYPE_SUPPLY_PLAN,
@@ -1062,7 +1086,7 @@ export default class RealmCountryPlanningUnitList extends Component {
               loading: false,
             },
             () => {
-              this.hideSecondComponent();
+              hideSecondComponent();
             }
           );
         } else {
@@ -1084,7 +1108,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
               break;
@@ -1097,7 +1121,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
               break;
@@ -1108,7 +1132,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   loading: false,
                 },
                 () => {
-                  this.hideSecondComponent();
+                  hideSecondComponent();
                 }
               );
               break;
@@ -1116,9 +1140,10 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
       });
   };
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
+  /**
+   * Renders the realm country planning unit(Alternate Reporting Unit) list.
+   * @returns {JSX.Element} - Realm country planning unit(Alternate Reporting Unit) list.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
