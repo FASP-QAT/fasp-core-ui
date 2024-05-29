@@ -1135,7 +1135,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
               var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
               var json = {
-                amount: missingActualConsumption.toFixed(0),
+                amount: missingActualConsumption.toFixed(4),
                 planningUnit: {
                   id: consumptionUnit.planningUnit.id,
                   label: consumptionUnit.planningUnit.label
