@@ -2742,6 +2742,12 @@ export default class CommitTreeComponent extends React.Component {
                                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
+                                            var findNodeIndexParent=1;
+                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2) {
+                                            }else{
+                                                findNodeIndexParent = completeFlatList.findIndex(n => n.id == node.parent);
+                                            }
+                                            if(findNodeIndexParent!=-1){
                                             if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
@@ -2772,9 +2778,16 @@ export default class CommitTreeComponent extends React.Component {
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator = annualTargetCalculator;
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             completeFlatList[findNodeIndex] = node;
+                                        }else{
+                                            completeFlatList.splice(i,1);
+                                            i=i-1;
+                                        }
                                         }
                                     }
-                                    tree.tree.flatList = completeFlatList;
+                                    const uniqueFlatList = completeFlatList.filter((obj, index) => {
+                                        return index === completeFlatList.findIndex(o => obj.id === o.id);
+                                    });
+                                    tree.tree.flatList = uniqueFlatList;
                                     treeList[tl] = tree;
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
