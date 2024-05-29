@@ -3271,7 +3271,7 @@
     "static.import.doNoImportCheckbox":"Toggle do not import",
     "static.shipment.budgetWarning1":"The budget",
     "static.shipment.budgetWarning2":") is going over budget by $",
-    "static.shipment.budgetWarning3":"(please see shipment ID",
+    "static.shipment.budgetWarning3":"if you submit.",
     "static.shipment.budgetWarning4":"Do you want to continue?",
     "static.organisation.organisationcodemax10digittext": "Display name length should be 10 characters long"
 }
