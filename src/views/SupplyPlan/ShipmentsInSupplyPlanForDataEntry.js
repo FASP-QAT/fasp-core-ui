@@ -3486,9 +3486,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         if (negativeBudget > 0 && valid == true) {
             var message="";
             for(var i=0;i<budgetJson.length;i++){
-                message=message.concat(i18n.t("static.shipment.budgetWarning1")).concat(" ").concat(getLabelText(budgetJson[i].budget.label,this.state.lang)).concat(" (").concat(budgetJson[i].budget.name).concat(i18n.t("static.shipment.budgetWarning2")).concat(formatter(budgetJson[i].amount,0)).concat(" ").concat(i18n.t("static.shipment.budgetWarning3")).concat(" ").concat([...new Set(budgetJson[i].shipmentList.map(ele => ele.shipmentId))].toString()).concat(")\n");
+                message=message.concat(i18n.t("static.shipment.budgetWarning1")).concat(" ").concat(getLabelText(budgetJson[i].budget.label,this.state.lang)).concat(" (").concat(budgetJson[i].budget.name).concat(i18n.t("static.shipment.budgetWarning2")).concat(formatter(budgetJson[i].amount,0)).concat(" ").concat(i18n.t("static.shipment.budgetWarning3")).concat("\n");
             }
-            message=message.concat("\n").concat("Do you want to continue?");
+            message=message.concat(i18n.t("static.shipment.budgetWarning4"));
             var cf = window.confirm(message);
             if (cf == true) {
                 return valid;
