@@ -43,7 +43,7 @@ export default class BranchTemplateTicketComponent extends Component {
                 details: "",
                 file: "",
                 attachFile: "",
-                priority: ''
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -188,7 +188,10 @@ export default class BranchTemplateTicketComponent extends Component {
             return "";
         }
     }
-
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
     updatePriority(newState){
         // let priority  = this.state.priority;
         // let priority = event.target.value;
@@ -232,7 +235,7 @@ export default class BranchTemplateTicketComponent extends Component {
                             realmName: this.state.realmId,
                             templateName: this.state.branchTemplate.templateName,
                             details: this.state.branchTemplate.details,
-                            priority: ''
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {

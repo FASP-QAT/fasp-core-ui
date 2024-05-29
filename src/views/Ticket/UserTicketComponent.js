@@ -392,6 +392,10 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
     updatePriority(newState){
         // let priority  = this.state.priority;
         // let priority = event.target.value;

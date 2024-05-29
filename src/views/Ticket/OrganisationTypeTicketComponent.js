@@ -8,13 +8,15 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisationType.organisationType"))
 let summaryText_2 = "Add Organisation Type"
 const initialValues = {
     summary: "",
     realmId: "",
     organisationTypeName: '',
-    notes: ''
+    notes: '',
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for organisation type ticket component
@@ -44,6 +46,7 @@ export default class OrganisationTypeTicketComponent extends Component {
                 summary: summaryText_1,
                 realmId: "",
                 organisationTypeName: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -56,6 +59,7 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -89,6 +93,25 @@ export default class OrganisationTypeTicketComponent extends Component {
     Capitalize(str) {
         this.state.organisationType.organisationTypeName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        console.log('priority - : '+newState);
+        let { organisationType } = this.state;
+        organisationType.priority = newState;
+        this.setState(
+            {
+                organisationType
+            }, () => {
+
+                console.log('priority - state : '+this.state.organisationType.priority);
+            }
+        );
+    }
+
     /**
      * This function is used to get realm list on page load
      */
@@ -172,6 +195,7 @@ export default class OrganisationTypeTicketComponent extends Component {
         organisationType.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         organisationType.organisationTypeName = '';
         organisationType.notes = '';
+        organisationType.priority = 3;
         this.setState({
             organisationType: organisationType,
             realm: this.props.items.userRealmId,
@@ -204,7 +228,8 @@ export default class OrganisationTypeTicketComponent extends Component {
                             summary: summaryText_1,
                             realmId: this.props.items.userRealmId,
                             organisationTypeName: '',
-                            notes: ''
+                            notes: '',
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -338,6 +363,9 @@ export default class OrganisationTypeTicketComponent extends Component {
                                             value={this.state.organisationType.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.organisationType.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

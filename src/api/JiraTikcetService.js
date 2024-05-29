@@ -78,8 +78,8 @@ class JiraTicketService {
         fields.customfield_10063 = json.realm;
         fields.assignee = assignee;
         mainObject.fields = fields;
-        // return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
-        // );
+        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        );
     }
     addIssueAttachment(json, issueId) {
         if (issueId != '') {

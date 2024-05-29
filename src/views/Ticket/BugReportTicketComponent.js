@@ -9,7 +9,7 @@ import TicketPriorityComponent from './TicketPriorityComponent';
 const initialValues = {
     summary: "",
     description: "",
-    priority: ''
+    priority: 3
 }
 const entityname = i18n.t('static.program.realmcountry');
 /**
@@ -40,7 +40,7 @@ export default class BugReportTicketComponent extends Component {
                 description: '',
                 file: '',
                 attachFile: '',
-                priority: ''
+                priority: 3
             },
             message: '',
             loading: false
@@ -87,11 +87,16 @@ export default class BugReportTicketComponent extends Component {
         bugReport.description = '';
         bugReport.file = '';
         bugReport.attachFile = '';
+        bugReport.priority = 3;
         this.setState({
             bugReport
         },
             () => { });
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
     updatePriority(newState){
         // let priority  = this.state.priority;
         // let priority = event.target.value;

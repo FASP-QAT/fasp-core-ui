@@ -10,12 +10,14 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Edit Planning Unit"
 const initialValues = {
     summary: summaryText_1,
     planningUnitName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for planning unit ticket component
@@ -43,7 +45,8 @@ export default class EditPlanningUnitTicketComponent extends Component {
             planningUnit: {
                 summary: summaryText_1,
                 planningUnitName: '',
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -56,6 +59,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changePlanningUnit = this.changePlanningUnit.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -236,6 +240,25 @@ export default class EditPlanningUnitTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        console.log('priority - : '+newState);
+        let { planningUnit } = this.state;
+        planningUnit.priority = newState;
+        this.setState(
+            {
+                planningUnit
+            }, () => {
+
+                console.log('priority - state : '+this.state.planningUnit.priority);
+            }
+        );
+    }
+
     /**
      * This function is called when reset button is clicked to reset the planning unit details
      */
@@ -243,6 +266,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
         let { planningUnit } = this.state;
         planningUnit.planningUnitName = '';
         planningUnit.notes = '';
+        planningUnit.priority = 3;
         this.setState({
             planningUnit: planningUnit,
             planningUnitId: ''
@@ -393,6 +417,9 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                             value={this.state.planningUnit.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.planningUnit.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

@@ -8,12 +8,14 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import HealthAreaService from '../../api/HealthAreaService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Edit Technical Area"
 const initialValues = {
     summary: summaryText_1,
     technicalAreaName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for technical area ticket component
@@ -41,7 +43,8 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             technicalArea: {
                 summary: summaryText_1,
                 technicalAreaName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -52,6 +55,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -153,6 +157,25 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        console.log('priority - : '+newState);
+        let { technicalArea } = this.state;
+        technicalArea.priority = newState;
+        this.setState(
+            {
+                technicalArea
+            }, () => {
+
+                console.log('priority - state : '+this.state.technicalArea.priority);
+            }
+        );
+    }
+
     /**
      * This function is called when reset button is clicked to reset the technical area details
      */
@@ -160,6 +183,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
         let { technicalArea } = this.state;
         technicalArea.technicalAreaName = '';
         technicalArea.notes = '';
+        technicalArea.priority = 3;
         this.setState({
             technicalArea: technicalArea,
             technicalAreaId: ''
@@ -310,6 +334,9 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                                             value={this.state.technicalArea.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.technicalArea.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
