@@ -3282,5 +3282,7 @@
     "static.priority.medium": "Medium",
     "static.priority.mediumDesc": "User can wait for a resolution without causing substantial disruption (Affects a business-critical function, but a workaround exists).",
     "static.priority.low": "Low",
-    "static.priority.lowDesc": "Problem is noticeable but not critical to daily operations and would be good to fix eventually. (Affects a non-business-critical function)."
+    "static.priority.lowDesc": "Problem is noticeable but not critical to daily operations and would be good to fix eventually. (Affects a non-business-critical function).",
+    "static.scenarioPlanning.tab1":"Scenario Supply Plan",
+    "static.scenarioPlanning.tab2":"Local/Server Supply Plan - V"
 }
