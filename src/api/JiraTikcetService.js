@@ -71,6 +71,7 @@ class JiraTicketService {
             fields.summary = json.summary;
         }
         fields.description = this.getDataInFormat(json);
+        console.log('user josn: '+ fields.description);
         fields.project = project;
         fields.issuetype = issuetype;
         fields.reporter = reporter;

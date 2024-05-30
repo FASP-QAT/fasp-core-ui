@@ -10,6 +10,7 @@ import RealmService from '../../api/RealmService';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import UnitService from '../../api/UnitService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Add Forecasting Unit"
 const initialValues = {
@@ -20,7 +21,8 @@ const initialValues = {
     forecastingUnitDesc: "",
     genericName: "",
     unit: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for forecasting unit ticket component
@@ -63,7 +65,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                 forecastingUnitDesc: "",
                 genericName: "",
                 unit: "",
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -81,6 +84,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -357,6 +361,26 @@ export default class ForecastingUnitTicketComponent extends Component {
         }, 30000);
     }
     /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // let priority  = this.state.priority;
+        // let priority = event.target.value;
+        console.log('priority - : '+newState);
+        let { forecastingUnit } = this.state;
+        forecastingUnit.priority = newState;
+        this.setState(
+            {
+                forecastingUnit
+            }, () => {
+
+                console.log('priority - state : '+this.state.forecastingUnit.priority);
+            }
+        );
+    }
+
+    /**
      * This function is called when reset button is clicked to reset the forecasting unit details
      */
     resetClicked() {
@@ -434,7 +458,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                             forecastingUnitDesc: "",
                             genericName: "",
                             unit: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -625,6 +650,9 @@ export default class ForecastingUnitTicketComponent extends Component {
                                             value={this.state.forecastingUnit.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.forecastingUnit.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

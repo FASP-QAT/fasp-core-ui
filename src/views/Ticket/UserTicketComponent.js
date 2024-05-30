@@ -12,6 +12,7 @@ import LanguageService from '../../api/LanguageService';
 import RealmService from '../../api/RealmService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
 /**
@@ -47,6 +48,19 @@ const validationSchema = function (values) {
         orgAndCountry: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
             .required(i18n.t('static.user.org&CountryText')),
+        // priority: Yup.string()
+        //     .test('validatePriority', 'Priority needed',
+        //         function (value) {
+        //             console.log('this.state.user.priority: '+this.state.user.priority);
+        //             if (this.state.user.priority != '') {
+        //                 return true;
+        //             } else {
+        //                 return false;
+        //             }
+        //         })
+        //     .required(i18n.t('static.user.validrole')),
+        // priority: Yup.string()
+        //     .required(i18n.t('static.ticket.priority'))
     })
 }
 /**
@@ -64,7 +78,8 @@ export default class UserTicketComponent extends Component {
                 orgAndCountry: '',
                 role: [],
                 language: "",
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             realms: [],
@@ -80,6 +95,7 @@ export default class UserTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.roleChange = this.roleChange.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -377,6 +393,25 @@ export default class UserTicketComponent extends Component {
             () => { });
     }
     /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // let priority  = this.state.priority;
+        // let priority = event.target.value;
+        console.log('priority - : '+newState);
+        let { user } = this.state;
+        user.priority = newState;
+        this.setState(
+            {
+                user
+            }, () => {
+
+                console.log('priority - state : '+this.state.user.priority);
+            }
+        );
+    }
+    /**
      * This is used to display the content
      * @returns This returns user details form
      */
@@ -415,7 +450,8 @@ export default class UserTicketComponent extends Component {
                             orgAndCountry: "",
                             role: "",
                             language: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -621,6 +657,9 @@ export default class UserTicketComponent extends Component {
                                             value={this.state.user.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.user.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className=" mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

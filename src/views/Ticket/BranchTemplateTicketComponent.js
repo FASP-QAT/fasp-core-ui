@@ -7,6 +7,7 @@ import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constant
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dataset.BranchTreeTemplate"))
 let summaryText_2 = "Add Branch Template"
 /**
@@ -41,7 +42,8 @@ export default class BranchTemplateTicketComponent extends Component {
                 templateName: "",
                 details: "",
                 file: "",
-                attachFile: ""
+                attachFile: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -53,6 +55,7 @@ export default class BranchTemplateTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -186,6 +189,26 @@ export default class BranchTemplateTicketComponent extends Component {
         }
     }
     /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // let priority  = this.state.priority;
+        // let priority = event.target.value;
+        console.log('priority - : '+newState);
+        let { branchTemplate } = this.state;
+        branchTemplate.priority = newState;
+        this.setState(
+            {
+                branchTemplate
+            }, () => {
+
+                console.log('priority - state : '+this.state.branchTemplate.priority);
+            }
+        );
+    }
+
+    /**
      * This is used to display the content
      * @returns This returns branch template details form
      */
@@ -212,6 +235,7 @@ export default class BranchTemplateTicketComponent extends Component {
                             realmName: this.state.realmId,
                             templateName: this.state.branchTemplate.templateName,
                             details: this.state.branchTemplate.details,
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -376,6 +400,9 @@ export default class BranchTemplateTicketComponent extends Component {
                                         <div>
                                             <p>{i18n.t('static.ticket.filesuploadnote')}</p>
                                         </div>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.branchTemplate.priority} updatePriority={this.updatePriority} />
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

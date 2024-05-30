@@ -15,6 +15,7 @@ import HealthAreaService from '../../api/HealthAreaService';
 import DropdownService from '../../api/DropdownService';
 import classNames from 'classnames';
 import { API_URL, SPACE_REGEX } from '../../Constants';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
 /**
@@ -110,7 +111,8 @@ export default class ProgramTicketComponent extends Component {
                 shippedToArrivedBySeaLeadTime: '',
                 shippedToArrivedByRoadLeadTime: '',
                 arrivedToDeliveredLeadTime: '',
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -137,6 +139,7 @@ export default class ProgramTicketComponent extends Component {
         this.updateFieldData = this.updateFieldData.bind(this);
         this.getProgramDisplayCode = this.getProgramDisplayCode.bind(this);
         this.changeRealmCountry = this.changeRealmCountry.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -241,6 +244,24 @@ export default class ProgramTicketComponent extends Component {
             });
         }
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        console.log('priority - : '+newState);
+        let { program } = this.state;
+        program.priority = newState;
+        this.setState(
+            {
+                program
+            }, () => {
+
+                console.log('priority - state : '+this.state.program.priority);
+            }
+        );
+    }
+
     /**
      * This function is used to get list of program manager, realm country, organisation, health area
      * @param {*} realmId This is the realm Id for which lists should be loaded
@@ -668,6 +689,7 @@ export default class ProgramTicketComponent extends Component {
         program.shippedToArrivedByRoadLeadTime = '';
         program.arrivedToDeliveredLeadTime = '';
         program.notes = '';
+        program.priority = 3;
         this.setState({
             program: program,
             realmId: this.props.items.userRealmId,
@@ -769,7 +791,8 @@ export default class ProgramTicketComponent extends Component {
                             shippedToArrivedBySeaLeadTime: '',
                             shippedToArrivedByRoadLeadTime: '',
                             arrivedToDeliveredLeadTime: '',
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -1142,6 +1165,9 @@ export default class ProgramTicketComponent extends Component {
                                             value={this.state.program.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.program.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
