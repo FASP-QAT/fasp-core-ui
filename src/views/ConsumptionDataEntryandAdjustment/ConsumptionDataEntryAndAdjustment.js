@@ -26,7 +26,7 @@ import {
   Table
 } from 'reactstrap';
 import * as Yup from 'yup';
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE } from '../../Constants.js'
+import { API_URL, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -38,7 +38,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from "../../CommonComponent/Logo";
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import dataentryScreenshot1 from '../../assets/img/dataentryScreenshot-1.png';
 import dataentryScreenshot2 from '../../assets/img/dataentryScreenshot-2.png';
@@ -49,6 +49,7 @@ import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import DropdownService from '../../api/DropdownService.js';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const pickerLang = {
@@ -141,7 +142,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       countRecived: 0,
       isTableLoaded: "",
       consumptionNotesForValidation: "",
-      monthArray:[]
+      monthArray:[],
+      versionId: -1,
+      versions: [],
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -162,6 +165,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.formulaChanged = this.formulaChanged.bind(this);
     this.pickAMonth2 = React.createRef();
     this.roundingForPuQty=this.roundingForPuQty.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
+    this.getPrograms = this.getPrograms.bind(this);
+    this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
   }
   /**
    * Rounds the given pu quantity (puQty) to 4 decimal places if it's less than 1,
@@ -1532,7 +1538,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    */
   componentDidMount() {
     hideSecondComponent();
-    this.getDatasetList();
+    // this.getDatasetList();
+    this.getPrograms()
   }
   /**
    * Exports the data to a CSV file.
@@ -1776,6 +1783,449 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     a.click()
   }
   /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedProgram(event) {
+    var flag = event.target.checked ? 1 : 0
+    if (flag) {
+        this.setState({
+            onlyDownloadedProgram: true,
+            loading: false
+        }, () => {
+            this.getPrograms();
+        })
+    } else {
+        this.setState({
+            onlyDownloadedProgram: false,
+            loading: false
+        }, () => {
+            this.getPrograms();
+        })
+    }
+  }
+  /**
+    * Retrieves list of all programs
+  */
+  getPrograms() {
+    this.setState({ loading: true })
+    if (localStorage.getItem('sessionType') === 'Online') {
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            .then(response => {
+                var proList = [];
+                if (response.status == 200) {
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            id: response.data[i].id,
+                            label: response.data[i].label,
+                            name: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
+                    this.setState({
+                        datasetList: proList,
+                        loading: false,
+                        allProgramList: proList
+                    }, () => {
+                        this.consolidatedProgramList();
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    }, () => {
+                        this.hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    this.consolidatedProgramList();
+                }
+            );
+    } else {
+        this.setState({ loading: false })
+        this.consolidatedProgramList()
+    }
+  }
+  /**
+   * Consolidates server and local version of all programs
+   */
+  consolidatedProgramList = () => {
+      this.setState({ loading: true })
+      const lan = 'en';
+      const { datasetList } = this.state
+      var proList;
+      if(this.state.onlyDownloadedProgram) {
+          proList = [];
+      } else {
+          proList = datasetList;
+      }
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['datasetData'], 'readwrite');
+          var program = transaction.objectStore('datasetData');
+          var getRequest = program.getAll();
+          getRequest.onerror = function (event) {
+          };
+          getRequest.onsuccess = function (event) {
+              var myResult = [];
+              
+                  myResult = getRequest.result;
+                  var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                  var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  let downloadedProgramData = [];
+                  for (var i = 0; i < myResult.length; i++) {
+                      if (myResult[i].userId == userId) {
+                          var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                          var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                          var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                          programData.code = programData.programCode;
+                          programData.id = programData.programId;
+                          var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+                          var regionList = programData.regionList;
+                          planningUnitList.sort((a, b) => {
+                              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                              return itemLabelA > itemLabelB ? 1 : -1;
+                          });
+                          regionList.sort((a, b) => {
+                              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                              return itemLabelA > itemLabelB ? 1 : -1;
+                          });
+                          var forecastProgramJson = {
+                              name: programData.programCode,
+                              id: myResult[i].id.split("_")[0],
+                              regionList: regionList,
+                              planningUnitList: planningUnitList,
+                              dataset: programData
+                          }
+                          var f = 0
+                          for (var k = 0; k < this.state.datasetList.length; k++) {
+                              if (this.state.datasetList[k].id == programData.programId) {
+                                  f = 1;
+                              }
+                          }
+                          if(this.state.onlyDownloadedProgram) {
+                              proList.push(forecastProgramJson)
+                          } else {
+                              if (f == 0) {
+                                  proList.push(forecastProgramJson)
+                              } else if(f == 1) {
+                                  proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                              }
+                          }
+                          downloadedProgramData.push(forecastProgramJson);
+                      }
+                  }
+                  var lang = this.state.lang;
+                  if (proList.length == 1) {
+                      this.setState({
+                          datasetList: proList.sort(function (a, b) {
+                              a = (a.name).toLowerCase();
+                              b = (b.name).toLowerCase();
+                              return a < b ? -1 : a > b ? 1 : 0;
+                          }),
+                          loading: false,
+                          downloadedProgramData: downloadedProgramData,
+                          downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                              a = (a.name).toLowerCase();
+                              b = (b.name).toLowerCase();
+                              return a < b ? -1 : a > b ? 1 : 0;
+                          })
+                      }, () => {
+                          this.filterVersion();
+                      })
+                  } else {
+                          this.setState({
+                              datasetList: proList.sort(function (a, b) {
+                                  a = (a.name).toLowerCase();
+                                  b = (b.name).toLowerCase();
+                                  return a < b ? -1 : a > b ? 1 : 0;
+                              }),
+                              downloadedProgramData: downloadedProgramData,
+                              downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                  a = (a.name).toLowerCase();
+                                  b = (b.name).toLowerCase();
+                                  return a < b ? -1 : a > b ? 1 : 0;
+                              }),
+                              loading: false
+                          }, () => {
+                              this.filterVersion();
+                          })
+                  }
+              
+          }.bind(this);
+      }.bind(this);
+  }
+  /**
+     * Sets selected version
+     * @param {*} event - Version change event
+     */
+  setVersionId(event) {
+    var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+    versionId = parseInt(versionId);
+    if (versionId != '' || versionId != undefined) {
+        this.setState({
+            planningUnitList: [],
+            planningUnitId: "",
+            regionList: [],
+            regionId: "",
+            showData: false,
+            dataEl: "",
+            versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
+        }, () => {
+            this.getDatasetData();
+        })
+    } else {
+        localStorage.setItem("sesVersionId", event.target.value);
+        this.setState({
+            planningUnitList: [],
+            planningUnitId: "",
+            regionList: [],
+            regionId: "",
+            showData: false,
+            dataEl: "",
+            versionId: event.target.value
+        }, () => {
+            this.getDatasetData();
+        })
+    }
+  }
+  /**
+   * Retrieves list of all available version for selected forecast program
+   */
+  getVersionIds() {
+      let programId = this.state.datasetId;
+      let datasetId = this.state.datasetId;
+      if (programId != 0) {
+          const program = this.state.datasetList.filter(c => c.id == datasetId)
+          if (program.length == 1) {
+              if (localStorage.getItem("sessionType") === 'Online') {
+                  DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                      .then(response => {
+                          this.setState({
+                              versions: []
+                          }, () => {
+                              this.setState({
+                                  versions: response.data
+                              }, () => { this.consolidatedVersionList(programId) });
+                          });
+                      }).catch(
+                          error => {
+                              this.setState({
+                                  programs: [], loading: false
+                              })
+                              if (error.message === "Network Error") {
+                                  this.setState({
+                                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                      loading: false
+                                  });
+                              } else {
+                                  switch (error.response ? error.response.status : "") {
+                                      case 401:
+                                          this.props.history.push(`/login/static.message.sessionExpired`)
+                                          break;
+                                      case 403:
+                                          this.props.history.push(`/accessDenied`)
+                                          break;
+                                      case 500:
+                                      case 404:
+                                      case 406:
+                                          this.setState({
+                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                              loading: false
+                                          });
+                                          break;
+                                      case 412:
+                                          this.setState({
+                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                              loading: false
+                                          });
+                                          break;
+                                      default:
+                                          this.setState({
+                                              message: 'static.unkownError',
+                                              loading: false
+                                          });
+                                          break;
+                                  }
+                              }
+                          }
+                      );
+              } else {
+                  this.setState({
+                      versions: [],
+                  }, () => {
+                      this.consolidatedVersionList(programId)
+                  })
+              }
+          } else {
+              this.setState({
+                  versions: [],
+              }, () => { })
+          }
+      } else {
+          this.setState({
+              versions: [],
+              planningUnitList: [],
+              regionList: []
+          }, () => { })
+      }
+  }
+  /**
+   * Retrieves version list of the selected program
+   */
+  filterVersion() {
+      this.setState({ loading: true })
+      let programId = this.state.datasetId;
+      if (programId != 0) {
+          const program = this.state.datasetList.filter(c => c.id == programId)
+          if (program.length == 1) {
+              if (localStorage.getItem('sessionType') === 'Online') {
+                  DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                      .then(response => {
+                          this.setState({
+                              versions: []
+                          }, () => {
+                              this.setState({
+                                  versions: response.data
+                              }, () => { this.consolidatedVersionList(programId) });
+                          });
+                      }).catch(
+                          error => {
+                              this.setState({
+                                  programs: [], loading: false
+                              })
+                              if (error.message === "Network Error") {
+                                  this.setState({
+                                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                      loading: false
+                                  });
+                              } else {
+                                  switch (error.response ? error.response.status : "") {
+                                      case 401:
+                                          this.props.history.push(`/login/static.message.sessionExpired`)
+                                          break;
+                                      case 403:
+                                          this.props.history.push(`/accessDenied`)
+                                          break;
+                                      case 500:
+                                      case 404:
+                                      case 406:
+                                          this.setState({
+                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                              loading: false
+                                          });
+                                          break;
+                                      case 412:
+                                          this.setState({
+                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                              loading: false
+                                          });
+                                          break;
+                                      default:
+                                          this.setState({
+                                              message: 'static.unkownError',
+                                              loading: false
+                                          });
+                                          break;
+                                  }
+                              }
+                          }
+                      );
+              } else {
+                  this.setState({
+                      versions: [],
+                      loading: false
+                  }, () => {
+                      this.consolidatedVersionList(programId)
+                  })
+              }
+          } else {
+              this.setState({
+                  versions: [],
+                  loading: false
+              }, () => { })
+          }
+      } else {
+          this.setState({
+              versions: [],
+              loading:false
+          }, () => {
+              if(document.getElementById("tableDiv")){
+                  this.el = jexcel(document.getElementById("tableDiv"), '');
+                  jexcel.destroy(document.getElementById("tableDiv"), true);
+              }
+          })
+      }
+  }
+  /**
+   * Gets consolidated list of all versions for a forecast program
+   * @param {*} programId - Forecast Program Id
+   */
+  consolidatedVersionList = (programId) => {
+      const { versions } = this.state
+      var verList = versions;
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['datasetData'], 'readwrite');
+          var program = transaction.objectStore('datasetData');
+          var getRequest = program.getAll();
+          getRequest.onerror = function (event) {
+          };
+          getRequest.onsuccess = function (event) {
+              var myResult = [];
+              myResult = getRequest.result;
+              var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+              var userId = userBytes.toString(CryptoJS.enc.Utf8);
+              for (var i = 0; i < myResult.length; i++) {
+                  if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                      var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                      var programData = databytes.toString(CryptoJS.enc.Utf8)
+                      var version = JSON.parse(programData).currentVersion
+                      version.versionId = `${version.versionId} (Local)`
+                      verList.push(version)
+                  }
+              }
+              let versionList = verList.filter(function (x, i, a) {
+                  return a.indexOf(x) === i;
+              })
+              versionList.reverse();
+              if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+                  this.setState({
+                      versions: versionList,
+                      versionId: this.props.match.params.versionId + " (Local)",
+                  }, () => {
+                      this.getDatasetData();
+                  })
+              } else if (localStorage.getItem("sesVersionId") != '' && localStorage.getItem("sesVersionId") != undefined) {
+                  let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionId"));
+                  this.setState({
+                      versions: versionList,
+                      versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionId") : versionList[0].versionId),
+                  }, () => {
+                      this.getDatasetData();
+                  })
+              } else {
+                  this.setState({
+                      versions: versionList,
+                      versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
+                  }, () => {
+                      this.getDatasetData();
+                  })
+              }
+          }.bind(this);
+      }.bind(this)
+  }
+  /**
    * Reterives forecast program list from indexed db that user has loaded
    */
   getDatasetList() {
@@ -1864,6 +2314,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       localStorage.setItem("sesDatasetId", datasetId);
       this.setState({
         datasetId: datasetId,
+        versionId: '',
         dataEl: "",
         showSmallTable: false,
         showDetailTable: false,
@@ -1874,7 +2325,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         } catch (error) {
         }
         if (datasetId != "") {
-          this.getDatasetData();
+          this.filterVersion();
         } else {
           this.setState({
             showSmallTable: false,
@@ -1891,164 +2342,169 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Reterives consumption data for selected program
    */
   getDatasetData() {
+    let programId = this.state.datasetId;
+    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
+    let versionId = this.state.versionId;
     this.setState({
       loading: true
     })
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
-    }.bind(this);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
-      var datasetOs = datasetTransaction.objectStore('datasetData');
-      var dsRequest = datasetOs.get(this.state.datasetId);
-      dsRequest.onerror = function (event) {
+    if (versionId.toString().includes('Local')) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
       }.bind(this);
-      dsRequest.onsuccess = function (event) {
-        var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
-        var tcOs = tcTransaction.objectStore('tracerCategory');
-        var tcRequest = tcOs.getAll();
-        tcRequest.onerror = function (event) {
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+        var datasetOs = datasetTransaction.objectStore('datasetData');
+        var dsRequest = datasetOs.get(tempDatasetId);
+        dsRequest.onerror = function (event) {
         }.bind(this);
-        tcRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = tcRequest.result;
-          var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-          var fuOs = fuTransaction.objectStore('forecastingUnit');
-          var fuRequest = fuOs.getAll();
-          fuRequest.onerror = function (event) {
+        dsRequest.onsuccess = function (event) {
+          var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+          var tcOs = tcTransaction.objectStore('tracerCategory');
+          var tcRequest = tcOs.getAll();
+          tcRequest.onerror = function (event) {
           }.bind(this);
-          fuRequest.onsuccess = function (event) {
-            var fuResult = [];
-            fuResult = fuRequest.result;
-            var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-            var puOs = puTransaction.objectStore('planningUnit');
-            var puRequest = puOs.getAll();
-            puRequest.onerror = function (event) {
+          tcRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = tcRequest.result;
+            var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+            var fuOs = fuTransaction.objectStore('forecastingUnit');
+            var fuRequest = fuOs.getAll();
+            fuRequest.onerror = function (event) {
             }.bind(this);
-            puRequest.onsuccess = function (event) {
-              var puResult = [];
-              puResult = puRequest.result;
-              var datasetData = dsRequest.result;
-              var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
-              var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-              var datasetJson = JSON.parse(datasetData);
-              var consumptionList = datasetJson.actualConsumptionList;
-              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
-              planningUnitList.sort((a, b) => {
-                var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase();
-                var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase();
-                return itemLabelA > itemLabelB ? 1 : -1;
-              });
-              var regionList = datasetJson.regionList;
-              regionList.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                return itemLabelA > itemLabelB ? 1 : -1;
-              });
-              var rangeValue = this.state.singleValue2;
-              var startDate = moment(rangeValue.year + '-' + (rangeValue.month <= 9 ? "0" + rangeValue.month : rangeValue.month) + '-01').format("YYYY-MM-DD");
-              var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
-              var daysInMonth = datasetJson.currentVersion.daysInMonth;
-              var monthArray = [];
-              var curDate = startDate;
-              var planningUnitTotalList = [];
-              var planningUnitTotalListRegion = [];
-              for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
-                curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
-                var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
-                var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
-                monthArray.push({ date: curDate, noOfDays: noOfDays })
-                var totalPlanningUnit = 0;
-                var totalPlanningUnitPU = 0;
-                for (var cul = 0; cul < planningUnitList.length; cul++) {
-                  var totalQty = "";
-                  var totalQtyPU = "";
-                  for (var r = 0; r < regionList.length; r++) {
-                    var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == planningUnitList[cul].planningUnit.id)
-                    var qty = 0;
-                    var qtyInPU = 0;
-                    var reportingRate = "";
-                    var actualConsumption = "";
-                    var daysOfStockOut = ""
-                    if (consumptionDataForMonth.length > 0) {
-                      var c = consumptionDataForMonth[0];
-                      reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                      actualConsumption = c.amount;
-                      daysOfStockOut = c.daysOfStockOut;
-                      qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100;
-                      qty = qty.toFixed(4)
-                      var multiplier = 0;
-                      if (planningUnitList[cul].consumptionDataType == 1) {
-                        multiplier = 1
-                      } else if (planningUnitList[cul].consumptionDataType == 2) {
-                        multiplier = planningUnitList[cul].planningUnit.multiplier
+            fuRequest.onsuccess = function (event) {
+              var fuResult = [];
+              fuResult = fuRequest.result;
+              var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+              var puOs = puTransaction.objectStore('planningUnit');
+              var puRequest = puOs.getAll();
+              puRequest.onerror = function (event) {
+              }.bind(this);
+              puRequest.onsuccess = function (event) {
+                var puResult = [];
+                puResult = puRequest.result;
+                var datasetData = dsRequest.result;
+                var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJson = JSON.parse(datasetData);
+                var consumptionList = datasetJson.actualConsumptionList;
+                var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
+                planningUnitList.sort((a, b) => {
+                  var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase();
+                  var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase();
+                  return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                var regionList = datasetJson.regionList;
+                regionList.sort((a, b) => {
+                  var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                  var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                  return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                var rangeValue = this.state.singleValue2;
+                var startDate = moment(rangeValue.year + '-' + (rangeValue.month <= 9 ? "0" + rangeValue.month : rangeValue.month) + '-01').format("YYYY-MM-DD");
+                var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+                var daysInMonth = datasetJson.currentVersion.daysInMonth;
+                var monthArray = [];
+                var curDate = startDate;
+                var planningUnitTotalList = [];
+                var planningUnitTotalListRegion = [];
+                for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+                  curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                  var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
+                  var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
+                  monthArray.push({ date: curDate, noOfDays: noOfDays })
+                  var totalPlanningUnit = 0;
+                  var totalPlanningUnitPU = 0;
+                  for (var cul = 0; cul < planningUnitList.length; cul++) {
+                    var totalQty = "";
+                    var totalQtyPU = "";
+                    for (var r = 0; r < regionList.length; r++) {
+                      var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == planningUnitList[cul].planningUnit.id)
+                      var qty = 0;
+                      var qtyInPU = 0;
+                      var reportingRate = "";
+                      var actualConsumption = "";
+                      var daysOfStockOut = ""
+                      if (consumptionDataForMonth.length > 0) {
+                        var c = consumptionDataForMonth[0];
+                        reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                        actualConsumption = c.amount;
+                        daysOfStockOut = c.daysOfStockOut;
+                        qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100;
+                        qty = qty.toFixed(4)
+                        var multiplier = 0;
+                        if (planningUnitList[cul].consumptionDataType == 1) {
+                          multiplier = 1
+                        } else if (planningUnitList[cul].consumptionDataType == 2) {
+                          multiplier = planningUnitList[cul].planningUnit.multiplier
+                        } else {
+                          multiplier = planningUnitList[cul].otherUnit.multiplier
+                        }
+                        if (planningUnitList[cul].consumptionDataType == 1) {
+                          qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
+                        } else if (planningUnitList[cul].consumptionDataType == 2) {
+                          qtyInPU = (Number(qty));
+                        } else if (planningUnitList[cul].consumptionDataType == 3) {
+                          qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
+                        }
                       } else {
-                        multiplier = planningUnitList[cul].otherUnit.multiplier
+                        qty = "";
+                        reportingRate = 100;
+                        daysOfStockOut = 0;
+                        qtyInPU = ""
                       }
-                      if (planningUnitList[cul].consumptionDataType == 1) {
-                        qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
-                      } else if (planningUnitList[cul].consumptionDataType == 2) {
-                        qtyInPU = (Number(qty));
-                      } else if (planningUnitList[cul].consumptionDataType == 3) {
-                        qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
+                      planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Number(qty).toFixed(4) : "", qtyInPU: qty !== "" ? Number(qtyInPU).toFixed(4) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                      if (qty !== "") {
+                        totalQty = Number(totalQty) + Number(qty);
+                        totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                       }
-                    } else {
-                      qty = "";
-                      reportingRate = 100;
-                      daysOfStockOut = 0;
-                      qtyInPU = ""
                     }
-                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Number(qty).toFixed(4) : "", qtyInPU: qty !== "" ? Number(qtyInPU).toFixed(4) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
-                    if (qty !== "") {
-                      totalQty = Number(totalQty) + Number(qty);
-                      totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
-                    }
+                    planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Number(totalQty).toFixed(4) : "", qtyInPU: totalQtyPU !== "" ? Number(totalQtyPU).toFixed(4) : "" })
+                    totalPlanningUnit += totalQty;
+                    totalPlanningUnitPU += totalQtyPU;
                   }
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Number(totalQty).toFixed(4) : "", qtyInPU: totalQtyPU !== "" ? Number(totalQtyPU).toFixed(4) : "" })
-                  totalPlanningUnit += totalQty;
-                  totalPlanningUnitPU += totalQtyPU;
                 }
-              }
-              var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
-              var tracerCategoryListFilter = myResult.filter(c => healthAreaList.includes(c.healthArea.id));
-              var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
-              var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
-              var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
-              var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
-              this.setState({
-                consumptionList: consumptionList,
-                tempConsumptionList: consumptionList,
-                regionList: regionList,
-                startDate: startDate,
-                stopDate: stopDate,
-                monthArray: monthArray,
-                datasetJson: datasetJson,
-                planningUnitList: planningUnitList,
-                forecastingUnitList: forecastingUnitList,
-                showSmallTable: true,
-                loading: false,
-                planningUnitTotalList: planningUnitTotalList,
-                planningUnitTotalListRegion: planningUnitTotalListRegion,
-                allPlanningUnitList: allPlanningUnitList
-              }, () => {
+                var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
+                var tracerCategoryListFilter = myResult.filter(c => healthAreaList.includes(c.healthArea.id));
+                var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
+                var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
+                var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
+                var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
                 this.setState({
-                  isTableLoaded: this.getTableDiv()
+                  consumptionList: consumptionList,
+                  tempConsumptionList: consumptionList,
+                  regionList: regionList,
+                  startDate: startDate,
+                  stopDate: stopDate,
+                  monthArray: monthArray,
+                  datasetJson: datasetJson,
+                  planningUnitList: planningUnitList,
+                  forecastingUnitList: forecastingUnitList,
+                  showSmallTable: true,
+                  loading: false,
+                  planningUnitTotalList: planningUnitTotalList,
+                  planningUnitTotalListRegion: planningUnitTotalListRegion,
+                  allPlanningUnitList: allPlanningUnitList
+                }, () => {
+                  this.setState({
+                    isTableLoaded: this.getTableDiv()
+                  })
+                  if (this.props.match.params.planningUnitId > 0) {
+                    this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
+                  }
+                  if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                    this.buildDataJexcel(localStorage.getItem("sesDatasetPlanningUnitId"), 0)
+                  }
                 })
-                if (this.props.match.params.planningUnitId > 0) {
-                  this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
-                }
-                if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
-                  this.buildDataJexcel(localStorage.getItem("sesDatasetPlanningUnitId"), 0)
-                }
-              })
+              }.bind(this)
             }.bind(this)
           }.bind(this)
         }.bind(this)
       }.bind(this)
-    }.bind(this)
+    }
   }
   /**
    * Toggles the visibility of guidance.
@@ -2366,6 +2822,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </option>
         )
       }, this);
+    const { versions } = this.state;
+    let versionList = versions.length > 0
+      && versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+          </option>
+        )
+      }, this);
     const { allPlanningUnitList } = this.state;
     let planningUnits = allPlanningUnitList.length > 0
       && allPlanningUnitList.map((item, i) => {
@@ -2575,6 +3040,22 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </div>
                             </FormGroup>
                             <FormGroup className="col-md-3">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
+                              <div className="controls ">
+                                <Input
+                                  type="select"
+                                  name="versionId"
+                                  id="versionId"
+                                  bsSize="sm"
+                                  onChange={(e) => { this.setVersionId(e); }}
+                                  value={this.state.versionId}
+                                >
+                                  <option value="-1">{i18n.t('static.common.select')}</option>
+                                  {versionList}
+                                </Input>
+                              </div>
+                            </FormGroup>
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                               <div className="controls edit">
                                 <Picker
@@ -2591,11 +3072,28 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            <FormGroup className="tab-ml-0 mb-md-3 ml-3">
-                              <Col md="12" >
+                            <FormGroup className="col-md-3 ">
+                              <div className="tab-ml-1 ml-lg-3">
+                                <Input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  id="onlyDownloadedProgram"
+                                  name="onlyDownloadedProgram"
+                                  checked={this.state.onlyDownloadedProgram}
+                                  onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                />
+                                <Label
+                                  className="form-check-label"
+                                  check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                  {i18n.t('static.common.onlyDownloadedProgram')}
+                                </Label>
+                              </div>
+                            </FormGroup>
+                            <FormGroup className="col-md-3">
+                              <div className="tab-ml-1 ml-lg-3">
                                 <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
                                 <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.dataentry.showInPlanningUnits')}</Label>
-                              </Col>
+                              </div>
                             </FormGroup>
                           </div>
                         </div>
