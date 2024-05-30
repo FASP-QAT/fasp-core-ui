@@ -458,7 +458,6 @@ export default class UserTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            console.log('inside submit...');
                             this.state.user.summary = summaryText_2;
                             this.state.user.userLanguageCode = this.state.lang;
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
