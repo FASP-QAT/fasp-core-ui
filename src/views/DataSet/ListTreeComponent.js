@@ -2396,12 +2396,13 @@ export default class ListTreeComponent extends Component {
                         options: { format: JEXCEL_DATE_FORMAT_SM }
                     },
                     {
-                        type: 'dropdown',
-                        title: i18n.t('static.common.status'),
-                        source: [
-                            { id: true, name: i18n.t('static.common.active') },
-                            { id: false, name: i18n.t('static.common.disabled') }
-                        ]
+                        type: 'checkbox',
+                        title: i18n.t('static.common.active'),
+                        width:60
+                        // source: [
+                        //     { id: true, name: i18n.t('static.common.active') },
+                        //     { id: false, name: i18n.t('static.common.disabled') }
+                        // ]
                     },
                     {
                         type: 'hidden'
