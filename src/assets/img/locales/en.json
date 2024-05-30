@@ -3273,5 +3273,14 @@
     "static.shipment.budgetWarning2":") is going over budget by $",
     "static.shipment.budgetWarning3":"if you submit.",
     "static.shipment.budgetWarning4":"Do you want to continue?",
-    "static.organisation.organisationcodemax10digittext": "Display name length should be 10 characters long"
+    "static.organisation.organisationcodemax10digittext": "Display name length should be 10 characters long",
+    "static.priority": "Priority",
+    "static.priority.highest": "Highest",
+    "static.priority.highestDesc": "QAT is down or user cannot log in.",
+    "static.priority.high": "High",
+    "static.priority.highDesc": "Problem involves significant inconveniences for users, such as not being able to complete their forecast or supply plan. (Affects a business-critical function and no workarounds exist).",
+    "static.priority.medium": "Medium",
+    "static.priority.mediumDesc": "User can wait for a resolution without causing substantial disruption (Affects a business-critical function, but a workaround exists).",
+    "static.priority.low": "Low",
+    "static.priority.lowDesc": "Problem is noticeable but not critical to daily operations and would be good to fix eventually. (Affects a non-business-critical function)."
 }

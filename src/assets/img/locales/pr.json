@@ -3261,5 +3261,14 @@
     "static.errorPage.validUserComment": "Insira a descrição",
     "static.tree.deleteScenario": "Excluir cenário",
     "static.tree.showOnlyActive": "Mostrar apenas ativo",
-    "static.tree.showInactive": "Mostrar inativo"
+    "static.tree.showInactive": "Mostrar inativo",
+    "static.priority": "Prioridade",
+    "static.priority.highest": "Altíssima",
+    "static.priority.highestDesc": "O QAT está inativo ou o usuário não consegue fazer login.",
+    "static.priority.high": "Alto",
+    "static.priority.highDesc": "O problema envolve inconvenientes significativos para os usuários, como não conseguir completar sua previsão ou plano de fornecimento. (Afeta uma função crítica para os negócios e não existem soluções alternativas).",
+    "static.priority.medium": "Médio",
+    "static.priority.mediumDesc": "O usuário pode aguardar uma resolução sem causar interrupções substanciais (afeta uma função crítica para os negócios, mas existe uma solução alternativa).",
+    "static.priority.low": "Baixo",
+    "static.priority.lowDesc": "O problema é perceptível, mas não é crítico para as operações diárias e seria bom resolvê-lo eventualmente. (Afeta uma função não crítica para os negócios)."
 }

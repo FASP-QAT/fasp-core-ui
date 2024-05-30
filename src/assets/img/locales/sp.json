@@ -3262,5 +3262,14 @@
     "static.errorPage.validUserComment": "Introduzca la descripción",
     "static.tree.deleteScenario": "Eliminar escenario",
     "static.tree.showOnlyActive": "Mostrar solo activa",
-    "static.tree.showInactive": "Mostrar inactiva"
+    "static.tree.showInactive": "Mostrar inactiva",
+    "static.priority": "Prioridad",
+    "static.priority.highest": "Mas alto",
+    "static.priority.highestDesc": "QAT está inactivo o el usuario no puede iniciar sesión.",
+    "static.priority.high": "Alto",
+    "static.priority.highDesc": "El problema implica importantes inconvenientes para los usuarios, como no poder completar su previsión o plan de suministro. (Afecta una función crítica para el negocio y no existen soluciones alternativas).",
+    "static.priority.medium": "Medio",
+    "static.priority.mediumDesc": "El usuario puede esperar una resolución sin causar una interrupción sustancial (afecta una función crítica para el negocio, pero existe una solución alternativa).",
+    "static.priority.low": "Bajo",
+    "static.priority.lowDesc": "El problema es notable pero no crítico para las operaciones diarias y sería bueno solucionarlo eventualmente. (Afecta a una función no crítica para el negocio)."
 }

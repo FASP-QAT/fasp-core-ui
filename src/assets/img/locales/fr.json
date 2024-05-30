@@ -3261,5 +3261,14 @@
     "static.errorPage.validUserComment": "Entrez la description",
     "static.tree.deleteScenario": "Supprimer le scénario",
     "static.tree.showOnlyActive": "Afficher uniquement les actifs",
-    "static.tree.showInactive": "Afficher inactif"
+    "static.tree.showInactive": "Afficher inactif",
+    "static.priority": "Priorité",
+    "static.priority.highest": "Le plus élevé",
+    "static.priority.highestDesc": "QAT est en panne ou l'utilisateur ne peut pas se connecter.",
+    "static.priority.high": "Haut",
+    "static.priority.highDesc": "Le problème entraîne des inconvénients importants pour les utilisateurs, tels que l'impossibilité de finaliser leurs prévisions ou leur plan d'approvisionnement. (Affecte une fonction critique pour l'entreprise et aucune solution de contournement n'existe).",
+    "static.priority.medium": "Moyen",
+    "static.priority.mediumDesc": "L'utilisateur peut attendre une résolution sans provoquer de perturbations substantielles (affecte une fonction critique pour l'entreprise, mais une solution de contournement existe).",
+    "static.priority.low": "Faible",
+    "static.priority.lowDesc": "Le problème est visible mais n’est pas critique pour les opérations quotidiennes et il serait bon de le résoudre éventuellement. (Affecte une fonction non critique pour l'entreprise)."
 }
