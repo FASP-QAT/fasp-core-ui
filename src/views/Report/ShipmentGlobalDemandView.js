@@ -194,8 +194,8 @@ const optionsPie = {
             const data = context.chart.data.datasets[0].data;
             const total = data.reduce((acc, value) => acc + value, 0);
             const percentage = ((value / total) * 100).toFixed(2);
-            if(percentage < 2){
-                return ``;
+            if(percentage < 4){
+                return '';
             } else {
                 return `${percentage}%`;
             }
@@ -204,10 +204,24 @@ const optionsPie = {
           align: 'start',
           offset: -10,
           borderWidth: 2,
-          borderColor: 'white',
+          borderColor: (context) => {
+            const data = context.chart.data.datasets[0].data;
+            const total = data.reduce((acc, value) => acc + value, 0);
+            const percentage = ((context.dataset.data[context.dataIndex] / total) * 100).toFixed(2);
+            if(percentage >= 4){
+                return 'white';
+            }
+          },
           borderRadius: 25,
-          backgroundColor: (context) => context.dataset.backgroundColor[context.dataIndex],
-          padding: 6,
+          backgroundColor: (context) => {
+            const data = context.chart.data.datasets[0].data;
+            const total = data.reduce((acc, value) => acc + value, 0);
+            const percentage = ((context.dataset.data[context.dataIndex] / total) * 100).toFixed(2);
+            if(percentage >= 4){
+                return context.dataset.backgroundColor[context.dataIndex];
+            }
+          },
+          padding: 2,
         },
     },
     title: {
