@@ -584,6 +584,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[36] = shipmentList[i].shipmentQty;
                                                 data[37] = shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? 1 : 0;
                                                 data[38] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;
+                                                data[39] = Number(Number(Number(Number(Math.round(Number(Number(Math.round(shipmentList[i].shipmentRcpuQty))*Number(shipmentList[i].realmCountryPlanningUnit.multiplier))))*Number(Number(shipmentList[i].rate).toFixed(2))).toFixed(2))+Number(Number(shipmentList[i].freightCost).toFixed(2))).toFixed(2);
                                                 shipmentsArr.push(data);
                                             }
                                             if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -627,6 +628,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[36] = 0;
                                                 data[37] = 0;
                                                 data[38] = "";
+                                                data[39] = 0;
                                                 shipmentsArr[0] = data;
                                             }
                                             var options = {
@@ -703,6 +705,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                         readOnly: true
                                                         , autoCasting: false
                                                     },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
@@ -1243,6 +1246,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[36] = 0;
         data[37] = 0;
         data[38] = "";
+        data[39] = 0;
         obj.insertRow(data);
         obj.setValueFromCoords(2, json.length, 0, true);
         obj.setValueFromCoords(12, json.length, 0, true);
@@ -3258,7 +3262,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
+                    console.log("elInstance.getValueFromCoords(38, y, true) Test@123",elInstance.getValueFromCoords(39, y, true));
+                    console.log("W Test@123",elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(39, y, true)!=elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17") && c.planningUnit.id == map.get("3"));
