@@ -939,6 +939,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Sets the version id in the component state on change and builds data accordingly.
      */
     setVersionId(event) {
+        if(event.target.value!=0 && event.target.value!=""){
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
         let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY") + "-01");
         let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY") + "-01");
@@ -1028,6 +1029,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }, () => {
             this.filterData(true);
         })
+    }else{
+        this.setState({
+            toggleDoNotImport:false,
+            versionId: event.target.value
+        }, () => {
+            this.filterData(true);
+        })
+    }
     }
     /**
      * Handles the selection of a forecast program ID and updates the state accordingly.
