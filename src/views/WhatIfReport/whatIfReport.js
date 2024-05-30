@@ -6139,14 +6139,14 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <NavLink
                                                     active={this.state.activeTab[0] === '1'}
                                                     onClick={() => { this.toggle(0, '1'); }}
-                                                >{i18n.t('static.supplyPlan.currentSupplyPlan')} </NavLink>
+                                                >{i18n.t('static.scenarioPlanning.tab1')} </NavLink>
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
+                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>
