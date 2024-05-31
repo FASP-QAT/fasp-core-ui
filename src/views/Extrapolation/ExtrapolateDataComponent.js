@@ -296,7 +296,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             offlineTES: false,
             offlineArima: false,
             isDisabled: false,
-            onlyDownloadedProgram: false
+            onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);

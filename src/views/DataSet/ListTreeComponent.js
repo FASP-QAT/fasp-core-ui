@@ -123,7 +123,7 @@ export default class ListTreeComponent extends Component {
             beforeEndDateDisplay: '',
             allProcurementAgentList: [],
             planningUnitObjList: [],
-            onlyDownloadedProgram: false
+            onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
