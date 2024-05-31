@@ -149,7 +149,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       monthArray:[],
       versionId: -1,
       versions: [],
-      isDisabled: false
+      isDisabled: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
