@@ -58,7 +58,6 @@ class ProgramIntegration extends Component {
      */
     filterVersionStatus = function (instance, cell, c, r, source) {
         var rowData = (this.state.dataEL.getJson(null, false)[r]);
-        // return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
         return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 4) : this.state.versionStatusArr);
                 
     }.bind(this);
