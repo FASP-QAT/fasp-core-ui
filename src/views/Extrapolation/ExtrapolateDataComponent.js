@@ -295,7 +295,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolationNotes: null,
             offlineTES: false,
             offlineArima: false,
-            isDisabled: false
+            isDisabled: false,
+            onlyDownloadedProgram: false
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -314,6 +315,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setButtonFlag = this.setButtonFlag.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
+        this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
     }
     /**
      * Handles change for seasonality check box.
@@ -333,6 +335,28 @@ export default class ExtrapolateDataComponent extends React.Component {
         getDatabase();
         this.getPrograms();
         this.getDateDifference();
+    }
+    /**
+     * Handles the change event of the diplaying only downloaded programs.
+     * @param {Object} event - The event object containing the checkbox state.
+     */
+    changeOnlyDownloadedProgram(event) {
+        var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedProgram: true,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedProgram: false,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        }
     }
     /**
      * Retrieves list of all programs
@@ -384,7 +408,12 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { forecastProgramList } = this.state
-        var proList = forecastProgramList;
+        var proList;
+        if(this.state.onlyDownloadedProgram) {
+            proList = [];
+        } else {
+            proList = forecastProgramList;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -435,10 +464,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     f = 1;
                                 }
                             }
-                            if (f == 0) {
+                            if(this.state.onlyDownloadedProgram) {
                                 proList.push(forecastProgramJson)
                             } else {
-                                proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                                if (f == 0) {
+                                    proList.push(forecastProgramJson)
+                                } else if(f == 1) {
+                                    proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                                }
                             }
                             downloadedProgramData.push(forecastProgramJson);
                         }
@@ -3443,6 +3476,23 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {regions}
                                             </Input>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
+                                        <div className="tab-ml-1 ml-lg-3">
+                                            <Input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="onlyDownloadedProgram"
+                                                name="onlyDownloadedProgram"
+                                                checked={this.state.onlyDownloadedProgram}
+                                                onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                {i18n.t('static.common.onlyDownloadedProgram')}
+                                            </Label>
                                         </div>
                                     </FormGroup>
                                     {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
