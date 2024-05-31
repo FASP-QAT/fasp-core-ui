@@ -3291,9 +3291,21 @@ export default class BuildTree extends Component {
                     alert("Please select scenario first.")
                 }
             } else if (type == 4) {
+                if (scenarioId != "") {
+                    var scenario11 = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
+                    if (!this.state.showOnlyActive && scenario11.active.toString() == "false") {
+                        this.setState({
+                            items: [],
+                            selectedScenario: "",
+                        })
+                    }
+                } else {
+                    this.setState({
+                        items: [],
+                        selectedScenario: "",
+                    })
+                }
                 this.setState({
-                    items: [],
-                    selectedScenario: "",
                     showOnlyActive: !this.state.showOnlyActive
                 })
             } else {
@@ -12714,7 +12726,7 @@ export default class BuildTree extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2">
-                                                    {i18n.t('static.common.disabled')}
+                                                    {i18n.t('static.dataentry.inactive')}
                                                 </Label>
                                             </FormGroup>
                                         </FormGroup>
