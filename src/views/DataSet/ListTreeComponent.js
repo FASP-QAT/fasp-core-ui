@@ -122,7 +122,8 @@ export default class ListTreeComponent extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             allProcurementAgentList: [],
-            planningUnitObjList: []
+            planningUnitObjList: [],
+            onlyDownloadedProgram: false
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -147,6 +148,7 @@ export default class ListTreeComponent extends Component {
         this.changed = this.changed.bind(this);  
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
+        this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
       }
 
       hideThirdComponent() {
@@ -1764,7 +1766,12 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { datasetList } = this.state
-        var proList = datasetList;
+        var proList;
+        if(this.state.onlyDownloadedProgram) {
+            proList = [];
+        } else {
+            proList = datasetList;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1803,8 +1810,12 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if (f == 0) {
+                            if(this.state.onlyDownloadedProgram) {
                                 proList.push(programData)
+                            } else {
+                                if (f == 0) {
+                                    proList.push(programData)
+                                }
                             }
                             downloadedProgramData.push(programData);
                         }
@@ -2379,6 +2390,32 @@ export default class ListTreeComponent extends Component {
         this.getForecastMethodList();
         this.procurementAgentList();
     }
+    /**
+     * Handles the change event of the diplaying only downloaded programs.
+     * @param {Object} event - The event object containing the checkbox state.
+     */
+    changeOnlyDownloadedProgram(event) {
+        var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedProgram: true,
+                datasetId: '',
+                loading: false
+            }, () => {
+                this.getPrograms();
+                this.buildJexcel();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedProgram: false,
+                datasetId: '',
+                loading: false
+            }, () => {
+                this.getPrograms();
+                this.buildJexcel();
+            })
+        }
+    }
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2728,6 +2765,23 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
+                            <div className="tab-ml-1 ml-lg-3">
+                                <Input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="onlyDownloadedProgram"
+                                    name="onlyDownloadedProgram"
+                                    checked={this.state.onlyDownloadedProgram}
+                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                    {i18n.t('static.common.onlyDownloadedProgram')}
+                                </Label>
+                            </div>
+                        </FormGroup>
                         <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>

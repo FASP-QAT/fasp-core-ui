@@ -50,6 +50,10 @@ import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import DropdownService from '../../api/DropdownService.js';
+import DatasetService from "../../api/DatasetService.js";
+import ForecastingUnitService from "../../api/ForecastingUnitService.js";
+import PlanningUnitService from "../../api/PlanningUnitService.js";
+import TracerCategoryService from "../../api/TracerCategoryService.js";
 // Localized entity name
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const pickerLang = {
@@ -145,6 +149,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       monthArray:[],
       versionId: -1,
       versions: [],
+      isDisabled: false
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -1503,6 +1508,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           cell.classList.add('readonly');
           elInstance.setStyle((colArr[j + 1]).concat(parseInt(count5)), "background-color", "yellow");
         }
+        if(this.state.isDisabled){
+          var cell = elInstance.getCell((colArr[j + 1]).concat(parseInt(count5)))
+          cell.classList.add('readonly');
+          var cell = elInstance.getCell((colArr[j + 1]).concat(parseInt(count6)))
+          cell.classList.add('readonly');
+          var cell = elInstance.getCell((colArr[j + 1]).concat(parseInt(count7)))
+          cell.classList.add('readonly');
+        }
         count = count + 8;
         count1 = count1 + 8;
         count2 = count2 + 8;
@@ -1538,6 +1551,147 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    */
   componentDidMount() {
     hideSecondComponent();
+    ForecastingUnitService.getForecastingUnitListAll().then(response => {
+      if (response.status == 200) {
+        this.setState({
+          fuResult: response.data,
+          loading: false
+        })
+      }
+    }).catch(
+        error => {
+            if (error.message === "Network Error") {
+                this.setState({
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                });
+            } else {
+                switch (error.response ? error.response.status : "") {
+                    case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                    case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                    case 500:
+                    case 404:
+                    case 406:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    case 412:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    default:
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                        break;
+                }
+          }
+      }
+    );
+
+    PlanningUnitService.getAllPlanningUnitList().then(response => {
+      if (response.status == 200) {
+        this.setState({
+          puResult: response.data,
+          loading: false
+        })
+      }
+    }).catch(
+        error => {
+            if (error.message === "Network Error") {
+                this.setState({
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                });
+            } else {
+                switch (error.response ? error.response.status : "") {
+                    case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                    case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                    case 500:
+                    case 404:
+                    case 406:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    case 412:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    default:
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                        break;
+                }
+            }
+        }
+    );
+
+    TracerCategoryService.getTracerCategoryListAll()
+      .then(response => {
+        if (response.status == 200) {
+          this.setState({
+            tcResult: response.data,
+            loading: false
+          })
+        }
+    }).catch(
+      error => {
+          if (error.message === "Network Error") {
+              this.setState({
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+              });
+          } else {
+              switch (error.response ? error.response.status : "") {
+                  case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                  case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                  case 500:
+                  case 404:
+                  case 406:
+                      this.setState({
+                          message: error.response.data.messageCode,
+                          loading: false
+                      });
+                      break;
+                  case 412:
+                      this.setState({
+                          message: error.response.data.messageCode,
+                          loading: false
+                      });
+                      break;
+                  default:
+                      this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                      });
+                      break;
+              }
+          }
+      }
+    );
     // this.getDatasetList();
     this.getPrograms()
   }
@@ -2345,10 +2499,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let programId = this.state.datasetId;
     var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
     let versionId = this.state.versionId;
-    this.setState({
-      loading: true
-    })
     if (versionId.toString().includes('Local')) {
+      this.setState({
+        loading: true,
+        isDisabled: false
+      })
       var db1;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -2504,6 +2659,130 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }.bind(this)
         }.bind(this)
       }.bind(this)
+    } else {
+      this.setState({
+        loading: true,
+        isDisabled: true
+      })
+      DatasetService.getDatasetDataWithoutTree(programId, versionId)
+        .then(response => {
+          if (response.status == 200) {
+            var datasetJson = response.data
+            var consumptionList = datasetJson.actualConsumptionList;
+            var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
+            planningUnitList.sort((a, b) => {
+              var itemLabelA = (this.state.showInPlanningUnit ? getLabelText(a.planningUnit.label, this.state.lang) : a.consumptionDataType == 1 ? getLabelText(a.planningUnit.forecastingUnit.label, this.state.lang) : a.consumptionDataType == 2 ? getLabelText(a.planningUnit.label, this.state.lang) : getLabelText(a.otherUnit.label, this.state.lang)).toUpperCase();
+              var itemLabelB = (this.state.showInPlanningUnit ? getLabelText(b.planningUnit.label, this.state.lang) : b.consumptionDataType == 1 ? getLabelText(b.planningUnit.forecastingUnit.label, this.state.lang) : b.consumptionDataType == 2 ? getLabelText(b.planningUnit.label, this.state.lang) : getLabelText(b.otherUnit.label, this.state.lang)).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var regionList = datasetJson.regionList;
+            regionList.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var rangeValue = this.state.singleValue2;
+            var startDate = moment(rangeValue.year + '-' + (rangeValue.month <= 9 ? "0" + rangeValue.month : rangeValue.month) + '-01').format("YYYY-MM-DD");
+            var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+            var daysInMonth = datasetJson.currentVersion.daysInMonth;
+            var monthArray = [];
+            var curDate = startDate;
+            var planningUnitTotalList = [];
+            var planningUnitTotalListRegion = [];
+            for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+              curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+              var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
+              var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
+              monthArray.push({ date: curDate, noOfDays: noOfDays })
+              var totalPlanningUnit = 0;
+              var totalPlanningUnitPU = 0;
+              for (var cul = 0; cul < planningUnitList.length; cul++) {
+                var totalQty = "";
+                var totalQtyPU = "";
+                for (var r = 0; r < regionList.length; r++) {
+                  var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == planningUnitList[cul].planningUnit.id)
+                  var qty = 0;
+                  var qtyInPU = 0;
+                  var reportingRate = "";
+                  var actualConsumption = "";
+                  var daysOfStockOut = ""
+                  if (consumptionDataForMonth.length > 0) {
+                    var c = consumptionDataForMonth[0];
+                    reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                    actualConsumption = c.amount;
+                    daysOfStockOut = c.daysOfStockOut;
+                    qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100;
+                    qty = qty.toFixed(4)
+                    var multiplier = 0;
+                    if (planningUnitList[cul].consumptionDataType == 1) {
+                      multiplier = 1
+                    } else if (planningUnitList[cul].consumptionDataType == 2) {
+                      multiplier = planningUnitList[cul].planningUnit.multiplier
+                    } else {
+                      multiplier = planningUnitList[cul].otherUnit.multiplier
+                    }
+                    if (planningUnitList[cul].consumptionDataType == 1) {
+                      qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
+                    } else if (planningUnitList[cul].consumptionDataType == 2) {
+                      qtyInPU = (Number(qty));
+                    } else if (planningUnitList[cul].consumptionDataType == 3) {
+                      qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(4)
+                    }
+                  } else {
+                    qty = "";
+                    reportingRate = 100;
+                    daysOfStockOut = 0;
+                    qtyInPU = ""
+                  }
+                  planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Number(qty).toFixed(4) : "", qtyInPU: qty !== "" ? Number(qtyInPU).toFixed(4) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                  if (qty !== "") {
+                    totalQty = Number(totalQty) + Number(qty);
+                    totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
+                  }
+                }
+                planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Number(totalQty).toFixed(4) : "", qtyInPU: totalQtyPU !== "" ? Number(totalQtyPU).toFixed(4) : "" })
+                totalPlanningUnit += totalQty;
+                totalPlanningUnitPU += totalQtyPU;
+              }
+            }
+            var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
+            var tracerCategoryListFilter = this.state.tcResult.filter(c => healthAreaList.includes(c.healthArea.id));
+            var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
+            var forecastingUnitList = this.state.fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
+            var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
+            var allPlanningUnitList = this.state.puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
+            this.setState({
+              consumptionList: consumptionList,
+              tempConsumptionList: consumptionList,
+              regionList: regionList,
+              startDate: startDate,
+              stopDate: stopDate,
+              monthArray: monthArray,
+              datasetJson: datasetJson,
+              planningUnitList: planningUnitList,
+              forecastingUnitList: forecastingUnitList,
+              showSmallTable: true,
+              loading: false,
+              planningUnitTotalList: planningUnitTotalList,
+              planningUnitTotalListRegion: planningUnitTotalListRegion,
+              allPlanningUnitList: allPlanningUnitList
+            }, () => {
+              this.setState({
+                isTableLoaded: this.getTableDiv()
+              })
+              if (this.props.match.params.planningUnitId > 0) {
+                this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
+              }
+              if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                this.buildDataJexcel(localStorage.getItem("sesDatasetPlanningUnitId"), 0)
+              }
+            })
+            this.setState({ 
+              datasetJson: datasetJson,
+              loading: false 
+            })
+          }
+      });
     }
   }
   /**
@@ -3116,9 +3395,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
                                       </Label><br />
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
-                                        <a className="card-header-action">
+                                        {!this.state.isDisabled &&<a className="card-header-action">
                                           {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
-                                        </a>
+                                        </a>}
                                       </Label><br />
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
                                       </Label>
@@ -3135,6 +3414,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         id="consumptionNotes"
                                         valid={!errors.consumptionNotes}
                                         invalid={!!errors.consumptionNotes}
+                                        disabled={this.state.isDisabled}
                                         bsSize="sm"
                                         readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
                                         onChange={(e) => { handleChange(e); this.setState({ consumptionChanged: true }) }}
@@ -3146,7 +3426,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                   </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && !this.state.isDisabled && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                                     <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                                 </FormGroup>
                               </div>
@@ -3186,7 +3466,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   <CardFooter>
                     <FormGroup>
                       <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                      <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                      {!this.state.isDisabled && <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                       {this.state.consumptionChanged && <><Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
                       {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                       &nbsp;
