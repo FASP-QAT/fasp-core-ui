@@ -2497,9 +2497,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    */
   getDatasetData() {
     let programId = this.state.datasetId;
-    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
     let versionId = this.state.versionId;
     if (versionId.toString().includes('Local')) {
+      var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
       this.setState({
         loading: true,
         isDisabled: false
