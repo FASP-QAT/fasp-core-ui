@@ -1389,7 +1389,7 @@ class AddprogramPlanningUnit extends Component {
         ele[9].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
         ele[10].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
         ele[11].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), 
-        ele[13] ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        ele[13].toString() =="true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
