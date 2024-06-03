@@ -797,7 +797,7 @@ export default class PlanningUnitListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
+                        <div className="consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
