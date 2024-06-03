@@ -399,6 +399,7 @@ export default class EditForecastingUnitComponent extends Component {
                     </option>
                 )
             }, this);
+        console.log("this.state.forecastingUnit.genericLabel.label_en Test@123",this.state.forecastingUnit.genericLabel.label_en)    
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -410,7 +411,7 @@ export default class EditForecastingUnitComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.forecastingUnit.label.label_en,
-                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en,
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en==null?'':this.state.forecastingUnit.genericLabel.label_en,
                                     unitId: this.state.forecastingUnit.unit.id,
                                     tracerCategoryId: this.state.forecastingUnit.tracerCategory.id,
                                     productCategoryId: this.state.forecastingUnit.productCategory.id
