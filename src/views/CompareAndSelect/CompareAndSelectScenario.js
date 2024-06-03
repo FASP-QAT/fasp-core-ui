@@ -37,7 +37,10 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { DatePicker } from 'antd';
+import "antd/dist/antd.css";
 const ref = React.createRef();
+const { RangePicker } = DatePicker;
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -92,7 +95,8 @@ class CompareAndSelectScenario extends Component {
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
             changed: false,
-            dataChangedFlag: 0
+            dataChangedFlag: 0,
+            xAxisDisplayBy: 1
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -107,6 +111,7 @@ class CompareAndSelectScenario extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.loadedTable1 = this.loadedTable1.bind(this)
         this.changeTable1 = this.changeTable1.bind(this)
+        this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
     }
     /**
      * Handles the click event on the range picker box.
@@ -205,47 +210,47 @@ class CompareAndSelectScenario extends Component {
                 }
             }
             if (selectedPlanningUnit[0].treeForecast.toString() == "true") {
-            for (var tl = 0; tl < treeList.length; tl++) {
-                var tree = treeList[tl];
-                var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
-                for (var sl = 0; sl < scenarioList.length; sl++) {
-                    try {
-                        var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
-                    } catch (err) {
-                        flatList = []
-                    }
-                    if (colourArrayCount > 10) {
-                        colourArrayCount = 0;
-                    }
-                    var readonly = flatList.length > 0 ? false : true;
-                    dataForPlanningUnit = [];
-                    try {
-                        var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
-                    } catch (err) {
-                        dataForPlanningUnit = []
-                    }
-                    var data = [];
-                    if (dataForPlanningUnit.length > 0) {
-                        for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
-                            if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
-                                data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                for (var tl = 0; tl < treeList.length; tl++) {
+                    var tree = treeList[tl];
+                    var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    for (var sl = 0; sl < scenarioList.length; sl++) {
+                        try {
+                            var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                        } catch (err) {
+                            flatList = []
+                        }
+                        if (colourArrayCount > 10) {
+                            colourArrayCount = 0;
+                        }
+                        var readonly = flatList.length > 0 ? false : true;
+                        dataForPlanningUnit = [];
+                        try {
+                            var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                        } catch (err) {
+                            dataForPlanningUnit = []
+                        }
+                        var data = [];
+                        if (dataForPlanningUnit.length > 0) {
+                            for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
+                                if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
+                                    data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                                }
                             }
                         }
+                        let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
+                            if (!a[month])
+                                a[month] = Object.assign({}, { month, calculatedMmdValue });
+                            else
+                                a[month].calculatedMmdValue += calculatedMmdValue;
+                            return a;
+                        }, {}));
+                        treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
+                        colourArrayCount += 1;
+                        count += 1;
                     }
-                    let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
-                        if (!a[month])
-                            a[month] = Object.assign({}, { month, calculatedMmdValue });
-                        else
-                            a[month].calculatedMmdValue += calculatedMmdValue;
-                        return a;
-                    }, {}));
-                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
-                    colourArrayCount += 1;
-                    count += 1;
                 }
             }
-        }
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined) {
             }
             var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
@@ -315,7 +320,7 @@ class CompareAndSelectScenario extends Component {
         var totalArray = [];
         var monthArrayForError = [];
         if (consumptionData.length > 0) {
-            for(var i=0;i<consumptionData.length;i++){
+            for (var i = 0; i < consumptionData.length; i++) {
                 monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
             }
         }
@@ -323,7 +328,7 @@ class CompareAndSelectScenario extends Component {
         var actualMultiplier = 1;
         var actualDiff = [];
         var countArray = [];
-        var useForLowestError=[];
+        var useForLowestError = [];
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             totalArray.push(0);
             actualDiff.push(0);
@@ -338,8 +343,8 @@ class CompareAndSelectScenario extends Component {
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-                    if(scenarioFilter.length>0 && (useForLowestError[tsl]==undefined || useForLowestError[tsl]==null || useForLowestError[tsl]==false)){
-                        useForLowestError[tsl]=true;
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
                     }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue) * multiplier : "")) : 0;
                     if (diff < 0) {
@@ -351,8 +356,8 @@ class CompareAndSelectScenario extends Component {
                     }
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-                    if(scenarioFilter.length>0 && (useForLowestError[tsl]==undefined || useForLowestError[tsl]==null || useForLowestError[tsl]==false)){
-                        useForLowestError[tsl]=true;
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
                     }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : "")) : 0;
                     if (diff < 0) {
@@ -430,7 +435,7 @@ class CompareAndSelectScenario extends Component {
         higherThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdHighPerc);
         lowerThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdLowPerc);
         var finalData = [];
-        var min = Math.min(...actualDiff.filter((c,index) => useForLowestError[index]))
+        var min = Math.min(...actualDiff.filter((c, index) => useForLowestError[index]))
         var treeScenarioList = this.state.treeScenarioList;
         for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
             finalData.push({
@@ -501,7 +506,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             actualDiff: actualDiff,
             finalData: finalData,
-            useForLowestError:useForLowestError
+            useForLowestError: useForLowestError
         }, () => {
             let treeScenarioList1 = this.state.treeScenarioList;
             let dataArray = [];
@@ -547,7 +552,7 @@ class CompareAndSelectScenario extends Component {
                         width: 100
                     },
                     {
-                        title: i18n.t('static.consumption.forcast'),
+                        title: i18n.t('static.consumption.forcast') + '<i class="fa fa-plus-square-o supplyPlanIcon"></i>',
                         type: 'html',
                         readOnly: true,
                         width: 150
@@ -1200,7 +1205,7 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('notSelectedForecast');
                 }
             }
-            if (Math.min(...this.state.actualDiff.filter((c,index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
+            if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
                 var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('lowestError');
             } else {
@@ -1222,7 +1227,7 @@ class CompareAndSelectScenario extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changeTable1 = function (instance, cell, x, y, value) {
-        this.setState({            
+        this.setState({
             loading: true
         })
         var elInstance = instance;
@@ -1337,7 +1342,7 @@ class CompareAndSelectScenario extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-            }            
+            }
         } else {
             cont = true;
         }
@@ -1566,7 +1571,7 @@ class CompareAndSelectScenario extends Component {
      * Submits the selected scenario and updates the dataset accordingly.
      */
     submitScenario() {
-        this.setState({dataChangedFlag: 0, loading: true })
+        this.setState({ dataChangedFlag: 0, loading: true })
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         var treeId = this.state.selectedTreeScenarioId.toString().split("~")[0];
         if (scenarioId == undefined) {
@@ -1676,7 +1681,7 @@ class CompareAndSelectScenario extends Component {
                 let id = AuthenticationService.displayDashboardBasedOnRole();
                 this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
             })
-        }        
+        }
     }
     /**
      * Toggles the visibility of guidance in the component state.
@@ -1684,6 +1689,80 @@ class CompareAndSelectScenario extends Component {
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
+        })
+    }
+    /**
+     * This function is used to set the x axis display by value selected by the user
+     * @param {*} e This is the event value
+     */
+    setXAxisDisplayBy(e) {
+        this.setState({ loading: true })
+        let displayBy = e.target.value;
+        let val;
+        if (displayBy == 1) {
+            val = this.state.rangeValue;
+        } else if (displayBy == 2) {
+            val = {
+                from: {
+                    year: this.state.rangeValue.from.year,
+                    month: 1,
+                },
+                to: {
+                    year: this.state.rangeValue.to.year,
+                    month: 12,
+                }
+            }
+        } else {
+            val = {
+                from: {
+                    year: this.state.rangeValue.from.year,
+                    month: (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                },
+                to: {
+                    year: this.state.rangeValue.to.year,
+                    month: (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12,
+                }
+            }
+        }
+        this.setState({
+            xAxisDisplayBy: displayBy,
+            rangeValue: val,
+            loading: false
+        }, () => {
+            this.buildJexcel()
+        })
+    }
+    /**
+     * This function is called when the date range is changed
+     * @param {*} value This is the value of the daterange selected by the user
+     */
+    handleYearRangeChange(value) {
+        let val;
+        if (this.state.xAxisDisplayBy == 2) {
+            val = {
+                from: {
+                    year: value[0].year(),
+                    month: 1,
+                },
+                to: {
+                    year: value[1].year(),
+                    month: 12,
+                }
+            }
+        } else {
+            val = {
+                from: {
+                    year: value[0].year(),
+                    month: this.state.rangeValue.from.month,
+                },
+                to: {
+                    year: value[1].year(),
+                    month: this.state.rangeValue.to.month,
+                }
+            }
+        }
+        this.setState({ rangeValue: val }, () => {
+            this.buildJexcel()
         })
     }
     /**
@@ -2001,6 +2080,85 @@ class CompareAndSelectScenario extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.xAxisDisplay')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="xAxisDisplayBy"
+                                                            id="xAxisDisplayBy"
+                                                            bsSize="sm"
+                                                            value={this.state.xAxisDisplayBy}
+                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                        >
+                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
+                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
+                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3 pickerRangeBox">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                </Label>
+                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            ref="pickRange"
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            key={JSON.stringify(rangeValue)}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                )}
+                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormGroup>
                                         </div>
                                     </div>
