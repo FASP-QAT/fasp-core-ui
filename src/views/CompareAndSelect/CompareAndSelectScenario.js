@@ -218,7 +218,7 @@ class CompareAndSelectScenario extends Component {
                 for (var tl = 0; tl < treeList.length; tl++) {
                     var tree = treeList[tl];
                     var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList.filter(c => c.active.toString() == "true") : [];
                     for (var sl = 0; sl < scenarioList.length; sl++) {
                         try {
                             var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
@@ -513,7 +513,7 @@ class CompareAndSelectScenario extends Component {
             finalData: finalData,
             useForLowestError: useForLowestError
         }, () => {
-            let treeScenarioList1 = this.state.treeScenarioList.filter(c => c.scenario.active);
+            let treeScenarioList1 = this.state.treeScenarioList;
             let dataArray = [];
             let count = 0;
             for (var j = 0; j < treeScenarioList1.length; j++) {
