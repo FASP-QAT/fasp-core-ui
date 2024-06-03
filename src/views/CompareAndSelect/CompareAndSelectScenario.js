@@ -92,7 +92,8 @@ class CompareAndSelectScenario extends Component {
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
             changed: false,
-            dataChangedFlag: 0
+            dataChangedFlag: 0,
+            showFits: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -136,6 +137,15 @@ class CompareAndSelectScenario extends Component {
             showForecastPeriod: e.target.checked
         }, () => {
             this.setMonth1List()
+        })
+    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
+    setShowFits(e) {
+        this.setState({
+            showFits: e.target.checked
         })
     }
     /**
@@ -208,7 +218,7 @@ class CompareAndSelectScenario extends Component {
                 for (var tl = 0; tl < treeList.length; tl++) {
                     var tree = treeList[tl];
                     var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList.filter(c => c.active.toString() == "true") : [];
                     for (var sl = 0; sl < scenarioList.length; sl++) {
                         try {
                             var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
@@ -313,23 +323,21 @@ class CompareAndSelectScenario extends Component {
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
         var totalArray = [];
-        let actualMax = moment.max(consumptionData.map(d => moment(d.month)));
         var monthArrayForError = [];
         if (consumptionData.length > 0) {
-            monthArrayForError.push(moment(actualMax).format("YYYY-MM-DD"));
-            monthArrayForError.push(moment(actualMax).add(-1, 'months').format("YYYY-MM-DD"));
-            monthArrayForError.push(moment(actualMax).add(-2, 'months').format("YYYY-MM-DD"));
-            monthArrayForError.push(moment(actualMax).add(-3, 'months').format("YYYY-MM-DD"));
-            monthArrayForError.push(moment(actualMax).add(-4, 'months').format("YYYY-MM-DD"));
-            monthArrayForError.push(moment(actualMax).add(-5, 'months').format("YYYY-MM-DD"));
+            for (var i = 0; i < consumptionData.length; i++) {
+                monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+            }
         }
         var multiplier = 1;
         var actualMultiplier = 1;
         var actualDiff = [];
         var countArray = [];
+        var useForLowestError = [];
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             totalArray.push(0);
             actualDiff.push(0);
+            useForLowestError.push(false);
         }
         var totalActual = 0;
         for (var mo = 0; mo < monthArrayForError.length; mo++) {
@@ -340,6 +348,9 @@ class CompareAndSelectScenario extends Component {
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
+                    }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue) * multiplier : "")) : 0;
                     if (diff < 0) {
                         diff = 0 - diff;
@@ -350,6 +361,9 @@ class CompareAndSelectScenario extends Component {
                     }
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
+                    if (scenarioFilter.length > 0 && (useForLowestError[tsl] == undefined || useForLowestError[tsl] == null || useForLowestError[tsl] == false)) {
+                        useForLowestError[tsl] = true;
+                    }
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : "")) : 0;
                     if (diff < 0) {
                         diff = 0 - diff;
@@ -426,7 +440,7 @@ class CompareAndSelectScenario extends Component {
         higherThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdHighPerc);
         lowerThenConsumptionThresholdPU = Number(this.state.datasetJson.currentVersion.forecastThresholdLowPerc);
         var finalData = [];
-        var min = Math.min(...actualDiff.filter(c => c != 0))
+        var min = Math.min(...actualDiff.filter((c, index) => useForLowestError[index]))
         var treeScenarioList = this.state.treeScenarioList;
         for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
             finalData.push({
@@ -438,9 +452,9 @@ class CompareAndSelectScenario extends Component {
                 tree: treeScenarioList[tsList].tree,
                 scenario: treeScenarioList[tsList].scenario,
                 totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(2),
-                isLowest: min == actualDiff[tsList] ? 1 : 0,
-                forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 ? (((actualDiff[tsList]) / totalActual) * 100).toFixed(4) : "",
-                noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined ? countArray[tsList] + 1 : "",
+                isLowest: min == actualDiff[tsList] && useForLowestError[tsList] ? 1 : 0,
+                forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual) * 100).toFixed(4) : "",
+                noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined && useForLowestError[tsList] ? countArray[tsList] + 1 : "",
                 compareToConsumptionForecastClass:
                     treeScenarioList[tsList].type == 'T' ?
                         !treeScenarioList[tsList].readonly
@@ -496,9 +510,10 @@ class CompareAndSelectScenario extends Component {
         this.el = dataEl;
         this.setState({
             actualDiff: actualDiff,
-            finalData: finalData
+            finalData: finalData,
+            useForLowestError: useForLowestError
         }, () => {
-            let treeScenarioList1 = this.state.treeScenarioList.filter(c => c.scenario.active);
+            let treeScenarioList1 = this.state.treeScenarioList;
             let dataArray = [];
             let count = 0;
             for (var j = 0; j < treeScenarioList1.length; j++) {
@@ -508,8 +523,8 @@ class CompareAndSelectScenario extends Component {
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
                 data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
-                data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined ? countArray[j] + 1 : ""
+                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
+                data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
                 data[7] = finalData[j].compareToConsumptionForecast
                 data[8] = finalData[j].id
                 dataArray.push(data)
@@ -1195,7 +1210,7 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('notSelectedForecast');
                 }
             }
-            if (Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[j]) {
+            if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
                 var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('lowestError');
             } else {
@@ -1832,7 +1847,8 @@ class CompareAndSelectScenario extends Component {
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
-                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))
+                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null)))
+                        // data: json.map((item, c) => c >= count && item[1] !== "" ? item[1] : null)
                     }
                 )
             })
@@ -2173,6 +2189,23 @@ class CompareAndSelectScenario extends Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>}
+                                                </div>
+                                                <div className={"row check inline pt-lg-3 pl-lg-3"}>
+                                                    <div className="pt-lg-2 col-md-12">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="showFits"
+                                                            name="showFits"
+                                                            checked={this.state.showFits}
+                                                            onClick={(e) => { this.setShowFits(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolations.showFits')}</b>
+                                                        </Label>
+                                                    </div>
                                                     {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
