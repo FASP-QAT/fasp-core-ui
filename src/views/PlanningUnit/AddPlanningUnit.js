@@ -333,7 +333,7 @@ export default class AddPlanningUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -379,9 +379,14 @@ export default class AddPlanningUnit extends Component {
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 406:
+                                                            this.setState({
+                                                                message: i18n.t('static.message.planningUnitAlreadyExists'),
                                                                 loading: false
                                                             });
                                                             break;
