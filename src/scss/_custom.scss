@@ -2522,6 +2522,10 @@ input::placeholder {
   transform: translateX(-63%) scale(1);
 }
 
+.progressbartext4Import {
+  left: 48%;
+  transform: translateX(-38%) scale(1);
+}
 
 @media only screen and (max-width: 1024px) {
   // .progressbartext1 {
@@ -10839,5 +10843,18 @@ legend.scheduler-border {
   z-index: 2 !important;
   position: sticky !important;
   // background: #fff;
-
+}
+.errorBorder > div > div > fieldset {
+  border-color: #BA0C2F;
+}
+.StepCardFooter {
+  margin-bottom: -1.25rem;
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  padding: 10px 20px;
+  background-color: #f7f7f7;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
