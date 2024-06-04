@@ -6,10 +6,12 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import UnitService from '../../api/UnitService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import jexcel from 'jspreadsheet';
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -69,6 +71,7 @@ export default class EditPlanningUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     /**
      * Updates the loading state of the component.
@@ -137,6 +140,7 @@ export default class EditPlanningUnitComponent extends Component {
                             this.setState({
                                 planningUnit: response.data, loading: false
                             });
+                            this.buildJExcel();
                         } else {
                             this.setState({
                                 message: response.data.messageCode, loading: false
@@ -233,6 +237,89 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             );
     }
+
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
+    buildJExcel() {
+        // let realmCountryList = this.state.selRealmCountry;
+        let programArray = [];
+        let count = 0;
+        // for (var j = 0; j < realmCountryList.length; j++) {
+        //     data = [];
+        //     data[0] = realmCountryList[j].realmCountryId
+        //     data[1] = getLabelText(realmCountryList[j].realm.label, this.state.lang)
+        //     data[2] = getLabelText(realmCountryList[j].country.label, this.state.lang)
+        //     data[3] = getLabelText(realmCountryList[j].defaultCurrency.label, this.state.lang)
+        //     data[4] = realmCountryList[j].lastModifiedBy.username;
+        //     data[5] = (realmCountryList[j].lastModifiedDate ? moment(realmCountryList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+        //     data[6] = realmCountryList[j].active;
+        //     realmCountryArray[count] = data;
+        //     count++;
+        // }
+
+        //temp data for table
+        data = [];
+        data[0] = 'Program1';
+        data[1] = 'Program Type data';
+        data[2] = 'Active';
+        programArray[0] = data;
+
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+        var data = programArray;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [100, 100, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                // {
+                //     title: 'realmCountryId',
+                //     type: 'hidden',
+                // },
+                // {
+                //     title: i18n.t('static.realm.realm'),
+                //     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                // },
+                {
+                    title: i18n.t('static.program.programMaster'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.module'), 
+                    type: 'text',
+                },
+                {   
+                    title: i18n.t('static.program.puStatus'),
+                    type: 'text',
+                }                
+                
+            ],
+            editable: false,
+            onload: loadedForNonEditableTables,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY            
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl, loading: false
+        })
+    }
+
     /**
      * Renders the planning unit details form.
      * @returns {JSX.Element} - Planning unit details form.
@@ -433,6 +520,8 @@ export default class EditPlanningUnitComponent extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUniteg')}</Label>
                                                 </FormGroup>
+                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                </div>
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
