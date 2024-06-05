@@ -854,6 +854,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (programId != 0) {
             const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
             this.state.getDatasetFilterList = this.state.datasetList
+            console.log('this.state.datasetList size: '+ this.state.datasetList.length);
+            console.log('this.state.datasetList Forecast pgm: '+ JSON.stringify(this.state.datasetList));
             var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
             this.setState({
                 data: [],
@@ -1022,6 +1024,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         });
         const { rangeValue } = this.state
         const { programs } = this.state;
+        console.log('programs [0]: '+JSON.stringify(programs[0]));
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
