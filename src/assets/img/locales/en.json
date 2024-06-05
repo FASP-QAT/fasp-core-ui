@@ -3262,7 +3262,6 @@
     "static.tree.targetChangePer": "Target change (%)",
     "static.tree.changePerPoints": "Change (% points)",
     "static.errorPage.validUserComment": "Enter Description",
-    "static.common.erpComboboxError": "Fill either ERP planning unit or RO/Order No. to populate data",
     "static.scenarioPlanning.changeAMC":"Change AMC",
     "static.scenarioPlanning.monthInPastValidation":"Please select Months in Past for AMC",
     "static.scenarioPlanning.monthInFutureValidation":"Please select Months in Future for AMC",
@@ -3287,5 +3286,18 @@
     "static.priority.lowDesc": "Problem is noticeable but not critical to daily operations and would be good to fix eventually. (Affects a non-business-critical function).",
     "static.scenarioPlanning.tab1":"Scenario Supply Plan",
     "static.scenarioPlanning.tab2":"Local/Server Supply Plan - v",
-    "static.common.onlyDownloadedProgram": "Show only downloaded programs"
+    "static.common.onlyDownloadedProgram": "Show only downloaded programs",
+    "static.shipmentTooltip.erpFlag":"Auto-checked if this shipment is linked using the Link ERP Shipment screen",
+    "static.shipmentTooltip.qatShipmentId":"Automatically assigned by QAT when supply plan is uploaded to the server",
+    "static.shipmentTooltip.procurementAgent":"Add/remove procurement agents in the Update Program Info screen",
+    "static.shipmentTooltip.localProcurementAgent":"If checked, QAT will use the user-entered local procurement agent lead time in the Update Planning Unit screen",
+    "static.shipmentTooltip.aru":"User-entered for each country in the Alternate Reporting Unit screen",
+    "static.shipmentTooltip.conversionFactor":"User-enetered in the Alternate Reporting Unit screen",
+    "static.shipmentTooltip.emergencyShipment":"If checked, shipment will be highlighted red",
+    "static.shipmentTooltip.fundingSource":"Add/remove funding sources in the Update Program Info screen",
+    "static.shipmentTooltip.budget":"Each shipment beyond the planned stage requires a budget. Add or update budget information in the Budget screen",
+    "static.shipmentTooltip.pricePerPU":"Provided based on the following order: program-specific PA PU price (user entered) -> realm-level PA PU price -> program-specific PU price (user entered)",
+    "static.shipmentTooltip.puCost":"Order Qty (PU) * Price per PU",
+    "static.shipmentTooltip.freightCost":"Calculated using the user-entered freight percentage in the Update Program Info screen",
+    "static.shipmentTooltip.total":"PU Cost + Freight Cost"
 }
