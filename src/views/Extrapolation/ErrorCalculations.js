@@ -16,13 +16,15 @@ function getCoefficient(data) {
     let e2Bar = 0
     let ePerABar = 0
     for (let x = 0; x < data.length; x++) {
+        if(data[x].actual!=null){
+            absEBar += abs(data[x].forecast - data[x].actual)
+        }
         if (data[x].actual) {
             xBar += data[x].actual
             yBar += data[x].forecast
             xyBar += data[x].actual * data[x].forecast
             xxBar += data[x].actual * data[x].actual
             eBar += data[x].forecast - data[x].actual
-            absEBar += abs(data[x].forecast - data[x].actual)
             absEPerABar += abs(data[x].forecast - data[x].actual) / data[x].actual
             e2Bar += (data[x].forecast - data[x].actual) * (data[x].forecast - data[x].actual)
             ePerABar += (data[x].forecast - data[x].actual) / data[x].actual
