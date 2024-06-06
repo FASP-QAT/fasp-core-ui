@@ -178,15 +178,14 @@ export default class TracerCategoryTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { tracerCategory } = this.state;
         tracerCategory.priority = newState;
         this.setState(
             {
                 tracerCategory
             }, () => {
-
-                console.log('priority - state : '+this.state.tracerCategory.priority);
+                // console.log('priority - state : '+this.state.tracerCategory.priority);
             }
         );
     }

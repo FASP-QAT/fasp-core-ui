@@ -163,15 +163,14 @@ export default class EditTechnicalAreaTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { technicalArea } = this.state;
         technicalArea.priority = newState;
         this.setState(
             {
                 technicalArea
             }, () => {
-
-                console.log('priority - state : '+this.state.technicalArea.priority);
+                // console.log('priority - state : '+this.state.technicalArea.priority);
             }
         );
     }

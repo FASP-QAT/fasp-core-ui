@@ -166,15 +166,14 @@ export default class EditDataSourceTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { dataSource } = this.state;
         dataSource.priority = newState;
         this.setState(
             {
                 dataSource
             }, () => {
-
-                console.log('priority - state : '+this.state.dataSource.priority);
+                // console.log('priority - state : '+this.state.dataSource.priority);
             }
         );
     }

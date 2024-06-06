@@ -177,15 +177,14 @@ export default class ProductCategoryTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { productCategory } = this.state;
         productCategory.priority = newState;
         this.setState(
             {
                 productCategory
             }, () => {
-
-                console.log('priority - state : '+this.state.productCategory.priority);
+                // console.log('priority - state : '+this.state.productCategory.priority);
             }
         );
     }

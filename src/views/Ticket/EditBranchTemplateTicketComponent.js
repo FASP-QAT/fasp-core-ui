@@ -176,15 +176,14 @@ export default class EditBranchTemplateTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { branchTemplate } = this.state;
         branchTemplate.priority = newState;
         this.setState(
             {
                 branchTemplate
             }, () => {
-
-                console.log('priority - state : '+this.state.branchTemplate.priority);
+                // console.log('priority - state : '+this.state.branchTemplate.priority);
             }
         );
     }

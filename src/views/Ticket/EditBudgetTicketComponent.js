@@ -177,15 +177,14 @@ export default class EditBudgetTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { budget } = this.state;
         budget.priority = newState;
         this.setState(
             {
                 budget
             }, () => {
-
-                console.log('priority - state : '+this.state.budget.priority);
+                // console.log('priority - state : '+this.state.budget.priority);
             }
         );
     }

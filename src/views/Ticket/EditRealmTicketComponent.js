@@ -144,15 +144,14 @@ export default class EditRealmTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { realm } = this.state;
         realm.priority = newState;
         this.setState(
             {
                 realm
             }, () => {
-
-                console.log('priority - state : '+this.state.realm.priority);
+                // console.log('priority - state : '+this.state.realm.priority);
             }
         );
     }

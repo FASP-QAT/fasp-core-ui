@@ -98,9 +98,7 @@ export default class ChangeRequestTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        // let priority  = this.state.priority;
-        // let priority = event.target.value;
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { changeRequest } = this.state;
         changeRequest.priority = newState;
         this.setState(
@@ -108,7 +106,7 @@ export default class ChangeRequestTicketComponent extends Component {
                 changeRequest
             }, () => {
 
-                console.log('priority - state : '+this.state.changeRequest.priority);
+                // console.log('priority - state : '+this.state.changeRequest.priority);
             }
         );
     }

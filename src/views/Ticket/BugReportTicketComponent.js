@@ -98,9 +98,7 @@ export default class BugReportTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        // let priority  = this.state.priority;
-        // let priority = event.target.value;
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { bugReport } = this.state;
         bugReport.priority = newState;
         this.setState(
@@ -108,7 +106,7 @@ export default class BugReportTicketComponent extends Component {
                 bugReport
             }, () => {
 
-                console.log('priority - state : '+this.state.bugReport.priority);
+                // console.log('priority - state : '+this.state.bugReport.priority);
             }
         );
     }

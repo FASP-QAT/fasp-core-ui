@@ -249,15 +249,14 @@ export default class ProgramTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { program } = this.state;
         program.priority = newState;
         this.setState(
             {
                 program
             }, () => {
-
-                console.log('priority - state : '+this.state.program.priority);
+                // console.log('priority - state : '+this.state.program.priority);
             }
         );
     }

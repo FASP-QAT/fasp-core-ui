@@ -176,15 +176,14 @@ export default class EditFundingSourceTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { fundingSource } = this.state;
         fundingSource.priority = newState;
         this.setState(
             {
                 fundingSource
             }, () => {
-
-                console.log('priority - state : '+this.state.fundingSource.priority);
+                // console.log('priority - state : '+this.state.fundingSource.priority);
             }
         );
     }

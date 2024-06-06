@@ -193,17 +193,14 @@ export default class BranchTemplateTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        // let priority  = this.state.priority;
-        // let priority = event.target.value;
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { branchTemplate } = this.state;
         branchTemplate.priority = newState;
         this.setState(
             {
                 branchTemplate
             }, () => {
-
-                console.log('priority - state : '+this.state.branchTemplate.priority);
+                // console.log('priority - state : '+this.state.branchTemplate.priority);
             }
         );
     }
