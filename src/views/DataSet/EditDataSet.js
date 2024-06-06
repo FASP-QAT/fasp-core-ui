@@ -24,7 +24,10 @@ import ProgramService from "../../api/ProgramService";
 import i18n from "../../i18n";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.program.programMaster');
+// Initial values for form fields
 let initialValues = {
     programName: '',
     realmId: '',
@@ -36,11 +39,17 @@ let initialValues = {
     regionId: [],
     programCode1: ''
 }
+
+/**
+ * Defines the validation schema for forecast program details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required('Enter forecasting program name'),
+            .required(i18n.t('static.dataSet.forecastingProgramName')),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
@@ -64,6 +73,9 @@ const validationSchema = function (values) {
         //         })
     })
 }
+/**
+ * Component for edit forecast program details.
+ */
 export default class EditProgram extends Component {
     constructor(props) {
         super(props);
@@ -149,30 +161,30 @@ export default class EditProgram extends Component {
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
     }
+    /**
+     * Change message state
+     * @param {String} message Message that needs to be changed
+     */
     changeMessage(message) {
         this.setState({ message: message })
     }
+    /**
+     * Change loading state
+     * @param {String} message loading state new value
+     */
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    Capitalize(str) {
-        let { program } = this.state
-        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Reterives forecast program details,program manager list, region list, organisation list, health area list on component mount
+     */
     componentDidMount() {
         ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
             var proObj = response.data;
@@ -183,7 +195,7 @@ export default class EditProgram extends Component {
             var healthAreaCode = splitCode[1];
             var organisationCode = splitCode[2];
             if (splitCode.length > 4) {
-                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]), programCode.length);
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3])+2, programCode.length);
             }
             if (uniqueCode == undefined) {
                 uniqueCode = ""
@@ -214,7 +226,7 @@ export default class EditProgram extends Component {
                             message: response.data.messageCode, loading: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -481,6 +493,10 @@ export default class EditProgram extends Component {
             }
         );
     }
+    /**
+     * Generates a health area code based on the selected health ID.
+     * @param {Event} event - The change event containing the selected health area ID.
+     */
     generateHealthAreaCode(value) {
         var healthAreaId = value;
         let healthAreaCode = ''
@@ -491,12 +507,20 @@ export default class EditProgram extends Component {
             healthAreaCode: healthAreaCode.slice(0, -1)
         })
     }
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(event) {
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
     }
+    /**
+     * Handles the change event for regions.
+     * @param {Array} event - An array containing the selected region IDs.
+     */
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -508,6 +532,11 @@ export default class EditProgram extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program, isChanged: true });
     }
+    /**
+     * Updates the health area field data in the component state.
+     * Sets the selected health area ID in the component state and updates the program object with the selected health area IDs.
+     * @param {array} value - An array containing the selected health area IDs.
+     */
     updateFieldDataHealthArea(value) {
         let { program } = this.state;
         this.setState({ healthAreaId: value });
@@ -519,6 +548,10 @@ export default class EditProgram extends Component {
         program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program, isChanged: true });
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programName") {
@@ -547,6 +580,10 @@ export default class EditProgram extends Component {
         this.setState({ program, isChanged: true }, () => { 
         })
     }
+    /**
+     * Renders the edit forecast program screen.
+     * @returns {JSX.Element} - Edit forecast program screen.
+     */
     render() {
         const { programManagerList } = this.state;
         let programManagers = programManagerList.length > 0
@@ -604,7 +641,7 @@ export default class EditProgram extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }
@@ -748,7 +785,7 @@ export default class EditProgram extends Component {
                                                         type="text" name="programName" valid={!errors.programName}
                                                         bsSize="sm"
                                                         invalid={touched.programName && !!errors.programName || !!errors.programName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.program.label.label_en}
                                                         id="programName" />
@@ -872,9 +909,15 @@ export default class EditProgram extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list forecast program screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSet/listDataSet/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the forecast program details when reset button is clicked.
+     */
     resetClicked() {
         ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
             var programCode = response.data.programCode;

@@ -16,7 +16,12 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Localized entity name
 const entityname = i18n.t('static.dashboard.realmcountry')
+/**
+ * Component for mapping realm with country.
+ */
 class RealmCountry extends Component {
     constructor(props) {
         super(props);
@@ -63,21 +68,35 @@ class RealmCountry extends Component {
         this.checkDuplicateCountry = this.checkDuplicateCountry.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to filter active countries
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterCountry = function (instance, cell, c, r, source) {
         return this.state.countryArr.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Function to filter active currency
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     filterCurrency = function (instance, cell, c, r, source) {
         return this.state.currencyArr.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Fetches the realm country mapping list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
@@ -188,7 +207,7 @@ class RealmCountry extends Component {
                                             var data = papuDataArr;
                                             var options = {
                                                 data: data,
-                                                columnDrag: true,
+                                                columnDrag: false,
                                                 colWidths: [100, 100, 100, 100],
                                                 columns: [
                                                     {
@@ -265,8 +284,6 @@ class RealmCountry extends Component {
                                                 allowManualInsertColumn: false,
                                                 allowDeleteRow: true,
                                                 onchange: this.changed,
-                                                onblur: this.blur,
-                                                onfocus: this.focus,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 onpaste: this.onPaste,
@@ -366,7 +383,7 @@ class RealmCountry extends Component {
                                                 message: response.data.messageCode
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     })
@@ -414,7 +431,7 @@ class RealmCountry extends Component {
                                         message: response.data.messageCode
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                             })
@@ -462,7 +479,7 @@ class RealmCountry extends Component {
                             message: response.data.messageCode
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -510,7 +527,7 @@ class RealmCountry extends Component {
                     message: response.data.messageCode
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -554,6 +571,9 @@ class RealmCountry extends Component {
                 }
             );
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var json = this.el.getJson(null, false);
         var data = [];
@@ -568,6 +588,11 @@ class RealmCountry extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -582,6 +607,9 @@ class RealmCountry extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicateCountry();
         var validation = this.checkValidation();
@@ -616,7 +644,7 @@ class RealmCountry extends Component {
                             message: response.data.messageCode
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 })
@@ -662,6 +690,10 @@ class RealmCountry extends Component {
         } else {
         }
     }
+    /**
+     * Function to check for duplicate countries.
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
     checkDuplicateCountry = function () {
         var tableJson = this.el.getJson(null, false);
         let count = 0;
@@ -676,13 +708,18 @@ class RealmCountry extends Component {
                 changedFlag: 0,
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
             return false;
         } else {
             return true;
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -691,10 +728,14 @@ class RealmCountry extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
-    blur = function (instance) {
-    }
-    focus = function (instance) {
-    }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -722,9 +763,21 @@ class RealmCountry extends Component {
             this.el.setValueFromCoords(6, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Function to handle cell edits in jexcel.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object being edited.
+     * @param {number} x - The x-coordinate of the edited cell.
+     * @param {number} y - The y-coordinate of the edited cell.
+     * @param {any} value - The new value of the edited cell.
+     */
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(6, y, 1, true);
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -757,6 +810,10 @@ class RealmCountry extends Component {
         }
         return valid;
     }
+    /**
+     * Renders the realm country mapping list.
+     * @returns {JSX.Element} - Realm country mapping list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -797,6 +854,9 @@ class RealmCountry extends Component {
             </div>
         )
     }
+    /**
+     * Redirects to the list realm screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

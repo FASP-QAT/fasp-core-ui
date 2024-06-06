@@ -42,6 +42,11 @@ const initialValues = {
   languageId: [],
 };
 const entityname = i18n.t("static.user.user");
+/**
+ * This const is used to define the validation schema for user details
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     username: Yup.string()
@@ -70,6 +75,9 @@ const validationSchema = function (values) {
       .required(i18n.t("static.user.org&CountryText")),
   });
 };
+/**
+ * This component is used to display the user details in a form and allow user to edit the details
+ */
 class EditUserComponent extends Component {
   constructor(props) {
     super(props);
@@ -118,12 +126,19 @@ class EditUserComponent extends Component {
     this.filterProgram = this.filterProgram.bind(this);
     this.filterData = this.filterData.bind(this);
   }
+  /**
+   * This function is used to hide the messages that are there in div2 after 30 seconds
+   */
   hideSecondComponent() {
     document.getElementById("div2").style.display = "block";
     setTimeout(function () {
       document.getElementById("div2").style.display = "none";
     }, 30000);
   }
+  /**
+   * This function is called when some data in the form is changed
+   * @param {*} event This is the on change event
+   */
   dataChange(event) {
     let { user } = this.state;
     if (event.target.name == "username") {
@@ -160,7 +175,10 @@ class EditUserComponent extends Component {
       () => {}
     );
   }
- 
+  /**
+   * This function is called when role is changed
+   * @param {*} roleId This is the value role Ids selected by the user
+   */
   roleChange(roleId) {
     var selectedArray = [];
     for (var p = 0; p < roleId.length; p++) {
@@ -214,6 +232,9 @@ class EditUserComponent extends Component {
       () => {}
     );
   }
+  /**
+   * This function is used to filter the program based on realm Id and realm country Id
+   */
   filterProgram() {
     let realmId = this.state.user.realm.realmId;
     if (realmId != 0 && realmId != null) {
@@ -229,6 +250,9 @@ class EditUserComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to filter the health area based on realm Id
+   */
   filterHealthArea() {
     let realmId = this.state.user.realm.realmId;
     let selHealthArea;
@@ -238,6 +262,9 @@ class EditUserComponent extends Component {
       selHealthArea = this.state.healthAreas;
     }
   }
+  /**
+   * This function is used to filter the organisation based on realm Id
+   */
   filterOrganisation() {
     let realmId = this.state.user.realm.realmId;
     if (realmId != 0 && realmId != null) {
@@ -251,6 +278,9 @@ class EditUserComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to filter the realm country based on realm Id
+   */
   filterData() {
     let realmId = this.state.user.realm.realmId;
     if (realmId != 0 && realmId != null) {
@@ -264,6 +294,9 @@ class EditUserComponent extends Component {
       });
     }
   }
+  /**
+   * This function is used to get the list of realm country, health area, organisation and program for access control
+   */
   getAccessControlData() {
     let realmId = AuthenticationService.getRealmId();
     DropdownService.getRealmCountryDropdownList(realmId)
@@ -555,6 +588,9 @@ class EditUserComponent extends Component {
         }
       });
   }
+  /**
+   * This function is called when something in the access control table is changed to add the validation and set values of other cell
+   */
   changed = function (instance, cell, x, y, value) {
     if (x == 1) {
       this.el.setValueFromCoords(4, y, "", true);
@@ -603,6 +639,9 @@ class EditUserComponent extends Component {
       }
     }
   }.bind(this);
+  /**
+   * This function is used to filter the program list based on user's selected realm country, health area and organisation
+   */
   filterProgramByCountryId = function (instance, cell, c, r, source) {
     var value = this.state.addUserEL.getJson(null, false)[r][1];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
@@ -652,6 +691,9 @@ class EditUserComponent extends Component {
     }
     return proList;
   }.bind(this);
+  /**
+   * This function is used to build the table the access control
+   */
   buildJexcel() {
     const { selProgram } = this.state;
     const { selRealmCountry } = this.state;
@@ -767,7 +809,7 @@ class EditUserComponent extends Component {
     var data = papuDataArr;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
       columns: [
         {
@@ -912,7 +954,12 @@ class EditUserComponent extends Component {
       loading1: false,
     });
   }
-  loaded = function (instance, cell, x, y, value) {
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   * @param {*} cell This is the object of the DOM element
+   */
+  loaded = function (instance, cell) {
     jExcelLoadedFunction(instance);
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -922,6 +969,9 @@ class EditUserComponent extends Component {
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
   };
+  /**
+   * This function is called when user clicks on add row in access control table to add the access control
+   */
   addRow() {
     var data = [];
     data[0] = this.state.user.username;
@@ -931,6 +981,11 @@ class EditUserComponent extends Component {
     data[4] = "";
     this.el.insertRow(data, 0, 1);
   }
+  /**
+   * This function is called when user pastes some data into the sheet
+   * @param {*} instance This is the sheet where the data is being placed
+   * @param {*} data This is the data that is being pasted
+   */
   onPaste(instance, data) {
     var z = -1;
     for (var i = 0; i < data.length; i++) {
@@ -945,6 +1000,10 @@ class EditUserComponent extends Component {
       }
     }
   }
+  /**
+   * This function is called before saving the user access control to check validations for all the rows that are available in the table
+   * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+   */
   checkValidation() {
     var valid = true;
     var json = this.el.getJson(null, false);
@@ -996,6 +1055,9 @@ class EditUserComponent extends Component {
     }
     return valid;
   }
+  /**
+   * This function is used to get the user details
+   */
   componentDidMount() {
     document.getElementById("roleValid").value = false;
     UserService.getUserByUserId(this.props.match.params.userId)
@@ -1270,6 +1332,10 @@ class EditUserComponent extends Component {
         }
       });
   }
+  /**
+   * This is used to display the content
+   * @returns This returns user details form and show access control data in tabular format
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -1817,6 +1883,9 @@ class EditUserComponent extends Component {
       </div>
     );
   }
+  /**
+   * This function is called when cancel button is clicked and is redirected to list user screen
+   */
   cancelClicked() {
     this.props.history.push(
       `/user/listUser/` +
@@ -1824,6 +1893,9 @@ class EditUserComponent extends Component {
         i18n.t("static.message.cancelled", { entityname })
     );
   }
+  /**
+   * This function is called when reset button is clicked to reset the user details
+   */
   resetClicked() {
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {

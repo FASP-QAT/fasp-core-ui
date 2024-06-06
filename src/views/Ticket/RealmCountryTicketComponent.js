@@ -12,8 +12,14 @@ import CurrencyService from '../../api/CurrencyService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
+/**
+ * This const is used to define the validation schema for realm country ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -27,6 +33,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.country.currencytext')),
     })
 }
+/**
+ * This component is used to display the realm country form and allow user to submit the add master request in jira
+ */
 export default class RealmCountryTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -36,7 +45,8 @@ export default class RealmCountryTicketComponent extends Component {
                 realmId: "",
                 countryId: "",
                 currencyId: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -53,7 +63,12 @@ export default class RealmCountryTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeCountry = this.changeCountry.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realmCountry } = this.state
         if (event.target.name == "summary") {
@@ -84,6 +99,10 @@ export default class RealmCountryTicketComponent extends Component {
             realmCountry
         }, () => { })
     };
+    /**
+     * This function is called when realm country is changed
+     * @param {*} event This is the on change event
+     */
     changeCountry(event) {
         if (event === null) {
             let { realmCountry } = this.state;
@@ -106,7 +125,26 @@ export default class RealmCountryTicketComponent extends Component {
             });
         }
     }
-    
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { realmCountry } = this.state;
+        realmCountry.priority = newState;
+        this.setState(
+            {
+                realmCountry
+            }, () => {
+                // console.log('priority - state : '+this.state.realmCountry.priority);
+            }
+        );
+    }
+
+    /**
+     * This function is used to get realm, country and currency lists on page load
+     */
     componentDidMount() {
         RealmService.getRealmListAll()
             .then(response => {
@@ -300,17 +338,24 @@ export default class RealmCountryTicketComponent extends Component {
             }
         );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the realm country details
+     */
     resetClicked() {
         let { realmCountry } = this.state;
         realmCountry.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         realmCountry.countryId = '';
         realmCountry.currencyId = '';
         realmCountry.notes = '';
+        realmCountry.priority = 3;
         this.setState({
             realmCountry: realmCountry,
             realm: this.props.items.userRealmId,
@@ -319,6 +364,10 @@ export default class RealmCountryTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns realm country details form
+     */
     render() {
         const { realms } = this.state;
         const { currencies } = this.state;
@@ -349,7 +398,8 @@ export default class RealmCountryTicketComponent extends Component {
                             realmId: this.props.items.userRealmId,
                             countryId: "",
                             currencyId: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -512,6 +562,9 @@ export default class RealmCountryTicketComponent extends Component {
                                             value={this.state.realmCountry.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.realmCountry.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

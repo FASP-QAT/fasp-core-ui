@@ -19,6 +19,9 @@ import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.usagePeriod.usagePeriod')
+/**
+ * This component is used to display usage period list 
+ */
 class UsagePeriod extends Component {
     constructor(props) {
         super(props);
@@ -39,12 +42,18 @@ class UsagePeriod extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getUsagePeriodData = this.getUsagePeriodData.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to build the jexcel table for usage period
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -82,7 +91,7 @@ class UsagePeriod extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100],
             columns: [
                 {
@@ -204,6 +213,9 @@ class UsagePeriod extends Component {
             loading: false
         })
     }
+    /**
+     * This component is used to get the usage period data
+     */
     getUsagePeriodData() {
         this.hideSecondComponent();
         UsagePeriodService.getUsagePeriodList().then(response => {
@@ -275,13 +287,22 @@ class UsagePeriod extends Component {
                 }
             );
     }
+    /**
+     * This function is used to call the usage period data function on component load
+     */
     componentDidMount() {
         this.getUsagePeriodData();
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
@@ -289,6 +310,14 @@ class UsagePeriod extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell or to update the value
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -297,6 +326,9 @@ class UsagePeriod extends Component {
         }
         this.el.setValueFromCoords(6, y, 1, true);
     }
+    /**
+     * This function is called when user clicks on add row button add the usage period row in table
+     */
     addRow = function () {
         var data = [];
         data[0] = 0;
@@ -311,6 +343,9 @@ class UsagePeriod extends Component {
             data, 0, 1
         );
     };
+    /**
+     * This function is called when submit button of the usage period is clicked and is used to save usage periods if all the data is successfully validated.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -403,6 +438,11 @@ class UsagePeriod extends Component {
         } else {
         }
     }
+    /**
+     * This function is used to format the usage period table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -410,6 +450,14 @@ class UsagePeriod extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when something in the usage period table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     changed = function (instance, cell, x, y, value) {
 
         changed(instance, cell, x, y, value)
@@ -421,6 +469,10 @@ class UsagePeriod extends Component {
             this.el.setValueFromCoords(6, y, 1, true);
         }
     }.bind(this);
+    /**
+     * This function is called before saving the usage period to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -441,6 +493,10 @@ class UsagePeriod extends Component {
         }
         return valid;
     }
+    /**
+     * This is used to display the content
+     * @returns This returns usage period table
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

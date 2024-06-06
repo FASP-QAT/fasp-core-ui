@@ -12,8 +12,14 @@ import LanguageService from '../../api/LanguageService';
 import RealmService from '../../api/RealmService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
+/**
+ * This const is used to define the validation schema for user ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -42,8 +48,24 @@ const validationSchema = function (values) {
         orgAndCountry: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
             .required(i18n.t('static.user.org&CountryText')),
+        // priority: Yup.string()
+        //     .test('validatePriority', 'Priority needed',
+        //         function (value) {
+        //             console.log('this.state.user.priority: '+this.state.user.priority);
+        //             if (this.state.user.priority != '') {
+        //                 return true;
+        //             } else {
+        //                 return false;
+        //             }
+        //         })
+        //     .required(i18n.t('static.user.validrole')),
+        // priority: Yup.string()
+        //     .required(i18n.t('static.ticket.priority'))
     })
 }
+/**
+ * This component is used to display the user form and allow user to submit the add master request in jira
+ */
 export default class UserTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -56,7 +78,8 @@ export default class UserTicketComponent extends Component {
                 orgAndCountry: '',
                 role: [],
                 language: "",
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             realms: [],
@@ -72,7 +95,12 @@ export default class UserTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.roleChange = this.roleChange.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { user } = this.state
         if (event.target.name == "summary") {
@@ -106,6 +134,10 @@ export default class UserTicketComponent extends Component {
             user
         }, () => { })
     };
+    /**
+     * This function is called when role is changed
+     * @param {*} roleId This is the on change event
+     */
     roleChange(roleId) {
         let { user } = this.state;
         let count = 0;
@@ -135,7 +167,9 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
-   
+    /**
+     * This function is used to get the language list on page load
+     */
     componentDidMount() {
         LanguageService.getLanguageListActive()
             .then(response => {
@@ -330,11 +364,17 @@ export default class UserTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the usage period details
+     */
     resetClicked() {
         let { user } = this.state;
         user.realm = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -352,6 +392,27 @@ export default class UserTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { user } = this.state;
+        user.priority = newState;
+        this.setState(
+            {
+                user
+            }, () => {
+
+                // console.log('priority - state : '+this.state.user.priority);
+            }
+        );
+    }
+    /**
+     * This is used to display the content
+     * @returns This returns user details form
+     */
     render() {
         const { realms } = this.state;
         const { languages } = this.state;
@@ -387,7 +448,8 @@ export default class UserTicketComponent extends Component {
                             orgAndCountry: "",
                             role: "",
                             language: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -593,6 +655,9 @@ export default class UserTicketComponent extends Component {
                                             value={this.state.user.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.user.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className=" mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

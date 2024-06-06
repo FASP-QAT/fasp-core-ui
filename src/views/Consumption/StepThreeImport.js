@@ -24,6 +24,10 @@ import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
+import { addDoubleQuoteToRowContent, dateFormatter } from '../../CommonComponent/JavascriptCommonFunctions';
+/**
+ * Component for Import from QAT supply plan step three for the import
+ */
 export default class StepThreeImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -78,10 +82,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.updateTESData = this.updateTESData.bind(this);
         this.updateArimaData = this.updateArimaData.bind(this);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -89,6 +99,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Changes the background color of cells based on certain conditions.
+     */
     changeColor() {
         var elInstance1 = this.el;
         var elInstance = this.state.languageEl;
@@ -109,9 +122,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         }
     }
-    dateFormatter = value => {
-        return moment(value).format('MMM YY')
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('')
@@ -126,8 +139,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption != null ? ele.supplyPlanConsumption : "", ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption != null ? ele.currentQATConsumption : "", ele.import == true ? 'Yes' : 'No'])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.buildCSVTable.map(ele => A.push(addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption != null ? ele.supplyPlanConsumption : "", ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption != null ? ele.currentQATConsumption : "", ele.import == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -139,9 +152,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Builds data for extrapolation and runs extrapolation methods
+     */
     ExtrapolatedParameters() {
         var listOfPlanningUnits = this.state.listOfPlanningUnits;
         var programData = this.state.datasetDataUnencrypted;
@@ -203,6 +216,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             })
         }
     }
+    /**
+     * Updates the moving average data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the moving average data set.
+     */
     updateMovingAvgData(data) {
         var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
         jsonDataMovingAvg.push(data);
@@ -221,6 +238,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         })
     }
+    /**
+     * Updates the semi average data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the semi average data set.
+     */
     updateSemiAveragesData(data) {
         var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
         jsonDataSemiAverage.push(data);
@@ -239,6 +260,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         })
     }
+    /**
+     * Updates the linear regression data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the linear regression data set.
+     */
     updateLinearRegressionData(data) {
         var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
         jsonDataLinearRegression.push(data);
@@ -256,6 +281,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         })
     }
+    /**
+     * Updates the TES data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the TES data set.
+     */
     updateTESData(data) {
         var jsonDataTes = this.state.jsonDataTes;
         jsonDataTes.push(data);
@@ -273,6 +302,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         })
     }
+    /**
+     * Updates the ARIMA data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the ARIMA data set.
+     */
     updateArimaData(data) {
         var jsonDataArima = this.state.jsonDataArima;
         jsonDataArima.push(data);
@@ -290,6 +323,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
         })
     }
+    /**
+     * Saves extrapolation data in indexed DB
+     */
     saveForecastConsumptionExtrapolation() {
         this.setState({
             loading: true
@@ -348,7 +384,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var jsonSemi = jsonDataSemiAvgFilter[0].data;
                                 var data = [];
                                 for (var i = 0; i < jsonSemi.length; i++) {
-                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
                                 }
                                 consumptionExtrapolationList.push(
                                     {
@@ -376,7 +412,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if (jsonDataMovingFilter.length > 0) {
                                 var jsonDataMoving = jsonDataMovingFilter[0].data;
                                 for (var i = 0; i < jsonDataMoving.length; i++) {
-                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
                                 }
                                 consumptionExtrapolationList.push(
                                     {
@@ -405,7 +441,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if (jsonDataLinearFilter.length > 0) {
                                 var jsonDataLinear = jsonDataLinearFilter[0].data;
                                 for (var i = 0; i < jsonDataLinear.length; i++) {
-                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
                                 }
                                 consumptionExtrapolationList.push(
                                     {
@@ -434,7 +470,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if (jsonDataTesFilter.length > 0) {
                                 var jsonDataTes = jsonDataTesFilter[0].data;
                                 for (var i = 0; i < jsonDataTes.length; i++) {
-                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
                                 }
                                 consumptionExtrapolationList.push(
                                     {
@@ -467,7 +503,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if (jsonDataArimaFilter.length > 0) {
                                 var jsonDataArima = jsonDataArimaFilter[0].data;
                                 for (var i = 0; i < jsonDataArima.length; i++) {
-                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                 }
                                 consumptionExtrapolationList.push(
                                     {
@@ -517,6 +553,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Saves forecast consumption data in indexed db
+     */
     formSubmit() {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -671,10 +710,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             ]
         });
     }
-    loaded = function (instance, cell, x, y, value) {
-    }
-    componentDidMount() {
-    }
+    /**
+     * Reterives actual consumption data from server
+     */
     filterData() {
         let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
         let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
@@ -742,6 +780,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -792,7 +834,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         planningUnitListJexcel.splice(0, 1);
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             columns: [
                 {
@@ -899,6 +941,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             this.changeColor();
         })
     }
+    /**
+     * Renders the import from QAT supply plan step three screen.
+     * @returns {JSX.Element} - Import from QAT supply plan step three screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

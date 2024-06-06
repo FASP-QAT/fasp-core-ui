@@ -8,7 +8,7 @@ import { MultiSelect } from 'react-multi-select-component';
 import { Card, CardBody, Form, FormGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
@@ -19,7 +19,12 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, formatter, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Localized entity name
 const entityname = i18n.t('static.region.region');
+/**
+ * Component for list of region details.
+ */
 class RegionListComponent extends Component {
     constructor(props) {
         super(props);
@@ -34,21 +39,11 @@ class RegionListComponent extends Component {
             countryLabels: [],
         }
         this.filterData = this.filterData.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -113,7 +108,7 @@ class RegionListComponent extends Component {
         let data = this.state.selRegion.map(ele => [
             getLabelText(ele.realmCountry.label, this.state.lang),
             getLabelText(ele.region.label, this.state.lang),
-            this.formatter(ele.capacityCbm),
+            formatter(ele.capacityCbm,0),
             ele.gln,
             ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
         ]);
@@ -132,9 +127,9 @@ class RegionListComponent extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.regionHead.region') + '.pdf')
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         this.state.countryLabels.map(ele =>
@@ -147,8 +142,8 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.region.capacitycbm'));
         headers.push(i18n.t('static.region.gln'));
         headers.push(i18n.t('static.common.status'));
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.selRegion.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -160,12 +155,10 @@ class RegionListComponent extends Component {
         document.body.appendChild(a)
         a.click()
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles the change event for countries.
+     * @param {Array} countrysId - An array containing the selected country IDs.
+     */
     handleChange(countrysId) {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -177,6 +170,9 @@ class RegionListComponent extends Component {
             this.filterData()
         })
     }
+    /**
+     * Builds the jexcel component to display region list.
+     */
     buildJexcel() {
         let regionList = this.state.selRegion;
         let regionListArray = [];
@@ -197,7 +193,7 @@ class RegionListComponent extends Component {
         var data = regionListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -232,7 +228,7 @@ class RegionListComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -257,6 +253,9 @@ class RegionListComponent extends Component {
             regionEl: regionEl, loading: false
         })
     }
+    /**
+     * Fetches and filters warehouse capacity data based on selected countries.
+     */
     filterData() {
         let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
         if (this.state.countryValues.length > 0) {
@@ -327,6 +326,9 @@ class RegionListComponent extends Component {
             });
         }
     }
+    /**
+     * Fetches the realm country list from the server on page load.
+     */
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getRealmCountryDropdownList(realmId)
@@ -345,7 +347,7 @@ class RegionListComponent extends Component {
                         () => { })
                 } else {
                     this.setState({ message: response.data.messageCode, loading: false },
-                        () => { this.hideSecondComponent(); })
+                        () => { hideSecondComponent(); })
                 }
             })
             .catch(
@@ -388,9 +390,10 @@ class RegionListComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Renders the region list.
+     * @returns {JSX.Element} - Region list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -437,6 +440,8 @@ class RegionListComponent extends Component {
                                                         value={this.state.countryValues}
                                                         onChange={(e) => { this.handleChange(e) }}
                                                         options={countryList && countryList.length > 0 ? countryList : []}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>

@@ -19,6 +19,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CompareVersionTableCompareVersion from './CompareVersionTableCompareVersion';
+/**
+ * Component for comparing versions.
+ */
 class CompareVersion extends Component {
     constructor(props) {
         super(props);
@@ -43,6 +46,10 @@ class CompareVersion extends Component {
         this.setVersionId1 = this.setVersionId1.bind(this);
         this.updateState = this.updateState.bind(this);
     }
+    /**
+     * Sets the version ID in local storage and updates the component state.
+     * @param {Event} e The event object containing the selected version ID.
+     */
     setVersionId(e) {
         var versionId = e.target.value;
         localStorage.setItem("sesDatasetVersionId", versionId);
@@ -60,6 +67,10 @@ class CompareVersion extends Component {
             }
         })
     }
+    /**
+     * Sets the version ID in local storage and updates the component state.
+     * @param {Event} e The event object containing the selected version ID.
+     */
     setVersionId1(e) {
         var versionId = e.target.value;
         localStorage.setItem("sesDatasetCompareVersionId", versionId);
@@ -70,6 +81,10 @@ class CompareVersion extends Component {
             this.getData1();
         })
     }
+    /**
+     * Sets the dataset ID in local storage and updates the component state.
+     * @param {Event} e The event object containing the selected dataset ID.
+     */
     setDatasetId(e) {
         var datasetId = e.target.value;
         localStorage.setItem("sesLiveDatasetId", datasetId);
@@ -84,6 +99,9 @@ class CompareVersion extends Component {
             this.getVersionList();
         })
     }
+    /**
+     * Reterives version list
+     */
     getVersionList() {
         this.setState({
             loading: true
@@ -144,6 +162,9 @@ class CompareVersion extends Component {
             })
         }
     }
+    /**
+     * Reterives version list for compare
+     */
     getVersionList1() {
         this.setState({
             loading: true
@@ -205,11 +226,19 @@ class CompareVersion extends Component {
             })
         }
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * Reterives forecast programs list
+     */
     componentDidMount() {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
@@ -246,6 +275,9 @@ class CompareVersion extends Component {
             }
         );
     }
+    /**
+     * Reterives forecast programs from indexed db
+     */
     getOfflineDatasetList() {
         this.setState({
             loading: true
@@ -318,6 +350,10 @@ class CompareVersion extends Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Retrieves dataset data based on the selected version ID and updates the component state accordingly.
+     * This function retrieves dataset data either from local storage or from the server, depending on the selected version.
+     */
     getData() {
         this.setState({
             loading: true
@@ -371,7 +407,7 @@ class CompareVersion extends Component {
                                     } else {
                                         total = null;
                                     }
-                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
+                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId && c.active.toString() == "true")[0];
                                     label = {
                                         label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
                                         label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
@@ -484,6 +520,10 @@ class CompareVersion extends Component {
             })
         }
     }
+    /**
+     * Retrieves dataset data based on the selected version ID and updates the component state accordingly.
+     * This function retrieves dataset data either from local storage or from the server, depending on the selected version.
+     */
     getData1() {
         this.setState({
             loading: true
@@ -537,7 +577,7 @@ class CompareVersion extends Component {
                                     } else {
                                         total = null;
                                     }
-                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
+                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId && c.active.toString() == "true")[0];
                                     label = {
                                         label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
                                         label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
@@ -647,6 +687,10 @@ class CompareVersion extends Component {
             })
         }
     }
+    /**
+     * Renders the compare version screen.
+     * @returns {JSX.Element} - Compare version screen.
+     */
     render() {
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0

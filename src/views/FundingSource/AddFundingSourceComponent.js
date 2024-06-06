@@ -9,12 +9,19 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 let initialValues = {
   fundingSourceId: [],
   subFundingSource: "",
   fundingSourceCode: "",
 }
+// Localized entity name
 const entityname = i18n.t('static.fundingsource.fundingsource');
+/**
+ * Defines the validation schema for funding source details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -27,6 +34,9 @@ const validationSchema = function (values) {
       .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
   })
 }
+/**
+ * Component for adding funding source details.
+ */
 class AddFundingSourceComponent extends Component {
   constructor(props) {
     super(props);
@@ -53,6 +63,9 @@ class AddFundingSourceComponent extends Component {
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.getDisplayName = this.getDisplayName.bind(this);
   }
+  /**
+   * Fetch funding source display name on blur event of funding source field
+   */
   getDisplayName() {
     let realmId = document.getElementById("realmId").value;
     let fundingSourceValue = document.getElementById("fundingSource").value;
@@ -61,6 +74,7 @@ class AddFundingSourceComponent extends Component {
     if (realmId != '' && fundingSourceValue.length != 0) {
       if (fundingSourceValue.length >= 7) {
         fundingSourceValue = fundingSourceValue.slice(0, 5);
+        //Fetch funding source display name
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
             let { fundingSource } = this.state;
@@ -108,6 +122,7 @@ class AddFundingSourceComponent extends Component {
             }
           );
       } else {
+        //Fetch funding source display name
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
             let { fundingSource } = this.state;
@@ -157,6 +172,10 @@ class AddFundingSourceComponent extends Component {
       }
     }
   }
+  /**
+   * Handles data change in the funding source form.
+   * @param {Event} event - The change event.
+   */
   dataChange(event) {
     let { fundingSource } = this.state;
     if (event.target.name == "realmId") {
@@ -176,7 +195,11 @@ class AddFundingSourceComponent extends Component {
     },
       () => { });
   };
-  
+  /**
+   * Capitalizes the first letter of the funding source & display name.
+   * @param {string} str - The funding source/display name.
+   * @returns {string} - Capitalized funding source/display name.
+   */
   Capitalize(str) {
     var reg = /^[1-9]\d*(\.\d+)?$/
     if (str != null && str != "") {
@@ -185,7 +208,11 @@ class AddFundingSourceComponent extends Component {
       return "";
     }
   }
+  /**
+   * Fetches Realm list & RealmId on component mount.
+   */
   componentDidMount() {
+    //Fetch all realm list 
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
@@ -238,6 +265,7 @@ class AddFundingSourceComponent extends Component {
           }
         }
       );
+    //Fetch realmId
     let realmId = AuthenticationService.getRealmId();
     if (realmId != -1) {
       let { fundingSource } = this.state;
@@ -250,11 +278,18 @@ class AddFundingSourceComponent extends Component {
         })
     }
   }
+  /**
+   * Hides the message in div2 after 30 seconds.
+   */
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
+  /**
+   * Renders the funding source details form.
+   * @returns {JSX.Element} - funding source details form.
+   */
   render() {
     const { realms } = this.state;
     let realmList = realms.length > 0
@@ -461,9 +496,15 @@ class AddFundingSourceComponent extends Component {
       </div>
     );
   }
+  /**
+   * Redirects to the list funding source when cancel button is clicked.
+   */
   cancelClicked() {
     this.props.history.push(`/fundingSource/listFundingSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
+  /**
+   * Resets the funding source details form when reset button is clicked.
+   */
   resetClicked() {
     let { fundingSource } = this.state;
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {

@@ -11,6 +11,7 @@ import i18n from '../../i18n';
 import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Add Planning Unit"
 const initialValues = {
@@ -19,8 +20,14 @@ const initialValues = {
     forecastingUnitDesc: "",
     unit: "",
     multiplier: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
+/**
+ * This const is used to define the validation schema for planning unit ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -39,6 +46,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
+/**
+ * This component is used to display the planning unit form and allow user to submit the add master request in jira
+ */
 export default class PlanningUnitTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -49,7 +59,8 @@ export default class PlanningUnitTicketComponent extends Component {
                 forecastingUnitDesc: '',
                 unit: '',
                 multiplier: '',
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -64,7 +75,12 @@ export default class PlanningUnitTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeForecastingUnit = this.changeForecastingUnit.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { planningUnit } = this.state
         if (event.target.name == "summary") {
@@ -95,6 +111,10 @@ export default class PlanningUnitTicketComponent extends Component {
             planningUnit
         }, () => { })
     };
+    /**
+     * This function is called when forecasting unit is changed
+     * @param {*} event This is the on change event
+     */
     changeForecastingUnit(event) {
         if (event === null) {
             let { planningUnit } = this.state;
@@ -117,6 +137,25 @@ export default class PlanningUnitTicketComponent extends Component {
             });
         }
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { planningUnit } = this.state;
+        planningUnit.priority = newState;
+        this.setState(
+            {
+                planningUnit
+            }, () => {
+                // console.log('priority - state : '+this.state.planningUnit.priority);
+            }
+        );
+    }
+    /**
+     * This function is used to get unit list on page load
+     */
     componentDidMount() {
         UnitService.getUnitListAll()
             .then(response => {
@@ -196,11 +235,17 @@ export default class PlanningUnitTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the planning unit details
+     */
     resetClicked() {
         let { planningUnit } = this.state;
         planningUnit.planningUnitDesc = '';
@@ -208,6 +253,7 @@ export default class PlanningUnitTicketComponent extends Component {
         planningUnit.unit = '';
         planningUnit.multiplier = '';
         planningUnit.notes = '';
+        planningUnit.priority = 3;
         this.setState({
             planningUnit: planningUnit,
             unitId: '',
@@ -215,6 +261,10 @@ export default class PlanningUnitTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns planning unit details form
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -239,7 +289,8 @@ export default class PlanningUnitTicketComponent extends Component {
                             forecastingUnitDesc: "",
                             unit: "",
                             multiplier: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -411,6 +462,9 @@ export default class PlanningUnitTicketComponent extends Component {
                                             value={this.state.planningUnit.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.planningUnit.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

@@ -1,3 +1,14 @@
+/**
+ * This function is used to calculate the modeling information of the partcular node and its related nodes
+ * @param {*} dataset This is the json that user has downloaded
+ * @param {*} props This is the props of the page from which this function is called
+ * @param {*} page This is the name of the page from which this function is called 
+ * @param {*} nodeId This is node Id for which modeling information has to be calculated
+ * @param {*} scenarioId This is the scenario id for which modeling information has to be calculated
+ * @param {*} type This is the flag used to update data if the flag is true
+ * @param {*} treeId This is the tree Id to which this node belongs
+ * @param {*} isTemplate This is flag used to check if the calculations has be done for template or for a tree
+ */
 export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     nodeId = -1;
     var datasetJson = {};
@@ -41,7 +52,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
-                    scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                    scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
@@ -104,7 +115,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
-                    scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                    scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
@@ -616,7 +627,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
-                    scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                    scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];

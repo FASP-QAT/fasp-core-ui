@@ -16,7 +16,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
@@ -27,6 +26,11 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+/**
+ * Component for Supplier Lead Times Report.
+ */
 class SupplierLeadTimes extends Component {
     constructor(props) {
         super(props);
@@ -60,6 +64,9 @@ class SupplierLeadTimes extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.setprogramId = this.setprogramId.bind(this);
     }
+    /**
+     * Builds the jexcel table based on the output list of lead time data.
+     */
     buildJexcel() {
         let outPutList = this.state.outPutList;
         let outPutArray = [];
@@ -87,7 +94,7 @@ class SupplierLeadTimes extends Component {
         var data = outPutArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -158,7 +165,7 @@ class SupplierLeadTimes extends Component {
                 ],
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -184,9 +191,10 @@ class SupplierLeadTimes extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV(columns) {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
@@ -201,9 +209,9 @@ class SupplierLeadTimes extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var A = [addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
-            ele => A.push(this.addDoubleQuoteToRowContent([
+            ele => A.push(addDoubleQuoteToRowContent([
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -230,6 +238,10 @@ class SupplierLeadTimes extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -337,6 +349,10 @@ class SupplierLeadTimes extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplierLeadTimes').concat('.pdf'));
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {array} planningUnitIds - The selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -348,6 +364,10 @@ class SupplierLeadTimes extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {array} procurementAgentIds - The selected procurement agent IDs.
+     */
     handleProcurementAgentChange = (procurementAgentIds) => {
         procurementAgentIds = procurementAgentIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -359,6 +379,9 @@ class SupplierLeadTimes extends Component {
             this.fetchData()
         })
     }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -423,6 +446,9 @@ class SupplierLeadTimes extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local program.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -480,6 +506,9 @@ class SupplierLeadTimes extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Retrieves the list of planning units for a selected program.
+     */
     getPlanningUnit = () => {
         let programId = this.state.programId;
         if (programId > 0) {
@@ -597,6 +626,9 @@ class SupplierLeadTimes extends Component {
                 })
         }
     }
+    /**
+     * Retrieves the list of procurement agents for a selected program.
+     */
     getProcurementAgent = () => {
         let programId = document.getElementById("programId").value;
         if (localStorage.getItem("sessionType") === 'Online') {
@@ -660,6 +692,9 @@ class SupplierLeadTimes extends Component {
             this.consolidatedProcurementAgentList()
         }
     }
+    /**
+     * Consolidates the list of procurement agents obtained from server and local.
+     */
     consolidatedProcurementAgentList = () => {
         const { procurementAgents } = this.state
         var proList = procurementAgents;
@@ -713,9 +748,9 @@ class SupplierLeadTimes extends Component {
             }.bind(this);
         }.bind(this);
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches data based on selected programs, planning units, and procurement agents.
+     */
     fetchData = () => {
         let programId = document.getElementById("programId").value;
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -977,9 +1012,16 @@ class SupplierLeadTimes extends Component {
             }
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Sets the selected program ID and triggers fetching of planning units and procurement agents.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setprogramId(event) {
         this.setState({
             programId: event.target.value
@@ -988,7 +1030,14 @@ class SupplierLeadTimes extends Component {
             this.getProcurementAgent();
         })
     }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+    /**
+     * Renders the Suppliers Lead Time report table.
+     * @returns {JSX.Element} - Suppliers Lead Time report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1208,6 +1257,8 @@ class SupplierLeadTimes extends Component {
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>
@@ -1222,6 +1273,8 @@ class SupplierLeadTimes extends Component {
                                             onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                             options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>}

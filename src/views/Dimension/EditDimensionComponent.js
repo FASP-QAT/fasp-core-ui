@@ -6,10 +6,17 @@ import { API_URL } from '../../Constants.js';
 import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 let initialValues = {
     label: ""
 }
+// Localized entity name
 const entityname = i18n.t('static.dimension.dimension');
+/**
+ * Defines the validation schema for dimension details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -17,6 +24,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.dimension.dimensiontext'))
     })
 }
+/**
+ * Component for editing dimension details.
+ */
 export default class UpdateDimensionComponent extends Component {
     constructor(props) {
         super(props);
@@ -39,11 +49,18 @@ export default class UpdateDimensionComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles data change in the dimension form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { dimension } = this.state
         if (event.target.name === "label") {
@@ -55,8 +72,11 @@ export default class UpdateDimensionComponent extends Component {
             }
         )
     };
-   
+    /**
+     * Fetches dimension detail on component mount.
+     */
     componentDidMount() {
+        //Fetch dimension detail by dimensionId
         DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -111,12 +131,24 @@ export default class UpdateDimensionComponent extends Component {
             }
         );
     }
+    /**
+     * Capitalizes the first letter of the dimension name.
+     * @param {string} str - The dimension name.
+     */
     Capitalize(str) {
         this.state.dimension.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Redirects to the list dimension screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dimension/listDimension/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
-    } render() {
+    } 
+    /**
+     * Renders the dimension detail form.
+     * @returns {JSX.Element} - dimension detail form.
+     */
+    render() {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -242,6 +274,9 @@ export default class UpdateDimensionComponent extends Component {
             </div>
         );
     }
+    /**
+     * Resets the dimension detail form when reset button is clicked.
+     */
     resetClicked() {
         DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
             this.setState({

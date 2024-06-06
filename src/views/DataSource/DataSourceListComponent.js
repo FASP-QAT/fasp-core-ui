@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants';
 import DataSourceService from '../../api/DataSourceService';
@@ -15,7 +15,12 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.datasource.datasource');
+/**
+ * Component for list of data source details.
+ */
 export default class DataSourceListComponent extends Component {
     constructor(props) {
         super(props);
@@ -31,23 +36,15 @@ export default class DataSourceListComponent extends Component {
         }
         this.addNewDataSource = this.addNewDataSource.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+
     filterData() {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
         let programId = document.getElementById("programId").value;
@@ -104,6 +101,9 @@ export default class DataSourceListComponent extends Component {
                 () => { this.buildJexcel() });
         }
     }
+    /**
+     * Builds the jexcel component to display data source list.
+     */
     buildJexcel() {
         let dataSourceList = this.state.selSource;
         let dataSourceArray = [];
@@ -126,7 +126,7 @@ export default class DataSourceListComponent extends Component {
         var data = dataSourceArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -168,7 +168,7 @@ export default class DataSourceListComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -194,8 +194,11 @@ export default class DataSourceListComponent extends Component {
             dataSourceEl: dataSourceEl, loading: false
         })
     }
+    /**
+     * Reterives the program, realm, data source type and data source list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
@@ -224,7 +227,7 @@ export default class DataSourceListComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -417,9 +420,9 @@ export default class DataSourceListComponent extends Component {
                 }
             );
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Redirects to the edit data source screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -432,6 +435,9 @@ export default class DataSourceListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add data source screen.
+     */
     addNewDataSource() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/dataSource/addDataSource`)
@@ -439,6 +445,10 @@ export default class DataSourceListComponent extends Component {
             alert(i18n.t('static.common.online'))
         }
     }
+    /**
+     * Renders the data source list.
+     * @returns {JSX.Element} - Data Source list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

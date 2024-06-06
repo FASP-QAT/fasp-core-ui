@@ -16,7 +16,10 @@ import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.budget');
+
+// Initial values for form fields
 const initialValues = {
     budget: '',
     programId: [],
@@ -27,6 +30,12 @@ const initialValues = {
     fundingSourceList: [],
     currencyId: ''
 }
+/**
+ * Defines the validation schema for budget details.
+ * @param {*} values - Form values.
+ * @param {*} t 
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
@@ -45,6 +54,9 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.budgetDisplayNameText')),
     })
 }
+/**
+ * Component for adding budget details.
+ */
 class AddBudgetComponent extends Component {
     constructor(props) {
         super(props);
@@ -116,6 +128,10 @@ class AddBudgetComponent extends Component {
         this.pickRange = React.createRef();
         this.programChange = this.programChange.bind(this);
     }
+    /**
+     * Handles change in selected programs.
+     * @param {Array} programId - Selected program IDs.
+     */
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -143,18 +159,40 @@ class AddBudgetComponent extends Component {
         },
             () => { });
     }
+    /**
+     * Show budget date range picker
+     * @param {Event} e -  The click event.
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
+    /**
+     * Handle date range change
+     * @param {*} value 
+     * @param {*} text 
+     * @param {*} listIndex 
+     */
     handleRangeChange(value, text, listIndex) {
     }
+    /**
+     * Update budget range after date range picker is closed
+     * @param {*} value 
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
+    /**
+     * Capitalizes the first letter of the budget name.
+     * @param {string} str - The budget name.
+     */
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Handles data change in the budget form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { budget } = this.state;
         if (event.target.name === "budget") {
@@ -186,15 +224,22 @@ class AddBudgetComponent extends Component {
         },
             () => { });
     };
-
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Fetches RealmId, Program list, Funding source list and Currency list on component mount.
+     */
     componentDidMount() {
         this.setState({ loading: true })
+        // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
+        //Fetch Program list
         DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
@@ -261,6 +306,7 @@ class AddBudgetComponent extends Component {
                     }
                 }
             );
+        //Fetch all funding source list
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
@@ -312,6 +358,7 @@ class AddBudgetComponent extends Component {
                     }
                 }
             );
+        //Fetch currency list
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
                 var listArray = response.data;
@@ -366,6 +413,10 @@ class AddBudgetComponent extends Component {
             }
         );
     }
+    /**
+     * Renders the budget details form.
+     * @returns {JSX.Element} - Budget details form.
+     */
     render() {
         const { fundingSources } = this.state;
         const { currencyList } = this.state;
@@ -526,6 +577,7 @@ class AddBudgetComponent extends Component {
                                                         required
                                                         options={this.state.programs}
                                                         value={this.state.programId}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
@@ -675,9 +727,15 @@ class AddBudgetComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list budget screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the budget details form when reset button is clicked.
+     */
     resetClicked() {
         let { budget } = this.state;
         var dt = new Date();

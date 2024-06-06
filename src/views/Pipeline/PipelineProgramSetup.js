@@ -20,6 +20,10 @@ import PipelineProgramInventory from './PipelineProgramInventory.js';
 import PipelineProgramPlanningUnits from './PipelineProgramPlanningUnits.js';
 import PipelineProgramProcurementAgent from './PipelineProgramProcurementAgent';
 import PipelineProgramShipment from './PipelineProgramShipment';
+/**
+ * Component for pipeline program onboarding.
+ * Allows users to go through a multi-step form for pipeline program onboarding.
+ */
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
         super(props);
@@ -126,15 +130,30 @@ export default class PipelineProgramSetup extends Component {
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
+    /**
+     * Generates a country code based on the selected realm country ID.
+     * @param {Event} event - The change event containing the selected realm country ID.
+     */
     generateCountryCode(code) {
         this.setState({ realmCountryCode: code })
     }
+    /**
+     * Generates a health area code based on the selected health ID.
+     * @param {Event} event - The change event containing the selected health area ID.
+     */
     generateHealthAreaCode(code) {
         this.setState({ healthAreaCode: code })
     }
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(code) {
         this.setState({ organisationCode: code })
     }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
     endProgramInfoStepOne() {
         this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: true });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -143,6 +162,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles the completion of step two and updates the display to show step three.
+     */
     endProgramInfoStepTwo() {
         this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -151,6 +173,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles the completion of step three and updates the display to show step four.
+     */
     endProgramInfoStepThree() {
         this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -159,6 +184,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'block';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles the completion of step four and updates the display to show step five.
+     */
     endProgramInfoStepFour() {
         this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -167,6 +195,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'block';
     }
+    /**
+     * Handles the completion of step five and updates the display to show step six.
+     */
     endProgramInfoStepFive() {
         this.refs.programInfoChild.startLoading();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
@@ -233,6 +264,9 @@ export default class PipelineProgramSetup extends Component {
             }
         );
     }
+    /**
+     * Saves step one data in state.
+     */
     finishedStepOne() {
         this.setState({
             pipelineProgramSetupPer: 14.28, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
@@ -247,6 +281,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Saves step two data on server.
+     */
     finishedStepTwo() {
         var planningUnits = this.refs.child.savePlanningUnits();
         var checkValidation = this.refs.child.checkValidation();
@@ -292,6 +329,9 @@ export default class PipelineProgramSetup extends Component {
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });
     }
+    /**
+     * Saves step three data on server.
+     */
     finishedStepThree() {
         var datasources = this.refs.datasourcechild.saveDataSource();
         var checkValidation = this.refs.datasourcechild.checkValidation();
@@ -329,6 +369,9 @@ export default class PipelineProgramSetup extends Component {
                 }
             });
     }
+    /**
+     * Saves step four data on server.
+     */
     finishedStepFour = () => {
         var consumption = this.refs.fundingSourceChild.saveFundingSource();
         var checkValidation = this.refs.fundingSourceChild.checkValidation();
@@ -366,6 +409,9 @@ export default class PipelineProgramSetup extends Component {
                 }
             });
     }
+    /**
+     * Saves step five data on server.
+     */
     finishedStepFive = () => {
         var inventory = this.refs.procurementAgentChild.saveProcurementAgent();
         var checkValidation = this.refs.procurementAgentChild.checkValidation();
@@ -402,6 +448,9 @@ export default class PipelineProgramSetup extends Component {
                 }
             });
     }
+    /**
+     * Saves step six data on server.
+     */
     finishedStepSix = () => {
         var consumption = this.refs.consumptionChild.saveConsumption();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
@@ -440,6 +489,9 @@ export default class PipelineProgramSetup extends Component {
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });
     }
+    /**
+     * Saves step seven data on server.
+     */
     finishedStepSeven = () => {
         var inventory = this.refs.inventoryChild.saveInventory();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
@@ -478,8 +530,14 @@ export default class PipelineProgramSetup extends Component {
                 alert(i18n.t('pipeline.garbageDataValidation'));
             });
     }
+    /**
+     * Saves step eight data on server.
+     */
     finishedStepEignt = () => {
     }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     backToprogramInfoStepOne() {
         this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'block';
@@ -488,6 +546,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     backToprogramInfoStepTwo() {
         this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: true });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -496,6 +557,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles moving back to step three from any subsequent step and updates the display accordingly.
+     */
     backToprogramInfoStepThree() {
         this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -504,6 +568,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles moving back to step four from any subsequent step and updates the display accordingly.
+     */
     backToprogramInfoStepFour() {
         this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
@@ -512,6 +579,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('pipelineProgramDataStepFour').style.display = 'block';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
     }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     previousToStepOne() {
         this.setState({
             pipelineProgramSetupPer: 0, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -530,6 +600,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     previousToStepTwo() {
         this.setState({
             pipelineProgramSetupPer: 15.28, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
@@ -547,6 +620,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step three from any subsequent step and updates the display accordingly.
+     */
     previousToStepThree() {
         this.setState({
             pipelineProgramSetupPer: 29.56, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -564,6 +640,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step four from any subsequent step and updates the display accordingly.
+     */
     previousToStepFour() {
         this.setState({
             pipelineProgramSetupPer: 43.84, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -581,6 +660,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step five from any subsequent step and updates the display accordingly.
+     */
     previousToStepFive = () => {
         this.setState({
             pipelineProgramSetupPer: 58.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -598,6 +680,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step six from any subsequent step and updates the display accordingly.
+     */
     previousToStepSix = () => {
         this.setState({
             pipelineProgramSetupPer: 72.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
@@ -615,6 +700,9 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles moving back to step seven from any subsequent step and updates the display accordingly.
+     */
     previousToStepSeven = () => {
         this.setState({
             pipelineProgramSetupPer: 86.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
@@ -632,6 +720,10 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'block';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == 'programCode1') {
@@ -688,6 +780,10 @@ export default class PipelineProgramSetup extends Component {
         }
         this.setState({ program }, () => { })
     }
+    /**
+     * Handles the change event for regions.
+     * @param {Array} event - An array containing the selected region IDs.
+     */
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -699,6 +795,10 @@ export default class PipelineProgramSetup extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
+    /**
+     * Handles the change event for health areas.
+     * @param {Array} event - An array containing the selected health area IDs.
+     */
     updateFieldDataHealthArea(value) {
         let { program } = this.state;
         this.setState({ healthAreaId: value });
@@ -710,6 +810,10 @@ export default class PipelineProgramSetup extends Component {
         program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
     }
+    /**
+     * Reterives the region list
+     * @param {Event} event - The change event.
+     */
     getRegionList(e) {
         ProgramService.getRegionList(e.target.value)
             .then(response => {
@@ -768,6 +872,9 @@ export default class PipelineProgramSetup extends Component {
                 }
             );
     }
+    /**
+     * Reterives pipeline program details on component mount
+     */
     componentDidMount() {
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
@@ -1017,6 +1124,10 @@ export default class PipelineProgramSetup extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         document.getElementById('stepEight').style.display = 'none';
     }
+    /**
+     * Renders the pipeline program onboarding screen.
+     * @returns {JSX.Element} - Pipeline program onboarding screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">

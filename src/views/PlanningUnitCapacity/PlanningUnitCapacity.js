@@ -15,13 +15,18 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL } from "../../Constants";
+// Initial values for form fields
 let initialValues = {
     startDate: '',
     stopDate: '',
     supplier: [],
     capacity: ''
 }
+// Localized entity name
 const entityname = i18n.t('static.dashboad.planningunitcapacity')
+/**
+ * Component for adding planning unit volume/capacity details.
+ */
 class PlanningUnitCapacity extends Component {
     constructor(props) {
         super(props);
@@ -59,11 +64,18 @@ class PlanningUnitCapacity extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Calculate & return current date.
+     * @returns {Date} - Current Date.
+     */
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -74,6 +86,9 @@ class PlanningUnitCapacity extends Component {
         let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
         return date;
     }
+    /**
+     * Handles the add/edit of Planning Unit Volumes on submit.
+     */
     submitForm() {
         var validation = this.checkValidation();
         if (validation) {
@@ -155,9 +170,21 @@ class PlanningUnitCapacity extends Component {
         } else {
         }
     }
+    /**
+     * Filters the supplier/manufacturer list while searching.
+     * @param {*} instance - This is the instance of the jExcel spreadsheet
+     * @param {*} cell - This is the current cell object being filtered
+     * @param {*} c - The column index.
+     * @param {*} r - The row index
+     * @param {*} source - The source data for the dropdown list (Supplier list) associated with the current cell.
+     * @returns {Array} - Filtered array of supplier.
+     */
     filterSupplier = function (instance, cell, c, r, source) {
         return this.state.supplierList.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Builds the jexcel component to display planning unit volume list.
+     */
     buildJExcel() {
         const { suppliers } = this.state;
         let supplierList = [];
@@ -211,7 +238,7 @@ class PlanningUnitCapacity extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             columns: [
                 {
@@ -282,6 +309,19 @@ class PlanningUnitCapacity extends Component {
             onpaste: this.onPaste,
             oneditionend: this.oneditionend,
             onload: this.loaded,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el;
+                    var rowData = elInstance.getRowData(y);
+                    if(rowData[6]==0){
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                    }else{
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    }
+                }
+            },
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -374,6 +414,14 @@ class PlanningUnitCapacity extends Component {
             loading: false
         })
     }
+    /**
+     * This function is called when cell value is edited & mark change in row.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -382,6 +430,11 @@ class PlanningUnitCapacity extends Component {
         }
         this.el.setValueFromCoords(7, y, 1, true);
     }
+    /**
+     * This function is called when user pastes some data into the sheet
+     * @param {*} instance - This is the sheet where the data is being placed
+     * @param {*} data - This is the data that is being pasted
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -396,18 +449,24 @@ class PlanningUnitCapacity extends Component {
             }
         }
     }
+    /**
+     * Fetches Planning Unit, Planning Unit Capacity and all Supplier List from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
+        //Fetch planning unit by id
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
                     planningUnit: response.data,
                 })
+                //Fetch planning unit capacity for id
                 PlanningUnitService.getPlanningUnitCapacityForId(this.props.match.params.planningUnitId).then(response => {
                     if (response.status == 200) {
                         this.setState({
                             planningUnitCapacity: response.data,
                             rows: response.data
                         })
+                        //Fetch all supplier list
                         SupplierService.getSupplierListAll()
                             .then(response => {
                                 if (response.status == 200) {
@@ -566,6 +625,9 @@ class PlanningUnitCapacity extends Component {
             }
         );
     }
+    /**
+     * Adds new row to the jexcel spreadsheet
+     */
     addRow = function () {
         var data = [];
         data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
@@ -580,6 +642,14 @@ class PlanningUnitCapacity extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Validate cell values on change.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({
             changedFlag: 1
@@ -666,9 +736,26 @@ class PlanningUnitCapacity extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Updates change in cell value
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     onedit = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(7, y, 1, true);
-    }.bind(this);
+    }.bind(this);  
+
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -679,6 +766,10 @@ class PlanningUnitCapacity extends Component {
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called before saving/editing the planning unit volumes to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -758,6 +849,10 @@ class PlanningUnitCapacity extends Component {
         }
         return valid;
     }
+    /**
+     * Renders the Planning Unit Volume/Capacity list.
+     * @returns {JSX.Element} - the Planning Unit Volume list.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -794,6 +889,9 @@ class PlanningUnitCapacity extends Component {
             </div >
         );
     }
+    /**
+     * Redirects to the list planning unit when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

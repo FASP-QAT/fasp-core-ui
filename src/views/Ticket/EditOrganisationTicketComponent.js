@@ -8,13 +8,20 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import OrganisationService from '../../api/OrganisationService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Edit Organisation"
 const initialValues = {
     summary: summaryText_1,
     organizationName: '',
-    notes: ''
+    notes: '',
+    priority: 3
 }
+/**
+ * This const is used to define the validation schema for organisation ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -26,6 +33,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the organisation form and allow user to submit the update master request in jira
+ */
 export default class EditOrganisationTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -33,7 +43,8 @@ export default class EditOrganisationTicketComponent extends Component {
             organisation: {
                 summary: summaryText_1,
                 organizationName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -44,7 +55,12 @@ export default class EditOrganisationTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { organisation } = this.state
         if (event.target.name == "summary") {
@@ -68,7 +84,9 @@ export default class EditOrganisationTicketComponent extends Component {
             organisation
         }, () => { })
     };
-   
+    /**
+     * This function is used to get organisation lists on page load
+     */
     componentDidMount() {
         OrganisationService.getOrganisationList()
             .then(response => {
@@ -121,21 +139,50 @@ export default class EditOrganisationTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the budget details
+     */
     resetClicked() {
         let { organisation } = this.state;
         organisation.organizationName = '';
         organisation.notes = '';
+        organisation.priority = 3;
         this.setState({
             organisation: organisation,
             organizationId: ''
         },
             () => { });
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { organisation } = this.state;
+        organisation.priority = newState;
+        this.setState(
+            {
+                organisation
+            }, () => {
+                // console.log('priority - state : '+this.state.organisation.priority);
+            }
+        );
+    }
+
+    /**
+     * This is used to display the content
+     * @returns This returns organisation details form
+     */
     render() {
         const { organizations } = this.state;
         let organizationList = organizations.length > 0
@@ -276,6 +323,9 @@ export default class EditOrganisationTicketComponent extends Component {
                                             value={this.state.organisation.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.organisation.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

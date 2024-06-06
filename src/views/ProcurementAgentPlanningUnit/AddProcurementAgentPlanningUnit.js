@@ -17,7 +17,12 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.procurementAgentPlanningUnit')
+/**
+ * Component for mapping procurement agent and planning unit.
+ */
 export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);
@@ -51,19 +56,18 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.changed = this.changed.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
-    hideSecondComponent() {
-        document.getElementById('div2').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to filter products based on active flag
+     */
     filterProduct = function (instance, cell, c, r, source) {
         return this.state.products.filter(c => c.active.toString() == "true");
     }.bind(this);
+    /**
+     * Reterives procurement agent and planning unit list and build jexcel table on component mount
+     */
     componentDidMount() {
         ProcurementAgentService.getProcurementAgentPlaningUnitList(this.state.procurementAgentId)
             .then(response => {
@@ -166,7 +170,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                     var data = papuDataArr;
                                                     var options = {
                                                         data: data,
-                                                        columnDrag: true,
+                                                        columnDrag: false,
                                                         colWidths: [200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
                                                             {
@@ -380,7 +384,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                 message: response.data.messageCode
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }).catch(
@@ -427,7 +431,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                     message: response.data.messageCode
                                 },
                                     () => {
-                                        this.hideSecondComponent();
+                                        hideSecondComponent();
                                     })
                             }
                         }).catch(
@@ -474,7 +478,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                         message: response.data.messageCode
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             }).catch(
@@ -517,6 +521,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 }
             );
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -537,6 +549,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }
         elInstance.setValueFromCoords(12, y, 1, true);
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRow = function () {
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
@@ -556,6 +571,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             data, 0, 1
         );
     };
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -570,6 +590,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
     }
+    /**
+     * Function to handle form submission and save data on server.
+     */
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
@@ -612,7 +635,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             message: response.data.messageCode, loading: false
                         },
                             () => {
-                                this.hideSecondComponent();
+                                hideSecondComponent();
                             })
                     }
                 }).catch(
@@ -657,6 +680,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         } else {
         }
     }
+    /**
+     * Function to check for duplicate planning units.
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
     checkDuplicatePlanningUnit = function () {
         var tableJson = this.el.getJson(null, false);
         let tempArray = tableJson;
@@ -670,13 +697,18 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 changedFlag: 0,
             },
                 () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
             return false;
         } else {
             return true;
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -685,6 +717,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({
             changedFlag: 1
@@ -741,6 +781,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             this.el.setValueFromCoords(12, y, 1, true);
         }
     }.bind(this);
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -799,6 +843,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         }
         return valid;
     }
+    /**
+     * Renders the Procurement agent planning unit mapping list.
+     * @returns {JSX.Element} - Procurement agent planning unit mapping list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -841,6 +889,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             </div >
         );
     }
+    /**
+     * Redirects to the list procurement agent screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }

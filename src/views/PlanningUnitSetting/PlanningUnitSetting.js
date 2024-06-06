@@ -38,16 +38,28 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import csvicon from '../../assets/img/csv.png';
+import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
+//Array of months
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+//Array of months
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+/**
+ * Sorts array
+ * @param {*} sourceArray - Source array to be sorted
+ * @returns {Array} - Sorted array
+ */
 const sortArray = (sourceArray) => {
     const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
     return sourceArray.sort(sortByName);
 };
+/**
+ * Component for adding/listing planning unit details.
+ */
 export default class PlanningUnitSetting extends Component {
     constructor(props) {
         super(props);
@@ -110,16 +122,26 @@ export default class PlanningUnitSetting extends Component {
         this.productCategoryList = this.productCategoryList.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Redirects to the dashboard when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
+    /**
+     * This function is called before saving/editing the planning unit details to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -151,6 +173,14 @@ export default class PlanningUnitSetting extends Component {
         }
         return valid;
     }
+    /**
+     * This function is called when cell value is edited & mark change in row.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         this.setState({
@@ -167,6 +197,11 @@ export default class PlanningUnitSetting extends Component {
         }
         elInstance.setValueFromCoords(10, y, 1, true);
     }
+    /**
+     * This function is called when user pastes some data into the sheet
+     * @param {*} instance - This is the sheet where the data is being placed
+     * @param {*} data - This is the data that is being pasted
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -210,6 +245,14 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * Validate cell values on change.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Column Number
+     * @param {*} y - Row Number
+     * @param {*} value - Cell Value
+     */
     changed = function (instance, cell, x, y, value) {
 
         changed(instance, cell, x, y, value)
@@ -341,7 +384,11 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * Fetch tracer category list
+     */
     tracerCategoryList() {
+        //Fetch all tracer category list
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -421,6 +468,9 @@ export default class PlanningUnitSetting extends Component {
                 }
             );
     }
+    /**
+     * Fetch procurement agent list & sort it.
+     */
     procurementAgentList() {
         var db1;
         getDatabase();
@@ -472,18 +522,28 @@ export default class PlanningUnitSetting extends Component {
                     allProcurementAgentList: tempList,
                 },
                     () => {
+                        //Fetch product category list
                         this.productCategoryList();
                     })
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Fetches Database List from the server on component mount.
+     */
     componentDidMount() {
         this.getDatasetList();
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * Sets the `onbeforeunload` event handler of the window object after the component updates 
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -491,6 +551,9 @@ export default class PlanningUnitSetting extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Fetch database list
+     */
     getDatasetList() {
         var db1;
         getDatabase();
@@ -562,6 +625,10 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Handles change in forecastProgramId.
+     * @param {Event} event - The change event.
+     */
     setProgramId(event) {
         var pID = document.getElementById("forecastProgramId").value;
         if (pID != 0) {
@@ -641,6 +708,9 @@ export default class PlanningUnitSetting extends Component {
                 })
         }
     }
+    /**
+     * Fetch product category list & filter it.
+     */
     productCategoryList() {
         var db1;
         getDatabase();
@@ -704,6 +774,9 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Filters the Planning Unit list according to the programId & builds the jexcel.
+     */
     filterData(addRowInJexcel) {
         var forecastProgramId = this.state.forecastProgramId;
         if (forecastProgramId > 0) {
@@ -731,20 +804,38 @@ export default class PlanningUnitSetting extends Component {
                 })
         }
     }
+    /**
+     * Handles change in daterange
+     * @param {*} value 
+     * @param {*} text 
+     * @param {*} listIndex 
+     */
     handleRangeChange(value, text, listIndex) {
     }
+    /**
+     * Handles closing of daterange picker
+     * @param {*} value 
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.filterData();
         })
     }
+    /**
+     * Handles click on daterange picker
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    //Formats the daterange
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
+    /**
+     * Builds the jexcel component to display the Planning Unit list.
+     */
     buildJExcel(addRowInJexcel) {
         let outPutList = this.state.selsource;
         let outPutListArray = [];
@@ -807,7 +898,7 @@ export default class PlanningUnitSetting extends Component {
         this.setState({ dropdownList: dropdownList })
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -815,7 +906,8 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
-                    required: true,
+                    width:150,
+                    required: true
                     // readOnly: true// 0A
                 },
                 {
@@ -827,7 +919,7 @@ export default class PlanningUnitSetting extends Component {
                         autocomplete: true,
                         remoteSearch: true,
                         onbeforesearch: function (instance, request) {
-                            if (this.state.sortOrderLoading == false) {
+                            if (this.state.sortOrderLoading == false && instance.search.length > 2) {
                                 request.method = 'GET';
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -842,10 +934,8 @@ export default class PlanningUnitSetting extends Component {
                             }
                         }.bind(this),
                     },
-                    filter: function() {
-                        this.dropdownList = [];
-                    },
-                    width: '170',
+                    filter: this.filterPlanningUnitList,
+                    width: '150',
                     required: true
                     // readOnly: true //1B
                 },
@@ -1066,10 +1156,25 @@ export default class PlanningUnitSetting extends Component {
             }
         })
     }
+    /**
+     * Resets the Planning Unit list
+     * @param {*} instance - This is the instance of the jExcel spreadsheet
+     * @param {*} cell - This is the current cell object being filtered
+     * @param {*} c - The column index.
+     * @param {*} r - The row index
+     * @param {*} source - The source data for the dropdown list associated with the current cell.
+     * @returns {Array} - Empty Array.
+     */
     filterPlanningUnitList = function (instance, cell, c, r, source) {
         var mylist = [];
         return mylist;
     }.bind(this)
+    /**
+     * Handles page change
+     * @param {*} el - The reference to the jExcel spreadsheet element.
+     * @param {*} pageNo - The page number that the user has navigated to.
+     * @param {*} oldPageNo - The page number that the user was previously on before navigating to the new page.
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -1099,6 +1204,14 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
@@ -1145,6 +1258,9 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * Handles the add/edit of Planning Unit on submit.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -1516,6 +1632,10 @@ export default class PlanningUnitSetting extends Component {
             }
         }
     }
+    /**
+     * Disable planning unit consumption data
+     * @param {*} listOfDisablePuNode - list of disable planning unit node
+     */
     disablePUConsumptionData(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
         for (var i = 0; i < datasetList1.length; i++) {
@@ -1576,6 +1696,10 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Disables planning unit node
+     * @param {*} listOfDisablePuNode - list to disable planning unit node
+     */
     disablePUNode(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
         for (var i = 0; i < datasetList1.length; i++) {
@@ -1663,6 +1787,10 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }
     }
+    /**
+     * Fetch Planning Unit list. Also adds new row to jexcel spreadsheet
+     * @param {*} callBy - Determines whether to add new row or not
+     */
     getPlanningUnitList(callBy) {
         if (callBy == 0) {
             var pID = document.getElementById("forecastProgramId").value;
@@ -1747,6 +1875,9 @@ export default class PlanningUnitSetting extends Component {
             this.addRow()
         }
     }
+    /**
+     * Add's new row to the jexcel shpreadsheet
+     */
     addRow = function () {
         var json = this.el.getJson(null, false);
         var data = [];
@@ -1773,11 +1904,59 @@ export default class PlanningUnitSetting extends Component {
         );
         this.el.getCell(("B").concat(parseInt(json.length) + 1)).classList.add('typing-' + this.state.lang);
     };
+    /**
+     * Toggles program info popover
+     */
     toggleProgramSetting() {
         this.setState({
             popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
         });
     }
+    /**
+     * Exports the data to a CSV file.
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + (this.state.startDateDisplay + ' ~ ' + this.state.endDateDisplay)) + '"')
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var planningUnitList;
+        // if (response.data.length > 0) {
+        var A = [];
+        let tableHeadTemp = [];
+        tableHeadTemp.push(i18n.t('static.productCategory.productCategory').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.dashboard.planningunitheader').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.commitTree.consumptionForecast') + ' ?').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.TreeForecast.TreeForecast') + ' ?').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push((i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.forecastReport.priceType').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.forecastReport.unitPrice').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.common.active').replaceAll(' ', '%20'));
+        A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[2].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[3].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[15].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16].toString() =="true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        // }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = (document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20')+"-"+i18n.t('static.updatePlanningUnit.updatePlanningUnit') + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+    /**
+     * Renders the Planning Unit list.
+     * @returns {JSX.Element} - the Planning Unit list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1799,6 +1978,7 @@ export default class PlanningUnitSetting extends Component {
                 )
             }, this);
         const { rangeValue } = this.state
+        //Formats the daterange
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
@@ -1824,6 +2004,7 @@ export default class PlanningUnitSetting extends Component {
                         <div className="" >
                             <div ref={ref}>
                                 <Col md="12 pl-0">
+                                    {this.state.datasetId != "" && this.state.datasetId != null && this.state.datasetId != undefined && this.state.datasetId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                                     <div className="row">
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
@@ -1897,8 +2078,8 @@ export default class PlanningUnitSetting extends Component {
                                 </i>
                             </p>
                         }
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div style={{ width: '100%' }} id="tableDiv">
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className='TableWidth100'>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

@@ -5,7 +5,7 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import RealmCountryService from "../../api/RealmCountryService";
@@ -13,11 +13,21 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.realmcountry');
+/**
+ * Function to sort an array of objects by country name.
+ * @param {Array} sourceArray - The array of objects to be sorted.
+ * @returns {Array} - Returns the sorted array of objects.
+ */
 const sortArray = (sourceArray) => {
     const sortByName = (a, b) => a.country.label.label_en.localeCompare(b.country.label.label_en, 'en', { numeric: true });
     return sourceArray.sort(sortByName);
 };
+/**
+ * Component for realm country list.
+ */
 class ListRealmCountryComponent extends Component {
     constructor(props) {
         super(props);
@@ -30,23 +40,17 @@ class ListRealmCountryComponent extends Component {
             lang: localStorage.getItem('lang')
         }
         this.filterData = this.filterData.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component unmounts.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Function to filter data based on the selected realm.
+     */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
@@ -64,6 +68,10 @@ class ListRealmCountryComponent extends Component {
             });
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJExcel() {
         let realmCountryList = this.state.selRealmCountry;
         let realmCountryArray = [];
@@ -85,7 +93,7 @@ class ListRealmCountryComponent extends Component {
         var data = realmCountryArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 150, 150, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -127,7 +135,7 @@ class ListRealmCountryComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -166,11 +174,11 @@ class ListRealmCountryComponent extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches realm and realm country list on component mount
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -188,7 +196,7 @@ class ListRealmCountryComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -250,7 +258,7 @@ class ListRealmCountryComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -294,6 +302,10 @@ class ListRealmCountryComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the realm country mapping list.
+     * @returns {JSX.Element} - Realm country mapping list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

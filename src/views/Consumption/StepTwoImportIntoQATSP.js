@@ -13,16 +13,15 @@ import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listIm
 import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html';
 import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
 import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
-import { checkValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const pickerLang = {
-    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-    from: 'From', to: 'To',
-}
+/**
+ * Component for Import into QAT supply plan step two for the import
+ */
 export default class StepTwoImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -40,11 +39,17 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.filterData = this.filterData.bind(this);
     }
+    /**
+     * Toggles the visibility of the guidance.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Builds the json for region data
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -73,11 +78,23 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         } else {
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         valid = checkValidation(this.el);
         return valid;
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
         if (x == 3) {
@@ -124,11 +141,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
-    componentDidMount() {
-    }
+    /**
+     * Filters region data and prepares it for display.
+     * Retrieves region list information from component props.
+     * Sorts the region list alphabetically by name.
+     * Prepends a "Do Not Import" option to the region list.
+     * Updates the component's state with the filtered region lists and triggers the building of the Jexcel component.
+     */
     filterData() {
         let regionList = this.props.items.regionList
         let programRegionList = []
@@ -168,6 +187,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 this.buildJexcel();
             })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.forecastProgramRegionList;
         var data = [];
@@ -205,7 +228,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 100, 100, 100],
             columns: [
                 {
@@ -268,7 +291,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -281,6 +304,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
+    /**
+     * Renders the import into QAT supply plan step two screen.
+     * @returns {JSX.Element} - Import into QAT supply plan step two screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -317,7 +344,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     </div>
                 </Modal>
                 <div className="consumptionDataEntryTable">
-                    <div id="mapRegion" style={{ display: this.props.items.loading ? "none" : "block" }}>
+                    <div id="mapRegion" className="TableWidth100" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

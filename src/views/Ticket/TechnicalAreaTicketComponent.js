@@ -13,8 +13,14 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmCountryService from '../../api/RealmCountryService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
+/**
+ * This const is used to define the validation schema for technical area ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -33,6 +39,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.displayName')),
     })
 }
+/**
+ * This component is used to display the technial area form and allow user to submit the add master request in jira
+ */
 export default class TechnicalAreaTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -43,7 +52,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                 countryName: [],
                 technicalAreaName: "",
                 technicalAreaCode: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -62,7 +72,12 @@ export default class TechnicalAreaTicketComponent extends Component {
         this.getRealmCountryList = this.getRealmCountryList.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { technicalArea } = this.state
         if (event.target.name == "summary") {
@@ -87,7 +102,9 @@ export default class TechnicalAreaTicketComponent extends Component {
             technicalArea
         }, () => { })
     };
-    
+    /**
+     * This function is used to get country and realm list on page load
+     */
     componentDidMount() {
         CountryService.getCountryListAll()
             .then(response => {
@@ -201,6 +218,10 @@ export default class TechnicalAreaTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is called realm country is changed
+     * @param {*} value This is value of realm country that is selected by the user
+     */
     updateFieldData(value) {
         let { technicalArea } = this.state;
         this.setState({ countryId: value });
@@ -212,6 +233,10 @@ export default class TechnicalAreaTicketComponent extends Component {
         technicalArea.countryName = realmCountryIdArray;
         this.setState({ technicalArea: technicalArea });
     }
+    /**
+     * This function is used to get the realm country list based on realm
+     * @param {*} realmId This is the realm Id for which realm country list will appear
+     */
     getRealmCountryList(realmId) {
         if (realmId !== "") {
             RealmCountryService.getRealmCountryForProgram(realmId)
@@ -278,11 +303,17 @@ export default class TechnicalAreaTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the technical area details
+     */
     resetClicked() {
         let { technicalArea } = this.state;
         technicalArea.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -290,6 +321,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         technicalArea.technicalAreaName = '';
         technicalArea.technicalAreaCode = '';
         technicalArea.notes = '';
+        technicalArea.priority = 3;
         this.setState({
             technicalArea: technicalArea,
             realmId: this.props.items.userRealmId,
@@ -297,9 +329,17 @@ export default class TechnicalAreaTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.technicalArea.technicalAreaName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to get the display name for technical area
+     * @param {*} event This is the on change event
+     */
     getDisplayName(event) {
         let realmId = this.state.realmId;
         let healthAreaValue = this.state.technicalArea.technicalAreaName;
@@ -404,6 +444,27 @@ export default class TechnicalAreaTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { technicalArea } = this.state;
+        technicalArea.priority = newState;
+        this.setState(
+            {
+                technicalArea
+            }, () => {
+                // console.log('priority - state : '+this.state.technicalArea.priority);
+            }
+        );
+    }
+    
+    /**
+     * This is used to display the content
+     * @returns This returns technical area details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -428,7 +489,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                             countryName: this.state.countryId,
                             technicalAreaName: this.state.technicalArea.technicalAreaName,
                             technicalAreaCode: this.state.technicalArea.technicalAreaCode,
-                            notes: this.state.technicalArea.notes
+                            notes: this.state.technicalArea.notes,
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -595,6 +657,9 @@ export default class TechnicalAreaTicketComponent extends Component {
                                             value={this.state.technicalArea.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.technicalArea.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

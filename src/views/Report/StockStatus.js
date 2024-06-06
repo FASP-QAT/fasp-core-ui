@@ -31,14 +31,18 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
 const ref = React.createRef();
 const pickerLang = {
-  months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
+/**
+ * Component for Stock Status Report.
+ */
 class StockStatus extends Component {
   constructor(props) {
     super(props);
@@ -71,28 +75,16 @@ class StockStatus extends Component {
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.programChange = this.programChange.bind(this);
     this.versionChange = this.versionChange.bind(this);
     this.toggleExport = this.toggleExport.bind(this);
-    this.roundAMC = this.roundAMC.bind(this);
   }
-  roundAMC(amc) {
-    if (amc != null) {
-      if (Number(amc).toFixed(0) >= 100) {
-        return Number(amc).toFixed(0);
-      } else if (Number(amc).toFixed(1) >= 10) {
-        return Number(amc).toFixed(1);
-      } else if (Number(amc).toFixed(2) >= 1) {
-        return Number(amc).toFixed(2);
-      } else {
-        return Number(amc).toFixed(3);
-      }
-    } else {
-      return null;
-    }
-  }
+  /**
+   * Handles the change event for the program selection.
+   * Resets relevant state variables and triggers filtering of versions.
+   * @param {Event} event - The on change event object.
+   */
   programChange(event) {
     this.setState({
       programId: event.target.value,
@@ -106,6 +98,12 @@ class StockStatus extends Component {
       this.filterVersion();
     })
   }
+  /**
+   * Handles the change event for the version selection.
+   * If a version is selected, updates the state with the new version ID and triggers data filtering.
+   * If no version is selected, updates the state and triggers retrieval of planning units.
+   * @param {Event} event - The event object.
+   */
   versionChange(event) {
     if (this.state.versionId != '' || this.state.versionId != undefined) {
       this.setState({
@@ -122,47 +120,21 @@ class StockStatus extends Component {
       })
     }
   }
+  /**
+   * Toggles the value of the 'show' state variable.
+   */
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  roundN = num => {
-    if (num !== '') {
-      return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-    } else {
-      return ''
-    }
-  }
-  formatter = value => {
-    if (value != null) {
-      var cell1 = value
-      cell1 += '';
-      var x = cell1.split('.');
-      var x1 = x[0];
-      var x2 = x.length > 1 ? '.' + x[1] : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
-    else {
-      return ''
-    }
-  }
-  makeText = m => {
-    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-    return '?'
-  }
-  dateFormatter = value => {
-    return moment(value).format('MMM YY')
-  }
-  dateFormatterCSV = value => {
-    return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
-  }
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map(ele => '"' + ele + '"')
-  }
+  /**
+   * Returns the CSS class name for formatting text color in a row.
+   * @param {Object} row - The row object.
+   * @returns {string} - The CSS class name for text color formatting.
+   */
   rowtextFormatClassName = (row) => {
     return 'textcolor-purple';
   }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
     csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -171,7 +143,7 @@ class StockStatus extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -205,7 +177,7 @@ class StockStatus extends Component {
         }
         csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
         csvRow.push("")
-        const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
+        const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
         i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
         i18n.t('static.report.actual').replaceAll(' ', '%20'),
@@ -219,7 +191,7 @@ class StockStatus extends Component {
         i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
         ])];
         A = headers
-        item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+        item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
           return (
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code +
@@ -241,7 +213,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -254,6 +226,9 @@ class StockStatus extends Component {
     document.body.appendChild(a)
     a.click()
   }
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -295,11 +270,11 @@ class StockStatus extends Component {
       }
     }
     const unit = "pt";
-    const size = "A4"; 
-    const orientation = "landscape"; 
+    const size = "A4";
+    const orientation = "landscape";
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(8);    
+    doc.setFontSize(8);
     var pageArray = [];
     var list = this.state.PlanningUnitDataForExport
     var count = 0;
@@ -325,7 +300,7 @@ class StockStatus extends Component {
             align: 'left'
           })
         } else {
-          doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(ppu1.minQty), doc.internal.pageSize.width / 10, 120, {
+          doc.text(i18n.t('static.product.minQuantity') + ' : ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
             align: 'left'
           })
         }
@@ -337,7 +312,7 @@ class StockStatus extends Component {
             align: 'left'
           })
         } else {
-          doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ppu1.distributionLeadTime), doc.internal.pageSize.width / 10, 140, {
+          doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
             align: 'left'
           })
         }
@@ -347,7 +322,7 @@ class StockStatus extends Component {
         count++
         var height = doc.internal.pageSize.height;
         let otherdata =
-          item.data.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
+          item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0), formatter(ele.shipmentQty, 0),
           ele.shipmentInfo.map(item1 => {
             return (
               item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
@@ -365,7 +340,7 @@ class StockStatus extends Component {
                     : " | " + item1.orderNo) +
                 (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.roundAMC(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundAMC(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), ele.planBasedOn == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStock, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
         { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
@@ -549,6 +524,9 @@ class StockStatus extends Component {
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.stockstatus') + ".pdf")
   }
+  /**
+   * Fetches and filters data based on selected program, version, planning unit, and date range.
+   */
   filterData() {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
@@ -784,6 +762,7 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+                          console.log("shiplist", shiplist)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -941,6 +920,10 @@ class StockStatus extends Component {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
     }
   }
+  /**
+   * Fetches the data for exporting it in CSV or PDF based on the planning units selected
+   * @param {*} report This is the type of the export. 1 for PDF and 2 for CSV
+   */
   exportData = (report) => {
     this.setState({
       exportModal: false
@@ -1339,7 +1322,7 @@ class StockStatus extends Component {
                                 fontColor: 'transparent',
                               },
                               lineTension: 0,
-                              pointStyle: 'line',
+                              pointStyle: 'circle',
                               pointRadius: 0,
                               showInLegend: true,
                               data: data.map((item, index) => (Number(item.closingBalance)))
@@ -1617,7 +1600,7 @@ class StockStatus extends Component {
             let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
             var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
             var bar = {
-              labels: filteredPlanningUnitData.map((item, index) => (this.dateFormatter(item.dt))),
+              labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
               datasets: [
                 {
                   label: i18n.t('static.supplyplan.exipredStock'),
@@ -1748,7 +1731,7 @@ class StockStatus extends Component {
                     fontColor: 'transparent',
                   },
                   lineTension: 0,
-                  pointStyle: 'line',
+                  pointStyle: 'circle',
                   pointRadius: 0,
                   showInLegend: true,
                   data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
@@ -1810,7 +1793,7 @@ class StockStatus extends Component {
                   pointStyle: 'line',
                   pointRadius: 0,
                   yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item, index) => (this.roundN(item.mos)))
+                  data: filteredPlanningUnitData.map((item, index) => (roundN(item.mos)))
                 }
               ],
             };
@@ -2007,6 +1990,9 @@ class StockStatus extends Component {
         );
     }
   }
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -2072,6 +2058,9 @@ class StockStatus extends Component {
       this.consolidatedProgramList()
     }
   }
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state
     var proList = programs;
@@ -2139,6 +2128,12 @@ class StockStatus extends Component {
       }.bind(this);
     }.bind(this);
   }
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -2221,6 +2216,13 @@ class StockStatus extends Component {
       })
     }
   }
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state
     var verList = versions;
@@ -2287,6 +2289,9 @@ class StockStatus extends Component {
       }.bind(this);
     }.bind(this)
   }
+  /**
+   * Retrieves the list of planning units for a selected program and version.
+   */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -2345,8 +2350,8 @@ class StockStatus extends Component {
             var listArray = response.data;
             var planningUnitsMulti = []
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); 
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); 
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
               return itemLabelA > itemLabelB ? 1 : -1;
             }).map(item => {
               planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
@@ -2405,20 +2410,36 @@ class StockStatus extends Component {
       }
     });
   }
+  /**
+   * Calls the get programs function on page load
+   */
   componentDidMount() {
     this.getPrograms();
   }
-  show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => { this.filterData() })
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+  /**
+   * Renders the Stock Status report table.
+   * @returns {JSX.Element} - Stock Status report table.
+   */
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -2535,20 +2556,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
         , intersect: false
@@ -2618,7 +2639,7 @@ class StockStatus extends Component {
         }]
       },
       tooltips: {
-        mode:'nearest',
+        mode: 'nearest',
         intersect: false,
         // enabled: false,
         // custom: CustomTooltips,
@@ -2626,20 +2647,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
       },
@@ -2786,7 +2807,7 @@ class StockStatus extends Component {
           fontColor: 'transparent',
         },
         lineTension: 0,
-        pointStyle: 'line',
+        pointStyle: 'circle',
         pointRadius: 0,
         showInLegend: true,
         data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
@@ -2856,11 +2877,11 @@ class StockStatus extends Component {
         pointStyle: 'line',
         pointRadius: 0,
         yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
+        data: this.state.stockStatusList.map((item, index) => (item.mos != null ? roundN(item.mos) : item.mos))
       })
     }
     const bar = {
-      labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
+      labels: this.state.stockStatusList.map((item, index) => (dateFormatter(item.dt))),
       datasets: datasets,
     };
     const { rangeValue } = this.state
@@ -2899,10 +2920,9 @@ class StockStatus extends Component {
                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                             value={rangeValue}
                             lang={pickerLang}
-                            onChange={this.handleRangeChange}
                             onDismiss={this.handleRangeDissmis}
                           >
-                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                           </Picker>
                         </div>
                       </FormGroup>
@@ -3004,7 +3024,7 @@ class StockStatus extends Component {
                             </li>
                             <li><span className="redlegend "></span>
                               <span className="legendcommitversionText">
-                                {i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}
+                                {i18n.t("static.supplyPlan.minStockMos")} : {formatter(this.state.stockStatusList[0].minMos, 0)}
                               </span>
                             </li>
                             <li><span className="redlegend "></span>
@@ -3017,7 +3037,7 @@ class StockStatus extends Component {
                                 {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
                               </span>
                             </li>
-                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
                           </>}
                         </ul>
                       </FormGroup>
@@ -3064,21 +3084,21 @@ class StockStatus extends Component {
                         this.state.stockStatusList.map((item, idx) =>
                           <tr id="addr0" key={idx} >
                             <td>
-                              {this.dateFormatter(this.state.stockStatusList[idx].dt)}
+                              {dateFormatter(this.state.stockStatusList[idx].dt)}
                             </td>
                             {(idx == 0 ? this.state.firstMonthRegionCount : this.state.stockStatusList[idx - 1].regionCount) == (idx == 0 ? this.state.firstMonthRegionCountForStock : this.state.stockStatusList[idx - 1].regionCountForStock) ?
-                              <td><b>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</b></td> : <td>{this.formatter(this.state.stockStatusList[idx].openingBalance)}</td>}
+                              <td><b>{formatter(this.state.stockStatusList[idx].openingBalance, 0)}</b></td> : <td>{formatter(this.state.stockStatusList[idx].openingBalance, 0)}</td>}
                             <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
+                              {formatter(this.state.stockStatusList[idx].forecastedConsumptionQty, 0)}
                             </td> <td>
-                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
+                              {formatter(this.state.stockStatusList[idx].actualConsumptionQty, 0)}
                             </td>
                             <td>
-                              {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
+                              {formatter(this.state.stockStatusList[idx].shipmentQty, 0)}
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                return (<tr  ><td padding="0">{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${getLabelText(item.shipmentStatus.label, this.state.lang)}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
@@ -3103,21 +3123,21 @@ class StockStatus extends Component {
                               })}</table>
                             </td>
                             <td>
-                              {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
+                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment, 0)}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
+                              {this.state.stockStatusList[idx].expiredStock != 0 ? formatter(this.state.stockStatusList[idx].expiredStock, 0) : ''}
                             </td>
                             {this.state.stockStatusList[idx].regionCount == this.state.stockStatusList[idx].regionCountForStock ?
-                              <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}><b>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</b></td> : <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}>{this.formatter(this.state.stockStatusList[idx].closingBalance)}</td>}
+                              <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}><b>{formatter(this.state.stockStatusList[idx].closingBalance, 0)}</b></td> : <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 2 ? this.state.stockStatusList[idx].closingBalance == null ? "#cfcdc9" : this.state.stockStatusList[idx].closingBalance == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].closingBalance < this.state.stockStatusList[idx].minStock ? "#f48521" : this.state.stockStatusList[idx].closingBalance > this.state.stockStatusList[idx].maxStock ? "#edb944" : "#118b70" : "" }}>{formatter(this.state.stockStatusList[idx].closingBalance, 0)}</td>}
                             <td>
-                              {this.formatter(this.roundAMC(this.state.stockStatusList[idx].amc))}
+                              {formatter(roundAMC(this.state.stockStatusList[idx].amc, 0))}
                             </td>
                             <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
-                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : this.formatter(this.roundAMC(this.state.stockStatusList[idx].maxStock))}
+                              {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : formatter(roundAMC(this.state.stockStatusList[idx].maxStock, 0))}
                             </td>
                             <td>
-                              {this.state.stockStatusList[idx].unmetDemand != 0 ? this.formatter(this.state.stockStatusList[idx].unmetDemand) : ''}
+                              {this.state.stockStatusList[idx].unmetDemand != 0 ? formatter(this.state.stockStatusList[idx].unmetDemand, 0) : ''}
                             </td>
                           </tr>)
                       }
@@ -3167,6 +3187,10 @@ class StockStatus extends Component {
       </div>
     );
   }
+  /**
+   * Toggles the export modal and updates the state with the selected planning unit IDs for export.
+   * @param {number} type - The type of export action. 1 for PDF export, 2 for CSV export.
+   */
   toggleExport(type) {
     var list = this.state.planningUnitsMulti;
     this.setState({
@@ -3175,6 +3199,10 @@ class StockStatus extends Component {
       type: type
     })
   }
+  /**
+   * Sets the planning unit IDs for export in the state.
+   * @param {Array} e - An array containing the planning unit IDs to be exported.
+   */
   setPlanningUnitIdsExport(e) {
     this.setState({
       planningUnitIdsExport: e,

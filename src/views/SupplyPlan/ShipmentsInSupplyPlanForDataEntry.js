@@ -6,12 +6,15 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
+import { formatter, generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_NO_REGEX, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+/**
+ * This component is used to display the shipment data in the form of table for Shipment data entry screen
+ */
 export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Component {
     constructor(props) {
         super(props);
@@ -49,6 +52,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         this.formulaChanged = this.formulaChanged.bind(this)
         this.formulaChanged3 = this.formulaChanged3.bind(this)
     }
+    /**
+     * This function is used to format the number by adding commas
+     * @param {*} value This is the value of the number that needs to be formatted
+     * @returns This function returns the formatted number
+     */
     formatter = value => {
         if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
@@ -67,6 +75,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return ''
         }
     }
+    /**
+     * This function is used to update the data when some records are pasted in the shipment sheet
+     * @param {*} instance This is the sheet where the data is being placed
+     * @param {*} data This is the data that is being pasted
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -146,8 +159,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
-    componentDidMount() {
-    }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -164,6 +183,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             elInstance.setValueFromCoords(22, y, parseFloat(rowData[22]), true);
         }
     }
+    /**
+     * This function is used to build the Jexcel table with all the data based on the filters and based on all the dropdowns
+     */
     showShipmentData() {
         var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
@@ -562,6 +584,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[36] = shipmentList[i].shipmentQty;
                                                 data[37] = shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? 1 : 0;
                                                 data[38] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;
+                                                data[39] = Number(Number(Number(Number(Math.round(Number(Number(Math.round(shipmentList[i].shipmentRcpuQty))*Number(shipmentList[i].realmCountryPlanningUnit.multiplier))))*Number(Number(shipmentList[i].rate).toFixed(2))).toFixed(2))+Number(Number(shipmentList[i].freightCost).toFixed(2))).toFixed(2);
                                                 shipmentsArr.push(data);
                                             }
                                             if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -605,13 +628,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[36] = 0;
                                                 data[37] = 0;
                                                 data[38] = "";
+                                                data[39] = 0;
                                                 shipmentsArr[0] = data;
                                             }
                                             var options = {
                                                 data: shipmentsArr,
                                                 columns: [
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
+                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 90, autoCasting: false },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                     { type: 'autocomplete', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
                                                     { type: 'autocomplete', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
@@ -623,10 +647,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
+                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00000', decimal: '.', width: 100, readOnly: true },
                                                     { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
-                                                    { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
+                                                    { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 150 },
                                                     { type: 'autocomplete', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                     { type: 'autocomplete', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                     { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
@@ -681,6 +705,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                         readOnly: true
                                                         , autoCasting: false
                                                     },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
@@ -912,7 +937,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                                             json.push(data);
                                                                             var options = {
                                                                                 data: json,
-                                                                                columnDrag: true,
+                                                                                columnDrag: false,
                                                                                 colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
                                                                                 columns: [
                                                                                     {
@@ -1173,6 +1198,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }.bind(this)
         }.bind(this);
     }
+    /**
+     * This function is used when users click on the add row in the shipment table
+     */
     addRowInJexcel() {
         var obj = this.state.shipmentsEl;
         var json = obj.getJson(null, false);
@@ -1218,6 +1246,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[36] = 0;
         data[37] = 0;
         data[38] = "";
+        data[39] = 0;
         obj.insertRow(data);
         obj.setValueFromCoords(2, json.length, 0, true);
         obj.setValueFromCoords(12, json.length, 0, true);
@@ -1233,6 +1262,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
+    /**
+     * This function is used when users click on the add row in the shipment batch table
+     */
     addBatchRowInJexcel() {
         var data = [];
         var obj = this.state.shipmentBatchInfoTableEl;
@@ -1255,6 +1287,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[10] = "";
         obj.insertRow(data);
     }
+    /**
+     * This function is used to filter the currency list based on active flag
+     */
     filterCurrency = function (instance, cell, c, r, source) {
         return this.state.currencyList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -1262,6 +1297,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the data source list based on active flag
+     */
     filterDataSourceList = function (instance, cell, c, r, source) {
         return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -1269,6 +1307,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the funding source list based on active flag
+     */
     filterFundingSource = function (instance, cell, c, r, source) {
         return this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -1276,6 +1317,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the procurement agent list based on active flag
+     */
     filterProcurementAgent = function (instance, cell, c, r, source) {
         return this.state.procurementAgentList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -1283,6 +1327,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the alternate reporting unit list based on active flag
+     */
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
         var planningUnitId = (this.state.shipmentsEl.getJson(null, false)[r])[3];
         return this.state.realmCountryPlanningUnitList.filter(c => c.name != "" && c.active.toString() == "true" && c.planningUnitId == planningUnitId).sort(function (a, b) {
@@ -1291,10 +1338,18 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the shipment status list based on active flag
+     */
     filterShipmentStatus = function (instance, cell, c, r, source) {
         return this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
     }.bind(this)
-    loadedShipments = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the shipment table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedShipments = function (instance, cell) {
         if (this.props.shipmentPage != "shipmentDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -1302,19 +1357,39 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
+        tr.children[2].classList.add('InfoTr');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[14].classList.add('InfoTr');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[18].classList.add('InfoTr');
+        tr.children[21].classList.add('InfoTr');
+        tr.children[2].title = i18n.t('static.shipmentTooltip.erpFlag');
+        tr.children[3].title = i18n.t('static.shipmentTooltip.qatShipmentId');
+        tr.children[8].title = i18n.t('static.shipmentTooltip.procurementAgent');
+        tr.children[9].title = i18n.t('static.shipmentTooltip.localProcurementAgent');
+        tr.children[12].title = i18n.t('static.shipmentTooltip.aru');
+        tr.children[14].title = i18n.t('static.shipmentTooltip.conversionFactor');
+        tr.children[16].title = i18n.t('static.shipmentTooltip.emergencyShipment');
+        tr.children[17].title = i18n.t('static.shipmentTooltip.fundingSource');
+        tr.children[18].title = i18n.t('static.shipmentTooltip.budget');
+        tr.children[20].title = i18n.t('static.shipmentTooltip.pricePerPU');
+        tr.children[21].title = i18n.t('static.shipmentTooltip.puCost');
+        tr.children[22].title = i18n.t('static.shipmentTooltip.freightCost');
+        tr.children[23].title = i18n.t('static.shipmentTooltip.total');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[12].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[13].classList.add('AsteriskTheadtrTd');
-        tr.children[17].classList.add('AsteriskTheadtrTd');
-        tr.children[22].classList.add('AsteriskTheadtrTd');
-        tr.children[23].classList.add('AsteriskTheadtrTd');
+        tr.children[17].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[22].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[23].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[15].classList.add('AsteriskTheadtrTd');
         tr.children[19].classList.add('AsteriskTheadtrTd');
-        tr.children[20].classList.add('AsteriskTheadtrTd');
+        tr.children[20].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[24].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = instance.worksheets[0];
         var json = shipmentInstance.getJson(null, false);
@@ -1398,6 +1473,12 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             this.props.updateState("indexOfShipmentContainingBatch", -1);
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var shipmentInstance = el;
         var json = shipmentInstance.getJson(null, false);
@@ -1471,7 +1552,12 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
-    loadedQtyCalculator = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the strategic qty table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedQtyCalculator = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1483,9 +1569,17 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
     }
-    loadedQtyCalculator1 = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the strategic qty table 2 like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedQtyCalculator1 = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
+    /**
+     * This function is used to filter the budget list based on funding source and active flag
+     */
     budgetDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.shipmentsEl.getJson(null, false)[r])[16];
@@ -1500,6 +1594,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }
+    /**
+     * This function is used when user clicks on the show batch details for a particular shipment record
+     * @param {*} obj This is the sheet where the data is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} shipmentEditable This is the value of the flag that indicates whether table should be editable or not
+     * @param {*} autoPopup This is the value of the flag that indicates whether batch details table should be automatically populated or not
+     */
     batchDetailsClicked(obj, x, y, shipmentEditable, autoPopup) {
         this.props.updateState("showBatchSaveButton", shipmentEditable);
         this.props.updateState("loading", true);
@@ -1591,7 +1693,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 150, 100],
             columns: [
                 {
@@ -1696,6 +1798,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         this.setState({ shipmentBatchInfoTableEl: elVar });
         this.props.updateState("loading", false);
     }
+    /**
+     * This function is used to calculate if the shipment is an emergency shipment or not based on the lead times
+     * @param {*} y This is the value of the row number for which we are checking emergency shipment
+     */
     calculateEmergencyOrder(y) {
         var shipmentInstance = this.state.shipmentsEl;
         var rowData = shipmentInstance.getRowData(y);
@@ -1806,18 +1912,36 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
+    /**
+     * This function is used when some value of the formula cell is changed for the shipment table
+     * @param {*} instance This is the object of the DOM element
+     * @param {*} executions This is object of the formula cell that is being edited
+     */
     formulaChanged = function (instance, executions) {
         var executions = executions;
         for (var e = 0; e < executions.length; e++) {
             this.shipmentChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
+    /**
+     * This function is used when some value of the formula cell is changed for the shipment strategic qty table
+     * @param {*} instance This is the object of the DOM element
+     * @param {*} executions This is object of the formula cell that is being edited
+     */
     formulaChanged3 = function (instance, executions) {
         var executions = executions;
         for (var e = 0; e < executions.length; e++) {
             this.shipmentQtyChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
+    /**
+     * This function is called when something in the shipment table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     shipmentChanged = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -2314,6 +2438,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             this.props.updateState("shipmentChangedFlag", 1);
         }
     }
+    /**
+     * This function is called when something in the shipment strategic qty table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     shipmentQtyChanged = function (instance, cell, x, y, value) {
         this.props.updateState("qtyCalculatorValidationError", "");
         this.props.updateState("shipmentQtyChangedFlag", 1);
@@ -2357,6 +2489,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
+    /**
+     * This function is called when submit button of the shipment strategic qty is clicked and is used to save the shipment qty if all the data is successfully validated.
+     */
     saveShipmentQty() {
         this.props.updateState("loading", true);
         var validation = this.checkValidationForShipmentQty();
@@ -2401,6 +2536,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             this.props.hideThirdComponent()
         }
     }
+    /**
+     * This function is called before saving the shipment strategic qty to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationForShipmentQty() {
         var elInstance = this.state.qtyCalculatorTableEl;
         var y = 0;
@@ -2415,6 +2554,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         return valid;
     }
+    /**
+     * This function is used to format the shipment batch info table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedBatchInfoShipment = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
@@ -2423,6 +2567,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when something in the shipment batch info table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     batchInfoChangedShipment = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -2485,6 +2637,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
+    /**
+     * This function is called before saving the shipment batch info to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationShipmentBatchInfo() {
         var valid = true;
         var elInstance = this.state.shipmentBatchInfoTableEl;
@@ -2546,6 +2702,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the shipment batch info is clicked and is used to save shipment batch info if all the data is successfully validated.
+     */
     saveShipmentBatchInfo() {
         this.props.updateState("loading", true);
         this.props.updateState("shipmentBatchError", "");
@@ -2639,6 +2798,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             this.props.hideFifthComponent()
         }
     }
+    /**
+     * This function is used to format the shipment dates table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedShipmentDates = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
@@ -2650,6 +2814,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is used to calculate the different dates based on the lead times
+     * @param {*} y This is the value of the row number for which we are calculating the dates
+     */
     calculateLeadTimesOnChange(y) {
         var elInstance = this.state.shipmentsEl;
         var rowData = elInstance.getRowData(y);
@@ -2716,6 +2884,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
+    /**
+     * This function is called when something in the shipment dates table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     shipmentDatesChanged = function (instance, cell, x, y, value) {
         this.props.updateState("shipmentDatesError", "");
         this.props.updateState("shipmentDatesChangedFlag", 1);
@@ -2888,6 +3064,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
     }
+    /**
+     * This function is called before saving the shipment dates to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationForShipmentDates() {
         var valid = true;
         var elInstance = this.state.shipmentDatesTableEl;
@@ -2959,6 +3139,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the shipment dates is clicked and is used to save shipment dates if all the data is successfully validated.
+     */
     saveShipmentsDate() {
         this.props.updateState("loading", true);
         var validation = this.checkValidationForShipmentDates();
@@ -3001,6 +3184,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         shipmentInstance.setValueFromCoords(5, parseInt(rowNumber), map.get("6") != "" && map.get("6") != null && map.get("6") != undefined ? moment(map.get("6")).format("YYYY-MM-DD") : moment(map1.get("6")).format("YYYY-MM-DD"), true);
     }
+    /**
+     * This function is called before saving the shipment data to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationForShipments() {
         var valid = true;
         var elInstance = this.state.shipmentsEl;
@@ -3020,6 +3207,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         var negativeBudget = 0;
         var shipmentListAfterUpdate = this.props.items.shipmentListForSelectedPlanningUnitsUnfiltered;
+        var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (map.get("27") != -1) {
@@ -3094,7 +3282,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
+                    console.log("elInstance.getValueFromCoords(38, y, true) Test@123",elInstance.getValueFromCoords(39, y, true));
+                    console.log("W Test@123",elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(39, y, true)!=elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17") && c.planningUnit.id == map.get("3"));
@@ -3107,6 +3297,13 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                         var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                         if (availableBudgetAmount < 0) {
+                            if (budgetJson.findIndex(c => c.budget.id == budget.id) == -1) {
+                                budgetJson.push({
+                                    budget: budget,
+                                    amount: Number(0 - Number(availableBudgetAmount)).toFixed(2),
+                                    shipmentList: shipmentList.filter(c=>[...new Set(json.map(ele => ele[2]))].includes(c.shipmentId))
+                                })
+                            }
                             negativeBudget = negativeBudget + 1;
                             inValid("R", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                         } else {
@@ -3328,7 +3525,12 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
         if (negativeBudget > 0 && valid == true) {
-            var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
+            var message="";
+            for(var i=0;i<budgetJson.length;i++){
+                message=message.concat(i18n.t("static.shipment.budgetWarning1")).concat(" ").concat(getLabelText(budgetJson[i].budget.label,this.state.lang)).concat(" (").concat(budgetJson[i].budget.name).concat(i18n.t("static.shipment.budgetWarning2")).concat(formatter(budgetJson[i].amount,0)).concat(" ").concat(i18n.t("static.shipment.budgetWarning3")).concat("\n");
+            }
+            message=message.concat(i18n.t("static.shipment.budgetWarning4"));
+            var cf = window.confirm(message);
             if (cf == true) {
                 return valid;
             } else {
@@ -3339,6 +3541,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             return valid;
         }
     }
+    /**
+     * This function is called when submit button of the shipment is clicked and is used to save shipment if all the data is successfully validated.
+     */
     saveShipments() {
         this.props.updateState("loading", true);
         var validation = this.checkValidationForShipments();
@@ -3838,6 +4043,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         });
         return (<div></div>)
     }
+    /**
+     * This function is used to open the strategic calculator in case of strategic product when clicked on quantity cell
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     shipmentEditStart = function (instance, cell, x, y, value) {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
         var elInstance = this.state.shipmentsEl;
@@ -3947,7 +4160,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             json.push(data)
             var options = {
                 data: json,
-                columnDrag: true,
+                columnDrag: false,
                 columns: [
                     {
                         // title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', 
@@ -4075,7 +4288,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 json1.push(data1)
                 var options1 = {
                     data: json1,
-                    columnDrag: true,
+                    columnDrag: false,
                     columns: [
                         { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                         { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },

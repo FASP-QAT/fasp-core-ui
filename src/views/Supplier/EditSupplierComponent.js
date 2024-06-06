@@ -10,6 +10,11 @@ let initialValues = {
     supplier: ""
 }
 const entityname = i18n.t('static.supplier.supplier');
+/**
+ * This const is used to define the validation schema for supplier details
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         supplier: Yup.string()
@@ -17,6 +22,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.supplier.suppliertext'))
     })
 }
+/**
+ * This component is used to display the supplier details in a form and allow user to edit the details
+ */
 class EditSupplierComponent extends Component {
     constructor(props) {
         super(props);
@@ -46,11 +54,18 @@ class EditSupplierComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to capitalize the first letter of the supplier name
+     * @param {*} str This is the name of the supplier name
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { supplier } = this.state;
@@ -59,6 +74,10 @@ class EditSupplierComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { supplier } = this.state;
         if (event.target.name == "supplier") {
@@ -72,7 +91,9 @@ class EditSupplierComponent extends Component {
         },
             () => { });
     };
-    
+    /**
+     * This function is used to supplier details by supplier Id on page load
+     */
     componentDidMount() {
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             if (response.status == 200) {
@@ -128,6 +149,10 @@ class EditSupplierComponent extends Component {
             }
         );
     }
+    /**
+     * This is used to display the content
+     * @returns This returns supplier details form
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -298,9 +323,15 @@ class EditSupplierComponent extends Component {
             </div>
         );
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to list supplier screen
+     */
     cancelClicked() {
         this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when reset button is clicked to reset the supplier details
+     */
     resetClicked() {
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             this.setState({

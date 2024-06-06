@@ -42,6 +42,9 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * This component is used to display the modeling validation for a tree
+ */
 class ModelingValidation extends Component {
     constructor(props) {
         super(props);
@@ -84,11 +87,14 @@ class ModelingValidation extends Component {
         this.getTreeList = this.getTreeList.bind(this);
         this.getDatasetData = this.getDatasetData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.toggledata = this.toggledata.bind(this)
     }
+    /**
+     * This function is used to set the node value selected by the user
+     * @param {*} e This is the event value
+     */
     setNodeVal(e) {
         this.setState({ loading: true })
         var nodeIdArr = [];
@@ -106,6 +112,10 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
+    /**
+     * This function is used to set the display by value selected by the user
+     * @param {*} e This is the event value
+     */
     setDisplayBy(e) {
         this.setState({ loading: true })
         var displayBy = e.target.value;
@@ -116,6 +126,10 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
+    /**
+     * This function is used to set the x axis display by value selected by the user
+     * @param {*} e This is the event value
+     */
     setXAxisDisplayBy(e) {
         this.setState({ loading: true })
         let displayBy = e.target.value;
@@ -153,21 +167,36 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
+    /**
+     * This function is used to show the text for the date picker
+     * @param {*} m 
+     * @returns 
+     */
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
+    /**
+     * This function is used to toggle the data
+     */
     toggledata() {
         var show = this.state.show;
         this.setState({
             show: !show
         })
     }
+    /**
+     * This function is used to toggle the info icon for the level field
+     */
     toggleLevelFeild() {
         this.setState({
             popoverOpenLevelFeild: !this.state.popoverOpenLevelFeild,
         });
     }
+    /**
+     * This function is used to set the version Id selected by the user
+     * @param {*} e This is the event value
+     */
     setVersionId(e) {
         this.setState({ loading: true })
         var versionId = e.target.value;
@@ -217,6 +246,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the dataset data
+     */
     getDatasetData() {
         this.setState({
             loading: true
@@ -321,6 +353,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the tree list
+     */
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
@@ -347,6 +382,10 @@ class ModelingValidation extends Component {
             this.setTreeId(event);
         })
     }
+    /**
+     * This function is used to set the tree Id selected by the user
+     * @param {*} e This is the event value
+     */
     setTreeId(e) {
         this.setState({ loading: true })
         var treeId = e.target.value;
@@ -380,6 +419,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the list of scenarios for a tree
+     */
     getScenarioList() {
         this.setState({ loading: true })
         var treeList = this.state.treeList;
@@ -392,7 +434,7 @@ class ModelingValidation extends Component {
             if (treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 5).length > 0) {
                 levelList.push(-2);
             }
-            var scenarioList = treeListFiltered.scenarioList;
+            var scenarioList = treeListFiltered.scenarioList.filter(c => c.active.toString() == "true");
             var scenarioId = "";
             var event = {
                 target: {
@@ -449,6 +491,10 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to set the scenario Id selected by the user
+     * @param {*} e This is the event value
+     */
     setScenarioId(e) {
         this.setState({ loading: true })
         var scenarioId = e.target.value;
@@ -473,6 +519,10 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to set the dataset(program) Id selected by the user
+     * @param {*} e This is the event value
+     */
     setDatasetId(e) {
         this.setState({ loading: true })
         var datasetId = e.target.value;
@@ -510,6 +560,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to build the modeling validation data in tabular format
+     */
     getData() {
         if (this.state.scenarioId > 0 && this.state.levelId != "" && this.state.nodeVal.length > 0) {
             this.setState({
@@ -584,7 +637,7 @@ class ModelingValidation extends Component {
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     for (var k = 0; k < nodeVal.length; k++) {
-                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                         var calculatedValueTotal = 0;
                         for (var fl = 0; fl < flatListFiltered.length; fl++) {
                             var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -633,7 +686,7 @@ class ModelingValidation extends Component {
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     for (var k = 0; k < nodeVal.length; k++) {
-                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                         var calculatedValueTotal = 0;
                         for (var fl = 0; fl < flatListFiltered.length; fl++) {
                             var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -676,7 +729,7 @@ class ModelingValidation extends Component {
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     for (var k = 0; k < nodeVal.length; k++) {
-                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                         var calculatedValueTotal = 0;
                         for (var fl = 0; fl < flatListFiltered.length; fl++) {
                             var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -689,6 +742,8 @@ class ModelingValidation extends Component {
                         }
                         var val = ""
                         if (calculatedValueTotal != "") {
+                            console.log("calculatedValueTotal Test@123", calculatedValueTotal);
+                            console.log("Total Test@123", total);
                             val = (Number(calculatedValueTotal) / Number(total)) * 100;
                         }
                         data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
@@ -705,7 +760,7 @@ class ModelingValidation extends Component {
             var json = [];
             var options = {
                 data: dataArr,
-                columnDrag: true,
+                columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns,
                 onload: this.loaded,
@@ -732,7 +787,7 @@ class ModelingValidation extends Component {
             this.el = dataEl;
             var options2 = {
                 data: dataArr2,
-                columnDrag: true,
+                columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns2,
                 onload: this.loaded,
@@ -780,9 +835,18 @@ class ModelingValidation extends Component {
             })
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
     }
+    /**
+     * This function is used to set the level Id selected by the user
+     * @param {*} e This is the event value
+     */
     setLevelId(e) {
         this.setState({ loading: true })
         var levelId = e.target.value;
@@ -848,6 +912,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the version list based on dataset(program) Id
+     */
     getVersionList() {
         this.setState({
             loading: true
@@ -915,6 +982,9 @@ class ModelingValidation extends Component {
             })
         }
     }
+    /**
+     * This function is used to get the list of dataset(programs)
+     */
     componentDidMount() {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
@@ -949,6 +1019,9 @@ class ModelingValidation extends Component {
             }
         );
     }
+    /**
+     * This function is used to get the list of datasets that are downloaded by user
+     */
     getOfflineDatasetList() {
         this.setState({
             loading: true
@@ -1029,8 +1102,10 @@ class ModelingValidation extends Component {
             }.bind(this)
         }.bind(this)
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * This function is called when the date range is changed
+     * @param {*} value This is the value of the daterange selected by the user
+     */
     handleYearRangeChange(value) {
         let val;
         if (this.state.xAxisDisplayBy == 2) {
@@ -1060,17 +1135,35 @@ class ModelingValidation extends Component {
             this.getData()
         })
     }
+    /**
+     * This function is used to set the value of the data range that is selected by the user
+     * @param {*} value This is the value of the daterange selected by the user
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.getData()
         })
     }
+    /**
+     * This function is called to show the date range picker
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+    /**
+     * This function is used to add the double quotes to the row
+     * @param {*} arr This is the arr of the row elements
+     * @returns This function returns the row with double quotes
+     */
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
+    /**
+     * This function is used to format a number
+     * @param {*} value This is the value that needs to be formatted
+     * @returns This function returns the formatted value
+     */
     formatter = value => {
         var cell1 = value
         cell1 += '';
@@ -1083,6 +1176,9 @@ class ModelingValidation extends Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is used to export the data in PDF format
+     */
     exportPDF() {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -1313,6 +1409,9 @@ class ModelingValidation extends Component {
         addFooters(doc)
         doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
     }
+    /**
+     * This function is used to export the data in CSV format
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -1410,6 +1509,10 @@ class ModelingValidation extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * This is used to display the content
+     * @returns The modeling validation data in tabular format along with the different filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1767,6 +1870,8 @@ class ModelingValidation extends Component {
                                                         value={this.state.nodeVal}
                                                         onChange={(e) => { this.setNodeVal(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -1802,7 +1907,7 @@ class ModelingValidation extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3 pickerRangeBox">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
-                                                <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
                                                 </Label>
                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
                                                     <div className="controls edit">
@@ -1812,7 +1917,6 @@ class ModelingValidation extends Component {
                                                             value={rangeValue}
                                                             lang={pickerLang}
                                                             key={JSON.stringify(rangeValue)}
-                                                            onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

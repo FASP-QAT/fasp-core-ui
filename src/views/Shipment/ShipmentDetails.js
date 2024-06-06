@@ -37,7 +37,11 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlanForDataEntry";
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations.js";
 const entityname = i18n.t('static.dashboard.shipmentdetails');
-
+/**
+ * This const is used to define the validation schema for replan modal popup
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchemaReplan = function (values) {
     return Yup.object().shape({
         procurementAgentId: Yup.string()
@@ -46,6 +50,9 @@ const validationSchemaReplan = function (values) {
             .required(i18n.t('static.subfundingsource.errorfundingsource')),
     })
 }
+/**
+ * This component is used to allow the users to do the data entry for the shipment records
+ */
 export default class ShipmentDetails extends React.Component {
     constructor(props) {
         super(props);
@@ -119,7 +126,6 @@ export default class ShipmentDetails extends React.Component {
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
         this.updateDataType = this.updateDataType.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
         this.pickAMonthSingle = React.createRef();
@@ -131,7 +137,12 @@ export default class ShipmentDetails extends React.Component {
         this.setBudgetId = this.setBudgetId.bind(this);
         this.planShipment = this.planShipment.bind(this)
     }
-    addCommas(cell, row) {
+    /**
+     * This method is used to add commas to the number
+     * @param {*} cell This is value of the number
+     * @returns It returns the number separated by commas
+     */
+    addCommas(cell) {
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -142,6 +153,9 @@ export default class ShipmentDetails extends React.Component {
         }
         return x1 + x2;
     }
+    /**
+     * This function is used to export the shipment data entry template so that user can copy paste the bulk data
+     */
     exportCSV() {
         let workbook = new Workbook();
         let worksheet = workbook.addWorksheet(i18n.t('static.supplyplan.shipmentDataEntry'));
@@ -329,6 +343,12 @@ export default class ShipmentDetails extends React.Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
+            worksheet.getCell('K' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
             worksheet.getCell('O' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -391,16 +411,19 @@ export default class ShipmentDetails extends React.Component {
         worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('Q').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('S').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('V').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
@@ -417,10 +440,10 @@ export default class ShipmentDetails extends React.Component {
             fs.saveAs(blob, i18n.t('static.supplyplan.shipmentDataEntry') + '.xlsx');
         })
     }
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * This function is used to update the shipment date range filter value
+     * @param {*} value This is the value that user has selected
+     */
     handleRangeDissmis(value) {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
@@ -438,6 +461,10 @@ export default class ShipmentDetails extends React.Component {
             this.formSubmit(this.state.planningUnit, value);
         }
     }
+    /**
+     * This method is used to update the shipment type
+     * @param {*} value This is the value of data type that user has selected
+     */
     updateDataType(value) {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
@@ -467,40 +494,61 @@ export default class ShipmentDetails extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div3 after 30 seconds
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div4 after 30 seconds
+     */
     hideFourthComponent() {
         document.getElementById('div4').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div4').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to hide the messages that are there in div5 after 30 seconds
+     */
     hideFifthComponent() {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1) {
             window.onbeforeunload = () => true
@@ -508,6 +556,9 @@ export default class ShipmentDetails extends React.Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used to fetch list all the offline programs that the user have downloaded
+     */
     componentDidMount = function () {
         document.getElementById("shipmentsDetailsTable").closest('.card').classList.add("removeCardwrap");
         var db1;
@@ -581,6 +632,10 @@ export default class ShipmentDetails extends React.Component {
             }.bind(this);
         }.bind(this)
     };
+    /**
+     * This function is used to fetch list all the planning units based on the programs that the user has selected
+     * @param {*} value This is value of the program that is selected either by user or is autoselected
+     */
     getPlanningUnitList(value) {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
@@ -756,6 +811,11 @@ export default class ShipmentDetails extends React.Component {
             }
         }
     }
+    /**
+     * This function is used fetch all the shipment records based on the filters and build all the necessary data
+     * @param {*} value This is the value of planning unit
+     * @param {*} rangeValue This is the value of date range that is selected
+     */
     formSubmit(value, rangeValue) {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
@@ -880,6 +940,9 @@ export default class ShipmentDetails extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when cancel button is clicked
+     */
     cancelClicked() {
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
@@ -903,6 +966,10 @@ export default class ShipmentDetails extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to toggle the batch details/Shipment dates or strategic model
+     * @param {*} method This method value is used to check if unsaved changes alert should be displayed or not
+     */
     toggleLarge(method) {
         var cont = false;
         if (method != "submit" && (this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1)) {
@@ -929,11 +996,17 @@ export default class ShipmentDetails extends React.Component {
             });
         }
     }
+    /**
+     * This function is used to dispaly the batch data
+     */
     openBatchPopUp() {
         this.setState({
             batchInfo: true,
         });
     }
+    /**
+     * This function is called when cancel button for batch details/Shipment dates or strategic model popup is clicked
+     */
     actionCanceled() {
         var cont = false;
         if (this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1) {
@@ -958,11 +1031,19 @@ export default class ShipmentDetails extends React.Component {
             })
         }
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * This function is used to toggle the replan model
+     */
     toggleReplan() {
         var budgetList = this.state.budgetListPlanAll.filter(c => c.fundingSource.fundingSourceId == TBD_FUNDING_SOURCE);
         this.setState({
@@ -977,6 +1058,10 @@ export default class ShipmentDetails extends React.Component {
             singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
         })
     }
+    /**
+     * This is used to display the content
+     * @returns The shipment data in tabular format
+     */
     render() {
         const checkOnline = localStorage.getItem('sessionType');
         const pickerLang = {
@@ -1054,7 +1139,6 @@ export default class ShipmentDetails extends React.Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
-                                                            onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -1071,6 +1155,7 @@ export default class ShipmentDetails extends React.Component {
                                                             options={this.state.programList}
                                                             value={this.state.programSelect}
                                                             onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -1085,6 +1170,8 @@ export default class ShipmentDetails extends React.Component {
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -1099,6 +1186,7 @@ export default class ShipmentDetails extends React.Component {
                                                             options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
                                                             value={this.state.shipmentType}
                                                             onChange={(e) => { this.updateDataType(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -1225,7 +1313,6 @@ export default class ShipmentDetails extends React.Component {
                                                         lang={pickerLang.months}
                                                         theme="dark"
                                                         key={JSON.stringify(this.state.singleValue)}
-                                                        onChange={this.handleAMonthChangeSingle}
                                                         onDismiss={this.handleAMonthDissmisSingle}
                                                     >
                                                         <MonthBox value={makeText(this.state.singleValue)} onClick={this.handleClickMonthBoxSingle} />
@@ -1338,27 +1425,49 @@ export default class ShipmentDetails extends React.Component {
             </div>
         );
     }
+    /**
+     * This function is called when replan date picker is clicked
+     * @param {*} e 
+     */
     handleClickMonthBoxSingle = (e) => {
         this.pickAMonthSingle.current.show()
     }
-    handleAMonthChangeSingle = (value, text) => {
-    }
+    /**
+     * This function is used to update the replan date filter value
+     * @param {*} value This is the value that user has selected
+     */
     handleAMonthDissmisSingle = (value) => {
         this.setState({ singleValue: value })
     }
+    /**
+     * This function is called when shipment date range picker is clicked
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
+    /**
+     * This function is used to set the planning unit Ids that are selected for replan
+     * @param {*} e This is value of the event
+     */
     setPlanningUnitIdsPlan(e) {
         this.setState({
             planningUnitIdsPlan: e,
         })
     }
+    /**
+     * This function is used to set the procurement agent Id that is selected for replan
+     * @param {*} e This is value of the event
+     */
     setProcurementAgentId(e) {
         this.setState({
             procurementAgentId: e.target.value
         })
     }
+    /**
+     * This function is used to set the funding source Id that is selected for replan
+     * @param {*} e This is value of the event
+     */
     setFundingSourceId(e) {
         var budgetList = this.state.budgetListPlanAll.filter(c => c.fundingSource.fundingSourceId == e.target.value);
         this.setState({
@@ -1367,11 +1476,18 @@ export default class ShipmentDetails extends React.Component {
             budgetId: budgetList.length == 1 ? budgetList[0].budgetId : "",
         })
     }
+    /**
+     * This function is used to set the budget Id that is selected for replan
+     * @param {*} e This is value of the event
+     */
     setBudgetId(e) {
         this.setState({
             budgetId: e.target.value
         })
     }
+    /**
+     * This function is used to actually create the plan shipments based on the user inputs
+     */
     planShipment() {
         var programId = document.getElementById('programId').value;
         var db1;

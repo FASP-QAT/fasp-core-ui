@@ -24,7 +24,12 @@ import StepOne from './StepOne.js';
 import StepSix from './StepSix.js';
 import StepThree from './StepThree.js';
 import StepTwo from './StepTwo.js';
+import { Capitalize } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.program.programMaster');
+/**
+ * Component for program onboarding.
+ * Allows users to go through a multi-step form for program onboarding.
+ */
 export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
@@ -92,7 +97,6 @@ export default class ProgramOnboarding extends Component {
             organisationCode: '',
             healthAreaCode: '',
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
@@ -117,6 +121,9 @@ export default class ProgramOnboarding extends Component {
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
+     /**
+     * Sets up the initial display state for the steps.
+     */
     componentDidMount() {
         let { program } = this.state;
         let realmId = AuthenticationService.getRealmId();
@@ -191,6 +198,9 @@ export default class ProgramOnboarding extends Component {
                 }
             );
     }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
     finishedStepOne() {
         this.setState({ progressPer: 17 });
         document.getElementById('stepOne').style.display = 'none';
@@ -201,6 +211,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles the completion of step two and updates the display to show step three.
+     */
     finishedStepTwo() {
         this.setState({ progressPer: 34 });
         document.getElementById('stepOne').style.display = 'none';
@@ -211,6 +224,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles the completion of step three and updates the display to show step four.
+     */
     finishedStepThree() {
         this.setState({ progressPer: 51 });
         document.getElementById('stepOne').style.display = 'none';
@@ -221,6 +237,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles the completion of step four and updates the display to show step five.
+     */
     finishedStepFour() {
         this.setState({ progressPer: 68 });
         document.getElementById('stepOne').style.display = 'none';
@@ -231,6 +250,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles the completion of step five and updates the display to show step six.
+     */
     finishedStepFive() {
         this.setState({ progressPer: 85 });
         document.getElementById('stepOne').style.display = 'none';
@@ -241,6 +263,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'block';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles the completion of step six and updates the display to show step seven.
+     */
     finishedStepSix() {
         this.setState({ progressPer: 102 });
         document.getElementById('stepOne').style.display = 'none';
@@ -251,9 +276,15 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'block';
     }
+    /**
+     * Method to remove any displayed message text from the component state.
+     */
     removeMessageText() {
         this.setState({ message: '' });
     }
+    /**
+     * Handles the completion of step seven and calling the api for saving the details on server.
+     */
     finishedStepSeven() {
         let { program } = this.state;
         var j = this.refs.child.myFunction();
@@ -314,9 +345,15 @@ export default class ProgramOnboarding extends Component {
             this.setState({ message: "Please Enter Valid Data." });
         }
     }
+    /**
+     * Function to add a new row to the jexcel table.
+     */
     addRowInJexcel() {
         this.refs.child.addRow();
     }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     previousToStepOne() {
         this.setState({ progressPer: 0 });
         document.getElementById('stepOne').style.display = 'block';
@@ -327,6 +364,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     previousToStepTwo() {
         this.setState({ progressPer: 17 });
         document.getElementById('stepOne').style.display = 'none';
@@ -341,6 +381,9 @@ export default class ProgramOnboarding extends Component {
         this.setState({ program }, () => {
         })
     }
+    /**
+     * Handles moving back to step three from any subsequent step and updates the display accordingly.
+     */
     previousToStepThree() {
         this.setState({ progressPer: 34 });
         document.getElementById('stepOne').style.display = 'none';
@@ -355,6 +398,9 @@ export default class ProgramOnboarding extends Component {
         this.setState({ program }, () => {
         })
     }
+    /**
+     * Handles moving back to step four from any subsequent step and updates the display accordingly.
+     */
     previousToStepFour() {
         this.setState({ progressPer: 51 });
         document.getElementById('stepOne').style.display = 'none';
@@ -369,6 +415,9 @@ export default class ProgramOnboarding extends Component {
         this.setState({ program }, () => {
         })
     }
+    /**
+     * Handles moving back to step five from any subsequent step and updates the display accordingly.
+     */
     previousToStepFive() {
         this.setState({ progressPer: 68 });
         document.getElementById('stepOne').style.display = 'none';
@@ -379,6 +428,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
     }
+    /**
+     * Handles moving back to step six from any subsequent step and updates the display accordingly.
+     */
     previousToStepSix() {
         this.setState({ progressPer: 85 });
         document.getElementById('stepOne').style.display = 'none';
@@ -389,19 +441,31 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSix').style.display = 'block';
         document.getElementById('stepSeven').style.display = 'none';
     }
-    Capitalize(str) {
-        let { program } = this.state
-        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Generates a country code based on the selected realm country ID.
+     * @param {Event} event - The change event containing the selected realm country ID.
+     */
     generateCountryCode(code) {
         this.setState({ realmCountryCode: code })
     }
+    /**
+     * Generates a health area code based on the selected health ID.
+     * @param {Event} event - The change event containing the selected health area ID.
+     */
     generateHealthAreaCode(code) {
         this.setState({ healthAreaCode: code })
     }
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(code) {
         this.setState({ organisationCode: code })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programName") {
@@ -474,6 +538,10 @@ export default class ProgramOnboarding extends Component {
     }
     getDependentLists(e) {
     }
+    /**
+     * Reterives the region list
+     * @param {Event} event - The change event.
+     */
     getRegionList(e) {
         ProgramService.getRegionList(e.target.value)
             .then(response => {
@@ -532,6 +600,10 @@ export default class ProgramOnboarding extends Component {
                 }
             );
     }
+    /**
+     * Handles the change event for regions.
+     * @param {Array} event - An array containing the selected region IDs.
+     */
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -543,6 +615,10 @@ export default class ProgramOnboarding extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
+    /**
+     * Handles the change event for health areas.
+     * @param {Array} event - An array containing the selected health area IDs.
+     */
     updateFieldDataHealthArea(value) {
         let { program } = this.state;
         this.setState({ healthAreaId: value });
@@ -554,6 +630,10 @@ export default class ProgramOnboarding extends Component {
         program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
     }
+    /**
+     * Renders the program onboarding screen.
+     * @returns {JSX.Element} - Program onboarding screen.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -661,7 +741,7 @@ export default class ProgramOnboarding extends Component {
                                         <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
                                     </div>
                                     <div id="stepSix">
-                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
+                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
                                     </div>
                                     <div id="stepSeven">
                                         <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>

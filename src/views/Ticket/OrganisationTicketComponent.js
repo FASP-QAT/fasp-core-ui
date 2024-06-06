@@ -13,6 +13,7 @@ import OrganisationService from '../../api/OrganisationService';
 import OrganisationTypeService from "../../api/OrganisationTypeService.js";
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent.js';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
 const initialValues = {
@@ -22,8 +23,14 @@ const initialValues = {
     organisationCode: '',
     organisationName: '',
     notes: '',
-    organisationType: ''
+    organisationType: '',
+    priority: 3
 }
+/**
+ * This const is used to define the validation schema for organisation ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -44,6 +51,9 @@ const validationSchema = function (values) {
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
     })
 }
+/**
+ * This component is used to display the organisation form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -56,6 +66,7 @@ export default class OrganisationTicketComponent extends Component {
                 organisationName: "",
                 notes: "",
                 organisationType: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -77,7 +88,12 @@ export default class OrganisationTicketComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
         this.getOrganisationTypeByRealmId = this.getOrganisationTypeByRealmId.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { organisation } = this.state
         if (event.target.name == "summary") {
@@ -108,7 +124,9 @@ export default class OrganisationTicketComponent extends Component {
             organisation
         }, () => { })
     };
-   
+    /**
+     * This function is used to get the display name for organisation
+     */
     getDisplayName() {
         let realmId = this.state.realm;
         let organisationValue = this.state.organisation.organisationName;
@@ -213,9 +231,16 @@ export default class OrganisationTicketComponent extends Component {
             }
         }
     }
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.organisation.organisationName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This function is used to get realm and organisation type lists on page load
+     */
     componentDidMount() {
         UserService.getRealmList()
             .then(response => {
@@ -282,6 +307,10 @@ export default class OrganisationTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get list of organisation type based on realm Id
+     * @param {*} realmId This is the realm Id for which organisation type should appear
+     */
     getOrganisationTypeByRealmId(realmId) {
         if (realmId != "") {
             OrganisationTypeService.getOrganisationTypeByRealmId(realmId)
@@ -350,6 +379,28 @@ export default class OrganisationTicketComponent extends Component {
             })
         }
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { organisation } = this.state;
+        organisation.priority = newState;
+        this.setState(
+            {
+                organisation
+            }, () => {
+
+            }
+        );
+    }
+
+    /**
+     * This function is used to update the realm country based on user selection
+     * @param {*} value This is the value of realm country that user has selected
+     */
     updateFieldData(value) {
         let { organisation } = this.state;
         this.setState({ countryId: value });
@@ -361,6 +412,10 @@ export default class OrganisationTicketComponent extends Component {
         organisation.realmCountryId = realmCountryIdArray;
         this.setState({ organisation: organisation });
     }
+    /**
+     * This function is used to get list of realm country based on realm Id
+     * @param {*} realmId This is the realm Id for which realm country should appear
+     */
     getRealmCountryList(realmId) {
         if (realmId != "") {
             HealthAreaService.getRealmCountryList(realmId)
@@ -427,11 +482,17 @@ export default class OrganisationTicketComponent extends Component {
                 );
         }
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the budget details
+     */
     resetClicked() {
         let { organisation } = this.state;
         organisation.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
@@ -448,6 +509,10 @@ export default class OrganisationTicketComponent extends Component {
         },
             () => { });
     }
+    /**
+     * This is used to display the content
+     * @returns This returns organisation details form
+     */
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -480,7 +545,8 @@ export default class OrganisationTicketComponent extends Component {
                             organisationCode: this.state.organisation.organisationCode,
                             organisationName: this.state.organisation.organisationName,
                             notes: this.state.organisation.notes,
-                            organisationType: this.state.organisationTypeId
+                            organisationType: this.state.organisationTypeId,
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -665,6 +731,9 @@ export default class OrganisationTicketComponent extends Component {
                                             value={this.state.organisation.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.organisation.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

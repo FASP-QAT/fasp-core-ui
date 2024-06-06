@@ -30,6 +30,11 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Defines the validation schema for tree extrapolation.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
@@ -140,7 +145,12 @@ const validationSchemaExtrapolation = function (values) {
                 }),
     })
 }
-
+/**
+ * Formats a number by adding commas as thousands separators and truncating decimals after the fourth digit.
+ * @param {number} cell1 - The number to be formatted.
+ * @param {Object} row - The row object (not used in this function).
+ * @returns {string} The formatted number with commas as thousands separators.
+ */
 function addCommasExtrapolation(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -156,6 +166,9 @@ function addCommasExtrapolation(cell1, row) {
         return "";
     }
 }
+/**
+ * Component for tree extrapolation
+ */
 export default class TreeExtrapolationComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -268,6 +281,9 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
         this.setButtonFlag = this.setButtonFlag.bind(this);
     }
+    /**
+     * Calculates the difference between selected date range
+     */
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
         let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
@@ -277,6 +293,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             monthsDiff: Math.round(monthsDiff) + 1
         });
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     handleRangeDissmis1(value) {
         this.setState({ rangeValue1: value, dataChanged: true }, () => {
             this.getDateDifference();
@@ -325,17 +346,32 @@ export default class TreeExtrapolationComponent extends React.Component {
             });
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox1(e) {
         this.pickRange1.current.show()
     }
+    /**
+     * Handles change for seasonality check box.
+     * @param {Event} event - The change event.
+     */
     seasonalityCheckbox(event) {
         this.setState({
             seasonality: event.target.checked ? 1 : 0
         });
     }
+    /**
+     * Toggle the display of jexcel table
+     */
     toggleJexcelData() {
         this.setState({ showJexcelData: !this.state.showJexcelData })
     }
+    /**
+     * Handles extrapolation data submission and saves the data in indexed db
+     */
     saveJexcelData() {
         var jexcelDataArr = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
@@ -358,6 +394,11 @@ export default class TreeExtrapolationComponent extends React.Component {
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         this.setState({ jexcelDataArr, nodeDataExtrapolation }, () => { this.buildJexcel() });
     }
+    /**
+     * Checks for gaps in the actual values and prompts the user to fill them or interpolate.
+     * If `type` is true, initiates extrapolation calculation, otherwise, builds extrapolation for MOM.
+     * @param {boolean} type - Indicates whether to calculate extrapolation (true) or build extrapolation for MOM (false).
+     */
     checkActualValuesGap(type) {
         this.setState({ extrapolationLoader: true }, () => {
             setTimeout(() => {
@@ -410,6 +451,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }, 0);
         });
     }
+    /**
+     * Updates the extrapolation notes state with the provided value.
+     * @param {String} notes The new value for the extrapolation notes.
+     */
     changeNotes(notes) {
         const { nodeDataExtrapolation } = this.state;
         nodeDataExtrapolation.notes = notes;
@@ -417,6 +462,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             nodeDataExtrapolation
         })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildExtrapolationMom() {
         var rangeValue = this.state.rangeValue1;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
@@ -576,7 +625,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         });
     }
-    
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidationExtrapolation() {
         var valid = true;
         var json = this.state.dataExtrapolation.getJson(null, false);
@@ -659,11 +711,19 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         return valid;
     }
+    /**
+     * Handle change in extrapolation method
+     * @param {Event} e The change event
+     */
     extrapolationMethodChange(e) {
         this.state.nodeDataExtrapolation.extrapolationMethod.id = e.target.value;
         this.state.dataExtrapolation.setValueFromCoords(13, 0, e.target.value, true);
         this.setState({ isChanged: true });
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setMonthsForMovingAverage(e) {
         this.setState({
         })
@@ -675,6 +735,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setAlpha(e) {
         var alpha = e.target.value;
         this.setState({
@@ -684,6 +748,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setBeta(e) {
         var beta = e.target.value;
         this.setState({
@@ -693,6 +761,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setGamma(e) {
         var gamma = e.target.value;
         this.setState({
@@ -702,6 +774,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setConfidenceLevelId(e) {
         var confidenceLevelId = e.target.value;
         this.setState({
@@ -711,6 +787,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setConfidenceLevelIdLinearRegression(e) {
         var confidenceLevelIdLinearRegression = e.target.value;
         this.setState({
@@ -720,6 +800,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setConfidenceLevelIdArima(e) {
         var confidenceLevelIdArima = e.target.value;
         this.setState({
@@ -729,6 +813,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setPId(e) {
         this.setState({
             p: e.target.value,
@@ -737,6 +825,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setDId(e) {
         this.setState({
             d: e.target.value,
@@ -745,6 +837,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setQId(e) {
         this.setState({
             q: e.target.value,
@@ -753,6 +849,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * Calculates extrapolation data
+     * @param {boolean} dataAvailabel Flag to check if data is available or not
+     */
     calculateExtrapolatedData(dataAvailabel) {
         var monthArray = this.state.monthArray;
         var jexcelDataArr = [];
@@ -908,6 +1008,9 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         });
     }
+    /**
+     * Function to interpolate missing data
+     */
     interpolate() {
         this.setState({ extrapolationLoader: true, isChanged: true, noDataMessage: "" }, () => {
             setTimeout(() => {
@@ -982,6 +1085,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             }, 0);
         })
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value,
@@ -992,18 +1100,19 @@ export default class TreeExtrapolationComponent extends React.Component {
             }, 0);
         })
     }
+    /**
+     * Handles manual chage in extrapolation
+     * @param {Event} e The change event
+     */
     manualChangeExtrapolation(e) {
         const { currentItemConfig } = this.props.items;
         (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
         this.state.dataExtrapolation.setValueFromCoords(12, 0, (e.target.checked == true ? true : false), true);
         this.props.updateState("currentItemConfig", currentItemConfig);
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    componentDidMount() {
-    }
+    /**
+     * Resets extrapolation data on reset button clicked
+     */
     resetExtrapolation() {
         var startDate1 = moment(this.props.items.forecastStartDate).startOf('month').subtract(23, 'months').startOf('month').utc().format("YYYY-MM-DD");
         var endDate1 = moment(this.props.items.forecastStartDate).startOf('month').utc().format("YYYY-MM-DD");
@@ -1051,6 +1160,9 @@ export default class TreeExtrapolationComponent extends React.Component {
             this.getExtrapolationMethodList();
         })
     }
+    /**
+     * Reterives extrapolation method list
+     */
     getExtrapolationMethodList() {
         this.setState({
             extrapolationLoader: true
@@ -1259,6 +1371,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }.bind(this)
         })
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         let dataArray = [];
         let data = [];
@@ -1341,7 +1457,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         var options = {
             data: dataArray,
-            columnDrag: true,
+            columnDrag: false,
             nestedHeaders: [nestedHeaders],
             columns: [
                 {
@@ -1626,9 +1742,15 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
         })
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loadedExtrapolation = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        // var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.querySelector("#tableDiv thead");      
         var tr = asterisk.firstChild.nextSibling;
         tr.children[3].classList.add('InfoTr');
         tr.children[3].title = i18n.t('static.tooltip.ReportingRate');
@@ -1653,6 +1775,14 @@ export default class TreeExtrapolationComponent extends React.Component {
             tr.children[9].title = i18n.t('static.tooltip.arima');
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     extrapolationChanged = function (instance, cell, x, y, value) {
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -1746,6 +1876,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         this.setState({ isChanged: true })
     }.bind(this);
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setMovingAvgId(e) {
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
@@ -1785,6 +1919,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setSemiAvgId(e) {
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
@@ -1821,6 +1959,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setLinearRegressionId(e) {
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
@@ -1857,6 +1999,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setSmoothingId(e) {
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
@@ -1894,6 +2040,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
+    /**
+     * Handles data change in the form.
+     * @param {Event} e - The change event.
+     */
     setArimaId(e) {
         var json1;
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
@@ -1931,71 +2081,113 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         })
     }
+    /**
+     * Toggle show guidance popup
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Toggle info for q value
+     */
     toggleQ() {
         this.setState({
             popoverOpenQ: !this.state.popoverOpenQ,
         });
     }
+    /**
+     * Toggle info for d value
+     */
     toggleD() {
         this.setState({
             popoverOpenD: !this.state.popoverOpenD,
         });
     }
+    /**
+     * Toggle info for p value
+     */
     toggleP() {
         this.setState({
             popoverOpenP: !this.state.popoverOpenP,
         });
     }
+    /**
+     * Toggle info for gamma value
+     */
     toggleGamma() {
         this.setState({
             popoverOpenGamma: !this.state.popoverOpenGamma,
         });
     }
+    /**
+     * Toggle info for beta value
+     */
     toggleBeta() {
         this.setState({
             popoverOpenBeta: !this.state.popoverOpenBeta,
         });
     }
+    /**
+     * Toggle info for alpha value
+     */
     toggleAlpha() {
         this.setState({
             popoverOpenAlpha: !this.state.popoverOpenAlpha,
         });
     }
+    /**
+     * Toggle info for confidence level
+     */
     toggleConfidenceLevel() {
         this.setState({
             popoverOpenConfidenceLevel: !this.state.popoverOpenConfidenceLevel,
         });
     }
+    /**
+     * Toggle info for confidence level 1
+     */
     toggleConfidenceLevel1() {
         this.setState({
             popoverOpenConfidenceLevel1: !this.state.popoverOpenConfidenceLevel1,
         });
     }
+    /**
+     * Toggle info for linear regression
+     */
     toggleLr() {
         this.setState({
             popoverOpenLr: !this.state.popoverOpenLr,
         });
     }
+    /**
+     * Toggle info for TES
+     */
     toggleTes() {
         this.setState({
             popoverOpenTes: !this.state.popoverOpenTes,
         });
     }
+    /**
+     * Toggle info for Arima
+     */
     toggleArima() {
         this.setState({
             popoverOpenArima: !this.state.popoverOpenArima,
         });
     }
+    /**
+     * Toggle info for semi average
+     */
     toggleSa() {
         this.setState({
             popoverOpenSa: !this.state.popoverOpenSa,
         });
     }
+    /**
+     * Toggle info for moving average
+     */
     toggleMa() {
         this.setState({
             popoverOpenMa: !this.state.popoverOpenMa,
@@ -2006,10 +2198,16 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenChooseMethod: !this.state.popoverOpenChooseMethod,
         });
     }
+    /**
+     * Sets button flag in state
+     */
     setButtonFlag(buttonFalg) {
         this.setState({ buttonFalg: buttonFalg });
     }
-    
+    /**
+     * Renders the tree extrapolation screen.
+     * @returns {JSX.Element} - Tree extrapolation screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

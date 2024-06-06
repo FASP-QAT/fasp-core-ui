@@ -11,8 +11,8 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { checkValidation, changed, jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { contrast, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
@@ -25,6 +25,9 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Import from QAT supply plan step one for the import
+ */
 export default class StepOneImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -56,13 +59,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selectedForecastProgram: '',
             getDatasetFilterList: [],
             selSource1: [],
-            isChanged1: false
+            isChanged1: false,
+            toggleDoNotImport: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -72,18 +75,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getProgramPlanningUnit = this.getProgramPlanningUnit.bind(this);
+        this.updatePUs = this.updatePUs.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.onchangepage = this.onchangepage.bind(this)
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div12').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -91,6 +97,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * Reterives the tracer category list
+     */
     getTracerCategoryList() {
         DropdownService.getTracerCategoryDropdownList()
             .then(response => {
@@ -142,7 +151,39 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
+        if (x == 2 || x == 9 || x == 7) {
+            var rowData = this.el.getRowData(y);
+            this.el.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var match = rowData[10];
+            if (match == 1 || rowData[1] == rowData[7]) {
+                var cell1 = this.el.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = this.el.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[7];
+            if (doNotImport == -1) {
+                var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = this.el.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                this.el.setComments(`J${parseInt(y) + 1}`, "");
+            } else {
+                var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+            }
+        }
+
         changed(instance, cell, x, y, value)
         this.props.removeMessageText && this.props.removeMessageText();
         var selectedPlanningUnitObj = "";
@@ -223,12 +264,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Calls getPrograms function on component mount
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Reterives the forecast programs from indexed db
+     */
     getDatasetList() {
         var db1;
         getDatabase();
@@ -297,6 +341,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives supply plan programs from server
+     */
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
@@ -351,8 +398,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({
             rangeValue: value
@@ -360,13 +410,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.filterData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Reterives planning unit list based on program and version Id
+     */
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -484,6 +538,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             document.getElementById("stepOneBtn").disabled = true;
         }
     }
+    /**
+     * Reterives forecast planning unit list based on forecast program
+     */
     getProgramPlanningUnit() {
         let versionId = this.state.forecastProgramVersionId;
         let forecastProgramId = document.getElementById("forecastProgramId").value;
@@ -531,6 +588,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -584,7 +645,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
                 {
@@ -654,32 +715,65 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
-                if (y != null) {
-                    var elInstance = el;
-                    elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
-                    var rowData = elInstance.getRowData(y);
-                    var match = rowData[10];
-                    if (match == 1 || rowData[1] == rowData[7]) {
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-                    }
-                    var doNotImport = rowData[7];
-                    if (doNotImport == -1) {
-                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'color', textColor);
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                        elInstance.setComments(`J${parseInt(y) + 1}`, "");
-                    } else {
+            onfilter: function (el) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var y = 0; y < jsonLength; y++) {
+                    try {
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(y);
+                        var match = rowData[10];
+                        if (match == 1 || rowData[1] == rowData[7]) {
+                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                            cell1.classList.remove('readonly');
+                        }
+                        var doNotImport = rowData[7];
+                        if (doNotImport == -1) {
+                            var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                            cell1.classList.add('doNotImport');
+                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            elInstance.setComments(`J${parseInt(y) + 1}`, "");
+                        } else {
+                            var cell1 = this.el.getCell(`H${parseInt(y) + 1}`)
+                            cell1.classList.remove('doNotImport');
+                        }
+                    } catch (error) {
+
                     }
                 }
             }.bind(this),
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            //     if (y != null) {
+            //         var elInstance = el;
+            //         elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            //         var rowData = elInstance.getRowData(y);
+            //         var match = rowData[10];
+            //         if (match == 1 || rowData[1] == rowData[7]) {
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //         } else {
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+            //         }
+            //         var doNotImport = rowData[7];
+            //         if (doNotImport == -1) {
+            //             elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', 'transparent');
+            //             elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', '#f48282');
+            //             let textColor = contrast('#f48282');
+            //             elInstance.setStyle(`H${parseInt(y) + 1}`, 'color', textColor);
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //             elInstance.setComments(`J${parseInt(y) + 1}`, "");
+            //         } else {
+            //         }
+            //     }
+            // }.bind(this),
             pagination: 5000000,
             filters: true,
             search: true,
@@ -707,6 +801,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
+    /**
+     * Filters planning unit list based on tracer category
+     */
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[5];
@@ -726,18 +823,25 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * Sets the program id in the component state on change and builds data accordingly.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
             versionId: '',
             forecastProgramId: '',
-            selSource1: []
+            selSource1: [],
+            toggleDoNotImport:false
         }, () => {
             this.filterVersion();
             this.filterForcastUnit();
             this.filterData();
         })
     }
+    /**
+     * Filters versions based on program
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -804,6 +908,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => { })
         }
     }
+    /**
+     * Filters the dataset list based on the selected program ID and updates the state accordingly.
+     */
     filterForcastUnit = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -825,13 +932,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => { })
         }
     }
+    /**
+     * Sets the version id in the component state on change and builds data accordingly.
+     */
     setVersionId(event) {
         this.setState({
-            versionId: event.target.value
+            versionId: event.target.value,
+            toggleDoNotImport:false,
+            selSource1: [],
         }, () => {
             this.filterData();
         })
     }
+    /**
+     * Handles the selection of a forecast program ID and updates the state accordingly.
+     * @param {Object} event The event object containing information about the selected forecast program ID.
+     */
     setForecastProgramId(event) {
         var forecastProgramId = event.target.value;
         if (forecastProgramId != "" && forecastProgramId != 0) {
@@ -844,9 +960,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
             this.setState({
                 forecastProgramId: event.target.value,
+                selSource1: [],
                 rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                 forecastProgramVersionId: forecastProgramVersionId,
-                selectedForecastProgram: selectedForecastProgram
+                selectedForecastProgram: selectedForecastProgram,
+                toggleDoNotImport:false
             }, () => {
                 this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
                 this.filterData();
@@ -861,11 +979,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
                 forecastProgramVersionId: 0,
                 selectedForecastProgram: '',
-            },()=>{
+                toggleDoNotImport:false
+            }, () => {
                 jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             })
         }
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -927,6 +1050,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Saves the data in the form of json
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -952,6 +1078,130 @@ export default class StepOneImportMapPlanningUnits extends Component {
         } else {
         }
     }
+    /**
+         * Sets the state to toggle do not import flag.
+         * @param {Event} e - The change event.
+         * @returns {void}
+         */
+    setToggleDoNotImport(e) {
+        this.setState({
+            toggleDoNotImport: e.target.checked,
+            loading: true
+        }, () => {
+            this.updatePUs()
+        })
+    }
+    updatePUs() {
+        var tableJson = this.el.getJson(null, false);
+        if (this.state.toggleDoNotImport) {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[7] == "") {
+                    this.el.setValueFromCoords(7, parseInt(i), -1, true);
+                }
+            }
+        } else {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[7] == -1) {
+                    this.el.setValueFromCoords(7, parseInt(i), "", true);
+                }
+            }
+        }
+    }
+    /**
+     * This function is used to format the consumption table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var y = 0; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[10];
+            if (match == 1 || rowData[1] == rowData[7]) {
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[7];
+            if (doNotImport == -1) {
+                var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                elInstance.setComments(`J${parseInt(y) + 1}`, "");
+            } else {
+                try {
+                    var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                    cell1.classList.remove('doNotImport');
+                } catch (err) { }
+            }
+
+        }
+    }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[10];
+            if (match == 1 || rowData[1] == rowData[7]) {
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[7];
+            if (doNotImport == -1) {
+                var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                elInstance.setComments(`J${parseInt(y) + 1}`, "");
+            } else {
+                try {
+                    var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                    cell1.classList.remove('doNotImport');
+                } catch (err) { }
+            }
+        }
+    }
+    /**
+     * Renders the import from QAT supply plan step one screen.
+     * @returns {JSX.Element} - Import from QAT supply plan step one screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1058,13 +1308,27 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     value={rangeValue}
                                     lang={pickerLang}
                                     key={JSON.stringify(rangeValue)}
-                                    onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
                                 >
-                                    <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
                             </div>
                         </FormGroup>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 && this.state.programId!=0 && this.state.versionId!=0 && this.state.forecastProgramId!=0 && this.state.programId!="" && this.state.versionId!="" && this.state.forecastProgramId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
+                            <Input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="toggleDoNotImport"
+                                name="toggleDoNotImport"
+                                checked={this.state.toggleDoNotImport}
+                                onClick={(e) => { this.setToggleDoNotImport(e); }}
+                            />
+                            <Label
+                                className="form-check-label"
+                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                {i18n.t('static.import.doNoImportCheckbox')}
+                            </Label>
+                        </FormGroup>}
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable">

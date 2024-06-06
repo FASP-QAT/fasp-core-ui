@@ -6,10 +6,12 @@ import { API_URL } from '../../Constants';
 import PipelineService from "../../api/PipelineService.js";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-const initialValues = {
-    fileTypeId: "",
-}
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
+/**
+ * Component for pipeline program import
+ */
 export default class PipelineProgramImport extends Component {
     constructor(props) {
         super(props);
@@ -24,20 +26,18 @@ export default class PipelineProgramImport extends Component {
         this.showFile = this.showFile.bind(this);
         this.showPipelineProgramInfo = this.showPipelineProgramInfo.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.toggleModalView = this.toggleModalView.bind(this);
     }
-    componentDidMount() {
-    }
-    
+    /**
+     * Toggles the modal view.
+     */
     toggleModalView() {
         this.setState({ toggelView: !this.state.toggelView });
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Displays a confirmation dialog for submitting pipeline program information.
+     * If confirmed, saves the JSON data.
+     */
     showPipelineProgramInfo() {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -60,7 +60,7 @@ export default class PipelineProgramImport extends Component {
                                         loading: false
                                     },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                             }).catch(
@@ -113,6 +113,10 @@ export default class PipelineProgramImport extends Component {
             ]
         });
     }
+    /**
+     * Reads the uploaded JSON file.
+     * @param {Event} e - The event object.
+     */
     showFile = async (e) => {
         e.preventDefault()
         const reader = new FileReader();
@@ -123,6 +127,10 @@ export default class PipelineProgramImport extends Component {
         };
         reader.readAsText(e.target.files[0])
     }
+    /**
+     * Renders the PipelineProgramImport component.
+     * @returns {JSX.Element} The JSX element to render.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -187,9 +195,15 @@ export default class PipelineProgramImport extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list pipeline program screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/pipeline/pieplineProgramList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }));
     }
+    /**
+     * Resets the pipeline program details when reset button is clicked.
+     */
     resetClicked = () => {
         const file = document.getElementById('file-input');
         file.value = '';

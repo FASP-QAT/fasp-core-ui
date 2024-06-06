@@ -24,7 +24,6 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -48,19 +47,22 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, dateFormatterCSV, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables, dateformatterCSV } from '../../CommonComponent/JExcelCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Expired Inventory Report.
+ */
 export default class ExpiredInventory extends Component {
     constructor(props) {
         super(props);
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.makeText = this.makeText.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         var dt = new Date();
@@ -83,9 +85,16 @@ export default class ExpiredInventory extends Component {
             lang: localStorage.getItem('lang')
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms();
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState(
             {
@@ -96,6 +105,10 @@ export default class ExpiredInventory extends Component {
                 this.filterVersion();
             })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         this.setState(
             {
@@ -104,20 +117,27 @@ export default class ExpiredInventory extends Component {
                 this.getPlanningUnit();
             })
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData();
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -182,6 +202,9 @@ export default class ExpiredInventory extends Component {
             this.consolidatedProgramList()
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -238,6 +261,12 @@ export default class ExpiredInventory extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -317,6 +346,13 @@ export default class ExpiredInventory extends Component {
             });
         }
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -376,6 +412,9 @@ export default class ExpiredInventory extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves the list of planning units for a selected program and version.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -471,26 +510,18 @@ export default class ExpiredInventory extends Component {
             }
         });
     }
+    /**
+     * Formats a date value into the format 'DD-MMM-YY' (e.g., '20 Jan 22').
+     * @param {Date|string} value - The date value to be formatted. It can be a Date object or a string representing a date.
+     * @returns {string} - The formatted date string in the 'DD-MMM-YY' format.
+     */
     dateformatter = value => {
         var dt = new Date(value)
         return moment(dt).format('DD-MMM-YY');
     }
-    dateformatterCSV = value => {
-        var dt = new Date(value)
-        return moment(dt).format('DD-MMM-YYYY');
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData() {
         let json = {
             "programId": document.getElementById("programId").value,
@@ -688,6 +719,12 @@ export default class ExpiredInventory extends Component {
             });
         }
     }
+    /**
+     * This function is used to display the ledger of a particular batch No for local versions
+     * @param {*} batchNo This is the value of the batch number for which the ledger needs to be displayed
+     * @param {*} createdDate This is the value of the created date for which the ledger needs to be displayed
+     * @param {*} expiryDate  This is the value of the expire date for which the ledger needs to be displayed
+     */
     showBatchLedgerClickedLocal(batchNo, createdDate, expiryDate) {
         this.setState({ loading: true })
         var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
@@ -704,6 +741,12 @@ export default class ExpiredInventory extends Component {
             loading: false
         })
     }
+    /**
+     * This function is used to display the ledger of a particular batch No for server versions
+     * @param {*} batchNo The batch number for which the ledger needs to be displayed
+     * @param {*} createdDate The created date for which the ledger needs to be displayed
+     * @param {*} expiryDate The expire date for which the ledger needs to be displayed
+     */
     showBatchLedgerClickedServer(batchId) {
         this.setState({ loading: true })
         var outPutList = this.state.outPutList.filter(c => c.batchInfo.batchId == batchId);
@@ -716,12 +759,13 @@ export default class ExpiredInventory extends Component {
             loading: false
         })
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV = (columns) => {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
         csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -731,8 +775,8 @@ export default class ExpiredInventory extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatterCSV(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(ele.shelfLife), (this.dateformatterCSV(ele.batchInfo.expiryDate)).replaceAll(' ', '%20'), (this.formatter(Math.round(ele.cost * ele.expiredQty))).replaceAll(' ', '%20')])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.outPutList.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), formatter(ele.expiredQty,0), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (dateFormatterCSV(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), formatter(ele.shelfLife,0), (dateformatterCSV(ele.batchInfo.expiryDate)).replaceAll(' ', '%20'), (formatter(Math.round(ele.cost * ele.expiredQty),0)).replaceAll(' ', '%20')])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -744,6 +788,10 @@ export default class ExpiredInventory extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -774,7 +822,7 @@ export default class ExpiredInventory extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -796,7 +844,7 @@ export default class ExpiredInventory extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate), (this.formatter(Math.round(ele.cost * ele.expiredQty)))]);
+        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(ele.expiredQty,0), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate), (formatter(Math.round(ele.cost * ele.expiredQty),0))]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,
@@ -809,6 +857,9 @@ export default class ExpiredInventory extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.expiredInventory') + ".pdf")
     }
+    /**
+     * Builds the jexcel table based on the output list.
+     */
     buildJExcel() {
         let outPutList = this.state.outPutList;
         let outPutListArray = [];
@@ -833,7 +884,7 @@ export default class ExpiredInventory extends Component {
         var data = outPutListArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 60, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -882,7 +933,7 @@ export default class ExpiredInventory extends Component {
                 }
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -908,6 +959,9 @@ export default class ExpiredInventory extends Component {
             languageEl: languageEl, loading: false
         })
     }
+    /**
+     * Redirects to the supply planning screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             var elInstance = instance;
@@ -925,6 +979,13 @@ export default class ExpiredInventory extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Toggle the batch ledger
+     * @param {*} batchNo The batch number for which the ledger needs to be displayed
+     * @param {*} createdDate The created date for which the ledger needs to be displayed 
+     * @param {*} expiryDate The expire date for which the ledger needs to be displayed 
+     * @param {*} batchId The batch Id for which the ledger needs to be displayed 
+     */
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
@@ -936,14 +997,18 @@ export default class ExpiredInventory extends Component {
             this.showBatchLedgerClickedServer(batchId)
         }
     }
+    /**
+     * Toggles the expired stock modal on cancel clicked.
+     */
     actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Renders the Expired Inventory report table.
+     * @returns {JSX.Element} - Expired Inventory report table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1144,7 +1209,6 @@ export default class ExpiredInventory extends Component {
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     value={rangeValue}
                                                     lang={pickerLang}
-                                                    onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

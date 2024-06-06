@@ -15,6 +15,11 @@ const initialValues = {
     dimensionId: []
 }
 const entityname = i18n.t('static.unit.unit');
+/**
+ * This const is used to define the validation schema for unit
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         dimensionId: Yup.string()
@@ -28,6 +33,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.unit.unitcodetext'))
     })
 }
+/**
+ * This component is used to display the unit details in a form and allow user to add the details
+ */
 class AddUnitComponent extends Component {
     constructor(props) {
         super(props);
@@ -51,6 +59,10 @@ class AddUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { unit } = this.state;
         if (event.target.name == "dimensionId") {
@@ -67,6 +79,10 @@ class AddUnitComponent extends Component {
         },
             () => { });
     };
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -74,12 +90,17 @@ class AddUnitComponent extends Component {
             return "";
         }
     }
-    
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used get dimension list
+     */
     componentDidMount() {
         DimensionService.getDimensionListAll()
             .then(response => {
@@ -141,6 +162,10 @@ class AddUnitComponent extends Component {
                 }
             );
     }
+    /**
+     * This is used to display the content
+     * @returns This returns unit details form
+     */
     render() {
         const { dimensions } = this.state;
         let dimensionList = dimensions.length > 0
@@ -308,9 +333,15 @@ class AddUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to list unit screen
+     */
     cancelClicked() {
         this.props.history.push(`/unit/listUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * This function is called when reset button is clicked to reset the unit details
+     */
     resetClicked() {
         let { unit } = this.state;
         unit.dimension.id = ''

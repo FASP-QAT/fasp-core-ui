@@ -20,6 +20,9 @@ import { DATE_FORMAT_CAP_WITHOUT_DATE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+/**
+ * Component for Qunatimed Import step five for showing final consumption details for the import
+ */
 export default class QunatimedImportStepFive extends Component {
     constructor(props) {
         super(props);
@@ -35,8 +38,11 @@ export default class QunatimedImportStepFive extends Component {
         this.changedImport = this.changedImport.bind(this);
         this.changeColor = this.changeColor.bind(this);
     }
-    componentDidMount() {
-    }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
     loaded_four = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionQuantimed(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
@@ -44,20 +50,45 @@ export default class QunatimedImportStepFive extends Component {
         tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
         tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
     }
+    /**
+     * Updates the component state with the provided parameter name and value.
+     * @param {string} parameterName - The name of the parameter to update in the component state.
+     * @param {*} value - The new value to set for the parameter.
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
     }
+    /**
+     * Redirects to the dashboard page.
+     */
     redirectToDashbaord() {
         this.props.redirectToDashboard();
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changedImport = function (instance, cell, x, y, value) {
     }
+    /**
+     * Calculates the difference in months between two dates.
+     * @param {Date} dateFrom - The start date.
+     * @param {Date} dateTo - The end date.
+     * @returns {number} - The difference in months between the two dates.
+     */
     monthDiff(dateFrom, dateTo) {
         return dateTo.getMonth() - dateFrom.getMonth() +
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
+    /**
+     * Function to save the consumption data
+     */
     formSubmit() {
         var tableJson = this.el.getJson(null, false);
         var count = 0;
@@ -264,6 +295,9 @@ export default class QunatimedImportStepFive extends Component {
             });
         }
     }
+    /**
+     * Changes the color of cells based on certain conditions.
+     */
     changeColor() {
         var elInstance = this.state.importEl;
         var json = elInstance.getJson();
@@ -280,6 +314,10 @@ export default class QunatimedImportStepFive extends Component {
             }
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     showFinalData() {
         this.setState({
             loading: true
@@ -425,6 +463,10 @@ export default class QunatimedImportStepFive extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Renders the quantimed import step five screen.
+     * @returns {JSX.Element} - Quantimed import step five screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

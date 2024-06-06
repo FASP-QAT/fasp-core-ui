@@ -21,7 +21,8 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   checkValidtion,
   jExcelLoadedFunction,
-  jExcelLoadedFunctionOnlyHideRow
+  jExcelLoadedFunctionOnlyHideRow,
+  loadedForNonEditableTables
 } from "../../CommonComponent/JExcelCommonFunctions";
 import MonthBox from "../../CommonComponent/MonthBox.js";
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -38,7 +39,12 @@ import RealmCountryService from "../../api/RealmCountryService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+// Localized entity name
 const entityname = i18n.t("static.integration.manualProgramIntegration");
+/**
+ * Component to trigger jsons manually
+ */
 export default class ConsumptionDetails extends Component {
   constructor(props) {
     super(props);
@@ -85,12 +91,14 @@ export default class ConsumptionDetails extends Component {
     this.submitClicked = this.submitClicked.bind(this);
     this.checkValidations = this.checkValidations.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.pickRange = React.createRef();
     this.filterProgram = this.filterProgram.bind(this);
     this.getVersions = this.getVersions.bind(this);
   }
+  /**
+   * Toggle manual json creation modal
+   */
   modelOpenClose() {
     this.setState({}, () => {
       if (!this.state.isModalOpen) {
@@ -131,6 +139,9 @@ export default class ConsumptionDetails extends Component {
       }
     });
   }
+  /**
+   * Calls showModal function
+   */
   test() {
     this.setState(
       {
@@ -141,6 +152,9 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Builds jexcel table to add manual integration
+   */
   showModal() {
     var data = [];
     var tableData = [];
@@ -155,7 +169,7 @@ export default class ConsumptionDetails extends Component {
     jexcel.destroy(document.getElementById("tableDiv"), true);
     var options = {
       data: tableData,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [100, 100, 100],
       columns: [
         {
@@ -245,6 +259,9 @@ export default class ConsumptionDetails extends Component {
       dataEL: varEL,
     });
   }
+  /**
+   * Reterives integration list on component mount
+   */
   componentDidMount() {
     this.setState({
       loading: true,
@@ -361,7 +378,7 @@ export default class ConsumptionDetails extends Component {
               loading: false,
             },
             () => {
-              this.hideFirstComponent();
+              hideFirstComponent();
             }
           );
         }
@@ -416,9 +433,11 @@ export default class ConsumptionDetails extends Component {
         }
       });
   }
-  loaded = function (instance, cell, x, y, value) {
-    jExcelLoadedFunction(instance);
-  };
+  /**
+   * This function is used to format the table like add asterisk or info to the table headers
+   * @param {*} instance This is the DOM Element where sheet is created
+   * @param {*} cell This is the object of the DOM element
+   */
   loadedModal = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     if (document.getElementsByClassName("jss").length > 1) {
@@ -435,6 +454,9 @@ export default class ConsumptionDetails extends Component {
       tr.children[3].classList.add("AsteriskTheadtrTd");
     }
   };
+  /**
+   * Filter version based on program
+   */
   filterVersion = function (instance, cell, c, r, source) {
     var value = this.state.dataEL.getJson(null, false)[r][0];
     var versionList = this.state.programList.filter((c) => c.id == value)[0]
@@ -452,6 +474,9 @@ export default class ConsumptionDetails extends Component {
     });
     return vlList.reverse();
   }.bind(this);
+  /**
+   * Function to add a new row to the jexcel table.
+   */
   addRowClicked() {
     var obj = this.state.dataEL;
     var data = [];
@@ -460,6 +485,14 @@ export default class ConsumptionDetails extends Component {
     data[2] = "";
     obj.insertRow(data);
   }
+  /**
+   * Function to handle changes in jexcel cells.
+   * @param {Object} instance - The jexcel instance.
+   * @param {Object} cell - The cell object that changed.
+   * @param {number} x - The x-coordinate of the changed cell.
+   * @param {number} y - The y-coordinate of the changed cell.
+   * @param {any} value - The new value of the changed cell.
+   */
   changed = function (instance, cell, x, y, value) {
     if (this.state.changedFlag == false) {
       this.setState({
@@ -478,6 +511,9 @@ export default class ConsumptionDetails extends Component {
       checkValidtion("text", "C", y, rowData[2], elInstance);
     }
   };
+  /**
+   * Function to handle form submission and save the data on server.
+   */
   submitClicked() {
     var validation = this.checkValidations();
     if (validation == true) {
@@ -509,7 +545,7 @@ export default class ConsumptionDetails extends Component {
                   isModalOpen: !this.state.isModalOpen,
                 },
                 () => {
-                  this.hideFirstComponent();
+                  hideFirstComponent();
                   this.showReport();
                 }
               );
@@ -520,7 +556,7 @@ export default class ConsumptionDetails extends Component {
                   color: "red",
                 },
                 () => {
-                  this.hideFirstComponent();
+                  hideFirstComponent();
                 }
               );
             }
@@ -579,7 +615,7 @@ export default class ConsumptionDetails extends Component {
             color: "red",
           },
           () => {
-            this.hideSecondComponent();
+            hideSecondComponent();
           }
         );
       }
@@ -590,11 +626,15 @@ export default class ConsumptionDetails extends Component {
           color: "red",
         },
         () => {
-          this.hideSecondComponent();
+          hideSecondComponent();
         }
       );
     }
   }
+  /**
+   * Function to check validation of the jexcel table.
+   * @returns {boolean} - True if validation passes, false otherwise.
+   */
   checkValidations() {
     var valid = true;
     var elInstance = this.state.dataEL;
@@ -619,20 +659,11 @@ export default class ConsumptionDetails extends Component {
     }
     return valid;
   }
-  hideFirstComponent() {
-    document.getElementById("div1").style.display = "block";
-    this.state.timeout = setTimeout(function () {
-      document.getElementById("div1").style.display = "none";
-    }, 30000);
-  }
-  hideSecondComponent() {
-    document.getElementById("div2").style.display = "block";
-    this.state.timeout = setTimeout(function () {
-      document.getElementById("div2").style.display = "none";
-    }, 30000);
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     localStorage.setItem("sesRangeValueManualJson", JSON.stringify(value));
     this.setState(
@@ -644,9 +675,18 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.pickRange.current.show();
   }
+  /**
+   * Handles the change event for countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -660,6 +700,9 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Filters programs based on selected countries.
+   */
   filterProgram = () => {
     let countryIds = this.state.countryValues.map((ele) => ele.value);
     this.setState(
@@ -733,7 +776,7 @@ export default class ConsumptionDetails extends Component {
                     programList: [],
                   },
                   () => {
-                    this.hideFirstComponent();
+                    hideFirstComponent();
                   }
                 );
               }
@@ -801,6 +844,11 @@ export default class ConsumptionDetails extends Component {
       }
     );
   };
+  /**
+   * Retrieves version lists for programs based on the country.
+   * Updates the programListBasedOnCountry state with version information.
+   * Displays the report after fetching the versions.
+   */
   getVersions() {
     this.setState(
       {
@@ -847,7 +895,7 @@ export default class ConsumptionDetails extends Component {
                     loading: false,
                   },
                   () => {
-                    this.hideFirstComponent();
+                    hideFirstComponent();
                   }
                 );
               }
@@ -916,6 +964,10 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -929,6 +981,11 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Displays the integration report.
+   * Retrieves integration data based on the selected date range, country, and program.
+   * Populates the report table with integration data.
+   */
   showReport() {
     this.setState(
       {
@@ -996,7 +1053,7 @@ export default class ConsumptionDetails extends Component {
               jexcel.destroy(document.getElementById("tableDivReport"), true);
               var options = {
                 data: tableData,
-                columnDrag: true,
+                columnDrag: false,
                 colWidths: [100, 100, 100],
                 columns: [
                   {
@@ -1040,7 +1097,7 @@ export default class ConsumptionDetails extends Component {
                 allowManualInsertRow: false,
                 license: JEXCEL_PRO_KEY,
                 editable: false,
-                onload: this.loaded,
+                onload: loadedForNonEditableTables,
                 contextMenu: function (obj, x, y, e) {
                   var items = [];
                   return items;
@@ -1062,7 +1119,7 @@ export default class ConsumptionDetails extends Component {
                   color: "red",
                 },
                 () => {
-                  this.hideFirstComponent();
+                  hideFirstComponent();
                 }
               );
             }
@@ -1117,6 +1174,10 @@ export default class ConsumptionDetails extends Component {
       }
     );
   }
+  /**
+   * Renders the manual json trigger report.
+   * @returns {JSX.Element} - Manual json trigger report.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -1200,7 +1261,6 @@ export default class ConsumptionDetails extends Component {
                         ref={this.pickRange}
                         value={this.state.rangeValue}
                         lang={pickerLang}
-                        onChange={this.handleRangeChange}
                         onDismiss={this.handleRangeDissmis}
                       >
                         <MonthBox
@@ -1235,6 +1295,8 @@ export default class ConsumptionDetails extends Component {
                         }
                         filterOptions={this.filterOptions}
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error && this.props.touched && (
                         <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1261,6 +1323,8 @@ export default class ConsumptionDetails extends Component {
                       }
                       filterOptions={this.filterOptions}
                       disabled={this.state.loading}
+                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                      selectSomeItems: i18n.t('static.common.select')}}
                     />
                     {!!this.props.error && this.props.touched && (
                       <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>

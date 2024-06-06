@@ -12,7 +12,7 @@ import { Card, CardBody, FormGroup, Input, InputGroup, Label } from 'reactstrap'
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -24,10 +24,14 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Stock Adjustment Report.
+ */
 class StockAdjustmentComponent extends Component {
     constructor(props) {
         super(props);
@@ -55,16 +59,14 @@ class StockAdjustmentComponent extends Component {
             versionId: ''
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
@@ -129,6 +131,9 @@ class StockAdjustmentComponent extends Component {
             this.setState({ loading: false })
         }
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
         const { programs } = this.state
         var proList = programs;
@@ -185,6 +190,12 @@ class StockAdjustmentComponent extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
         let programId = this.state.programId;
         if (programId != 0) {
@@ -262,6 +273,13 @@ class StockAdjustmentComponent extends Component {
         }
         this.fetchData();
     }
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
         var verList = versions;
@@ -321,6 +339,9 @@ class StockAdjustmentComponent extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Retrieves the list of planning units for a selected program and version.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -433,6 +454,10 @@ class StockAdjustmentComponent extends Component {
             }
         });
     }
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} event - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -444,34 +469,31 @@ class StockAdjustmentComponent extends Component {
             this.fetchData()
         })
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData()
         })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    formatter = (value) => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
+    /**
+     * Exports the data to a CSV file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -486,8 +508,8 @@ class StockAdjustmentComponent extends Component {
         csvRow.push('')
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        var A = [addDoubleQuoteToRowContent(headers)]
+        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -499,6 +521,10 @@ class StockAdjustmentComponent extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Exports the data to a PDF file.
+     * @param {array} columns - The columns to be exported.
+     */
     exportPDF = (columns) => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -529,7 +555,7 @@ class StockAdjustmentComponent extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -551,7 +577,7 @@ class StockAdjustmentComponent extends Component {
         doc.setFontSize(8);
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), this.formatter(ele.stockAdjustemntQty), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(ele.stockAdjustemntQty,0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let startY = 150 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -570,6 +596,9 @@ class StockAdjustmentComponent extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.stockAdjustment') + ".pdf")
     }
+    /**
+     * Builds the jexcel table based on the data list.
+     */
     buildJExcel() {
         let stockAdjustmentList = this.state.data;
         let stockAdjustmentArray = [];
@@ -591,7 +620,7 @@ class StockAdjustmentComponent extends Component {
         var data = stockAdjustmentArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [100, 100, 80, 60, 90, 90, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -626,7 +655,7 @@ class StockAdjustmentComponent extends Component {
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -653,9 +682,9 @@ class StockAdjustmentComponent extends Component {
             loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData = () => {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
@@ -741,7 +770,7 @@ class StockAdjustmentComponent extends Component {
                                             program: programJson,
                                             inventoryDate: ele.inventoryDate,
                                             planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
-                                            stockAdjustemntQty: ele.adjustmentQty,
+                                            stockAdjustemntQty: Math.round(Number(ele.adjustmentQty)*Number(ele.multiplier)),
                                             lastModifiedBy: generalProgramJson.currentVersion.lastModifiedBy,
                                             lastModifiedDate: generalProgramJson.currentVersion.lastModifiedDate,
                                             notes: ele.notes,
@@ -841,9 +870,16 @@ class StockAdjustmentComponent extends Component {
             });
         }
     }
+    /**
+     * Calls the get programs function on page load
+     */
     componentDidMount() {
         this.getPrograms()
     }
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
@@ -853,6 +889,10 @@ class StockAdjustmentComponent extends Component {
             this.filterVersion();
         })
     }
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
         if (this.state.versionId != '' || this.state.versionId != undefined) {
             this.setState({
@@ -869,6 +909,10 @@ class StockAdjustmentComponent extends Component {
             })
         }
     }
+    /**
+     * Renders the Stock Adjustment table.
+     * @returns {JSX.Element} - Stock Adjustment table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -944,8 +988,7 @@ class StockAdjustmentComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '80px' },
-                formatter: this.formatter
+                style: { width: '80px' }
             },
             {
                 dataField: 'lastModifiedBy.username',
@@ -1001,10 +1044,9 @@ class StockAdjustmentComponent extends Component {
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
-                                            onChange={this.handleRangeChange}
                                             onDismiss={this.handleRangeDissmis}
                                         >
-                                            <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
@@ -1063,6 +1105,8 @@ class StockAdjustmentComponent extends Component {
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>

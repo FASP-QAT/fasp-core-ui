@@ -7,13 +7,20 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource"))
 let summaryText_2 = "Edit Funding Source"
 const initialValues = {
     summary: summaryText_1,
     fundingSourceName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
+/**
+ * This const is used to define the validation schema for funding source ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -25,6 +32,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
+/**
+ * This component is used to display the funding source form and allow user to submit the update master request in jira
+ */
 export default class EditFundingSourceTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +42,8 @@ export default class EditFundingSourceTicketComponent extends Component {
             fundingSource: {
                 summary: summaryText_1,
                 fundingSourceName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -43,7 +54,12 @@ export default class EditFundingSourceTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { fundingSource } = this.state
         if (event.target.name == "summary") {
@@ -67,7 +83,9 @@ export default class EditFundingSourceTicketComponent extends Component {
             fundingSource
         }, () => { })
     };
-    
+    /**
+     * This function is used to get funding source list on page load
+     */
     componentDidMount() {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -130,21 +148,50 @@ export default class EditFundingSourceTicketComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the funding source details
+     */
     resetClicked() {
         let { fundingSource } = this.state;
         fundingSource.fundingSourceName = '';
         fundingSource.notes = '';
+        fundingSource.priority = 3;
         this.setState({
             fundingSource: fundingSource,
             fundingSourceId: ''
         },
             () => { });
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { fundingSource } = this.state;
+        fundingSource.priority = newState;
+        this.setState(
+            {
+                fundingSource
+            }, () => {
+                // console.log('priority - state : '+this.state.fundingSource.priority);
+            }
+        );
+    }
+
+    /**
+     * This is used to display the content
+     * @returns This returns funding source details form
+     */
     render() {
         const { fundingSources } = this.state;
         let fundingSourceList = fundingSources.length > 0
@@ -283,6 +330,9 @@ export default class EditFundingSourceTicketComponent extends Component {
                                             value={this.state.fundingSource.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.fundingSource.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

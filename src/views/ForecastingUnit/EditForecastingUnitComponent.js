@@ -9,24 +9,41 @@ import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import UnitService from '../../api/UnitService.js';
 import AuthenticationService from '../Common/AuthenticationService';
-
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
+import ProductService from '../../api/ProductService';
+// Localized entity name
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
+/**
+ * Defines the validation schema for forecasting unit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.forecastingunit.forecastingunittext')),
+        tracerCategoryId: Yup.string()
+            .required(i18n.t('static.tracercategory.tracercategoryText')),
+        productCategoryId: Yup.string()
+            .required(i18n.t('static.productcategory.productcategorytext')),
         genericLabel: Yup.string()
             .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
         unitId: Yup.string()
             .required(i18n.t('static.unit.unittext'))
     })
 }
+/**
+ * Component for editing forecasting unit details.
+ */
 export default class EditForecastingUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             message: '',
+            productcategories: [],
+            tracerCategories: [],
             forecastingUnit:
             {
                 active: '',
@@ -85,16 +102,13 @@ export default class EditForecastingUnitComponent extends Component {
             units: []
         }
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name === "label") {
@@ -104,10 +118,10 @@ export default class EditForecastingUnitComponent extends Component {
             forecastingUnit.realm.realmId = event.target.value;
         }
         if (event.target.name == "tracerCategoryId") {
-            forecastingUnit.tracerCategory.tracerCategoryId = event.target.value;
+            forecastingUnit.tracerCategory.id = event.target.value;
         }
         if (event.target.name == "productCategoryId") {
-            forecastingUnit.productCategory.productCategoryId = event.target.value;
+            forecastingUnit.productCategory.id = event.target.value;
         }
         if (event.target.name == "genericLabel") {
             forecastingUnit.genericLabel.label_en = event.target.value;
@@ -124,7 +138,9 @@ export default class EditForecastingUnitComponent extends Component {
             }
         )
     };
-    
+    /**
+     * Reterives unit list and forecasting unit details on component mount
+     */
     componentDidMount() {
         UnitService.getUnitListAll().then(response => {
             var listArray = response.data;
@@ -137,49 +153,51 @@ export default class EditForecastingUnitComponent extends Component {
                 units: listArray
             })
         })
-        .catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
                     forecastingUnit: response.data, loading: false
+                }, () => {
+                    this.getProductCategoryByRealmId()
                 });
             }
             else {
@@ -187,7 +205,7 @@ export default class EditForecastingUnitComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -229,15 +247,130 @@ export default class EditForecastingUnitComponent extends Component {
                 }
             }
         );
+        DropdownService.getTracerCategoryDropdownList()
+            .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    tracerCategories: listArray,
+                    loading: false
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { forecastingUnit } = this.state
-            forecastingUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
+
+    /**
+     * Reterives product category list based on realm Id from server
+     */
+    getProductCategoryByRealmId() {
+        this.setState({
+            loading: true
+        })
+        let realmId = this.state.forecastingUnit.realm.id;
+        if (realmId != "") {
+            ProductService.getProductCategoryList(realmId)
+                .then(response => {
+                    var listArray = response.data.slice(1);
+                    listArray = listArray.filter(c => c.payload.active.toString() == "true");
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                    //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
+                    this.setState({
+                        productcategories: listArray,
+                        loading: false
+                    })
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
         } else {
-            return "";
+            this.setState({
+                productcategories: []
+            })
         }
     }
+    /**
+     * Renders the forecasting unit details form.
+     * @returns {JSX.Element} - Forecasting unit details form.
+     */
     render() {
         const { units } = this.state;
         let unitList = units.length > 0
@@ -248,6 +381,25 @@ export default class EditForecastingUnitComponent extends Component {
                     </option>
                 )
             }, this);
+        const { tracerCategories } = this.state;
+        let tracerCategoryList = tracerCategories.length > 0
+            && tracerCategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+        const { productcategories } = this.state;
+        let productCategoryList = productcategories.length > 0
+            && productcategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.payload.productCategoryId}>
+                        {getLabelText(item.payload.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+        console.log("this.state.forecastingUnit.genericLabel.label_en Test@123",this.state.forecastingUnit.genericLabel.label_en)    
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -259,8 +411,10 @@ export default class EditForecastingUnitComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.forecastingUnit.label.label_en,
-                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en,
-                                    unitId: this.state.forecastingUnit.unit.id
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en==null?'':this.state.forecastingUnit.genericLabel.label_en,
+                                    unitId: this.state.forecastingUnit.unit.id,
+                                    tracerCategoryId: this.state.forecastingUnit.tracerCategory.id,
+                                    productCategoryId: this.state.forecastingUnit.productCategory.id
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -276,7 +430,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -297,9 +451,14 @@ export default class EditForecastingUnitComponent extends Component {
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 406:
+                                                            this.setState({
+                                                                message: i18n.t('static.message.forecastingUnitAlreadExists'),
                                                                 loading: false
                                                             });
                                                             break;
@@ -347,28 +506,44 @@ export default class EditForecastingUnitComponent extends Component {
                                                     </Input>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
-                                                        type="text"
+                                                        type="select"
                                                         name="tracerCategoryId"
                                                         id="tracerCategoryId"
                                                         bsSize="sm"
-                                                        readOnly
-                                                        value={getLabelText(this.state.forecastingUnit.tracerCategory.label, this.state.lang)}
+                                                        valid={!errors.tracerCategoryId && this.state.forecastingUnit.tracerCategory.id != ''}
+                                                        invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.forecastingUnit.tracerCategory.id}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_TRACER_CATEGORY_FOR_FU')}
                                                     >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {tracerCategoryList}
                                                     </Input>
+                                                    <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
-                                                        type="text"
+                                                        type="select"
                                                         name="productCategoryId"
                                                         id="productCategoryId"
                                                         bsSize="sm"
-                                                        readOnly
-                                                        value={getLabelText(this.state.forecastingUnit.productCategory.label, this.state.lang)}
+                                                        valid={!errors.productCategoryId && this.state.forecastingUnit.productCategory.id != ''}
+                                                        invalid={touched.productCategoryId && !!errors.productCategoryId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.forecastingUnit.productCategory.id}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_UPDATE_PLANNING_UNIT_CATEGORY_FOR_FU')}
                                                     >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {productCategoryList}
                                                     </Input>
+                                                    <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
@@ -378,7 +553,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.forecastingUnit.label.label_en}
                                                         required />
@@ -483,9 +658,15 @@ export default class EditForecastingUnitComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list forecasting unit screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the forecasting unit details when reset button is clicked.
+     */
     resetClicked() {
         ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
             this.setState({

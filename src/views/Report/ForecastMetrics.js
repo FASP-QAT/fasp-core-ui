@@ -1,4 +1,3 @@
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -23,8 +22,6 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
-import ProductService from '../../api/ProductService';
-import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import csvicon from '../../assets/img/csv.png';
@@ -33,11 +30,11 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { addDoubleQuoteToRowContent, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
-const pickerLang = {
-  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-  from: 'From', to: 'To',
-}
+/**
+ * Component for Forecast Metrics Report.
+ */
 class ForecastMetrics extends Component {
   constructor(props) {
     super(props);
@@ -78,19 +75,12 @@ class ForecastMetrics extends Component {
     this.filterProgram = this.filterProgram.bind(this)
     this.filterTracerCategory = this.filterTracerCategory.bind(this);
   }
-  makeText = m => {
-    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-    return '?'
-  }
-  roundN = num => {
-    return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-  }
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map(ele => '"' + ele + '"')
-  }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
-    csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.report.timeWindow') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -112,12 +102,12 @@ class ForecastMetrics extends Component {
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.report.qatPID')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
+    var A = [addDoubleQuoteToRowContent([(i18n.t('static.program.program')).replaceAll(' ', '%20'), (i18n.t('static.report.qatPID')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')])]
     re = this.state.consumptions
     for (var item = 0; item < re.length; item++) {
-      A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
-      re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
+      A.push([addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
+      re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : roundN2(re[item].forecastError) + '%', re[item].monthCount])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -130,6 +120,9 @@ class ForecastMetrics extends Component {
     document.body.appendChild(a)
     a.click()
   }
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -160,7 +153,7 @@ class ForecastMetrics extends Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
-          doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.month') + ' : ' + makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.report.timeWindow') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -231,7 +224,7 @@ class ForecastMetrics extends Component {
     const headers = [[i18n.t('static.program.program'), i18n.t('static.report.qatPID'), i18n.t('static.dashboard.planningunit'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), elt.planningUnit.id, getLabelText(elt.planningUnit.label),
-    elt.message != null ? i18n.t(elt.message) : this.roundN(elt.forecastError) + '%', elt.monthCount]);
+    elt.message != null ? i18n.t(elt.message) : roundN2(elt.forecastError) + '%', elt.monthCount]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startYtable,
@@ -251,6 +244,10 @@ class ForecastMetrics extends Component {
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.forecastmetrics') + ".pdf")
   }
+  /**
+   * Handles the change event for tracer categories.
+   * @param {Array} tracerCategoryIds - An array containing the selected tracer category IDs.
+   */
   handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -262,6 +259,10 @@ class ForecastMetrics extends Component {
       this.getPlanningUnit();
     })
   }
+  /**
+   * Handles the change event for countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -279,6 +280,9 @@ class ForecastMetrics extends Component {
       this.filterProgram();
     })
   }
+  /**
+   * Filters programs based on selected countries.
+   */
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
     this.setState({
@@ -360,6 +364,10 @@ class ForecastMetrics extends Component {
       }
     })
   }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -378,6 +386,10 @@ class ForecastMetrics extends Component {
       this.getPlanningUnit();
     })
   }
+  /**
+   * Retrieves and filters tracer categories based on the provided program IDs.
+   * @param {Array} programIds - An array containing the selected program IDs.
+   */
   filterTracerCategory(programIds) {
     this.setState({
       tracerCategories: [],
@@ -464,6 +476,10 @@ class ForecastMetrics extends Component {
       }
     })
   }
+  /**
+   * Handles the change event for planning units.
+   * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+   */
   handlePlanningUnitChange(planningUnitIds) {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -475,6 +491,9 @@ class ForecastMetrics extends Component {
       this.filterData()
     })
   }
+  /**
+     * Builds the jexcel table based on the consumption list.
+     */
   buildJExcel() {
     let consumptions = this.state.consumptions;
     let consumptionArray = [];
@@ -483,9 +502,9 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = (consumptions[j].program.code)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].message != null ? "" : this.roundN(consumptions[j].forecastError);
+      data[2] = consumptions[j].message != null ? "" : roundN2(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
-      data[4] = this.roundN(consumptions[j].forecastError);
+      data[4] = roundN2(consumptions[j].forecastError);
       consumptionArray[count] = data;
       count++;
     }
@@ -494,7 +513,7 @@ class ForecastMetrics extends Component {
     var data = consumptionArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [150, 150, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
@@ -554,6 +573,9 @@ class ForecastMetrics extends Component {
       languageEl: languageEl, loading: false
     })
   }
+  /**
+   * Callback function triggered when the Jexcel instance is loaded to format the table.
+   */
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
@@ -575,6 +597,9 @@ class ForecastMetrics extends Component {
       }
     }
   }
+  /**
+   * Filters data based on selected parameters and updates component state accordingly.
+   */
   filterData() {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -689,6 +714,9 @@ class ForecastMetrics extends Component {
       });
     }
   }
+  /**
+   * Retrieves the list of countries based on the realm ID and updates the state with the list.
+   */
   getCountrys() {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -786,6 +814,9 @@ class ForecastMetrics extends Component {
       }
     }
   }
+  /**
+   * Retrieves the list of planning units for a selected programs.
+   */
   getPlanningUnit() {
     if (this.state.tracerCategoryValues.length > 0) {
       let programValues = this.state.programValues;
@@ -863,22 +894,38 @@ class ForecastMetrics extends Component {
       this.filterData();
     }
   }
+  /**
+   * Calls the get countrys function on page load
+   */
   componentDidMount() {
     this.getCountrys();
   }
-  show() {
-  }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show()
   }
-  handleAMonthChange2 = (value, text) => {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleAMonthDissmis2 = (value) => {
     this.setState({ singleValue2: value }, () => {
       this.filterData();
     })
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+  /**
+   * Renders the Forecast Metrics Report table.
+   * @returns {JSX.Element} - Forecast Metrics Report table.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -980,7 +1027,6 @@ class ForecastMetrics extends Component {
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"
-                          onChange={this.handleAMonthChange2}
                           onDismiss={this.handleAMonthDissmis2}
                         >
                           <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
@@ -1018,6 +1064,8 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1036,6 +1084,8 @@ class ForecastMetrics extends Component {
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1057,7 +1107,10 @@ class ForecastMetrics extends Component {
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
-                            }, this) : []} />
+                            }, this) : []}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
+                             />
                       </div>
                     </FormGroup>
                     <FormGroup className="col-sm-3" id="hideDiv" style={{ zIndex: '1' }}>
@@ -1072,6 +1125,8 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                       </div>
                     </FormGroup>

@@ -16,6 +16,9 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import ManufaturerService from '../../api/SupplierService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+/**
+ * Component for pipeline program import shipment details
+ */
 export default class PipelineProgramShipment extends Component {
     constructor(props) {
         super(props);
@@ -40,6 +43,9 @@ export default class PipelineProgramShipment extends Component {
         this.SubmitProgram = this.SubmitProgram.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var valid = true;
         var list = this.state.pipelineShipmentData;
@@ -246,6 +252,14 @@ export default class PipelineProgramShipment extends Component {
             })
         }
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({ changedData: true })
         var regexDecimal = /^[0-9]+.[0-9]+$/
@@ -531,6 +545,9 @@ export default class PipelineProgramShipment extends Component {
             }
         }
     }
+    /**
+     * Reterives planning unit, shipment status, data source, procurement agent, supplier, funding source and shipment lists on component mount
+     */
     componentDidMount() {
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
@@ -901,6 +918,10 @@ export default class PipelineProgramShipment extends Component {
                 }
             );
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     initialiseshipment() {
         setTimeout('', 10000);
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
@@ -926,7 +947,7 @@ export default class PipelineProgramShipment extends Component {
             moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 150, 150, 150, 150, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100, 100, 100, 100, 180],
             columns: [
                 {
@@ -1058,6 +1079,14 @@ export default class PipelineProgramShipment extends Component {
             loading: false
         })
     }
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -1071,9 +1100,17 @@ export default class PipelineProgramShipment extends Component {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
     }
-    loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedCommonFunctionJExcel = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     SubmitShipment() {
         this.loaded()
         var data = this.el.getJson(null, false).map((ele, y) => ({
@@ -1151,6 +1188,9 @@ export default class PipelineProgramShipment extends Component {
                 }
             );
     }
+    /**
+     * Function to handle program form submission and save the data on server.
+     */
     SubmitProgram() {
         this.loaded()
         this.setState({ loading: true });
@@ -1277,6 +1317,10 @@ export default class PipelineProgramShipment extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import shipment details screen.
+     * @returns {JSX.Element} - Pipeline program import shipment details screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

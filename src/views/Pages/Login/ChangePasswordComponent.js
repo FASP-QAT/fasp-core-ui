@@ -8,6 +8,12 @@ import { API_URL, SECRET_KEY } from '../../../Constants.js';
 import UserService from '../../../api/UserService';
 import i18n from '../../../i18n';
 import AuthenticationService from '../../Common/AuthenticationService.js';
+import { hideFirstComponent } from '../../../CommonComponent/JavascriptCommonFunctions.js';
+/**
+ * Defines the validation schema for change password details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()
@@ -37,6 +43,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
+/**
+ * Component for changing the password.
+ */
 class ChangePasswordComponent extends Component {
     constructor(props) {
         super(props);
@@ -46,24 +55,33 @@ class ChangePasswordComponent extends Component {
             loading: false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.showPopUp = this.showPopUp.bind(this);
     }
+    /**
+     * Show password info popup
+     */
     showPopUp() {
         alert("1) " + i18n.t("static.message.newPasswordMinLength") + "\n2) " + i18n.t("static.message.newPasswordPassString") + "\n3) " + i18n.t("static.message.newPasswordSpecialChar") + "\n4) " + i18n.t("static.message.newPasswordNumber") + "\n5) " + i18n.t("static.message.newPasswordUppercase") + "\n6) " + i18n.t("static.message.newPasswordStartAlphabet") + "\n7) " + i18n.t("static.message.newPasswordNotSameAsUsername") + "\n8) " + i18n.t("static.message.newPasswordNotSameAsOldPassword"));
     }
-    hideFirstComponent() {
-    }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
-    
+    /**
+     * Gets logged in username on component mount
+     */
     componentDidMount() {
         let username = AuthenticationService.getLoggedInUsername();
         this.setState({ username },
             () => { });
     }
+    /**
+     * Renders the change password form.
+     * @returns {JSX.Element} - Change password form.
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -94,7 +112,7 @@ class ChangePasswordComponent extends Component {
                                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         }, () => {
                                                             document.getElementById('div1').style.display = 'block';
-                                                            this.hideFirstComponent();
+                                                            hideFirstComponent();
                                                         });
                                                     } else {
                                                         switch (error.response ? error.response.status : "") {
@@ -106,13 +124,13 @@ class ChangePasswordComponent extends Component {
                                                             case 412:
                                                                 this.setState({ message: error.response.data.messageCode },
                                                                     () => {
-                                                                        this.hideFirstComponent();
+                                                                        hideFirstComponent();
                                                                     });
                                                                 break;
                                                             default:
                                                                 this.setState({ message: 'static.unkownError' },
                                                                     () => {
-                                                                        this.hideFirstComponent();
+                                                                        hideFirstComponent();
                                                                     });
                                                                 break;
                                                         }
@@ -125,7 +143,7 @@ class ChangePasswordComponent extends Component {
                                         },
                                             () => {
                                                 document.getElementById('div1').style.display = 'block';
-                                                this.hideFirstComponent();
+                                                hideFirstComponent();
                                             });
                                     }
                                 }}

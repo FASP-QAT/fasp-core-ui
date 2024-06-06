@@ -14,6 +14,10 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, TITLE_FONT } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
+import { addDoubleQuoteToRowContent, formatter } from "../../CommonComponent/JavascriptCommonFunctions";
+/**
+ * Component used for displaying the table for compare and select
+ */
 export default class CompareVersionTableCompareVersion extends Component {
     constructor(props) {
         super(props);
@@ -27,21 +31,9 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.loaded = this.loaded.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
     }
-    addDoubleQuoteToRowContent = (arr) => {
-        return arr.map(ele => '"' + ele + '"')
-    }
-    formatter = value => {
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF() {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
@@ -143,7 +135,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             this.state.columns.map((item, idx) => {
                 if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
-                        dataArr.push(this.formatter(ele[idx]));
+                        dataArr.push(formatter(ele[idx],0));
                     } else {
                         dataArr.push(ele[idx]);
                     }
@@ -164,6 +156,9 @@ export default class CompareVersionTableCompareVersion extends Component {
         addFooters(doc)
         doc.save(this.props.datasetData.programCode + "-" + i18n.t('static.dashboard.compareVersion').concat('.pdf'));
     }
+    /**
+     * Exports the data to a CSV file.
+     */
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
@@ -182,8 +177,8 @@ export default class CompareVersionTableCompareVersion extends Component {
         csvRow.push('')
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
-        var A = [this.addDoubleQuoteToRowContent(headers)];
-        var C = [this.addDoubleQuoteToRowContent(["", "", this.props.versionLabel, this.props.versionLabel, this.props.versionLabel, this.props.versionLabel1, this.props.versionLabel1, this.props.versionLabel1])];
+        var A = [addDoubleQuoteToRowContent(headers)];
+        var C = [addDoubleQuoteToRowContent(["", "", this.props.versionLabel, this.props.versionLabel, this.props.versionLabel, this.props.versionLabel1, this.props.versionLabel1, this.props.versionLabel1])];
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
@@ -192,7 +187,7 @@ export default class CompareVersionTableCompareVersion extends Component {
                     B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23'));
                 }
             })
-            A.push(this.addDoubleQuoteToRowContent(B));
+            A.push(addDoubleQuoteToRowContent(B));
         })
         for (var i = 0; i < C.length; i++) {
             csvRow.push(C[i].join(","))
@@ -208,6 +203,9 @@ export default class CompareVersionTableCompareVersion extends Component {
         document.body.appendChild(a)
         a.click()
     }
+    /**
+     * Builds the jexcel table based on the planning unit and region list.
+     */
     componentDidMount() {
         this.props.updateState("loading", true);
         var datasetData = this.props.datasetData;
@@ -312,7 +310,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var options = {
             data: dataArray,
-            columnDrag: true,
+            columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
             nestedHeaders: nestedHeaders,
@@ -347,7 +345,12 @@ export default class CompareVersionTableCompareVersion extends Component {
         })
         this.props.updateState("loading", false);
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
             var elInstance = instance.worksheets[0];
@@ -415,6 +418,10 @@ export default class CompareVersionTableCompareVersion extends Component {
             tr.children[7].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
         }
     }
+    /**
+     * Renders the compare version table.
+     * @returns {JSX.Element} - Compare version table.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

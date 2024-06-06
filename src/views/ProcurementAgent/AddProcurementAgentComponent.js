@@ -14,7 +14,13 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.procurementagent.procurementagent')
+/**
+ * Defines the validation schema for procurement agent details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -38,6 +44,9 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
+/**
+ * Component for adding procurement agent details.
+ */
 class AddProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -84,12 +93,22 @@ class AddProcurementAgentComponent extends Component {
         this.programChange = this.programChange.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
+    /**
+     * Handles click event on color code picker. Toggle color picker according to displayColorPicker value. 
+     */
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
+    /**
+     * Close color picker.
+     */
     handleClose = () => {
         this.setState({ displayColorPicker: false })
     };
+    /**
+     * Handles color change in color picker.
+     * @param {*} color - selected color.
+     */
     handleChangeColor = (color) => {
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
@@ -102,11 +121,19 @@ class AddProcurementAgentComponent extends Component {
             () => {
             });
     };
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Capitalizes the first letter of the procurement agent name
+     * @param {*} str - The procurement agent name
+     * @returns {string} - Capitalized procurement agent name.
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -114,6 +141,9 @@ class AddProcurementAgentComponent extends Component {
             return "";
         }
     }
+    /**
+     * Fetch procurement agent display name on blur event of procurement agent name
+     */
     getDisplayName() {
         let realmId = document.getElementById("realmId").value;
         let procurementAgentValue = document.getElementById("procurementAgentName").value;
@@ -122,6 +152,7 @@ class AddProcurementAgentComponent extends Component {
         if (realmId != '' && procurementAgentValue.length != 0) {
             if (procurementAgentValue.length >= 10) {
                 procurementAgentValue = procurementAgentValue.slice(0, 8);
+                //Fetch procurement agent display name
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
                         let { procurementAgent } = this.state;
@@ -169,6 +200,7 @@ class AddProcurementAgentComponent extends Component {
                         }
                     );
             } else {
+                //Fetch procurement agent display name
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
                         let { procurementAgent } = this.state;
@@ -218,6 +250,10 @@ class AddProcurementAgentComponent extends Component {
             }
         }
     }
+    /**
+     * Handles data change in the procurement agent form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
@@ -252,6 +288,10 @@ class AddProcurementAgentComponent extends Component {
         },
             () => { });
     };
+    /**
+     * Handles change in Program dropdown & filters the program list
+     * @param {*} programId - The change event.
+     */
     programChange(programId) {
         var selectedArray = [];
         for (var p = 0; p < programId.length; p++) {
@@ -279,9 +319,13 @@ class AddProcurementAgentComponent extends Component {
         },
             () => { });
     }
-    
+    /**
+     * Fetch program list by realmId
+     * @param {*} e - The realmId
+     */
     getProgramByRealmId(e) {
         if (e != 0) {
+            //Fetch program list by realmId
             ProgramService.getProgramList(e)
                 .then(response => {
                     if (response.status == 200) {
@@ -353,7 +397,11 @@ class AddProcurementAgentComponent extends Component {
             })
         }
     }
+    /**
+     * Fetches Realm list, RealmId, Program list & procurement agent type list on component mount.
+     */
     componentDidMount() {
+        //Fetch all realm list
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -413,6 +461,7 @@ class AddProcurementAgentComponent extends Component {
                     }
                 }
             );
+        //Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         if (realmId != -1) {
             let { procurementAgent } = this.state;
@@ -422,9 +471,11 @@ class AddProcurementAgentComponent extends Component {
                 procurementAgent
             },
                 () => {
+                    //Fetch program list by realmId
                     this.getProgramByRealmId(realmId)
                 })
         }
+        //Fetch all procurement agent type list
         ProcurementAgentService.getProcurementAgentTypeListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -485,6 +536,10 @@ class AddProcurementAgentComponent extends Component {
                 }
             );
     }
+    /**
+     * Renders the procurement agent details form.
+     * @returns {JSX.Element} - the procurement agent details form.
+     */
     render() {
         const styles = reactCSS({
             'default': {
@@ -672,6 +727,7 @@ class AddProcurementAgentComponent extends Component {
                                                         required
                                                         options={this.state.programList}
                                                         value={this.state.programId}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
@@ -796,9 +852,15 @@ class AddProcurementAgentComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list procurement agent when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the procurement agent details form when reset button is clicked.
+     */
     resetClicked() {
         let { procurementAgent } = this.state;
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {

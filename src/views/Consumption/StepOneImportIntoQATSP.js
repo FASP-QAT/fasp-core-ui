@@ -19,8 +19,8 @@ import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listIm
 import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html';
 import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { checkValidation, changed, jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { contrast, hideSecondComponent, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, FORECAST_DATEPICKER_MONTH_DIFF, FORECAST_DATEPICKER_START_MONTH, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
@@ -33,6 +33,9 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Import into QAT supply plan step one for the import
+ */
 export default class StepOneImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -67,12 +70,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPeriod: '',
             selSource1: [],
             selectedForecastProgramDesc: '',
+            toggleDoNotImport: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -84,24 +87,31 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
+        this.updatePUs = this.updatePUs.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.onchangepage = this.onchangepage.bind(this)
     }
+    /**
+     * Toggles the visibility of the program setting popover.
+     */
     toggleProgramSetting() {
         this.setState({
             popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
         });
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div12').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Toggles the visibility of the guidance.
+     */
     toggleShowGuidance() {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
     }
+    /**
+     * Reterives supply plan planning unit
+     * @param {Number} value Selected program Id
+     */
     getPlanningUnitList(value) {
         if (value != 0) {
             localStorage.setItem("sesProgramId", value);
@@ -187,14 +197,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 forecastingUnit: []
                             });
                             tempList.unshift({
-                                name: "No Forecast Selected",
+                                name: i18n.t('static.commitTree.noForecastSelected'),
                                 id: -2,
                                 multiplier: 1,
                                 active: true,
                                 forecastingUnit: []
                             });
                             tempList.unshift({
-                                name: "Forecast is blank",
+                                name: i18n.t('static.importIntoSP.forecastBlank'),
                                 id: -3,
                                 multiplier: 1,
                                 active: true,
@@ -224,6 +234,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
         }
     }
+    /**
+     * Reterives tracer category list
+     */
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -273,8 +286,56 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
             );
     }
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        if (x == 2 || x == 3 || x == 6 || x == 7 || x == 8) {
+            this.el.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = this.el.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                try{
+                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+                }catch(err){}
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                var cell11 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                var cell11 = this.el.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = this.el.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+        }
         changed(instance, cell, x, y, value)
         if (x == 2) {
             let supplyPlanPlanningUnitId = this.el.getValueFromCoords(2, y);
@@ -326,13 +387,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Calls getProgramDetails function on component mount
+     */
     componentDidMount() {
         document.getElementById("stepOneBtn").disabled = true;
         this.getProgramDetails();
     }
+    /**
+     * Reterives dataset program list from server
+     */
     getDatasetList() {
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
@@ -372,7 +436,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.setState({
                     message: response.data.messageCode, loading: false
                 }, () => {
-                    this.hideSecondComponent();
+                    hideSecondComponent();
                 })
             }
         }).catch(
@@ -380,6 +444,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
         );
     }
+    /**
+     * Reterives supply plan programs details from indexed db
+     */
     getProgramDetails() {
         var db1;
         getDatabase();
@@ -421,6 +488,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }.bind(this);
         }.bind(this);
     }
+    /**
+     * Reterives supply plan programs from indexed db
+     */
     getPrograms(value) {
         if (value != 0) {
             var programId = value.split("_")[0];
@@ -462,22 +532,30 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
         }
     }
-    handleRangeChange(value, text, listIndex) {
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value },
             () => {
                 this.filterData(false);
             })
     }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
+    /**
+     * Reterives planning unit list based on program and version Id
+     */
     filterData(loadJexcel) {
+        this.props.updateStepOneData("loading", true);
         this.setState({
             loading: true
         })
@@ -500,7 +578,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
                         .then(response => {
                             if (response.status == 200) {
-                                console.log("Response Data Test@123",response.data);
                                 var planningUnitList = response.data.filter(c => c.active)
                                 this.setState({
                                     programPlanningUnitList: planningUnitList,
@@ -513,12 +590,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     this.buildJexcel();
                                 })
                             } else {
+                                this.props.updateStepOneData("loading", false);
                                 this.setState({
                                     programPlanningUnitList: []
                                 });
                             }
                         }).catch(
                             error => {
+                                this.props.updateStepOneData("loading", false);
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -558,6 +637,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         );
                 }
             } else {
+                this.props.updateStepOneData("loading", false);
                 this.setState({
                     message: i18n.t('static.importFromQATSupplyPlan.belongsSameCountry'),
                     color: 'red',
@@ -567,6 +647,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     })
             }
         } else if (forecastProgramId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -577,6 +658,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -587,6 +669,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -597,6 +680,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
+            this.props.updateStepOneData("loading", false);
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
@@ -608,6 +692,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             document.getElementById("stepOneBtn").disabled = true;
         }
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -651,7 +739,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [50, 100, 100, 100, 100, 50],
             columns: [
                 {
@@ -702,52 +790,53 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     type: 'hidden',
                 }
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
-                if (y != null) {
-                    var elInstance = el;
-                    elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
-                    var rowData = elInstance.getRowData(y);
-                    var match = rowData[6];
-                    if (match == 1) {
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-                    }
-                    var doNotImport = rowData[2];
-                    if (doNotImport == -1) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                    }
-                    var noForecastSelected = rowData[7];
-                    if (noForecastSelected) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell11.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
-                    }
-                    var isForecastBlank = rowData[8];
-                    if (isForecastBlank) {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
-                        var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell11.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else {
+            onfilter: function (el) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var y = 0; y < jsonLength; y++) {
+                    try {
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                        var rowData = elInstance.getRowData(y);
+                        var match = rowData[6];
+                        if (match == 1) {
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.remove('readonly');
+                        }
+                        var doNotImport = rowData[2];
+                        if (doNotImport == -1) {
+                            var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.add('doNotImport');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                            try{
+                            var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.remove('doNotImport');
+                            }catch(err){}
+                        }
+                        var noForecastSelected = rowData[7];
+                        if (noForecastSelected) {
+                            var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell11.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                        }
+                        var isForecastBlank = rowData[8];
+                        if (isForecastBlank) {
+                            var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell11.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        } else {
+                        }
+                    } catch (err) {
+
                     }
                 }
             }.bind(this),
@@ -780,6 +869,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.props.updateStepOneData("loading", false);
         document.getElementById("stepOneBtn").disabled = false;
     }
+    /**
+     * Filters planning unit list based on tracer category
+     */
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[5];
@@ -789,15 +881,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * Sets the program id in the component state on change and builds data accordingly.
+     */
     setProgramId(e) {
         var progId = e.target.value
         this.setState({
             programId: progId,
+            toggleDoNotImport:false,
+            selSource1:[],
         }, () => {
             this.getPrograms(progId)
             this.getPlanningUnitList(progId);
         })
     }
+    /**
+     * Filters versions based on program
+     */
     filterVersion = () => {
         let forecastProgramId = this.state.forecastProgramId;
         if (forecastProgramId != 0) {
@@ -835,10 +935,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => { })
         }
     }
+    /**
+     * Sets the version id in the component state on change and builds data accordingly.
+     */
     setVersionId(event) {
+        if(event.target.value!=0 && event.target.value!=""){
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
-        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY"));
-        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY"));
+        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY") + "-01");
+        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY") + "-01");
         let defaultForecastStartYear = forecastStartDate.getFullYear();
         let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
         let defaultForecastStopYear = forecastStopDate.getFullYear();
@@ -916,6 +1020,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
         this.setState({
+            toggleDoNotImport:false,
             versionId: event.target.value,
             minDate: { year: updatedForecastStartYear, month: updatedForecastStartMonth },
             maxDate: { year: updatedForecastStopYear, month: updatedForecastStopMonth },
@@ -924,7 +1029,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }, () => {
             this.filterData(true);
         })
+    }else{
+        this.setState({
+            toggleDoNotImport:false,
+            versionId: event.target.value
+        }, () => {
+            this.filterData(true);
+        })
     }
+    }
+    /**
+     * Handles the selection of a forecast program ID and updates the state accordingly.
+     * @param {Object} event The event object containing information about the selected forecast program ID.
+     */
     setForecastProgramId(e) {
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
         var programListFilter = [];
@@ -934,6 +1051,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let selectedForecastProgramDesc = e.target.options[e.target.selectedIndex].text;
         this.props.updateStepOneData("selectedForecastProgramDesc", selectedForecastProgramDesc);
         this.setState({
+            toggleDoNotImport:false,
+            selSource1:[],
             forecastProgramId: e.target.value,
             versionId: '',
             programListFilter: programListFilter.sort(function (a, b) {
@@ -946,6 +1065,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.filterData(true);
         })
     }
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -981,6 +1104,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }
         return valid;
     }
+    /**
+     * Saves the data in the form of json
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -1022,6 +1148,157 @@ export default class StepOneImportMapPlanningUnits extends Component {
         } else {
         }
     }
+    /**
+         * Sets the state to toggle do not import flag.
+         * @param {Event} e - The change event.
+         * @returns {void}
+         */
+    setToggleDoNotImport(e) {
+        this.setState({
+            toggleDoNotImport: e.target.checked
+        }, () => {
+            this.updatePUs()
+        })
+    }
+    updatePUs() {
+        var tableJson = this.el.getJson(null, false);
+        if (this.state.toggleDoNotImport) {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[2] == "") {
+                    this.el.setValueFromCoords(2, parseInt(i), -1, true);
+                }
+            }
+        } else {
+            for (var i = 0; i < tableJson.length; i++) {
+                var rowData = this.el.getRowData(i);
+                if (rowData[2] == -1) {
+                    this.el.setValueFromCoords(2, parseInt(i), "", true);
+                }
+            }
+        }
+    }
+    /**
+     * This function is used to format the consumption table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var y = 0; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                try{
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+                }catch(err){}
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+
+        }
+    }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+            var rowData = elInstance.getRowData(y);
+            var match = rowData[6];
+            if (match == 1) {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+            }
+            var doNotImport = rowData[2];
+            if (doNotImport == -1) {
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.add('doNotImport');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+                var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell1.classList.remove('doNotImport');
+            }
+            var noForecastSelected = rowData[7];
+            if (noForecastSelected) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+            var isForecastBlank = rowData[8];
+            if (isForecastBlank) {
+                var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                cell11.classList.add('readonly');
+                var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+            } else {
+            }
+        }
+    }
+    /**
+     * Renders the import into QAT supply plan step one screen.
+     * @returns {JSX.Element} - Import into QAT supply plan step one screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -1155,17 +1432,31 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     value={rangeValue}
                                     lang={pickerLang}
                                     key={JSON.stringify(rangeValue)}
-                                    onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
                                 >
-                                    <MonthBox value={this.makeText(rangeValue.from) + ' to ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                    <MonthBox value={makeText(rangeValue.from) + ' to ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
                             </div>
                         </FormGroup>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
+                            <Input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="toggleDoNotImport"
+                                name="toggleDoNotImport"
+                                checked={this.state.toggleDoNotImport}
+                                onClick={(e) => { this.setToggleDoNotImport(e); }}
+                            />
+                            <Label
+                                className="form-check-label"
+                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                {i18n.t('static.import.doNoImportCheckbox')}
+                            </Label>
+                        </FormGroup>}
                     </div>
                 </div>
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
+                <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >
+                    <div id="mapPlanningUnit" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0  || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="")  ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

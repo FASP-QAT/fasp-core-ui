@@ -6,8 +6,14 @@ import * as Yup from 'yup';
 import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.modelingType.modelingType"))
 let summaryText_2 = "Add Modeling Type"
+/**
+ * This const is used to define the validation schema for modeling type ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -18,6 +24,9 @@ const validationSchema = function (values) {
             .required('Enter modeling type'),
     })
 }
+/**
+ * This component is used to display the modeling type form and allow user to submit the add master request in jira
+ */
 export default class OrganisationTypeTicketComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +34,8 @@ export default class OrganisationTypeTicketComponent extends Component {
             modelingType: {
                 summary: summaryText_1,
                 modelingTypeName: "",
-                notes: ''
+                notes: '',
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -36,7 +46,12 @@ export default class OrganisationTypeTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { modelingType } = this.state
         if (event.target.name == "summary") {
@@ -52,27 +67,62 @@ export default class OrganisationTypeTicketComponent extends Component {
             modelingType
         }, () => { })
     };
-    
+    /**
+     * This function is used to capitalize the first letter of the unit name
+     * @param {*} str This is the name of the unit
+     */
     Capitalize(str) {
         this.state.modelingType.modelingTypeName = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * This is used to make the loader off on page load
+     */
     componentDidMount() {
         this.setState({ loading: false })
     }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is called when reset button is clicked to reset the modeling type details
+     */
     resetClicked() {
         let { modelingType } = this.state;
         modelingType.modelingTypeName = '';
         modelingType.notes = '';
+        modelingType.priority = 3;
         this.setState({
             modelingType: modelingType,
         },
             () => { });
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { modelingType } = this.state;
+        modelingType.priority = newState;
+        this.setState(
+            {
+                modelingType
+            }, () => {
+                // console.log('priority - state : '+this.state.modelingType.priority);
+            }
+        );
+    }
+
+    /**
+     * This is used to display the content
+     * @returns This returns modeling type details form
+     */
     render() {
         return (
             <div className="col-md-12">
@@ -85,7 +135,8 @@ export default class OrganisationTypeTicketComponent extends Component {
                         initialValues={{
                             summary: summaryText_1,
                             modelingType: '',
-                            notes: ''
+                            notes: '',
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -204,6 +255,9 @@ export default class OrganisationTypeTicketComponent extends Component {
                                             value={this.state.modelingType.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.modelingType.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

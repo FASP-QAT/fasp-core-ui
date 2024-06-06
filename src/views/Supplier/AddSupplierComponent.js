@@ -14,6 +14,11 @@ let initialValues = {
   supplier: ""
 }
 const entityname = i18n.t('static.supplier.supplier');
+/**
+ * This const is used to define the validation schema for supplier details
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -23,6 +28,9 @@ const validationSchema = function (values) {
       .required(i18n.t('static.supplier.suppliertext'))
   })
 }
+/**
+ * This component is used to display the supplier details in a form and allow user to add the details
+ */
 class AddSupplierComponent extends Component {
   constructor(props) {
     super(props);
@@ -45,11 +53,18 @@ class AddSupplierComponent extends Component {
     this.resetClicked = this.resetClicked.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
+  /**
+   * This function is used to hide the messages that are there in div2 after 30 seconds
+   */
   hideSecondComponent() {
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
     }, 30000);
   }
+  /**
+   * This function is used to capitalize the first letter of the unit name
+   * @param {*} str This is the name of the unit
+   */
   Capitalize(str) {
     if (str != null && str != "") {
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -57,6 +72,10 @@ class AddSupplierComponent extends Component {
       return "";
     }
   }
+  /**
+   * This function is called when some data in the form is changed
+   * @param {*} event This is the on change event
+   */
   dataChange(event) {
     let { supplier } = this.state;
     if (event.target.name == "realmId") {
@@ -70,7 +89,9 @@ class AddSupplierComponent extends Component {
     },
       () => { });
   };
-  
+  /**
+   * This function is used to get the realm list on page load
+   */
   componentDidMount() {
     RealmService.getRealmListAll()
       .then(response => {
@@ -137,6 +158,10 @@ class AddSupplierComponent extends Component {
         })
     }
   }
+  /**
+   * This is used to display the content
+   * @returns This returns supplier details form
+   */
   render() {
     const { realms } = this.state;
     let realmList = realms.length > 0
@@ -289,9 +314,15 @@ class AddSupplierComponent extends Component {
       </div>
     );
   }
+  /**
+   * This function is called when cancel button is clicked and is redirected to list supplier screen
+   */
   cancelClicked() {
     this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
   }
+  /**
+   * This function is called when reset button is clicked to reset the supplier details
+   */
   resetClicked() {
     let { supplier } = this.state;
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {

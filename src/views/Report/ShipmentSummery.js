@@ -59,6 +59,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 const ref = React.createRef();
 const options = {
   title: {
@@ -152,6 +153,9 @@ const pickerLang = {
   from: "From",
   to: "To",
 };
+/**
+ * Component for Shipment Summery Report.
+ */
 class ShipmentSummery extends Component {
   constructor(props) {
     super(props);
@@ -207,7 +211,6 @@ class ShipmentSummery extends Component {
       lang: localStorage.getItem("lang"),
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
@@ -217,26 +220,9 @@ class ShipmentSummery extends Component {
     this.loaded = this.loaded.bind(this);
     this.selected = this.selected.bind(this);
   }
-  makeText = (m) => {
-    if (m && m.year && m.month)
-      return pickerLang.months[m.month - 1] + ". " + m.year;
-    return "?";
-  };
-  formatter = (value) => {
-    var cell1 = value;
-    cell1 += "";
-    var x = cell1.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, "$1" + "," + "$2");
-    }
-    return x1 + x2;
-  };
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map((ele) => '"' + ele + '"');
-  };
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
     csvRow.push(
@@ -244,9 +230,9 @@ class ShipmentSummery extends Component {
       (
         i18n.t("static.report.dateRange") +
         " : " +
-        this.makeText(this.state.rangeValue.from) +
+        makeText(this.state.rangeValue.from) +
         " ~ " +
-        this.makeText(this.state.rangeValue.to)
+        makeText(this.state.rangeValue.to)
       ).replaceAll(" ", "%20") +
       '"'
     );
@@ -321,7 +307,7 @@ class ShipmentSummery extends Component {
     let viewById = this.state.viewById;
     var re;
     var A = [
-      this.addDoubleQuoteToRowContent([
+      addDoubleQuoteToRowContent([
         i18n.t("static.budget.fundingsource").replaceAll(" ", "%20"),
         i18n.t("static.report.orders").replaceAll(" ", "%20"),
         i18n.t("static.report.costUsd").replaceAll(" ", "%20"),
@@ -329,7 +315,7 @@ class ShipmentSummery extends Component {
     ];
     this.state.shipmentDetailsFundingSourceList.map((ele) =>
       A.push(
-        this.addDoubleQuoteToRowContent([
+        addDoubleQuoteToRowContent([
           ele.fundingSource.code.replaceAll(" ", "%20"),
           ele.orderCount,
           ele.cost,
@@ -343,7 +329,7 @@ class ShipmentSummery extends Component {
     csvRow.push("");
     csvRow.push("");
     var B = [
-      this.addDoubleQuoteToRowContent([
+      addDoubleQuoteToRowContent([
         i18n.t("static.report.qatPIDFID").replaceAll(" ", "%20"),
         i18n
           .t("static.report.planningUnit/ForecastingUnit")
@@ -373,7 +359,7 @@ class ShipmentSummery extends Component {
     re = this.state.shipmentDetailsList;
     for (var item = 0; item < re.length; item++) {
       B.push(
-        this.addDoubleQuoteToRowContent([
+        addDoubleQuoteToRowContent([
           re[item].planningUnit.id,
           getLabelText(re[item].planningUnit.label, this.state.lang)
             .replaceAll(",", " ")
@@ -427,13 +413,16 @@ class ShipmentSummery extends Component {
     a.target = "_Blank";
     a.download =
       i18n.t("static.report.shipmentDetailReport") +
-      this.makeText(this.state.rangeValue.from) +
+      makeText(this.state.rangeValue.from) +
       " ~ " +
-      this.makeText(this.state.rangeValue.to) +
+      makeText(this.state.rangeValue.to) +
       ".csv";
     document.body.appendChild(a);
     a.click();
   }
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
@@ -482,9 +471,9 @@ class ShipmentSummery extends Component {
           doc.text(
             i18n.t("static.report.dateRange") +
             " : " +
-            this.makeText(this.state.rangeValue.from) +
+            makeText(this.state.rangeValue.from) +
             " ~ " +
-            this.makeText(this.state.rangeValue.to),
+            makeText(this.state.rangeValue.to),
             doc.internal.pageSize.width / 8,
             90,
             {
@@ -632,8 +621,8 @@ class ShipmentSummery extends Component {
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
       this.state.viewById == 1
-        ? this.formatter(ele.shipmentQty)
-        : this.formatter(Number(ele.shipmentQty) * ele.multiplier),
+        ? formatter(ele.shipmentQty,0)
+        : formatter(Number(ele.shipmentQty) * ele.multiplier,0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
@@ -666,6 +655,9 @@ class ShipmentSummery extends Component {
     addFooters(doc);
     doc.save(i18n.t("static.report.shipmentDetailReport") + ".pdf");
   };
+  /**
+   * Retrieves the list of funding sources.
+   */
   getFundingSourceList() {
     if (localStorage.getItem("sessionType") === 'Online') {
       DropdownService.getFundingSourceDropdownList()
@@ -758,6 +750,9 @@ class ShipmentSummery extends Component {
       }.bind(this);
     }
   }
+  /**
+   * Retrieves the list of budgets.
+   */
   getBudgetList() {
     var programId = localStorage.getItem("sesProgramIdReport");
     if (this.state.programId != "" && this.state.programId != 0 && programId != "") {
@@ -910,6 +905,10 @@ class ShipmentSummery extends Component {
       );
     }
   }
+  /**
+   * Handles the change event for funding sources.
+   * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+   */
   handleFundingSourceChange = (fundingSourceIds) => {
     if (fundingSourceIds.length != 0) {
       fundingSourceIds = fundingSourceIds.sort(function (a, b) {
@@ -1059,6 +1058,10 @@ class ShipmentSummery extends Component {
       })
     }
   };
+  /**
+   * Handles the change event for budgets.
+   * @param {Array} budgetIds - An array containing the selected budget IDs.
+   */
   handleBudgetChange = (budgetIds) => {
     budgetIds = budgetIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1073,6 +1076,9 @@ class ShipmentSummery extends Component {
       }
     );
   };
+  /**
+   * Builds the jexcel table based on the shipment details list list.
+   */
   buildJExcel() {
     let shipmentDetailsList = this.state.shipmentDetailsList;
     let shipmentDetailsListArray = [];
@@ -1125,7 +1131,7 @@ class ShipmentSummery extends Component {
     var data = shipmentDetailsListArray;
     var options = {
       data: data,
-      columnDrag: true,
+      columnDrag: false,
       colWidths: [
         150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
       ],
@@ -1241,6 +1247,9 @@ class ShipmentSummery extends Component {
       loading: false,
     });
   }
+  /**
+   * Callback function triggered when the Jexcel instance is loaded to format the table.
+   */
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
     var elInstance = instance.worksheets[0];
@@ -1271,6 +1280,9 @@ class ShipmentSummery extends Component {
       }
     }
   };
+  /**
+   * Redirects to the edit shipment data entry screen on row click.
+   */
   selected = function (instance, cell, x, y, value, e) {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
@@ -1292,6 +1304,9 @@ class ShipmentSummery extends Component {
       }
     }
   };
+  /**
+   * Retrieves the list of programs.
+   */
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
@@ -1375,6 +1390,9 @@ class ShipmentSummery extends Component {
       this.consolidatedProgramList();
     }
   };
+  /**
+   * Consolidates the list of programs obtained from Server and local programs.
+   */
   consolidatedProgramList = () => {
     const { programs } = this.state;
     var proList = programs;
@@ -1443,6 +1461,12 @@ class ShipmentSummery extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
   filterVersion = () => {
     let programId = this.state.programId;
     if (programId != 0) {
@@ -1573,6 +1597,13 @@ class ShipmentSummery extends Component {
     }
     this.fetchData();
   };
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state;
     var verList = versions;
@@ -1660,6 +1691,9 @@ class ShipmentSummery extends Component {
       }.bind(this);
     }.bind(this);
   };
+  /**
+   * Retrieves the list of planning units for a selected program and selected version.
+   */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
@@ -1818,6 +1852,10 @@ class ShipmentSummery extends Component {
       }
     );
   };
+  /**
+   * Handles the change event for planning units.
+   * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+   */
   handlePlanningUnitChange = (planningUnitIds) => {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1832,10 +1870,17 @@ class ShipmentSummery extends Component {
       }
     );
   };
+  /**
+   * Calls the get programs and get funding source function on page load
+   */
   componentDidMount() {
     this.getPrograms();
     this.getFundingSourceList();
   }
+  /**     
+   * Sets the selected program ID selected by the user.
+   * @param {object} event - The event object containing information about the program selection.
+   */
   setProgramId(event) {
     this.setState(
       {
@@ -1849,6 +1894,10 @@ class ShipmentSummery extends Component {
       }
     );
   }
+  /**
+   * Sets the version ID and updates the tracer category list.
+   * @param {Object} event - The event object containing the version ID value.
+   */
   setVersionId(event) {
     if (this.state.versionId != "" || this.state.versionId != undefined) {
       this.setState(
@@ -1871,6 +1920,9 @@ class ShipmentSummery extends Component {
       );
     }
   }
+  /**
+   * Fetches data based on selected filters.
+   */
   fetchData = () => {
     let versionId = document.getElementById("versionId").value;
     let programId = document.getElementById("programId").value;
@@ -2473,48 +2525,36 @@ class ShipmentSummery extends Component {
       );
     }
   };
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => {
       this.fetchData();
     });
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show();
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">
       {i18n.t("static.common.loading")}
     </div>
   );
-  dateFormatterLanguage = (value) => {
-    if (moment(value).format("MM") === "01") {
-      return i18n.t("static.month.jan") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "02") {
-      return i18n.t("static.month.feb") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "03") {
-      return i18n.t("static.month.mar") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "04") {
-      return i18n.t("static.month.apr") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "05") {
-      return i18n.t("static.month.may") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "06") {
-      return i18n.t("static.month.jun") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "07") {
-      return i18n.t("static.month.jul") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "08") {
-      return i18n.t("static.month.aug") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "09") {
-      return i18n.t("static.month.sep") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "10") {
-      return i18n.t("static.month.oct") + " " + moment(value).format("YY");
-    } else if (moment(value).format("MM") === "11") {
-      return i18n.t("static.month.nov") + " " + moment(value).format("YY");
-    } else {
-      return i18n.t("static.month.dec") + " " + moment(value).format("YY");
-    }
-  };
+  /**
+   * Renders the Shipment Summery report table.
+   * @returns {JSX.Element} - Shipment Summery report table.
+   */
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -2549,7 +2589,7 @@ class ShipmentSummery extends Component {
 
     const bar = {
       labels: this.state.shipmentDetailsMonthList.map((item, index) =>
-        this.dateFormatterLanguage(item.dt)
+        dateFormatterLanguage(item.dt)
       ),
       datasets: [
         {
@@ -2693,14 +2733,13 @@ class ShipmentSummery extends Component {
                             }}
                             value={rangeValue}
                             lang={pickerLang}
-                            onChange={this.handleRangeChange}
                             onDismiss={this.handleRangeDissmis}
                           >
                             <MonthBox
                               value={
-                                this.makeText(rangeValue.from) +
+                                makeText(rangeValue.from) +
                                 " ~ " +
-                                this.makeText(rangeValue.to)
+                                makeText(rangeValue.to)
                               }
                               onClick={this._handleClickRangeBox}
                             />
@@ -2782,6 +2821,8 @@ class ShipmentSummery extends Component {
                                 : []
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -2829,6 +2870,8 @@ class ShipmentSummery extends Component {
                               }, this)
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -2856,6 +2899,8 @@ class ShipmentSummery extends Component {
                                   };
                                 }, this)
                               }
+                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')}}
                             />
                           </div>
                         </FormGroup>

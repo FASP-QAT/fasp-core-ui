@@ -14,7 +14,9 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.organisation.organisation');
+// Initial values for form fields
 let initialValues = {
     realmId: '',
     realmCountryId: [],
@@ -23,6 +25,11 @@ let initialValues = {
     organisationTypeId: '',
     organisationTypeList: []
 }
+/**
+ * Defines the validation schema for Organization details.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
@@ -33,13 +40,16 @@ const validationSchema = function (values) {
         organisationCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.common.displayName'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+            .max(10, i18n.t('static.organisation.organisationcodemax10digittext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationTypeId: Yup.string()
             .required(i18n.t('static.organisationType.organisationTypeValue'))
     })
 }
+/**
+ * Component for adding organization details.
+ */
 export default class AddOrganisationComponent extends Component {
     constructor(props) {
         super(props);
@@ -77,6 +87,9 @@ export default class AddOrganisationComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
+    /**
+     * Fetch organization display name on blur event
+     */
     getDisplayName() {
         let realmId = document.getElementById("realmId").value;
         let organisationValue = document.getElementById("organisationName").value;
@@ -85,6 +98,7 @@ export default class AddOrganisationComponent extends Component {
         if (realmId != 0 && organisationValue.length != 0) {
             if (organisationValue.length >= 4) {
                 organisationValue = organisationValue.slice(0, 2);
+                //Fetch organization display name
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
                         let { organisation } = this.state
@@ -132,6 +146,7 @@ export default class AddOrganisationComponent extends Component {
                         }
                     );
             } else {
+                //Fetch organization display name
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
                         let { organisation } = this.state
@@ -181,6 +196,10 @@ export default class AddOrganisationComponent extends Component {
             }
         }
     }
+    /**
+     * Handles data change in the organization details form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         let { organisation } = this.state
         if (event.target.name === "organisationName") {
@@ -198,9 +217,13 @@ export default class AddOrganisationComponent extends Component {
         ) => {
         })
     }
-    
+    /**
+     * Fetches RealmId ,Realm country list, Realm list & Organization Type list on component mount.
+     */
     componentDidMount() {
+        //Fetches RealmId
         let realmId = AuthenticationService.getRealmId();
+        //Fetches Realm's country list
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 var listArray = response.data;
@@ -251,6 +274,7 @@ export default class AddOrganisationComponent extends Component {
                     }
                 }
             );
+        //Fetch realm list
         UserService.getRealmList()
             .then(response => {
                 var listArray = response.data;
@@ -310,11 +334,17 @@ export default class AddOrganisationComponent extends Component {
                 organisation
             },
                 () => {
+                    //Fetch realm country list
                     this.getRealmCountryList();
+                    //Fetch Organization Type list by realmId
                     this.getOrganisationTypeByRealmId();
                 })
         }
     }
+    /**
+     * Handles change event on realm country dropdown & filters the dropdown list
+     * @param {Event} value - The change event.
+     */
     updateFieldData(value) {
         var selectedArray = [];
         for (var p = 0; p < value.length; p++) {
@@ -337,6 +367,10 @@ export default class AddOrganisationComponent extends Component {
         organisation.realmCountryArray = realmCountryIdArray;
         this.setState({ organisation: organisation });
     }
+    /**
+     * Handles change event on realm dropdown & filters the dropdown list
+     * @param {Event} value - The change event.
+     */
     getOrganisationTypeByRealmId() {
         if (this.state.organisation.realm.id != "") {
             OrganisationTypeService.getOrganisationTypeByRealmId(this.state.organisation.realm.id)
@@ -405,8 +439,13 @@ export default class AddOrganisationComponent extends Component {
             })
         }
     }
+    /**
+     * Fetches realm country list on change of realm dropdown value
+     * @param {Event} e - The change event.
+     */
     getRealmCountryList(e) {
         if (this.state.organisation.realm.id != "") {
+            //Fetch realm country list by realmId
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)
                 .then(response => {
                     if (response.status == 200) {
@@ -478,9 +517,17 @@ export default class AddOrganisationComponent extends Component {
             })
         }
     }
+    /**
+     * Capitalizes the first letter of the organization name.
+     * @param {string} str - The organization name.
+     */
     Capitalize(str) {
         this.state.organisation.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    /**
+     * Renders the organization details form.
+     * @returns {JSX.Element} - organization details form.
+     */
     render() {
         const { selCountries } = this.state;
         const { realms } = this.state;
@@ -488,14 +535,7 @@ export default class AddOrganisationComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {(() => {
-                            switch (this.state.languageId) {
-                                case 2: return (item.label.label_pr !== null && item.label.label_pr !== "" ? item.label.label_pr : item.label.label_en);
-                                case 3: return (item.label.label_fr !== null && item.label.label_fr !== "" ? item.label.label_fr : item.label.label_en);
-                                case 4: return (item.label.label_sp !== null && item.label.label_sp !== "" ? item.label.label_sp : item.label.label_en);
-                                default: return item.label.label_en;
-                            }
-                        })()}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -503,7 +543,7 @@ export default class AddOrganisationComponent extends Component {
         let organisationTypes = organisationTypeList.length > 0
             && organisationTypeList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationTypeId}>{item.label.label_en}</option>
+                    <option key={i} value={item.organisationTypeId}>{getLabelText(item.label, this.state.lang)}</option>
                 )
             }, this);
         return (
@@ -629,6 +669,8 @@ export default class AddOrganisationComponent extends Component {
                                                         multi
                                                         options={this.state.realmCountryList}
                                                         value={this.state.realmCountryId}
+                                                        placeholder={i18n.t('static.common.select')}
+
                                                     />
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </FormGroup>
@@ -701,9 +743,15 @@ export default class AddOrganisationComponent extends Component {
             </div>
         );
     }
+    /**
+     * Redirects to the list organization when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Resets the organization details form when reset button is clicked.
+     */
     resetClicked() {
         let { organisation } = this.state
         organisation.label.label_en = ''

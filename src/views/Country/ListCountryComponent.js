@@ -13,11 +13,20 @@ import CountryService from '../../api/CountryService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Localized entity name
 const entityname = i18n.t('static.country.countryMaster');
+/**
+ * Sorts the country list in ascending order
+ * @param {Array} sourceArray 
+ * @returns {Array} - Sorted Array of country.
+ */
 const sortArray = (sourceArray) => {
     const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
     return sourceArray.sort(sortByName);
 };
+/**
+ * Component for list of country details.
+ */
 export default class CountryListComponent extends Component {
     constructor(props) {
         super(props);
@@ -34,19 +43,31 @@ export default class CountryListComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
+    /**
+     * Hides the message in div1 after 30 seconds.
+     */
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
+    /**
+     * Hides the message in div2 after 30 seconds.
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Filters the country list according to the Status filters
+     */
     filterData() {
         var selStatus = document.getElementById("active").value;
         if (selStatus != "") {
@@ -73,6 +94,9 @@ export default class CountryListComponent extends Component {
             });
         }
     }
+    /**
+     * Redirects to the add country screen
+     */
     addNewCountry() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/country/addCountry`)
@@ -80,6 +104,9 @@ export default class CountryListComponent extends Component {
             alert("You must be Online.")
         }
     }
+    /**
+     * Builds the jexcel component to display country list.
+     */
     buildJExcel() {
         let countryList = this.state.selCountry;
         let countryArray = [];
@@ -101,7 +128,7 @@ export default class CountryListComponent extends Component {
         var data = countryArray;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [0, 120, 150, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
@@ -170,8 +197,12 @@ export default class CountryListComponent extends Component {
             countryEl: countryEl, loading: false
         })
     }
+    /**
+     * Fetches the country list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
         this.hideFirstComponent();
+        //Fetch all country list
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
                 var listArray = response.data;
@@ -234,9 +265,26 @@ export default class CountryListComponent extends Component {
                 }
             );
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
+    /**
+     * Redirects to the edit country screen on row click with countryId for editing.
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value
+     * @param {Event} e - The selected event.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -249,6 +297,10 @@ export default class CountryListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Renders the country list with filter.
+     * @returns {JSX.Element} - country list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

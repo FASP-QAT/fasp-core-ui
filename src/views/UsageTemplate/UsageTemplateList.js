@@ -33,6 +33,11 @@ import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.modelingType.modelingType')
+/**
+ * This const is used to define the validation schema for usage frequency calculator
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         picker1: Yup.string()
@@ -45,6 +50,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.label.fieldRequired'))
     })
 }
+/**
+ * This component is used the display,add or edit the usage templates in tabular format
+ */
 class usageTemplate extends Component {
     constructor(props) {
         super(props);
@@ -101,13 +109,18 @@ class usageTemplate extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getDimensionList = this.getDimensionList.bind(this);
     }
-    
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+    /**
+     * This function is used to get the dataset(Program) list
+     */
     getDataSet() {
         ProgramService.getDataSetList()
             .then(response => {
@@ -199,6 +212,9 @@ class usageTemplate extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get the tracer category list
+     */
     getTracerCategory() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -275,6 +291,9 @@ class usageTemplate extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get the unit list based on dimension
+     */
     getDimensionList() {
         UnitService.getUnitListByDimensionId(5)
             .then(response => {
@@ -350,6 +369,9 @@ class usageTemplate extends Component {
                 }
             );
     }
+    /**
+     * This function is used to get the list of forecasting units
+     */
     getForecastingUnit() {
         let forecastingUnitIds = this.state.tempForecastingUnitList.map(e => e.id)
         ForecastingUnitService.getForecastingUnitByIds(forecastingUnitIds).then(response => {
@@ -427,6 +449,9 @@ class usageTemplate extends Component {
             }
         );
     }
+    /**
+     * This function is used to get the full unit list
+     */
     getUnit() {
         UnitService.getUnitListAll().then(response => {
             if (response.status == 200) {
@@ -501,6 +526,9 @@ class usageTemplate extends Component {
             }
         );
     }
+    /**
+     * This function is used to get the usage period list
+     */
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
             if (response.status == 200) {
@@ -578,6 +606,9 @@ class usageTemplate extends Component {
             }
         );
     }
+    /**
+     * This function is used to build the jexcel table for usage templates
+     */
     buildJexcel() {
         var papuList = this.state.selSource;
         var data = [];
@@ -677,7 +708,7 @@ class usageTemplate extends Component {
         var data = papuDataArr;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 {
                     type: 'text',
@@ -719,7 +750,7 @@ class usageTemplate extends Component {
                         autocomplete: true,
                         remoteSearch: true,
                         onbeforesearch: function(instance, request) {
-                            if(this.state.tracerCategoryLoading == false){
+                            if(this.state.tracerCategoryLoading == false  && instance.search.length > 2){
                                 request.method = 'GET';                                
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -734,7 +765,6 @@ class usageTemplate extends Component {
                             }
                         }.bind(this),
                     },
-                    filter: this.filterForecastingUnitList,
                     required: true,
                     regex: {
                         ex: /^\S+(?: \S+)*$/,
@@ -797,7 +827,8 @@ class usageTemplate extends Component {
                     width: '130',
                     textEditor: true, 
                     required: true,
-                    number: true,
+                    // number: true,
+                    decimal: '.',
                     minValue: {
                         value: 0,
                         text: i18n.t('static.planningUnitSetting.negativeValueNotAllowed')
@@ -1208,6 +1239,9 @@ class usageTemplate extends Component {
             loading: false
         })
     }
+    /**
+     * This function is used to filter the dataset(Program) list based on the business function
+     */
     filterDataset = function (instance, cell, c, r, source) {
         var mylist = this.state.typeList;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
@@ -1215,6 +1249,9 @@ class usageTemplate extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the tracer category list by program Id based on active
+     */
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
         var mylist = this.state.tracerCategoryList.filter(c=>c.active);
         var value = (this.state.dataEl.getJson(null, false)[r])[1];
@@ -1224,10 +1261,9 @@ class usageTemplate extends Component {
         }
         return mylist;
     }.bind(this)
-    filterForecastingUnitList = function (instance, cell, c, r, source) {
-        var mylist = [];
-        return mylist;
-    }.bind(this)
+    /**
+     * This function is used to filter the frequency
+     */
     filterUsagePeriod1 = function (instance, cell, c, r, source) {
         var mylist = this.state.usagePeriodList;
         if (mylist[0].id == -1) {
@@ -1235,6 +1271,9 @@ class usageTemplate extends Component {
         }
         return mylist;
     }.bind(this)
+    /**
+     * This function is used to filter the Period Unit
+     */
     filterUsagePeriod2 = function (instance, cell, c, r, source) {
         var mylist = this.state.usagePeriodList;
         if (mylist[0].id == -1) {
@@ -1252,6 +1291,9 @@ class usageTemplate extends Component {
         }
         return tempUsagePeriodList;
     }.bind(this)
+    /**
+     * This function is used to get usage template list
+     */
     getUsageTemplateData() {
         this.hideSecondComponent();
         UsageTemplateService.getUsageTemplateListAll().then(response => {
@@ -1317,10 +1359,16 @@ class usageTemplate extends Component {
                 }
             );
     }
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
@@ -1328,6 +1376,9 @@ class usageTemplate extends Component {
             window.onbeforeunload = undefined
         }
     }
+    /**
+     * This function is used to build the role array
+     */
     componentDidMount() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -1343,10 +1394,21 @@ class usageTemplate extends Component {
                 this.getTracerCategory();
             })
     }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell or to update the value
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         elInstance.setValueFromCoords(17, y, 1, true);
     }
+    /**
+     * This function is called when user clicks on add row button add the usage template row in table
+     */
     addRow = function () {
         var data = [];
         data[0] = 0;
@@ -1376,6 +1438,9 @@ class usageTemplate extends Component {
         );
         this.el.getCell("E1").classList.add('typing-'+this.state.lang);
     };
+    /**
+     * This function is called when submit button of the usage template is clicked and is used to save usage templates if all the data is successfully validated.
+     */
     formSubmit = function () {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -1477,6 +1542,12 @@ class usageTemplate extends Component {
         } else {
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -1598,7 +1669,12 @@ class usageTemplate extends Component {
             }
         }
     }
-    loaded = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the usage template table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
         jExcelLoadedFunction(instance, 0);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1755,6 +1831,14 @@ class usageTemplate extends Component {
             }
         }
     }
+    /**
+     * This function is called when something in the usage template table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     changed = function (instance, cell, x, y, value) {
         changed(instance, cell, x, y, value)
         if ((x == 7 || x == 9) && this.el.getValueFromCoords(10, y)) {
@@ -2332,6 +2416,10 @@ class usageTemplate extends Component {
             cell1.classList.add('readonly');
         }
     }.bind(this);
+    /**
+     * This function is called before saving the usage template to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -2406,7 +2494,8 @@ class usageTemplate extends Component {
                 if (value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.program.validvaluetext'));   
+                    this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                    valid = false;   
                 }
                 if (!this.el.getValueFromCoords(10, y)) {
                     var col = ("L").concat(parseInt(y) + 1);
@@ -2546,6 +2635,10 @@ class usageTemplate extends Component {
         }
         return valid;
     }
+    /**
+     * This is used to display the content
+     * @returns This returns usage template table along with filters
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -2771,6 +2864,9 @@ class usageTemplate extends Component {
             </div>
         )
     }
+    /**
+     * This function is used to toggle the usage frequency modal
+     */
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2778,10 +2874,17 @@ class usageTemplate extends Component {
             () => {
             })
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to application dashboard screen
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
+    /**
+     * This function is called when user changes something in calculate usage frequency popup
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         if (event.target.name == "number1") {
             let tempList = this.state.usagePeriodListLong;

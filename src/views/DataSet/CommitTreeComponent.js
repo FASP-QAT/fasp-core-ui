@@ -41,16 +41,26 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { buildJxl, buildJxl1, consumptionExtrapolationNotesClicked, dataCheck, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+// Localized entity name
 const entityname = i18n.t('static.button.commit');
+// Initial values for form fields
 const initialValues = {
     notes: ''
 }
+/**
+ * Defines the validation schema for commit details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         notes: Yup.string()
             .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.commit.consumptionnotesvalid"))
     })
 }
+/**
+ * Component for commit forecast program
+ */
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -135,6 +145,13 @@ export default class CommitTreeComponent extends React.Component {
         this.loadedFunctionForTree = this.loadedFunctionForTree.bind(this);
         this.loadedFunctionForSelectedForecast = this.loadedFunctionForSelectedForecast.bind(this);
     }
+    /**
+     * Toggles the visibility of the version settings conflicts modal and displays conflict data if available.
+     * @param {Object} oldData - The old version data.
+     * @param {Object} latestData - The latest version data.
+     * @param {number} index - The index of the conflict.
+     * @param {number} page - The page number.
+     */
     toggleVersionSettingsConflictModal(oldData, latestData, index, page) {
         this.setState({
             versionSettingsConflictsModal: !this.state.versionSettingsConflictsModal
@@ -143,6 +160,12 @@ export default class CommitTreeComponent extends React.Component {
             this.showVersionSettingsConflictsData(oldData, latestData, index);
         }
     }
+    /**
+     * Builds jexcel table for version settings conflict resolution
+     * @param {Object} oldData - The old version data.
+     * @param {Object} latestData - The latest version data.
+     * @param {number} index - The index of the conflict.
+     */
     showVersionSettingsConflictsData(oldData, latestData, index) {
         var data = [];
         data.push(oldData);
@@ -226,6 +249,10 @@ export default class CommitTreeComponent extends React.Component {
         })
         document.getElementById("versionSettingsIndex").value = index;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForVersionSettingsConflicts = function (instance) {
         let target = document.getElementById('versionSettingsConflictsDiv');
         target.classList.add("removeOddColor")
@@ -249,6 +276,9 @@ export default class CommitTreeComponent extends React.Component {
         }
         elInstance.options.editable = false;
     }
+    /**
+     * Accepts current changes for version settings conflicts
+     */
     acceptCurrentChangesVersionSettings() {
         this.setState({ loading: true });
         var resolveConflictsInstance = this.state.versionSettingsConflictsInstance;
@@ -279,6 +309,9 @@ export default class CommitTreeComponent extends React.Component {
         this.toggleVersionSettingsConflictModal('', '', 0, '');
         this.setState({ loading: false })
     }
+    /**
+     * Accepts incoming changes for version settings conflicts
+     */
     acceptIncomingChangesVersionSettings() {
         this.setState({ loading: true })
         var resolveConflictsInstance = this.state.versionSettingsConflictsInstance;
@@ -309,6 +342,13 @@ export default class CommitTreeComponent extends React.Component {
         this.toggleVersionSettingsConflictModal('', '', 0, '');
         this.setState({ loading: false })
     }
+    /**
+     * Toggles the visibility of the planning unit conflicts modal and displays conflict data if available.
+     * @param {Object} oldData - The old version data.
+     * @param {Object} latestData - The latest version data.
+     * @param {number} index - The index of the conflict.
+     * @param {number} page - The page number.
+     */
     togglePlanningUnitsConflictModal(oldData, latestData, index, page) {
         this.setState({
             planningUnitsConflictsModal: !this.state.planningUnitsConflictsModal
@@ -317,6 +357,12 @@ export default class CommitTreeComponent extends React.Component {
             this.showPlanningUnitsConflictsData(oldData, latestData, index);
         }
     }
+    /**
+     * Builds jexcel table for planning unit conflict resolution
+     * @param {Object} oldData - The old version data.
+     * @param {Object} latestData - The latest version data.
+     * @param {number} index - The index of the conflict.
+     */
     showPlanningUnitsConflictsData(oldData, latestData, index) {
         var data = [];
         data.push(oldData);
@@ -430,6 +476,10 @@ export default class CommitTreeComponent extends React.Component {
         })
         document.getElementById("planningUnitsIndex").value = index;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForPlanningUnitsConflicts = function (instance) {
         let target = document.getElementById('planningUnitsConflictsDiv');
         target.classList.add("removeOddColor")
@@ -465,6 +515,9 @@ export default class CommitTreeComponent extends React.Component {
         }
         elInstance.options.editable = false;
     }
+    /**
+     * Accepts current changes for planning unit conflicts
+     */
     acceptCurrentChangesPlanningUnits() {
         this.setState({ loading: true });
         var resolveConflictsInstance = this.state.planningUnitsConflictsInstance;
@@ -495,6 +548,9 @@ export default class CommitTreeComponent extends React.Component {
         this.togglePlanningUnitsConflictModal('', '', 0, '');
         this.setState({ loading: false })
     }
+    /**
+     * Accepts incoming changes for planning unit conflicts
+     */
     acceptIncomingChangesPlanningUnits() {
         this.setState({ loading: true })
         var resolveConflictsInstance = this.state.planningUnitsConflictsInstance;
@@ -525,6 +581,11 @@ export default class CommitTreeComponent extends React.Component {
         this.togglePlanningUnitsConflictModal('', '', 0, '');
         this.setState({ loading: false })
     }
+    /**
+     * Toggles the active tab in a tab pane.
+     * @param {number} tabPane - The index of the tab pane.
+     * @param {string} tab - The identifier of the tab to activate.
+     */
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -532,6 +593,10 @@ export default class CommitTreeComponent extends React.Component {
             activeTab: newArray,
         });
     }
+    /**
+     * Sets the state for including only selected forecasts.
+     * @param {Event} e - The event object.
+     */
     setIncludeOnlySelectedForecasts(e) {
         this.setState({
             includeOnlySelectedForecasts: e.target.checked
@@ -539,12 +604,18 @@ export default class CommitTreeComponent extends React.Component {
             dataCheck(this, this.state.programDataLocal);
         })
     }
+    /**
+     * Handles the change in notes input.
+     * @param {Event} event - The change event object.
+     */
     notesChange(event) {
         this.setState({
             notes: event.target.value
         })
     }
-    
+    /**
+     * Reterives forecast program list on component mount
+     */
     componentDidMount = function () {
         var db1;
         getDatabase();
@@ -615,6 +686,10 @@ export default class CommitTreeComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * Sets program Id in state and build tables to show data
+     * @param {Event} e The change event
+     */
     setProgramId(e) {
         var programId = e.target.value;
         if (this.state.versionSettingsInstance != "" && this.state.versionSettingsInstance != undefined) {
@@ -708,7 +783,7 @@ export default class CommitTreeComponent extends React.Component {
                             data[9] = 4;
                             var options = {
                                 data: [data],
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.program.forecastStart'),
@@ -875,7 +950,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedPlanningUnitListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.productCategory.productCategory'),
@@ -1049,7 +1124,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedConsumptionListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t('static.dashboard.planningunitheader'),
@@ -1240,7 +1315,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: mergedTreeListArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: [
                                     {
                                         title: i18n.t("static.commitVersion.localV") + programDataLocal.currentVersion.versionId,
@@ -1571,7 +1646,7 @@ export default class CommitTreeComponent extends React.Component {
                             }
                             var options = {
                                 data: dataArray,
-                                columnDrag: true,
+                                columnDrag: false,
                                 columns: columns,
                                 nestedHeaders: nestedHeaders,
                                 onload: this.loadedFunctionForSelectedForecast,
@@ -1735,6 +1810,9 @@ export default class CommitTreeComponent extends React.Component {
             }
         })
     }
+    /**
+     * Merge data after conflict resolution
+     */
     mergeData() {
         var db1;
         var storeOS;
@@ -1917,6 +1995,10 @@ export default class CommitTreeComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForVersionSettings = function (instance) {
         let target = document.getElementById('versionSettingsDiv');
         target.classList.add("removeOddColor")
@@ -1983,6 +2065,10 @@ export default class CommitTreeComponent extends React.Component {
         elInstance.orderBy(9, 0);
         elInstance.options.editable = false;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForPlanningUnits = function (instance) {
         let target = document.getElementById('planningUnitDiv');
         target.classList.add("removeOddColor")
@@ -2070,6 +2156,10 @@ export default class CommitTreeComponent extends React.Component {
         elInstance.orderBy(14, 0);
         elInstance.options.editable = false;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForConsumption = function (instance) {
         let target = document.getElementById('consumptionDiv');
         target.classList.add("removeOddColor")
@@ -2168,6 +2258,10 @@ export default class CommitTreeComponent extends React.Component {
         elInstance.orderBy(6, 0);
         elInstance.options.editable = false;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForTree = function (instance) {
         let target = document.getElementById('treeDiv');
         target.classList.add("removeOddColor")
@@ -2266,6 +2360,10 @@ export default class CommitTreeComponent extends React.Component {
         elInstance.orderBy(6, 0);
         elInstance.options.editable = false;
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     */
     loadedFunctionForSelectedForecast = function (instance) {
         let target = document.getElementById('selectedForecastDiv');
         target.classList.add("removeOddColor")
@@ -2357,6 +2455,11 @@ export default class CommitTreeComponent extends React.Component {
         elInstance.orderBy(11, 0);
         elInstance.options.editable = false;
     }
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
@@ -2369,6 +2472,11 @@ export default class CommitTreeComponent extends React.Component {
             }
         })
     }
+    /**
+     * Toggles the state variable 'showValidation'.
+     * If 'showValidation' is currently true, it sets it to false, and vice versa.
+     * Additionally, if 'showValidation' is set to true after toggling, it triggers the 'buildJxl()' function.
+     */
     toggleShowValidation() {
         this.setState({
             showValidation: !this.state.showValidation
@@ -2381,12 +2489,21 @@ export default class CommitTreeComponent extends React.Component {
             }
         })
     }
+    /**
+     * Sets the state variable 'versionTypeId' based on the value obtained from the event 'e'.
+     * Typically used as an event handler for input elements like <input> or <select>.
+     * @param {Event} e - The event object, usually passed from an event listener.
+     */
     setVersionTypeId(e) {
         var versionTypeId = e.target.value;
         this.setState({
             versionTypeId: versionTypeId
         })
     }
+    /**
+     * This function is used to check the status of commit and once the commit is sucessful then call the load the latest version function
+     * @param {*} commitRequestId This is the commit request Id that is auto generated when user commits a version
+     */
     redirectToDashbaord(commitRequestId) {
         this.setState({ loading: true });
         AuthenticationService.setupAxiosInterceptors();
@@ -2451,6 +2568,10 @@ export default class CommitTreeComponent extends React.Component {
                 this.redirectToDashbaord(commitRequestId)
             })
     }
+    /**
+     * This function is used to get the latest program version
+     * @param {*} notificationDetails This is the program Id which user is trying to commit
+     */
     getLatestProgram(notificationDetails) {
         this.setState({ loading: true });
         var updatedJson = [];
@@ -2534,9 +2655,16 @@ export default class CommitTreeComponent extends React.Component {
                 }.bind(this);
             })
     }
+    /**
+     * This function is used to redirect user to master data sync screen after the latest version is loaded
+     * @param {*} programIds This is the program Id which user is trying to commit
+     */
     goToMasterDataSync(programIds) {
         this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
     }
+    /**
+     * This function is called when user clicks on commit button to send the data on server
+     */
     synchronize() {
         var checkIfThereAreTreesWithBlankPU = false;
         var checkIfThereAreTreesWithBlankFU = false;
@@ -2614,6 +2742,12 @@ export default class CommitTreeComponent extends React.Component {
                                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
+                                            var findNodeIndexParent=1;
+                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2) {
+                                            }else{
+                                                findNodeIndexParent = completeFlatList.findIndex(n => n.id == node.parent);
+                                            }
+                                            if(findNodeIndexParent!=-1){
                                             if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
@@ -2633,20 +2767,27 @@ export default class CommitTreeComponent extends React.Component {
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
-                                            var annualTargetCalculator=node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator;
-                                            if(annualTargetCalculator!=undefined){
-                                                var firstMonthOfTarget=node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator.firstMonthOfTarget
-                                                annualTargetCalculator.firstMonthOfTarget=moment(firstMonthOfTarget, 'YYYY-MM-DD').format("YYYY-MM")
-                                                if(annualTargetCalculator.yearsOfTarget=="" || annualTargetCalculator.actualOrTargetValueList.length==0){
-                                                    annualTargetCalculator={}
+                                            var annualTargetCalculator = node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator;
+                                            if (annualTargetCalculator != undefined) {
+                                                var firstMonthOfTarget = node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator.firstMonthOfTarget
+                                                annualTargetCalculator.firstMonthOfTarget = moment(firstMonthOfTarget, 'YYYY-MM-DD').format("YYYY-MM")
+                                                if (annualTargetCalculator.yearsOfTarget == "" || annualTargetCalculator.actualOrTargetValueList.length == 0) {
+                                                    annualTargetCalculator = {}
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator = annualTargetCalculator;
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             completeFlatList[findNodeIndex] = node;
+                                        }else{
+                                            completeFlatList.splice(i,1);
+                                            i=i-1;
+                                        }
                                         }
                                     }
-                                    tree.tree.flatList = completeFlatList;
+                                    const uniqueFlatList = completeFlatList.filter((obj, index) => {
+                                        return index === completeFlatList.findIndex(o => obj.id === o.id);
+                                    });
+                                    tree.tree.flatList = uniqueFlatList;
                                     treeList[tl] = tree;
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
@@ -2658,6 +2799,14 @@ export default class CommitTreeComponent extends React.Component {
                                     consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
+
+                                var planningUnitToUpdate = programJson.planningUnitList;
+                                for (var pl = 0; pl < planningUnitToUpdate.length; pl++) {
+                                    if(planningUnitToUpdate[pl].programPlanningUnitId==""){
+                                        planningUnitToUpdate[pl].programPlanningUnitId=null;
+                                    }
+                                }
+                                programJson.planningUnitList = planningUnitToUpdate;
                                 programJson.treeList = treeList;
                                 const compressedData = isCompress(programJson);
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
@@ -2752,16 +2901,28 @@ export default class CommitTreeComponent extends React.Component {
             })
         }
     }
+    /**
+     * This function is called when user clicks on the cancel button and is redirected to dashboard
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
+    /**
+     * Shows the first component by setting its display property to 'block', then hides it after 30 seconds.
+     */
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
     }
+    /**
+     * Handles the click event of a plus-minus button for a specific tree and scenario.
+     * It toggles the 'checked' property of the corresponding tree scenario and updates the state.
+     * @param {string} treeId - The ID of the tree.
+     * @param {string} scenarioId - The ID of the scenario.
+     */
     plusMinusClicked(treeId, scenarioId) {
         var index = this.state.treeScenarioList.findIndex(c => c.treeId == treeId && c.scenarioId == scenarioId);
         var treeScenarioList = this.state.treeScenarioList;
@@ -2770,6 +2931,10 @@ export default class CommitTreeComponent extends React.Component {
             treeScenarioList: treeScenarioList
         })
     }
+    /**
+     * This function is used to display multiple tabs on the screen
+     * @returns Returns multiple tabs
+     */
     tabPane() {
         return (
             <>
@@ -2836,6 +3001,10 @@ export default class CommitTreeComponent extends React.Component {
             </>
         );
     }
+    /**
+     * Renders the Commit program screen.
+     * @returns {JSX.Element} - Commit program screen.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

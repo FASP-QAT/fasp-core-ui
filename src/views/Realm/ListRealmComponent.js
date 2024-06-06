@@ -6,14 +6,19 @@ import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Localized entity name
 const entityname = i18n.t('static.realm.realm');
+/**
+ * Component for list of realm details.
+ */
 export default class ReactListComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,24 +30,18 @@ export default class ReactListComponent extends Component {
             lang: localStorage.getItem("lang"),
         }
         this.addNewRealm = this.addNewRealm.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Clears the timeout when the component is unmounted.
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
+    /**
+     * Fetches the realm list from the server and builds the jexcel component on component mount.
+     */
     componentDidMount() {
-        this.hideFirstComponent();
+        hideFirstComponent();
         RealmService.getRealmListAll().then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -80,7 +79,7 @@ export default class ReactListComponent extends Component {
                         var data = realmArray;
                         var options = {
                             data: data,
-                            columnDrag: true,
+                            columnDrag: false,
                             colWidths: [0, 100, 90, 90, 90, 90, 100, 120, 90],
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
@@ -159,7 +158,7 @@ export default class ReactListComponent extends Component {
                                 },
                             ],
                             editable: false,
-                            onload: this.loaded,
+                            onload: loadedForNonEditableTables,
                             pagination: localStorage.getItem("sesRecordCount"),
                             search: true,
                             columnSorting: true,
@@ -205,7 +204,7 @@ export default class ReactListComponent extends Component {
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         })
@@ -249,6 +248,9 @@ export default class ReactListComponent extends Component {
                 }
             );
     }
+    /**
+     * Redirects to the edit realm screen on row click.
+     */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
@@ -263,6 +265,9 @@ export default class ReactListComponent extends Component {
             }
         }
     }.bind(this);
+    /**
+     * Redirects to the add realm screen.
+     */
     addNewRealm() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.props.history.push(`/realm/addRealm`)
@@ -270,9 +275,10 @@ export default class ReactListComponent extends Component {
             alert("You must be Online.")
         }
     }
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
+    /**
+     * Renders the realm list.
+     * @returns {JSX.Element} - Realm list.
+     */
     render() {
         jexcel.setDictionary({
             Show: " ",

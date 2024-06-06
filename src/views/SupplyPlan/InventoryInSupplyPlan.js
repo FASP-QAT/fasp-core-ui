@@ -11,6 +11,9 @@ import { ADJUSTMENT_MODIFIED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSI
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+/**
+ * This component is used to display the inventory/adjustment data in the form of table for supply plan, scenario planning, supply planning comparision and supply plan version and review screen
+ */
 export default class InventoryInSupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -37,6 +40,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             inventoryBatchInfoTableEl: ""
         }
     }
+    /**
+     * This function is used to update the data when some records are pasted in the inventory/adjustment sheet
+     * @param {*} instance This is the sheet where the data is being placed
+     * @param {*} data This is the data that is being pasted
+     */
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -72,6 +80,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used when the editing for a particular cell is completed to format the cell
+     * @param {*} instance This is the sheet where the data is being updated
+     * @param {*} cell This is the value of the cell whose value is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
@@ -87,6 +103,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
     }
+    /**
+     * This function is used to update the data when some records are pasted in the inventory/adjustment batch info sheet
+     * @param {*} instance This is the sheet where the data is being placed
+     * @param {*} data This is the data that is being pasted
+     */
     onPasteForBatchInfo(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -103,8 +124,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
-    componentDidMount() {
-    }
+    /**
+     * This function is used to build the Jexcel table with all the data based on the filters and based on all the dropdowns
+     */
     showInventoryData() {
         var realmId = AuthenticationService.getRealmId();
         var planningUnitId = document.getElementById("planningUnitId").value;
@@ -308,7 +330,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     })
                     var options = {
                         data: inventoryDataArr,
-                        columnDrag: true,
+                        columnDrag: false,
                         columns: [
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
@@ -317,7 +339,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'autocomplete', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120, autoCasting: false },
                             { title: actualVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120, autoCasting: false },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00000', decimal: '.', width: 90, readOnly: true },
                             { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
                             { title: actualVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
@@ -424,6 +446,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }.bind(this);
     }.bind(this);
     }
+    /**
+     * This function is used when user clicks on the show batch details for a particular inventory/adjustment record
+     * @param {*} obj This is the sheet where the data is being updated
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} e This is mouse event handler
+     * @param {*} inventoryEditable This is the value of the flag that indicates whether table should be editable or not
+     */
     batchDetailsClicked(obj, x, y, e, inventoryEditable) {
         var rowData = obj.getRowData(y);
         this.props.updateState("loading", true);
@@ -535,7 +565,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         var options = {
             data: json,
-            columnDrag: true,
+            columnDrag: false,
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
@@ -628,6 +658,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.setState({ inventoryBatchInfoTableEl: elVar });
         this.props.updateState("loading", false);
     }
+    /**
+     * This function is used when users click on the add row in the inventory/adjustment table
+     */
     addRowInJexcel() {
         var obj = this.state.inventoryEl;
         var json = obj.getJson(null, false);
@@ -671,6 +704,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used when users click on the add row in the inventory/adjustment batch table
+     */
     addBatchRowInJexcel() {
         var obj = this.state.inventoryBatchInfoTableEl;
         var adjustmentType = this.props.items.inventoryType;
@@ -686,6 +722,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[7] = rowData[7];
         obj.insertRow(data);
     }
+    /**
+     * This function is used to filter the data source list based on active flag
+     */
     filterDataSource = function (instance, cell, c, r, source) {
         return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -693,6 +732,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
+    /**
+     * This function is used to filter the alternate reporting unit list based on active flag
+     */
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
         return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -700,7 +742,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             return a < b ? -1 : a > b ? 1 : 0;
         });
     }.bind(this)
-    loadedInventory = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the inventory/adjustment table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedInventory = function (instance, cell) {
         if (this.props.inventoryPage != "inventoryDataEntry") {
             jExcelLoadedFunctionOnlyHideRow(instance);
         } else {
@@ -770,6 +817,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called when page is changed to make some cells readonly based on multiple condition
+     * @param {*} el This is the DOM Element where sheet is created
+     * @param {*} pageNo This the page number which is clicked
+     * @param {*} oldPageNo This is the last page number that user had selected
+     */
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el;
         var json = elInstance.getJson(null, false);
@@ -819,12 +872,25 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used when some value of the formula cell is changed
+     * @param {*} instance This is the object of the DOM element
+     * @param {*} executions This is object of the formula cell that is being edited
+     */
     formulaChanged = function (instance, executions) {
         var executions = executions;
         for (var e = 0; e < executions.length; e++) {
             this.inventoryChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
+    /**
+     * This function is called when something in the inventory/adjustment table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     inventoryChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.inventoryEl;
         var rowData = elInstance.getRowData(y);
@@ -992,13 +1058,21 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is used to filter the batch list based on expiry date and created date
+     */
     filterBatchInfoForExistingDataForInventory = function (instance, cell, c, r, source) {
         var mylist = [];
         var date = (this.state.inventoryBatchInfoTableEl.getJson(null, false)[r])[7]
         mylist = this.state.batchInfoList.filter(c => c.id == 0 || c.id != -1 && (moment(c.expiryDate).format("YYYY-MM") > moment(date).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(date).format("YYYY-MM")));
         return mylist;
     }.bind(this)
-    loadedBatchInfoInventory = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the inventory/adjustment batch info table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedBatchInfoInventory = function (instance, cell) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1006,6 +1080,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
     }
+    /**
+     * This function is called when something in the inventory/adjustment batch info table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
     batchInfoChangedInventory = function (instance, cell, x, y, value) {
         var elInstance = this.state.inventoryBatchInfoTableEl;
         var rowData = elInstance.getRowData(y);
@@ -1042,6 +1124,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
     }
+    /**
+     * This function is called before saving the inventory/adjustment batch info to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationInventoryBatchInfo() {
         var valid = true;
         var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -1117,6 +1203,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the inventory/adjustment batch info is clicked and is used to save inventory/adjustment batch info if all the data is successfully validated.
+     */
     saveInventoryBatchInfo() {
         this.props.updateState("loading", true);
         var validation = this.checkValidationInventoryBatchInfo();
@@ -1195,6 +1284,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             this.props.hideThirdComponent();
         }
     }
+    /**
+     * This function is called before saving the inventory/adjustment data to check validations for all the rows that are available in the table
+     * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+     */
     checkValidationInventory() {
         var valid = true;
         var elInstance = this.state.inventoryEl;
@@ -1343,6 +1436,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         return valid;
     }
+    /**
+     * This function is called when submit button of the inventory/adjustment is clicked and is used to save inventory/adjustment if all the data is successfully validated.
+     */
     saveInventory() {
         this.props.updateState("inventoryError", "");
         this.props.updateState("loading", true);

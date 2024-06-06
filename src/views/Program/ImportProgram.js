@@ -1,13 +1,16 @@
 import bsCustomFileInput from 'bs-custom-file-input';
+import 'chartjs-plugin-annotation';
 import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
 import JSZip from 'jszip';
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import { ProgressBar, Step } from "react-step-progress-bar";
+import Select from 'react-select';
 import {
+    Row,
     Button,
     Card, CardBody,
     CardFooter,
@@ -17,6 +20,7 @@ import {
     Input,
     Label
 } from 'reactstrap';
+import "../../../node_modules/react-step-progress-bar/styles.css";
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import getLabelText from '../../CommonComponent/getLabelText.js';
@@ -25,15 +29,23 @@ import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import StepOneImport from '../DataSet/StepOneImportDataset';
+import StepTwoImport from '../DataSet/StepTwoImportDataset';
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 const initialValues = {
     programId: ''
 }
-
+// Localized entity name
 const entityname = i18n.t('static.dashboard.importprogram')
+/**
+ * Component for importing the program from zip.
+ */
 export default class ImportProgram extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            progressPer: 0,
             programList: [],
             message: '',
             loading: true,
@@ -41,16 +53,61 @@ export default class ImportProgram extends Component {
         this.formSubmit = this.formSubmit.bind(this)
         this.importFile = this.importFile.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        this.finishedStepOne = this.finishedStepOne.bind(this);
+        this.previousToStepOne = this.previousToStepOne.bind(this);
+        this.removeMessageText = this.removeMessageText.bind(this);
+        this.updateStepOneData = this.updateStepOneData.bind(this);
+        this.redirectToDashboard = this.redirectToDashboard.bind(this);
     }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
+    /**
+     * Redirects to the dashboard based on the user's role.
+     */
+    redirectToDashboard(color, msg) {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/'+color+'/' + msg)
     }
+    /**
+     * Updates the state with the provided key-value pair.
+     * @param {String} key The key of the state to be updated.
+     * @param {any} value The value to be assigned to the specified key in the state.
+     */
+    updateStepOneData(key, value) {
+        this.setState({
+            [key]: value
+        },
+            () => {
+            })
+    }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
+    finishedStepOne() {
+        this.setState({ progressPer: 100, loading: true });
+        document.getElementById('stepOneImport').style.display = 'none';
+        document.getElementById('stepTwoImport').style.display = 'block';
+        this.refs.stepTwoChild.filterData();
+    }
+    /**
+     * Updates the state of message to blank
+     */
+    removeMessageText() {
+        this.setState({ message: '' });
+    }
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
+    previousToStepOne() {
+        this.setState({ progressPer: 0, loading: true });
+        document.getElementById('stepOneImport').style.display = 'block';
+        document.getElementById('stepTwoImport').style.display = 'none';
+        this.refs.stepOneChild.filterData();
+    }
+    /**
+     * Retrieves programs from the indexedDB.
+     */
     getPrograms() {
         var db1;
         getDatabase();
@@ -97,6 +154,10 @@ export default class ImportProgram extends Component {
             }.bind(this);
         }.bind(this)
     }
+    /**
+     * Checks for newer versions of programs.
+     * @param {Array} programs - An array of programs to check for newer versions.
+     */
     checkNewerVersions(programs) {
         if (localStorage.getItem("sessionType") === 'Online') {
             ProgramService.checkNewerVersions(programs)
@@ -106,15 +167,20 @@ export default class ImportProgram extends Component {
                 })
         }
     }
+    /**
+     * Calls the get programs function on component mount
+     */
     componentDidMount() {
         this.getPrograms();
         bsCustomFileInput.init()
-        document.getElementById("programIdDiv").style.display = "none";
-        document.getElementById("formSubmitButton").style.display = "none";
-        document.getElementById("fileImportDiv").style.display = "block";
-        document.getElementById("fileImportButton").style.display = "block";
         this.setState({ loading: false })
+        hideSecondComponent();
+        document.getElementById('stepOneImport').style.display = 'block';
+        document.getElementById('stepTwoImport').style.display = 'none';
     }
+    /**
+     * Reads the data from the file and stores in indexed db
+     */
     formSubmit() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -491,6 +557,12 @@ export default class ImportProgram extends Component {
             }
         }
     }
+    /**
+     * Imports program data from a zip file.
+     * This function allows users to upload a zip file containing program data. It reads the contents
+     * of the zip file asynchronously, decrypts the program data, and displays the program information
+     * for further processing.
+     */
     importFile() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -522,7 +594,7 @@ export default class ImportProgram extends Component {
                                 catch (err) {
                                     this.setState({ message: i18n.t('static.program.zipfilereaderror'), loading: false },
                                         () => {
-                                            this.hideSecondComponent();
+                                            hideSecondComponent();
                                         })
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData.generalData, SECRET_KEY);
@@ -541,16 +613,15 @@ export default class ImportProgram extends Component {
                                     programListArray[i] = programDataJson;
                                     i++;
                                     if (i === size) {
+                                        this.updateStepOneData("loading", false);
                                         this.setState({
                                             message: "",
                                             programList: fileName,
                                             programListArray: programListArray,
                                             loading: false
+                                        }, () => {
+                                            this.finishedStepOne();
                                         })
-                                        document.getElementById("programIdDiv").style.display = "block";
-                                        document.getElementById("formSubmitButton").style.display = "block";
-                                        document.getElementById("fileImportDiv").style.display = "none";
-                                        document.getElementById("fileImportButton").style.display = "none";
                                     }
                                 }
                             }.bind(this))
@@ -563,83 +634,90 @@ export default class ImportProgram extends Component {
             }
         }
     }
-    
+    /**
+     * Updates program Ids
+     * @param {*} value Program Id selected by the user
+     */
     updateFieldData(value) {
-        this.setState({ programId: value });
+        this.updateStepOneData("programId", value);
     }
+    /**
+     * Renders the import program screen.
+     * @returns {JSX.Element} - Import Program screen.
+     */
     render() {
         return (
-            <>
+            <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
-                <AuthenticationServiceComponent history={this.props.history} />
-                <Card className="mt-2">
-                    <Formik
-                        initialValues={initialValues}
-                        render={
-                            ({
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                            }) => (
-                                <Form noValidate name='simpleForm'>
-                                    <CardBody className="pb-lg-2 pt-lg-2">
-                                        <FormGroup id="fileImportDiv">
-                                            <Col md="3">
-                                                <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
-                                            </Col>
-                                            <Col xs="12" md="4" className="custom-file">
-                                                <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
-                                            </Col>
-                                        </FormGroup>
-                                        <FormGroup id="programIdDiv" className="col-md-4">
-                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                            <Select
-                                                bsSize="sm"
-                                                valid={!errors.programId}
-                                                invalid={touched.programId && !!errors.programId}
-                                                onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                onBlur={handleBlur} name="programId" id="programId"
-                                                multi
-                                                options={this.state.programList}
-                                                value={this.state.programId}
-                                            />
-                                            <FormFeedback>{errors.programId}</FormFeedback>
-                                        </FormGroup>
-                                    </CardBody>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}></div>
-                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-                                                <div class="spinner-border blue ml-4" role="status">
-                                                </div>
-                                            </div>
-                                        </div>
+                <Row>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardBody>
+                                <Row>
+                                    <Col sm={6} md={6}>
+                                        <ProgressBar
+                                            percent={this.state.progressPer}
+                                            filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                                            style={{ width: '75%' }}
+                                        >
+                                            <Step transition="scale">
+                                                {({ accomplished }) => (
+                                                    <img
+                                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                        width="30"
+                                                        src="../../../../public/assets/img/numbers/number1.png"
+                                                    />
+                                                )}
+                                            </Step>
+                                            <Step transition="scale">
+                                                {({ accomplished }) => (
+                                                    <img
+                                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                        width="30"
+                                                        src="../../../../public/assets/img/numbers/number2.png"
+                                                    />
+                                                )}
+                                            </Step>
+                                        </ProgressBar>
+                                    </Col>
+                                </Row>
+                                <div className="d-sm-down-none progressbar mr-4">
+                                    <ul>
+                                        <li className="progressbartext1Import">{i18n.t('static.chooseFile.chooseFile')}</li>
+                                        <li className="progressbartext4Import">{i18n.t('static.common.selectProgram')}</li>
+                                    </ul>
+                                </div>
+                                <br></br>
+                                <div>
+                                    <div id="stepOneImport">
+                                        <StepOneImport ref='stepOneChild' importFile={this.importFile} cancelClicked={this.cancelClicked} resetClicked={this.resetClicked} finishedStepOne={this.finishedStepOne} updateStepOneData={this.updateStepOneData} redirectToDashboard={this.redirectToDashboard} loading={this.state.loading} items={this.state}></StepOneImport>
                                     </div>
-                                    <CardFooter>
-                                        <FormGroup>
-                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                            <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                            &nbsp;
-                                        </FormGroup>
-                                    </CardFooter>
-                                </Form>
-                            )} />
-                </Card>
-            </>
+                                    <div id="stepTwoImport">
+                                        <StepTwoImport ref='stepTwoChild' formSubmit={this.formSubmit} updateFieldData={this.updateFieldData} cancelClicked={this.cancelClicked} resetClicked={this.resetClicked} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} redirectToDashboard={this.redirectToDashboard} loading={this.state.loading} items={this.state}></StepTwoImport>
+                                    </div>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
         )
     }
+    /**
+     * Redirects to the application dashboard screen when cancel button is clicked.
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.redirectToDashboard('red', i18n.t('static.message.cancelled', { entityname }));
     }
+    /**
+     * Resets the import details when reset button is clicked.
+     */
     resetClicked() {
         this.state.programId = '';
+        this.updateStepOneData("message", "");
         this.setState({ programId: '', message: '' });
     }
 }

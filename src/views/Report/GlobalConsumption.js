@@ -1,5 +1,4 @@
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import 'chartjs-plugin-annotation';
 import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
@@ -24,14 +23,13 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
-import ProgramService from '../../api/ProgramService';
-import RealmService from '../../api/RealmService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -112,6 +110,9 @@ const options = {
     }
   }
 }
+/**
+ * Component for Global Consumption Report.
+ */
 class GlobalConsumption extends Component {
   constructor(props) {
     super(props);
@@ -146,7 +147,6 @@ class GlobalConsumption extends Component {
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-    this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.handleChange = this.handleChange.bind(this)
@@ -155,16 +155,12 @@ class GlobalConsumption extends Component {
     this.handleDisplayChange = this.handleDisplayChange.bind(this)
     this.filterProgram = this.filterProgram.bind(this)
   }
-  makeText = m => {
-    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-    return '?'
-  }
-  addDoubleQuoteToRowContent = (arr) => {
-    return arr.map(ele => '"' + ele + '"')
-  }
+  /**
+   * Exports the data to a CSV file.
+   */
   exportCSV() {
     var csvRow = [];
-    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     this.state.countryLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
@@ -181,10 +177,10 @@ class GlobalConsumption extends Component {
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
-    var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
+    var A = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
     re = this.state.consumptions
     for (var item = 0; item < re.length; item++) {
-      A.push([this.addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), re[item].planningUnitQty])])
+      A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), re[item].planningUnitQty])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -193,25 +189,13 @@ class GlobalConsumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.globalconsumption') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.dashboard.globalconsumption') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
-  formatter = value => {
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-  }
-  roundN = num => {
-    return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-  }
+  /**
+   * Exports the data to a PDF file.
+   */
   exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -242,7 +226,7 @@ class GlobalConsumption extends Component {
         if (i == 1) {
           doc.setFont('helvetica', 'normal')
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
         }
@@ -307,7 +291,7 @@ class GlobalConsumption extends Component {
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, this.formatter(elt.planningUnitQty)]);
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty,0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -322,6 +306,10 @@ class GlobalConsumption extends Component {
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.globalconsumption').concat('.pdf'));
   }
+  /**
+   * Handles the change event for countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -333,6 +321,9 @@ class GlobalConsumption extends Component {
       this.filterProgram();
     })
   }
+  /**
+   * Filters programs based on selected countries.
+   */
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
     this.setState({
@@ -414,6 +405,10 @@ class GlobalConsumption extends Component {
       }
     })
   }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -425,6 +420,10 @@ class GlobalConsumption extends Component {
       this.getPlanningUnit();
     })
   }
+  /**
+   * Handles the change event for planning units.
+   * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+   */
   handlePlanningUnitChange(planningUnitIds) {
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -436,9 +435,15 @@ class GlobalConsumption extends Component {
       this.filterData(this.state.rangeValue)
     })
   }
+  /**
+   * Handles the change event for display options.
+   */
   handleDisplayChange() {
     this.filterData(this.state.rangeValue)
   }
+  /**
+   * Filters data based on selected parameters and updates component state accordingly.
+   */
   filterData(rangeValue) {
     setTimeout('', 10000);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -471,7 +476,7 @@ class GlobalConsumption extends Component {
               let json = {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
-                "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
+                "planningUnitQty": roundN2((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
@@ -533,6 +538,9 @@ class GlobalConsumption extends Component {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
     }
   }
+  /**
+   * Retrieves the list of countries based on the realm ID and updates the state with the list.
+   */
   getCountrys() {
     this.setState({ loading: true })
     if (localStorage.getItem("sessionType") === 'Online') {
@@ -640,6 +648,9 @@ class GlobalConsumption extends Component {
     }
     this.filterData(this.state.rangeValue);
   }
+  /**
+   * Retrieves the list of planning units for a selected programs.
+   */
   getPlanningUnit() {
     this.setState({ loading: true })
     let programValues = this.state.programValues.map(c => c.value);
@@ -707,49 +718,43 @@ class GlobalConsumption extends Component {
       }
     })
   }
+  /**
+   * Calls the get countrys function on page load
+   */
   componentDidMount() {
     this.getCountrys();
   }
+  /**
+   * Toggles the value of the 'show' state variable.
+   */
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-  show() {
-  }
-  handleRangeChange(value, text, listIndex) {
-  }
+  /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value })
     this.filterData(value);
   }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
+  /**
+   * Displays a loading indicator while data is being loaded.
+   */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-  dateFormatterLanguage = value => {
-    if (moment(value).format('MM') === '01') {
-      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '02') {
-      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '03') {
-      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '04') {
-      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '05') {
-      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '06') {
-      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '07') {
-      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '08') {
-      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '09') {
-      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '10') {
-      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
-    } else if (moment(value).format('MM') === '11') {
-      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
-    } else {
-      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
-    }
-  }
+  /**
+   * Filters the options based on the provided filter string and sort the options.
+   * @param {Array} options - The array of options to filter.
+   * @param {string} filter - The filter string to apply.
+   * @returns {Array} - The filtered array of options.
+   */
   filterOptions = async (options, filter) => {
     if (filter) {
       return options.filter((i) =>
@@ -759,6 +764,10 @@ class GlobalConsumption extends Component {
       return options;
     }
   };
+  /**
+   * Renders the Global Consumption report table.
+   * @returns {JSX.Element} - Global Consumption report table.
+   */
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = [];
@@ -810,7 +819,7 @@ class GlobalConsumption extends Component {
       consumptionSummerydata.push(tempdata);
     }
     const bar = {
-      labels: [...new Set(this.state.consumptions.map(ele => (this.dateFormatterLanguage(ele.consumptionDateString1))))],
+      labels: [...new Set(this.state.consumptions.map(ele => (dateFormatterLanguage(ele.consumptionDateString1))))],
       datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
     };
     const pickerLang = {
@@ -849,7 +858,6 @@ class GlobalConsumption extends Component {
                           years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={rangeValue}
                           lang={pickerLang}
-                          onChange={this.handleRangeChange}
                           onDismiss={this.handleRangeDissmis}
                         >
                           <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -869,6 +877,8 @@ class GlobalConsumption extends Component {
                           options={countryList && countryList.length > 0 ? countryList : []}
                           filterOptions={this.filterOptions}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -888,6 +898,8 @@ class GlobalConsumption extends Component {
                         options={programList && programList.length > 0 ? programList : []}
                         filterOptions={this.filterOptions}
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -907,6 +919,8 @@ class GlobalConsumption extends Component {
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           filterOptions={this.filterOptions}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                       </div>
                     </FormGroup>
@@ -989,7 +1003,7 @@ class GlobalConsumption extends Component {
                                       {this.state.consumptions[idx].consumptionDateString}
                                     </td>
                                     <td >
-                                      {this.formatter(this.state.consumptions[idx].planningUnitQty)}
+                                      {formatter(this.state.consumptions[idx].planningUnitQty,0)}
                                     </td>
                                   </tr>)
                               }
