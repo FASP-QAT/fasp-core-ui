@@ -59,6 +59,7 @@ import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import PlanningUnitService from '../../api/PlanningUnitService';
+import { forEach } from 'mathjs';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -883,6 +884,8 @@ export default class BuildTree extends Component {
         this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
         this.validFieldData = this.validFieldData.bind(this);
         this.acceptValue1 = this.acceptValue1.bind(this);
+        this.shiftNode = this.shiftNode.bind(this);
+        this.updateReorderTable = this.updateReorderTable.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2099,7 +2102,9 @@ export default class BuildTree extends Component {
         var name = "";
         var unit = "";
         var levelNo = "";
+        var oldItems;
         if (data != "") {
+            oldItems = JSON.parse(JSON.stringify(this.state.curTreeObj.tree.flatList));
             var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
             var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
             levelNo = data.context.levels[0]
@@ -2107,6 +2112,17 @@ export default class BuildTree extends Component {
                 name = levelListFiltered[0].label.label_en;
                 unit = levelListFiltered[0].unit != null && levelListFiltered[0].unit.id != null ? levelListFiltered[0].unit.id : "";
             }
+            this.setState({ oldItems })
+        }
+        if (data == "") {
+            let { curTreeObj } = this.state;
+            var items = curTreeObj.tree.flatList;
+            items = JSON.parse(JSON.stringify(this.state.oldItems));
+            curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+            this.setState({
+                curTreeObj,
+                items
+            })
         }
         this.setState({
             levelModal: !this.state.levelModal,
@@ -2120,8 +2136,12 @@ export default class BuildTree extends Component {
             }, 0)  
         })
     }
+    /**
+     * Builds jexcel table for node reordering on same level
+     */
     buildLevelReorderJexcel() {
         var levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+        var flatList = this.state.curTreeObj.tree.flatList;
         var dataArray = [];
         let count = 0;
         var oldParent = 0;
@@ -2139,7 +2159,8 @@ export default class BuildTree extends Component {
                 oldParent = newParent;
                 data[0] = levelNodes[j].sortOrder;
                 data[1] = "Parent Node";
-                data[2] = parentNode[0].payload.label.label_en;
+                data[2] = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
+                data[3] = levelNodes[j].id;
                 dataArray[count] = data;
                 j--;
             } else {
@@ -2148,6 +2169,7 @@ export default class BuildTree extends Component {
                 data[0] = levelNodes[j].sortOrder;
                 data[1] = levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
+                data[3] = levelNodes[j].id;
                 dataArray[count] = data;
                 levelCount++;
             }
@@ -2178,8 +2200,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: "Node Position",
-                    type: 'dropdown',
-                    source: [{id: 0, name: "Parent Node"},{id: 1, name: 1},{id: 2, name: 2},{id: 3, name: 3},{id: 4, name: 4},{id: 5, name: 5}],
+                    type: 'text',
                     readOnly: false
                 },
                 {
@@ -2187,24 +2208,40 @@ export default class BuildTree extends Component {
                     type: 'text',
                     readOnly: true
                 },
+                {
+                    title: "Node Id",
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Action Up",
+                    type: 'text',
+                    readOnly: true,
+                    width: 50
+                },
+                {
+                    title: "Action Down",
+                    type: 'text',
+                    readOnly: true,
+                    width: 50
+                },
             ],
+            updateTable: this.updateReorderTable,
             editable: true,
             onload: this.loadedLevelReorder,
             pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
+            search: false,
+            columnSorting: false,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             // onchange: this.changed1,
-            updateTable: function (el, cell, x, y, source, value, id) {
-            }.bind(this),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            filters: true,
+            filters: false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return false;
@@ -2220,24 +2257,89 @@ export default class BuildTree extends Component {
             levelReorderEl: levelReorderEl
         });
     };
-    loadedLevelReorder = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table and add readonly class to cell
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedLevelReorder = function (instance, cell) {
         jExcelLoadedFunction(instance);
         var json = instance.worksheets[0].getJson(null, false);
         var colArr = ["A", "B", "C"]
         for (var j = 0; j < json.length; j++) {
-            if (json[j][1] == 0) {
-                for (var i = 0; i < colArr.length; i++) {
-                    var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
-                    cell.classList.add('readonly');
+            for (var i = 0; i < colArr.length; i++) {
+                var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
+                cell.classList.add('readonly');
+                if (json[j][1] == 'Parent Node') {
                     cell.classList.add('productValidationSubTotalClass');
                 }
             }
         }
     }
-    getDropdownSource = (rowIndex) => {
-        const { dropdownSources } = this.state;
-        return dropdownSources[rowIndex] || [];
-      };
+    /**
+     * Update the reorder jexcel to add button to shift node up or down
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} col The column object if applicable.
+     * @param {*} row The row object if applicable.
+     */
+    updateReorderTable(instance, cell, col, row) {
+        var rowData = instance.getRowData(row);
+        var rowDataPrev = instance.getRowData(row-1);
+        var rowDataNext = instance.getRowData(row+1);
+        var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
+        var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
+        if (col === 4 && rowData[1] != 'Parent Node' && showUpArrow) {
+            cell.innerHTML = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = '\u2191';
+            button.style.pointerEvents = 'auto';
+            button.onclick = (event) => {
+                event.stopPropagation();
+                var flatList = this.state.curTreeObj.tree.flatList;
+                var currNode = flatList.filter(f => f.id == rowData[3]);
+                var prevNode = flatList.filter(f => f.id == rowDataPrev[3]);
+                this.shiftNode(event, currNode, prevNode)
+            };
+            cell.appendChild(button);
+        }
+        if (col === 5 && rowData[1] != 'Parent Node' && showDownArrow) {
+            cell.innerHTML = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = '\u2193';
+            button.style.pointerEvents = 'auto';
+            button.onclick = (event) => {
+                event.stopPropagation();
+                var flatList = this.state.curTreeObj.tree.flatList;
+                var currNode = flatList.filter(f => f.id == rowData[3]);
+                var nextNode = flatList.filter(f => f.id == rowDataNext[3]);
+                this.shiftNode(event, currNode, nextNode)
+            };
+            cell.appendChild(button);
+        }
+    }
+    /**
+     * Function to shift node up or down by clicking on button
+     * @param {*} event The event object representing the button click event.
+     * @param {*} currNode Object of Current Node
+     * @param {*} prevNode Object of Previous Node
+     */
+    shiftNode(event, currNode, prevNode) {
+        event.stopPropagation();
+        let { curTreeObj } = this.state;
+        var items = curTreeObj.tree.flatList;
+        var currNodeIndex = items.findIndex(f => f.id == currNode[0].id);
+        var prevNodeIndex = items.findIndex(f => f.id == prevNode[0].id);
+        var temp = items[prevNodeIndex];
+        items[prevNodeIndex] = items[currNodeIndex];
+        items[currNodeIndex] = temp;
+        items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
+        items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
+        this.setState({ items })
+        this.buildLevelReorderJexcel();
+    }
     /**
      * Updates the component state with the new name for a level when the name input field is changed.
      * @param {Object} e The event object representing the input change event.
@@ -2265,6 +2367,21 @@ export default class BuildTree extends Component {
         var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
         var items = this.state.items;
+        items.forEach(function (e) {
+            e.oldSortOrder = e.sortOrder;
+        });
+        var shiftedNode = items.filter(e => e.newSortOrder);
+        shiftedNode.forEach(val => {
+            items.forEach(item => {
+                if (item.oldSortOrder.includes(val.oldSortOrder)) {
+                    var itemSplit = item.sortOrder.split(val.oldSortOrder);
+                    if(itemSplit.length > 1)
+                        item.sortOrder = val.newSortOrder+itemSplit[1];
+                    else
+                        item.sortOrder = val.newSortOrder;
+                }
+            });
+        })
         if (levelListFiltered != -1) {
             if (this.state.levelName != "") {
                 treeLevelList[levelListFiltered].label = {
