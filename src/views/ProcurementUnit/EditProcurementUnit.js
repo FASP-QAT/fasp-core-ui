@@ -391,9 +391,14 @@ export default class EditProcurementUnit extends Component {
                                                         break;
                                                     case 500:
                                                     case 404:
-                                                    case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 406:
+                                                        this.setState({
+                                                            message: i18n.t('static.procurementAgentProcurementUnit.procurementUnitAlreadyExists'),
                                                             loading: false
                                                         });
                                                         break;

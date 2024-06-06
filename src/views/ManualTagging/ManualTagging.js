@@ -564,10 +564,12 @@ export default class ManualTagging extends Component {
      */
     getProductCategories() {
         let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
+        ProductService.getProductCategoryListForErpLinking(this.state.countryId)
             .then(response => {
                 this.setState({
-                    productCategories: response.data.splice(1)
+                    productCategories: response.data
+                },()=>{
+                    this.getPlanningUnitListByProductcategoryIds();
                 })
             }).catch(
                 error => {
@@ -1022,7 +1024,7 @@ export default class ManualTagging extends Component {
                 tempNotes: ''
             }, () => {
                 let realmId = AuthenticationService.getRealmId();
-                this.getProductCategories();
+                // this.getProductCategories();
                 this.getFundingSourceList();
                 RealmCountryService.getRealmCountryForProgram(realmId)
                     .then(response => {
@@ -1322,13 +1324,13 @@ export default class ManualTagging extends Component {
         let planningUnits1 = this.state.planningUnits1;
         localStorage.setItem("sesCountryId", event.target.value);
         this.setState({
+            loading:true,
             planningUnitValues: [],
             productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
-            this.getPlanningUnitListByRealmCountryId();
-            this.filterErpData();
+            this.getProductCategories();
         })
     }
     /**
@@ -2061,6 +2063,7 @@ export default class ManualTagging extends Component {
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     this.setState({
+                        comboBoxError: roNoOrderNo == 0 && erpPlanningUnitId == 0 ? true : false,
                         artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3 != "" ? c.roPrimeLineNo == this.state.roPrimeLineNoForTab3 : true)),
                         displayButton: false
                     }, () => {
@@ -2116,6 +2119,7 @@ export default class ManualTagging extends Component {
                 );
         } else {
             this.setState({
+                comboBoxError: roNoOrderNo == 0 && erpPlanningUnitId == 0 ? true : false,
                 artmisList: [],
                 displayButton: false
             }, () => {
@@ -2156,11 +2160,7 @@ export default class ManualTagging extends Component {
             planningUnitLabels: [],
             planningUnits1: []
         }, () => {
-            if (productCategoryIds.length > 0) {
-                this.getPlanningUnitListByProductcategoryIds();
-            } else {
-                this.getPlanningUnitListByRealmCountryId();
-            }
+            this.getPlanningUnitListByProductcategoryIds();
             this.filterErpData();
         })
     }
@@ -2168,10 +2168,12 @@ export default class ManualTagging extends Component {
      * Retrieves active planning units based on selected product category IDs.
      */
     getPlanningUnitListByProductcategoryIds = () => {
-        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.length>0?this.state.productCategoryValues.map(ele => (ele.value).toString()):this.state.productCategories.map(ele => (ele.productCategoryId).toString()),this.state.countryId)
             .then(response => {
                 this.setState({
                     planningUnits1: response.data
+                },()=>{
+                    this.filterErpData();
                 })
             }).catch(
                 error => {
@@ -2235,7 +2237,7 @@ export default class ManualTagging extends Component {
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? [] : this.state.productCategoryValues.map(ele => (ele.value).toString()))
             let planningUnitIdList = (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
-            var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.payload.productCategoryId.toString()));
+            var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.productCategoryId.toString()));
             var sortOrderList = [];
             productCategorySortOrder.map(ele => sortOrderList.push(ele.sortOrder))
             var json = {
@@ -4508,7 +4510,7 @@ export default class ManualTagging extends Component {
         }, this);
         const { productCategories } = this.state;
         let productCategoryMultList = productCategories.length > 0 && productCategories.map((item, i) => {
-            return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.productCategoryId })
         }, this);
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -5046,6 +5048,7 @@ export default class ManualTagging extends Component {
                                                             <div className="controls ">
                                                                 <Autocomplete
                                                                     id="combo-box-demo1"
+                                                                    className={this.state.comboBoxError && this.state.table1Loader ? 'errorBorder' : ''}
                                                                     options={this.state.tracercategoryPlanningUnit}
                                                                     getOptionLabel={(option) => option.label}
                                                                     style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
@@ -5071,6 +5074,7 @@ export default class ManualTagging extends Component {
                                                                         variant="outlined"
                                                                         onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
                                                                 />
+                                                                {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6 pl-0">
@@ -5079,6 +5083,7 @@ export default class ManualTagging extends Component {
                                                             >
                                                                 <Autocomplete
                                                                     id="combo-box-demo"
+                                                                    className={this.state.comboBoxError && this.state.table1Loader ? 'errorBorder' : ''}
                                                                     defaultValue={this.state.roNoOrderNo}
                                                                     options={this.state.autocompleteData}
                                                                     getOptionLabel={(option) => option.label}
@@ -5103,6 +5108,7 @@ export default class ManualTagging extends Component {
                                                                             this.searchErpOrderData(e.target.value)
                                                                         }} />}
                                                                 />
+                                                                {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
                                                     </div>

@@ -249,69 +249,71 @@ export default class AddPlanningUnit extends Component {
             "searchText": term,
             "language": language
         }
-        DropdownService.getAutocompleteForecastingUnit(autocompletejson)
-            .then(response => {
-                var forecastingUnitList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    var label = response.data[i].label.label_en + '|' + response.data[i].id;
-                    forecastingUnitList[i] = { value: response.data[i].id, label: label }
-                }
-                var listArray = forecastingUnitList;
-                listArray.sort((a, b) => {
-                    var itemLabelA = a.label.toUpperCase(); 
-                    var itemLabelB = b.label.toUpperCase(); 
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    autocompleteData: listArray,
-                });
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        }, () => {
-                            hideSecondComponent()
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
+        if(term.length > 2) {
+            DropdownService.getAutocompleteForecastingUnit(autocompletejson)
+                .then(response => {
+                    var forecastingUnitList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        var label = response.data[i].label.label_en + '|' + response.data[i].id;
+                        forecastingUnitList[i] = { value: response.data[i].id, label: label }
+                    }
+                    var listArray = forecastingUnitList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        autocompleteData: listArray,
+                    });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            }, () => {
+                                hideSecondComponent()
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        }
     }
     /**
      * Renders the planning unit details form.
@@ -331,7 +333,7 @@ export default class AddPlanningUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -377,9 +379,14 @@ export default class AddPlanningUnit extends Component {
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 406:
+                                                            this.setState({
+                                                                message: i18n.t('static.message.planningUnitAlreadyExists'),
                                                                 loading: false
                                                             });
                                                             break;
@@ -434,7 +441,7 @@ export default class AddPlanningUnit extends Component {
                                                                 });
                                                             }
                                                         }} 
-                                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.startTyping')} {...params} variant="outlined"
+                                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.typeAtleast3')} {...params} variant="outlined"
                                                             onChange={(e) => {
                                                                 this.getAutocompleteForecastingUnit(e.target.value)
                                                             }} />}

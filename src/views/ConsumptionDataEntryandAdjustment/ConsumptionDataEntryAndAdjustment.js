@@ -636,7 +636,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var jsonSemi = jsonDataSemiAvgFilter[0].data;
               var data = [];
               for (var i = 0; i < jsonSemi.length; i++) {
-                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
               }
               consumptionExtrapolationList.push(
                 {
@@ -664,7 +664,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             if (jsonDataMovingFilter.length > 0) {
               var jsonDataMoving = jsonDataMovingFilter[0].data;
               for (var i = 0; i < jsonDataMoving.length; i++) {
-                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
               }
               consumptionExtrapolationList.push(
                 {
@@ -693,7 +693,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             if (jsonDataLinearFilter.length > 0) {
               var jsonDataLinear = jsonDataLinearFilter[0].data;
               for (var i = 0; i < jsonDataLinear.length; i++) {
-                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
               }
               consumptionExtrapolationList.push(
                 {
@@ -722,7 +722,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             if (jsonDataTesFilter.length > 0) {
               var jsonDataTes = jsonDataTesFilter[0].data;
               for (var i = 0; i < jsonDataTes.length; i++) {
-                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
               }
               consumptionExtrapolationList.push(
                 {
@@ -755,7 +755,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             if (jsonDataArimaFilter.length > 0) {
               var jsonDataArima = jsonDataArimaFilter[0].data;
               for (var i = 0; i < jsonDataArima.length; i++) {
-                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
+                data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
               }
               consumptionExtrapolationList.push(
                 {
@@ -1198,7 +1198,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
               var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
               var json = {
-                amount: missingActualConsumption.toFixed(0),
+                amount: missingActualConsumption.toFixed(4),
                 planningUnit: {
                   id: consumptionUnit.planningUnit.id,
                   label: consumptionUnit.planningUnit.label
@@ -2654,7 +2654,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 </FormGroup>
                               </div>
                               <div className="row">
-                                <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
+                                <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable DataentryTable">
                                   <div id="tableDiv" className="leftAlignTable">
                                   </div>
                                 </div>
