@@ -3272,5 +3272,8 @@
     "static.priority.medium": "Médio",
     "static.priority.mediumDesc": "O usuário pode aguardar uma resolução sem causar interrupções substanciais (afeta uma função crítica para os negócios, mas existe uma solução alternativa).",
     "static.priority.low": "Baixo",
-    "static.priority.lowDesc": "O problema é perceptível, mas não é crítico para as operações diárias e seria bom resolvê-lo eventualmente. (Afeta uma função não crítica para os negócios)."
+    "static.priority.lowDesc": "O problema é perceptível, mas não é crítico para as operações diárias e seria bom resolvê-lo eventualmente. (Afeta uma função não crítica para os negócios).",
+    "static.unit.conversionMethod": "Método de conversão",
+    "static.alternateReportingUnit.multiply": "Multiplicar",
+    "static.alternateReportingUnit.divide": "Dividir"
 }

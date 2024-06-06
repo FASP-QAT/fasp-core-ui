@@ -663,7 +663,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 100, readOnly: true },
+                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00000', decimal: '.', width: 100, readOnly: true },
                                                     { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                     { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 150 },

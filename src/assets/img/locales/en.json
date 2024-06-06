@@ -3299,5 +3299,8 @@
     "static.shipmentTooltip.pricePerPU":"Provided based on the following order: program-specific PA PU price (user entered) -> realm-level PA PU price -> program-specific PU price (user entered)",
     "static.shipmentTooltip.puCost":"Order Qty (PU) * Price per PU",
     "static.shipmentTooltip.freightCost":"Calculated using the user-entered freight percentage in the Update Program Info screen",
-    "static.shipmentTooltip.total":"PU Cost + Freight Cost"
+    "static.shipmentTooltip.total":"PU Cost + Freight Cost",
+    "static.unit.conversionMethod": "Conversion Method",
+    "static.alternateReportingUnit.multiply": "Multiply",
+    "static.alternateReportingUnit.divide": "Divide"
 }

@@ -3272,5 +3272,8 @@
     "static.priority.medium": "Moyen",
     "static.priority.mediumDesc": "L'utilisateur peut attendre une résolution sans provoquer de perturbations substantielles (affecte une fonction critique pour l'entreprise, mais une solution de contournement existe).",
     "static.priority.low": "Faible",
-    "static.priority.lowDesc": "Le problème est visible mais n’est pas critique pour les opérations quotidiennes et il serait bon de le résoudre éventuellement. (Affecte une fonction non critique pour l'entreprise)."
+    "static.priority.lowDesc": "Le problème est visible mais n’est pas critique pour les opérations quotidiennes et il serait bon de le résoudre éventuellement. (Affecte une fonction non critique pour l'entreprise).",
+    "static.unit.conversionMethod": "Méthode de conversion",
+    "static.alternateReportingUnit.multiply": "Multiplier",
+    "static.alternateReportingUnit.divide": "Diviser"
 }

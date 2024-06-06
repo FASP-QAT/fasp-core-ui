@@ -3273,5 +3273,8 @@
     "static.priority.medium": "Medio",
     "static.priority.mediumDesc": "El usuario puede esperar una resolución sin causar una interrupción sustancial (afecta una función crítica para el negocio, pero existe una solución alternativa).",
     "static.priority.low": "Bajo",
-    "static.priority.lowDesc": "El problema es notable pero no crítico para las operaciones diarias y sería bueno solucionarlo eventualmente. (Afecta a una función no crítica para el negocio)."
+    "static.priority.lowDesc": "El problema es notable pero no crítico para las operaciones diarias y sería bueno solucionarlo eventualmente. (Afecta a una función no crítica para el negocio).",
+    "static.unit.conversionMethod": "Método de conversión",
+    "static.alternateReportingUnit.multiply": "Multiplicar",
+    "static.alternateReportingUnit.divide": "Dividir"
 }
