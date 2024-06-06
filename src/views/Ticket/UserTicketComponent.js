@@ -397,9 +397,7 @@ export default class UserTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        // let priority  = this.state.priority;
-        // let priority = event.target.value;
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { user } = this.state;
         user.priority = newState;
         this.setState(
@@ -407,7 +405,7 @@ export default class UserTicketComponent extends Component {
                 user
             }, () => {
 
-                console.log('priority - state : '+this.state.user.priority);
+                // console.log('priority - state : '+this.state.user.priority);
             }
         );
     }

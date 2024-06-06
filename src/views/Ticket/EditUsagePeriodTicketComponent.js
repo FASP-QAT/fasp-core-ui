@@ -152,15 +152,14 @@ export default class EditTracerCategoryTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { usagePeriod } = this.state;
         usagePeriod.priority = newState;
         this.setState(
             {
                 usagePeriod
             }, () => {
-
-                console.log('priority - state : '+this.state.usagePeriod.priority);
+                // console.log('priority - state : '+this.state.usagePeriod.priority);
             }
         );
     }

@@ -162,15 +162,14 @@ export default class EditTreeTemplateTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { treeTemplate } = this.state;
         treeTemplate.priority = newState;
         this.setState(
             {
                 treeTemplate
             }, () => {
-
-                console.log('priority - state : '+this.state.treeTemplate.priority);
+                // console.log('priority - state : '+this.state.treeTemplate.priority);
             }
         );
     }

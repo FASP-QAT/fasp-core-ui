@@ -214,15 +214,14 @@ export default class ProcurementAgentTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { procurementAgent } = this.state;
         procurementAgent.priority = newState;
         this.setState(
             {
                 procurementAgent
             }, () => {
-
-                console.log('priority - state : '+this.state.procurementAgent.priority);
+                // console.log('priority - state : '+this.state.procurementAgent.priority);
             }
         );
     }

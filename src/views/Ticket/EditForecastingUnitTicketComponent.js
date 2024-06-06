@@ -280,15 +280,14 @@ export default class EditForecastingUnitTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { forecastingUnit } = this.state;
         forecastingUnit.priority = newState;
         this.setState(
             {
                 forecastingUnit
             }, () => {
-
-                console.log('priority - state : '+this.state.forecastingUnit.priority);
+                // console.log('priority - state : '+this.state.forecastingUnit.priority);
             }
         );
     }

@@ -302,17 +302,14 @@ export default class DataSourceTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        // let priority  = this.state.priority;
-        // let priority = event.target.value;
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { dataSource } = this.state;
         dataSource.priority = newState;
         this.setState(
             {
                 dataSource
             }, () => {
-
-                console.log('priority - state : '+this.state.dataSource.priority);
+                // console.log('priority - state : '+this.state.dataSource.priority);
             }
         );
     }

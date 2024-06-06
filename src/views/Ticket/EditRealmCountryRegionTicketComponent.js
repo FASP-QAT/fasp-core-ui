@@ -162,15 +162,14 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { realmCountryRegion } = this.state;
         realmCountryRegion.priority = newState;
         this.setState(
             {
                 realmCountryRegion
             }, () => {
-
-                console.log('priority - state : '+this.state.realmCountryRegion.priority);
+                // console.log('priority - state : '+this.state.realmCountryRegion.priority);
             }
         );
     }

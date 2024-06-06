@@ -167,15 +167,14 @@ export default class EditOrganisationTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { organisation } = this.state;
         organisation.priority = newState;
         this.setState(
             {
                 organisation
             }, () => {
-
-                console.log('priority - state : '+this.state.organisation.priority);
+                // console.log('priority - state : '+this.state.organisation.priority);
             }
         );
     }

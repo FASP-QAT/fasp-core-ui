@@ -246,15 +246,14 @@ export default class EditPlanningUnitTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { planningUnit } = this.state;
         planningUnit.priority = newState;
         this.setState(
             {
                 planningUnit
             }, () => {
-
-                console.log('priority - state : '+this.state.planningUnit.priority);
+                // console.log('priority - state : '+this.state.planningUnit.priority);
             }
         );
     }

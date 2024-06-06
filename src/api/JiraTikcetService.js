@@ -8,9 +8,28 @@ class JiraTicketService {
         var issuetype = new Object();
         var reporter = new Object();
         var assignee = new Object();
+        var priority = new Object();
         project.key = `${JIRA_PROJECT_KEY}`;
         issuetype.name = `${JIRA_PROJECT_ISSUE_TYPE_BUG_REPORT}`;
         assignee.id = `${ASSIGNEE_ID_FOR_BUG_ISSUE}`;
+        //To set Ticket priority
+        if(json.priority == 1) {
+            json.priority = 'Highest';//Replacing no. with actual priority string
+            priority.name = 'Highest';
+        } else if(json.priority == 2) {
+            json.priority = 'High';
+            priority.name = 'High';
+        } else if(json.priority == 3) {
+            json.priority = 'Medium';
+            priority.name = 'Medium';
+        } else if(json.priority == 4) {
+            json.priority = 'Low';
+            priority.name = 'Low';
+        } else {
+            json.priority = 'Lowest';
+            priority.name = 'Lowest';
+        }
+
         if ((`${API_URL}`).includes('uat-api.')) {
             fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
@@ -23,6 +42,7 @@ class JiraTicketService {
         fields.issuetype = issuetype;
         fields.reporter = reporter;
         fields.assignee = assignee;
+        fields.priority = priority;
         mainObject.fields = fields;
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
@@ -31,12 +51,32 @@ class JiraTicketService {
         var mainObject = new Object();
         var fields = new Object();
         var project = new Object();
-        var issuetype = new Object();
+        var issuetype = new Object();var priority = new Object();
         var reporter = new Object();
         var assignee = new Object();
+        var priority = new Object();
         project.key = `${JIRA_PROJECT_KEY}`;
         issuetype.name = `${JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA}`;
         assignee.id = `${ASSIGNEE_ID_FOR_NON_BUG_ISSUE}`;
+
+        //To set Ticket priority
+        if(json.priority == 1) {
+            json.priority = 'Highest';//Replacing no. with actual priority string
+            priority.name = 'Highest';
+        } else if(json.priority == 2) {
+            json.priority = 'High';
+            priority.name = 'High';
+        } else if(json.priority == 3) {
+            json.priority = 'Medium';
+            priority.name = 'Medium';
+        } else if(json.priority == 4) {
+            json.priority = 'Low';
+            priority.name = 'Low';
+        } else {
+            json.priority = 'Lowest';
+            priority.name = 'Lowest';
+        }
+
         if ((`${API_URL}`).includes('uat-api.')) {
             fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
@@ -49,6 +89,7 @@ class JiraTicketService {
         fields.issuetype = issuetype;
         fields.reporter = reporter;
         fields.assignee = assignee;
+        fields.priority = priority;
         mainObject.fields = fields;
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
@@ -60,9 +101,29 @@ class JiraTicketService {
         var issuetype = new Object();
         var reporter = new Object();
         var assignee = new Object();
+        var priority = new Object();
         project.key = `${JIRA_PROJECT_KEY}`;
         issuetype.name = `${JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_USER}`;
         assignee.id = `${ASSIGNEE_ID_FOR_NON_BUG_ISSUE}`;
+
+        //To set Ticket priority
+        if(json.priority == 1) {
+            json.priority = 'Highest';//Replacing no. with actual priority string
+            priority.name = 'Highest';
+        } else if(json.priority == 2) {
+            json.priority = 'High';
+            priority.name = 'High';
+        } else if(json.priority == 3) {
+            json.priority = 'Medium';
+            priority.name = 'Medium';
+        } else if(json.priority == 4) {
+            json.priority = 'Low';
+            priority.name = 'Low';
+        } else {
+            json.priority = 'Lowest';
+            priority.name = 'Lowest';
+        }
+
         if ((`${API_URL}`).includes('uat-api.')) {
             fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
@@ -71,12 +132,12 @@ class JiraTicketService {
             fields.summary = json.summary;
         }
         fields.description = this.getDataInFormat(json);
-        console.log('user josn: '+ fields.description);
         fields.project = project;
         fields.issuetype = issuetype;
         fields.reporter = reporter;
         fields.customfield_10063 = json.realm;
         fields.assignee = assignee;
+        fields.priority = priority;
         mainObject.fields = fields;
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
@@ -96,9 +157,29 @@ class JiraTicketService {
         var issuetype = new Object();
         var reporter = new Object();
         var assignee = new Object();
+        var priority = new Object();
         project.key = `${JIRA_PROJECT_KEY}`;
         issuetype.name = `${JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST}`;
         assignee.id = `${ASSIGNEE_ID_FOR_CHANGE_REQUEST}`;
+
+        //To set Ticket priority
+        if(json.priority == 1) {
+            json.priority = 'Highest';//Replacing no. with actual priority string
+            priority.name = 'Highest';
+        } else if(json.priority == 2) {
+            json.priority = 'High';
+            priority.name = 'High';
+        } else if(json.priority == 3) {
+            json.priority = 'Medium';
+            priority.name = 'Medium';
+        } else if(json.priority == 4) {
+            json.priority = 'Low';
+            priority.name = 'Low';
+        } else {
+            json.priority = 'Lowest';
+            priority.name = 'Lowest';
+        }
+
         if ((`${API_URL}`).includes('uat-api.')) {
             fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
@@ -111,6 +192,7 @@ class JiraTicketService {
         fields.issuetype = issuetype;
         fields.reporter = reporter;
         fields.assignee = assignee;
+        fields.priority = priority;
         mainObject.fields = fields;
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );

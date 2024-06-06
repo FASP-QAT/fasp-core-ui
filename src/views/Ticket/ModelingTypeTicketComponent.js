@@ -107,15 +107,14 @@ export default class OrganisationTypeTicketComponent extends Component {
      * @param {*} newState - This the selected priority
      */
     updatePriority(newState){
-        console.log('priority - : '+newState);
+        // console.log('priority - : '+newState);
         let { modelingType } = this.state;
         modelingType.priority = newState;
         this.setState(
             {
                 modelingType
             }, () => {
-
-                console.log('priority - state : '+this.state.modelingType.priority);
+                // console.log('priority - state : '+this.state.modelingType.priority);
             }
         );
     }
