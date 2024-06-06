@@ -2757,11 +2757,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 {/* Error */ }
                                                                 var regionErrorTotal = 0;
                                                                 var regionErrorTotalCount = 0;
-                                                                return (<><tr className="hoverTd">
+                                                                return (<><tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(r.value)}>
                                                                         {this.state.consumptionUnitShowArr.includes(r.value) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                     </td>
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{"   " + r.label + " Error"}</b></td>
+                                                                    <td className="sticky-col first-col clone" align="left"><b>{"   " + r.label + " Error"}</b></td>
                                                                     {this.state.monthArray.map((item1, count) => {
                                                                         let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
                                                                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
@@ -2769,7 +2769,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         regionErrorTotalCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
                                                                         return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : PercentageFormatter(errorDataRegionData[0].errorPerc * 100)) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                     })}
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{regionErrorTotalCount > 0 ? PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100) : 0}</b></td>
+                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100) : 0}</b></td>
                                                                 </tr>
                                                                     {/* actual */}
                                                                     {this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
@@ -2844,19 +2844,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 </>)
                                                             })}
                                                             {/* Error */}
-                                                            <tr className="hoverTd">
+                                                            <tr>
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Total Error</b></td>
+                                                                <td className="sticky-col first-col clone" align="left"><b>Total Error</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : data[0].errorPerc;
                                                                     countError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : 1;
                                                                     return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : PercentageFormatter(data[0].errorPerc * 100) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{countError > 0 ? PercentageFormatter((totalError / countError) * 100) : 0}</b></td>
+                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? PercentageFormatter((totalError / countError) * 100) : 0}</b></td>
                                                             </tr>
                                                             {/* Actual */}
-                                                            <tr className="hoverTd">
+                                                            <tr>
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                 <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{this.state.consumptionAdjForStockOutId ? "Adjusted Actual" : "Actual"}</td>
                                                                 {this.state.monthArray.map((item1, count) => {
@@ -2865,10 +2865,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     countActual += (isNaN(data[0].actualQty) || data[0].actualQty === '' || data[0].actualQty == null) ? 0 : 1;
                                                                     return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].actualQty) || data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number(data[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{countActual > 0 ? (Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                <td className="sticky-col first-col clone" align="left">{countActual > 0 ? (Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                             </tr>
                                                             {/* Forecast */}
-                                                            <tr className="hoverTd">
+                                                            <tr>
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                 <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>Forecast</td>
                                                                 {this.state.monthArray.map((item1, count) => {
@@ -2877,10 +2877,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     countForcaste += (isNaN(data[0].forecastQty) || data[0].forecastQty === '' || data[0].forecastQty == null) ? 0 : 1;
                                                                     return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].forecastQty) || data[0].forecastQty === '' || data[0].forecastQty == null) ? '' : (Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{countForcaste > 0 ? (Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                <td className="sticky-col first-col clone" align="left">{countForcaste > 0 ? (Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                             </tr>
                                                             {/* Difference */}
-                                                            <tr className="hoverTd">
+                                                            <tr>
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                 <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>Difference</td>
                                                                 {this.state.monthArray.map((item1, count) => {
