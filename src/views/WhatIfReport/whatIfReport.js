@@ -4689,7 +4689,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
                                                         <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
                                                         <option value="7">{i18n.t('static.scenarioPlanning.replanSupplyPlan')}</option>
-                                                        <option value="8">{i18n.t('static.scenarioPlanning.changeAMC')}</option>
+                                                        {/* <option value="8">{i18n.t('static.scenarioPlanning.changeAMC')}</option> */}
                                                     </Input>
                                                     <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                 </FormGroup>
