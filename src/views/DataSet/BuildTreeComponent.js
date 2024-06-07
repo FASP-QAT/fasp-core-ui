@@ -836,7 +836,6 @@ export default class BuildTree extends Component {
         this.showMomData = this.showMomData.bind(this);
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
-        this.buildLevelReorderJexcel = this.buildLevelReorderJexcel.bind(this);
         this.openScenarioModal = this.openScenarioModal.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
@@ -884,8 +883,10 @@ export default class BuildTree extends Component {
         this.resetModelingCalculatorData = this.resetModelingCalculatorData.bind(this);
         this.validFieldData = this.validFieldData.bind(this);
         this.acceptValue1 = this.acceptValue1.bind(this);
+        this.buildLevelReorderJexcel = this.buildLevelReorderJexcel.bind(this);
         this.shiftNode = this.shiftNode.bind(this);
         this.updateReorderTable = this.updateReorderTable.bind(this);
+        this.resetLevelReorder = this.resetLevelReorder.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2134,6 +2135,21 @@ export default class BuildTree extends Component {
             setTimeout(() => {
                 this.buildLevelReorderJexcel();
             }, 0)  
+        })
+    }
+    /**
+     * Resets the reorder level
+     */
+    resetLevelReorder() {
+        let { curTreeObj } = this.state;
+        var items = curTreeObj.tree.flatList;
+        items = JSON.parse(JSON.stringify(this.state.oldItems));
+        curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+        this.setState({
+            curTreeObj,
+            items
+        }, () => {
+            this.buildLevelReorderJexcel();
         })
     }
     /**
@@ -13028,6 +13044,7 @@ export default class BuildTree extends Component {
                                     <div className="mr-0">
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetLevelReorder()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>

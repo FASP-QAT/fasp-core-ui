@@ -749,7 +749,11 @@ export default class CreateTreeTemplate extends Component {
             beforeEndDateDisplay: '',
             modelingChangedOrAdded: false,
             currentNodeTypeId: "",
-            deleteChildNodes: false
+            deleteChildNodes: false,
+            levelReorderJexcelLoader: false,
+            levelReorderEl: "",
+            showReorderJexcel: false,
+            dropdownSources: {}
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -868,6 +872,10 @@ export default class CreateTreeTemplate extends Component {
         this.validFieldData = this.validFieldData.bind(this);
         this.changeModelingCalculatorJexcel = this.changeModelingCalculatorJexcel.bind(this);
         this.acceptValue1 = this.acceptValue1.bind(this);
+        this.buildLevelReorderJexcel = this.buildLevelReorderJexcel.bind(this);
+        this.shiftNode = this.shiftNode.bind(this);
+        this.updateReorderTable = this.updateReorderTable.bind(this);
+        this.resetLevelReorder = this.resetLevelReorder.bind(this);
     }
     /**
        * Hides the message in div3 after 30 seconds.
@@ -1935,7 +1943,9 @@ export default class CreateTreeTemplate extends Component {
         var name = "";
         var unit = "";
         var levelNo = "";
+        var oldItems;
         if (data != "") {
+            oldItems = JSON.parse(JSON.stringify(this.state.treeTemplate.flatList));
             var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
             var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
             levelNo = data.context.levels[0]
@@ -1943,13 +1953,248 @@ export default class CreateTreeTemplate extends Component {
                 name = levelListFiltered[0].label.label_en;
                 unit = levelListFiltered[0].unit != null && levelListFiltered[0].unit.id != null ? levelListFiltered[0].unit.id : "";
             }
+            this.setState({ oldItems })
+        }
+        if (data == "") {
+            let { treeTemplate } = this.state;
+            var items = treeTemplate.flatList;
+            items = JSON.parse(JSON.stringify(this.state.oldItems));
+            treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+            this.setState({
+                treeTemplate,
+                items
+            })
         }
         this.setState({
             levelModal: !this.state.levelModal,
             levelName: name,
             levelNo: levelNo,
-            levelUnit: unit
+            levelUnit: unit,
+            showReorderJexcel: true
+        }, () => {
+            setTimeout(() => {
+                this.buildLevelReorderJexcel();
+            }, 0)  
         })
+    }
+    /**
+     * Resets the reorder level
+     */
+    resetLevelReorder() {
+        let { treeTemplate } = this.state;
+        var items = treeTemplate.flatList;
+        items = JSON.parse(JSON.stringify(this.state.oldItems));
+        treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+        this.setState({
+            treeTemplate,
+            items
+        }, () => {
+            this.buildLevelReorderJexcel();
+        })
+    }
+    /**
+     * Builds jexcel table for node reordering on same level
+     */
+    buildLevelReorderJexcel() {
+        var levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
+        var flatList = this.state.treeTemplate.flatList;
+        var dataArray = [];
+        let count = 0;
+        var oldParent = 0;
+        var newParent = 0;
+        var levelCount = 1;
+        var dropdownSources = this.state.dropdownSources;
+        for (var j = 0; j < levelNodes.length; j++) {
+            data = [];
+            newParent = levelNodes[j].parent;
+            if(oldParent != newParent){
+                dropdownSources[count] = [];
+                dropdownSources[count].push({id: 0, name: "Parent Node"});
+                var parentNode = this.state.treeTemplate.flatList.filter(m => m.id == levelNodes[j].parent);
+                levelCount = 1;
+                oldParent = newParent;
+                data[0] = levelNodes[j].sortOrder;
+                data[1] = "Parent Node";
+                data[2] = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
+                data[3] = levelNodes[j].id;
+                dataArray[count] = data;
+                j--;
+            } else {
+                dropdownSources[count] = [];
+                dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
+                data[0] = levelNodes[j].sortOrder;
+                data[1] = levelCount.toString();
+                data[2] = levelNodes[j].payload.label.label_en;
+                data[3] = levelNodes[j].id;
+                dataArray[count] = data;
+                levelCount++;
+            }
+            count++;
+        }
+        this.setState({
+            dropdownSources
+        })
+        if (document.getElementById("levelReorderJexcel") != null) {
+            this.el = jexcel(document.getElementById("levelReorderJexcel"), '');
+        } else {
+            this.el = "";
+        }
+        if (document.getElementById("levelReorderJexcel") != null) {
+            jexcel.destroy(document.getElementById("levelReorderJexcel"), true);
+        }
+        var data = dataArray;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [50, 20, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.tree.monthStartNoSeasonality'),
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Node Position",
+                    type: 'text',
+                    readOnly: false
+                },
+                {
+                    title: "Node Name",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Node Id",
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Action Up",
+                    type: 'text',
+                    readOnly: true,
+                    width: 50
+                },
+                {
+                    title: "Action Down",
+                    type: 'text',
+                    readOnly: true,
+                    width: 50
+                },
+            ],
+            updateTable: this.updateReorderTable,
+            editable: true,
+            onload: this.loadedLevelReorder,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: false,
+            columnSorting: false,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onchange: this.changed1,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: false,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        if (document.getElementById("levelReorderJexcel") != null) {
+            var levelReorderEl = jexcel(document.getElementById("levelReorderJexcel"), options);
+            this.el = levelReorderEl;
+        } else {
+            var levelReorderEl = "";
+        }
+        this.setState({
+            levelReorderEl: levelReorderEl
+        });
+    };
+    /**
+     * This function is used to format the table and add readonly class to cell
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedLevelReorder = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+        var json = instance.worksheets[0].getJson(null, false);
+        var colArr = ["A", "B", "C"]
+        for (var j = 0; j < json.length; j++) {
+            for (var i = 0; i < colArr.length; i++) {
+                var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
+                cell.classList.add('readonly');
+                if (json[j][1] == 'Parent Node') {
+                    cell.classList.add('productValidationSubTotalClass');
+                }
+            }
+        }
+    }
+    /**
+     * Update the reorder jexcel to add button to shift node up or down
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} col The column object if applicable.
+     * @param {*} row The row object if applicable.
+     */
+    updateReorderTable(instance, cell, col, row) {
+        var rowData = instance.getRowData(row);
+        var rowDataPrev = instance.getRowData(row-1);
+        var rowDataNext = instance.getRowData(row+1);
+        var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
+        var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
+        if (col === 4 && rowData[1] != 'Parent Node' && showUpArrow) {
+            cell.innerHTML = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = '\u2191';
+            button.style.pointerEvents = 'auto';
+            button.onclick = (event) => {
+                event.stopPropagation();
+                var flatList = this.state.treeTemplate.flatList;
+                var currNode = flatList.filter(f => f.id == rowData[3]);
+                var prevNode = flatList.filter(f => f.id == rowDataPrev[3]);
+                this.shiftNode(event, currNode, prevNode)
+            };
+            cell.appendChild(button);
+        }
+        if (col === 5 && rowData[1] != 'Parent Node' && showDownArrow) {
+            cell.innerHTML = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = '\u2193';
+            button.style.pointerEvents = 'auto';
+            button.onclick = (event) => {
+                event.stopPropagation();
+                var flatList = this.state.treeTemplate.flatList;
+                var currNode = flatList.filter(f => f.id == rowData[3]);
+                var nextNode = flatList.filter(f => f.id == rowDataNext[3]);
+                this.shiftNode(event, currNode, nextNode)
+            };
+            cell.appendChild(button);
+        }
+    }
+    /**
+     * Function to shift node up or down by clicking on button
+     * @param {*} event The event object representing the button click event.
+     * @param {*} currNode Object of Current Node
+     * @param {*} prevNode Object of Previous Node
+     */
+    shiftNode(event, currNode, prevNode) {
+        event.stopPropagation();
+        let { treeTemplate } = this.state;
+        var items = treeTemplate.flatList;
+        var currNodeIndex = items.findIndex(f => f.id == currNode[0].id);
+        var prevNodeIndex = items.findIndex(f => f.id == prevNode[0].id);
+        var temp = items[prevNodeIndex];
+        items[prevNodeIndex] = items[currNodeIndex];
+        items[currNodeIndex] = temp;
+        items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
+        items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
+        this.setState({ items })
+        this.buildLevelReorderJexcel();
     }
     /**
      * Updates the component state with the new name for a level when the name input field is changed.
@@ -1978,6 +2223,21 @@ export default class CreateTreeTemplate extends Component {
         var treeLevelList = treeTemplate.levelList != undefined ? treeTemplate.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
         var items = this.state.items;
+        items.forEach(function (e) {
+            e.oldSortOrder = e.sortOrder;
+        });
+        var shiftedNode = items.filter(e => e.newSortOrder);
+        shiftedNode.forEach(val => {
+            items.forEach(item => {
+                if (item.oldSortOrder.includes(val.oldSortOrder)) {
+                    var itemSplit = item.sortOrder.split(val.oldSortOrder);
+                    if(itemSplit.length > 1)
+                        item.sortOrder = val.newSortOrder+itemSplit[1];
+                    else
+                        item.sortOrder = val.newSortOrder;
+                }
+            });
+        })
         if (levelListFiltered != -1) {
             if (this.state.levelName != "") {
                 treeLevelList[levelListFiltered].label = {
@@ -12093,11 +12353,20 @@ export default class CreateTreeTemplate extends Component {
                                                 }, this)}
                                         </Input>
                                     </FormGroup>
+                                    <FormGroup>
+                                    {this.state.showReorderJexcel &&
+                                        <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                            <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            </div>
+                                        </div>
+                                    }
+                                    </FormGroup>
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetLevelReorder()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>
